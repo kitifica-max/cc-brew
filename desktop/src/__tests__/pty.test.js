@@ -1,4 +1,4 @@
-import { describe, it, mock, beforeEach } from 'node:test';
+import { describe, it, test, mock, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import PtyManager from '../pty.js';
 
@@ -49,4 +49,16 @@ describe('PtyManager', () => {
     mgr.kill();
     assert.equal(mgr.running, false);
   });
+});
+
+test('write builds correct args for model and effort', () => {
+  const pty = new PtyManager();
+  pty.spawn('echo', [], '/tmp');
+  pty._busy = true;
+  pty.write('hello', true, 'claude-opus-5', 'high');
+  const queued = pty._queue[0];
+  assert.equal(queued.model, 'claude-opus-5');
+  assert.equal(queued.effort, 'high');
+  assert.equal(queued.continueConv, true);
+  pty.kill();
 });

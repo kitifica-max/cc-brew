@@ -17,21 +17,24 @@ export default class PtyManager {
     this.onMessage?.('system', 'Sesión iniciada');
   }
 
-  write(text, continueConv = true) {
+  write(text, continueConv = true, model = 'claude-sonnet-4-6', effort = 'medium') {
     if (text === '\x03') return;
     const msg = text.replace(/\n+$/, '').trim();
     if (!msg) return;
-    this._queue.push({ msg, continueConv });
+    this._queue.push({ msg, continueConv, model, effort });
     this._flush();
   }
 
   _flush() {
     if (this._busy || !this._queue.length) return;
     this._busy = true;
-    const { msg, continueConv } = this._queue.shift();
+    const { msg, continueConv, model, effort } = this._queue.shift();
     const chunks = [];
 
-    const args = continueConv ? ['--print', '--continue'] : ['--print'];
+    const args = ['--print'];
+    if (continueConv) args.push('--continue');
+    args.push('--model', model, '--effort', effort);
+
     const proc = spawn(this._command, args, {
       stdio: ['pipe', 'pipe', 'pipe'],
       cwd: this._cwd,
