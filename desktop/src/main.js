@@ -35,7 +35,7 @@ function buildMenu(status) {
   const items = [{ label: 'CC Controller', enabled: false }, { label: `Estado: ${status}`, enabled: false }];
 
   if (status === 'running') {
-    items.push(
+    items.push(...[
       { label: `Uptime: ${getUptime()}`, enabled: false },
       { label: active ? `Proyecto: ${active.name}` : `Sesion: ${process.env.SESSION_ID}`, enabled: false },
       active ? { label: active.path, enabled: false } : null,
@@ -44,7 +44,7 @@ function buildMenu(status) {
       { type: 'separator' },
       { label: 'Detener', click: stopSession },
       { label: 'Reiniciar', click: () => { stopSession(); startSession(); } },
-    ).filter(Boolean);
+    ].filter(Boolean));
   } else {
     items.push({ type: 'separator' }, { label: 'Iniciar', click: startSession });
   }
