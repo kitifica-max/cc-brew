@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, resolve } from 'path';
+import { EOL } from 'os';
 import { homedir } from 'os';
 
 function getHome() {
@@ -75,4 +76,27 @@ export function deleteProject(id) {
   data.projects = data.projects.filter(p => p.id !== id);
   if (data.activeId === id) data.activeId = data.projects[0]?.id ?? null;
   save(data);
+}
+
+export function saveProjectEnv(id, envObject) {
+  const data = load();
+  const project = data.projects.find(p => p.id === id);
+  if (!project) throw new Error(`Project not found: ${id}`);
+
+  const PROJECTS_BASE = getProjectsBase();
+  if (!project.path.startsWith(PROJECTS_BASE + '/') && project.path !== PROJECTS_BASE) {
+    throw new Error('Invalid project path');
+  }
+
+  let envContent = '';
+  for (const [key, value] of Object.entries(envObject)) {
+    if (!key || value === undefined || value === null) continue;
+    const safeKey = key.replace(/[^a-zA-Z0-9_]/g, '');
+    if (!safeKey) continue;
+    const safeValue = String(value).replace(/"/g, '\\"');
+    envContent += `${safeKey}="${safeValue}"${EOL}`;
+  }
+
+  const envPath = join(project.path, '.env');
+  writeFileSync(envPath, envContent, { mode: 0o600 });
 }

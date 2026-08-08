@@ -1,6 +1,6 @@
 import { strict as assert } from 'node:assert';
 import { test } from 'node:test';
-import { mkdirSync, rmSync, existsSync } from 'node:fs';
+import { mkdirSync, rmSync, existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
@@ -11,7 +11,7 @@ mkdirSync(join(TEST_HOME, '.config', 'cc-controller'), { recursive: true });
 mkdirSync(join(TEST_HOME, 'CCProjects'), { recursive: true });
 
 // Import AFTER setting HOME
-const { createProject, listProjects, getActive, switchProject, deleteProject } = await import('../projects.js');
+const { createProject, listProjects, getActive, switchProject, deleteProject, saveProjectEnv } = await import('../projects.js');
 
 test('createProject creates directory and returns project', () => {
   const p = createProject('test-1', 'My App');
@@ -48,6 +48,28 @@ test('switchProject rejects unknown id', () => {
 test('deleteProject removes from list', () => {
   deleteProject('test-4');
   assert.ok(!listProjects().find(p => p.id === 'test-4'));
+});
+
+test('saveProjectEnv creates .env with correct key-value pairs', () => {
+  const p = createProject('test-env-1', 'Env App');
+  saveProjectEnv('test-env-1', { GITHUB_TOKEN: 'ghp_12345', NETLIFY_AUTH_TOKEN: 'net_678' });
+  const envPath = join(p.path, '.env');
+  assert.ok(existsSync(envPath));
+  const content = readFileSync(envPath, 'utf8');
+  assert.ok(content.includes('GITHUB_TOKEN="ghp_12345"'));
+  assert.ok(content.includes('NETLIFY_AUTH_TOKEN="net_678"'));
+});
+
+test('saveProjectEnv rejects nonexistent project id', () => {
+  assert.throws(() => saveProjectEnv('nonexistent', { KEY: 'val' }), /not found/);
+});
+
+test('saveProjectEnv strips invalid key characters and skips empty keys', () => {
+  const p = createProject('test-env-2', 'Env App 2');
+  saveProjectEnv('test-env-2', { 'VALID_KEY': 'ok', '!!!': 'skip-empty', '': 'skip-empty' });
+  const content = readFileSync(join(p.path, '.env'), 'utf8');
+  assert.ok(content.includes('VALID_KEY="ok"'));
+  assert.ok(!content.includes('skip-empty'));
 });
 
 // Cleanup
