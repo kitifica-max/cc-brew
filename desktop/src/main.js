@@ -84,7 +84,7 @@ function startSession() {
     sessionToken: SESSION_TOKEN,
   });
 
-  bridge.onInput = (text) => pty.write(text);
+  bridge.onInput = (text, continueConv) => pty.write(text, continueConv);
   pty.onMessage = (role, text) => bridge?.broadcastMessage(role, text);
 
   bridge.connect();

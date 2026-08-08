@@ -16,7 +16,7 @@ export default class Bridge {
       .channel(`session:${this.sessionId}`)
       .on('broadcast', { event: 'input' }, ({ payload }) => {
         if (payload.token !== this.sessionToken) return;
-        this.onInput?.(payload.text);
+        this.onInput?.(payload.text, payload.continue !== false);
       })
       .subscribe();
   }
