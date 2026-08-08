@@ -1,40 +1,29 @@
 'use client';
-
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { supabase, SESSION_ID, SESSION_TOKEN } from './lib/supabase';
+import { loadProjects, saveProjects, makeProject } from './lib/storage';
+import ProjectsList from './components/ProjectsList';
+import SettingsSheet from './components/SettingsSheet';
+import FileUpload from './components/FileUpload';
 
-const STORAGE_KEY = 'cc-conversations';
-const MAX_CONVS = 20;
-
-function load() {
-  if (typeof window === 'undefined') return [];
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
-  catch { return []; }
-}
-
-function save(convs) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(convs.slice(0, MAX_CONVS))); }
-  catch {}
-}
-
-function makeConv() {
-  return { id: Math.random().toString(36).slice(2) + Date.now().toString(36), title: 'Nueva conversación', createdAt: Date.now(), messages: [], isNewStart: true };
-}
+const ICON_SETTINGS = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M14 17H5M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></g></svg>`;
+const ICON_SEND = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11zm7.318-19.539l-10.94 10.939"/></svg>`;
 
 const QUICK = [
   { label: '⌃C', text: '\x03' },
-  { label: '↵ Enter', text: '\n' },
-  { label: '✓ y', text: 'y\n' },
-  { label: '✕ n', text: 'n\n' },
+  { label: '↵', text: '\n' },
+  { label: 'y', text: 'y\n' },
+  { label: 'n', text: 'n\n' },
 ];
 
 export default function CCController() {
-  const [conversations, setConversations] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [currentId, setCurrentId] = useState(null);
   const [input, setInput] = useState('');
   const [connected, setConnected] = useState(false);
   const [thinking, setThinking] = useState(false);
   const [view, setView] = useState('chat');
+  const [showSettings, setShowSettings] = useState(false);
   const chatRef = useRef(null);
   const channelRef = useRef(null);
   const currentIdRef = useRef(null);
@@ -43,124 +32,111 @@ export default function CCController() {
 
   // Init from localStorage
   useEffect(() => {
-    let convs = load();
-    if (convs.length === 0) { const c = makeConv(); convs = [c]; save(convs); }
-    setConversations(convs);
-    setCurrentId(convs[0].id);
+    let ps = loadProjects();
+    if (ps.length === 0) { const p = makeProject(); ps = [p]; }
+    setProjects(ps);
+    setCurrentId(ps[0].id);
   }, []);
 
-  // Persist on change
-  useEffect(() => { if (conversations.length) save(conversations); }, [conversations]);
+  // Persist
+  useEffect(() => { if (projects.length) saveProjects(projects); }, [projects]);
 
-  // Scroll to bottom
+  // Scroll
   useEffect(() => {
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: 'smooth' });
-  }, [conversations, thinking, currentId]);
+  }, [projects, thinking, currentId]);
 
   // Supabase
   useEffect(() => {
     const ch = supabase.channel(`session:${SESSION_ID}`);
     channelRef.current = ch;
+
     ch.on('broadcast', { event: 'message' }, ({ payload }) => {
       setThinking(false);
       const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
-      setConversations(prev => prev.map(c => {
-        if (c.id !== currentIdRef.current) return c;
-        return { ...c, messages: [...c.messages, { id: Math.random().toString(36).slice(2), role: payload.role, text: payload.text, time }] };
+      setProjects(prev => prev.map(p => {
+        if (p.id !== currentIdRef.current) return p;
+        return { ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: payload.role, text: payload.text, time }] };
       }));
     });
+
+    ch.on('broadcast', { event: 'project-state' }, ({ payload }) => {
+      setProjects(prev => prev.map(local => {
+        const remote = payload.projects?.find(r => r.id === local.id);
+        return remote ? { ...local, path: remote.path } : local;
+      }));
+    });
+
     ch.subscribe(s => setConnected(s === 'SUBSCRIBED'));
     return () => { supabase.removeChannel(ch); };
   }, []);
 
-  const sendRaw = useCallback((text, continueConv = true) => {
-    channelRef.current?.send({ type: 'broadcast', event: 'input', payload: { text, token: SESSION_TOKEN, continue: continueConv } });
+  const sendEvent = useCallback((event, payload) => {
+    channelRef.current?.send({ type: 'broadcast', event, payload: { ...payload, token: SESSION_TOKEN } });
   }, []);
 
-  const currentConv = conversations.find(c => c.id === currentId);
-  const messages = currentConv?.messages ?? [];
+  const sendRaw = useCallback((text, continueConv = true) => {
+    const current = projects.find(p => p.id === currentIdRef.current);
+    sendEvent('input', { text, continue: continueConv, model: current?.model ?? 'claude-sonnet-4-6', effort: current?.effort ?? 'medium' });
+  }, [projects, sendEvent]);
+
+  const currentProject = projects.find(p => p.id === currentId);
+  const messages = currentProject?.messages ?? [];
 
   function handleSend() {
     const text = input.trim();
     if (!text) return;
-    const isNewStart = currentConv?.isNewStart ?? false;
+    const isNewStart = currentProject?.isNewStart ?? false;
     const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
-    setConversations(prev => prev.map(c => {
-      if (c.id !== currentId) return c;
-      return {
-        ...c,
-        isNewStart: false,
-        title: c.title === 'Nueva conversación' ? text.slice(0, 40) : c.title,
-        messages: [...c.messages, { id: Math.random().toString(36).slice(2), role: 'user', text, time }],
-      };
+    setProjects(prev => prev.map(p => {
+      if (p.id !== currentId) return p;
+      return { ...p, isNewStart: false, name: p.name === 'Nuevo proyecto' ? text.slice(0, 40) : p.name, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: 'user', text, time }] };
     }));
     sendRaw(text + '\n', !isNewStart);
     setInput('');
     setThinking(true);
   }
 
-  function createNew() {
-    const c = makeConv();
-    setConversations(prev => [c, ...prev]);
-    setCurrentId(c.id);
-    setThinking(false);
+  function handleCreateProject(name) {
+    const p = makeProject(name);
+    setProjects(prev => [p, ...prev]);
+    setCurrentId(p.id);
     setView('chat');
+    setThinking(false);
+    sendEvent('create-project', { id: p.id, name });
   }
 
-  function switchTo(id) {
+  function handleSwitchProject(id) {
     setCurrentId(id);
-    setThinking(false);
     setView('chat');
+    setThinking(false);
+    sendEvent('switch-project', { id });
   }
 
-  function deleteConv(id) {
-    setConversations(prev => {
-      const next = prev.filter(c => c.id !== id);
-      if (next.length === 0) { const fresh = makeConv(); setCurrentId(fresh.id); return [fresh]; }
+  function handleDeleteProject(id) {
+    setProjects(prev => {
+      const next = prev.filter(p => p.id !== id);
+      if (next.length === 0) { const fresh = makeProject(); setCurrentId(fresh.id); return [fresh]; }
       if (id === currentId) setCurrentId(next[0].id);
       return next;
     });
   }
 
-  // ── LIST VIEW ──
+  function updateProjectSettings(field, value) {
+    setProjects(prev => prev.map(p => p.id === currentId ? { ...p, [field]: value } : p));
+  }
+
   if (view === 'list') return (
-    <main style={{ height: '100dvh', background: '#fde8e4', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div style={{ background: '#f04e23', padding: '52px 20px 16px', flexShrink: 0 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-          <div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 6 }}>Claude Code</div>
-            <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em' }}>Conversaciones</div>
-          </div>
-          <button onClick={() => setView('chat')} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: 20, padding: '7px 14px', fontSize: 12, fontWeight: 700, color: '#fff', cursor: 'pointer' }}>
-            ← Volver
-          </button>
-        </div>
-      </div>
-
-      <div style={{ flex: 1, overflowY: 'auto', padding: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {conversations.map(conv => (
-          <div key={conv.id} onClick={() => switchTo(conv.id)} style={{ background: conv.id === currentId ? '#f04e23' : '#fff', borderRadius: 16, padding: '14px 42px 14px 16px', cursor: 'pointer', position: 'relative' }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: conv.id === currentId ? '#fff' : '#1a1a1a', marginBottom: 3 }}>{conv.title}</div>
-            <div style={{ fontSize: 10, fontWeight: 600, color: conv.id === currentId ? 'rgba(255,255,255,0.65)' : '#b0a09a' }}>
-              {new Date(conv.createdAt).toLocaleDateString('es', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} · {conv.messages.length} msgs
-            </div>
-            <button
-              onClick={e => { e.stopPropagation(); deleteConv(conv.id); }}
-              style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', fontSize: 15, color: conv.id === currentId ? 'rgba(255,255,255,0.5)' : '#ccc', cursor: 'pointer', padding: 6 }}
-            >✕</button>
-          </div>
-        ))}
-      </div>
-
-      <div style={{ padding: '12px 14px 36px', flexShrink: 0 }}>
-        <button onClick={createNew} style={{ width: '100%', background: '#1a1a1a', border: 'none', borderRadius: 16, padding: 16, fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: 'Sora, sans-serif' }}>
-          + Nueva conversación
-        </button>
-      </div>
-    </main>
+    <ProjectsList
+      projects={projects}
+      currentId={currentId}
+      onSwitch={handleSwitchProject}
+      onDelete={handleDeleteProject}
+      onCreate={handleCreateProject}
+      onBack={() => setView('chat')}
+    />
   );
 
-  // ── CHAT VIEW ──
   return (
     <main style={{ height: '100dvh', background: '#fde8e4', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
@@ -173,12 +149,18 @@ export default function CCController() {
               <div style={{ width: 7, height: 7, borderRadius: '50%', background: connected ? '#00b09b' : 'rgba(255,255,255,0.3)', boxShadow: connected ? '0 0 6px #00b09b' : 'none' }} />
               {connected ? 'Conectado' : 'Desconectado'}
             </div>
-            <button onClick={createNew} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 28, height: 28, fontSize: 20, color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>+</button>
+            <button
+              onClick={() => setShowSettings(true)}
+              style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
+              dangerouslySetInnerHTML={{ __html: ICON_SETTINGS }}
+            />
           </div>
         </div>
         <button onClick={() => setView('list')} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}>
-          <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1 }}>{currentConv?.title ?? 'Nueva conversación'}</div>
-          <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginTop: 3 }}>{conversations.length} conversación{conversations.length !== 1 ? 'es' : ''} · ver todas →</div>
+          <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1 }}>{currentProject?.name ?? 'Nuevo proyecto'}</div>
+          <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginTop: 3 }}>
+            {currentProject?.model?.split('-').slice(-2).join(' ')} · {currentProject?.effort} · {projects.length} proyecto{projects.length !== 1 ? 's' : ''} →
+          </div>
         </button>
       </div>
 
@@ -186,7 +168,7 @@ export default function CCController() {
       <div ref={chatRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 14px 8px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {messages.length === 0 && (
           <div style={{ textAlign: 'center', color: '#b0a09a', fontSize: 12, fontWeight: 600, marginTop: 40 }}>
-            {currentConv?.isNewStart ? 'Nueva sesión de Claude Code' : 'Sesión activa · Escribe un mensaje'}
+            {currentProject?.path ? `~/CCProjects/${currentProject.name}` : 'Creando directorio...'}
           </div>
         )}
         {messages.map(msg => <MessageRow key={msg.id} msg={msg} />)}
@@ -203,7 +185,15 @@ export default function CCController() {
       </div>
 
       {/* Input */}
-      <div style={{ background: '#fff', borderTop: '1px solid #f0d8d2', padding: '10px 14px 32px', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+      <div style={{ background: '#fff', borderTop: '1px solid #f0d8d2', padding: '10px 14px 32px', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+        <FileUpload
+          currentProject={currentProject}
+          sendEvent={sendEvent}
+          onFileSent={(filename) => {
+            const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+            setProjects(prev => prev.map(p => p.id !== currentId ? p : { ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: 'system', text: `Subiendo: ${filename}...`, time }] }));
+          }}
+        />
         <input
           value={input}
           onChange={e => setInput(e.target.value)}
@@ -211,9 +201,23 @@ export default function CCController() {
           placeholder="Escribe un mensaje..."
           style={{ flex: 1, background: '#fde8e4', border: '1.5px solid #f0d8d2', borderRadius: 22, padding: '10px 16px', fontSize: 16, fontWeight: 500, color: '#1a1a1a', fontFamily: 'Sora, sans-serif', outline: 'none' }}
         />
-        <button onClick={handleSend} style={{ width: 40, height: 40, borderRadius: '50%', background: '#f04e23', border: 'none', color: '#fff', fontSize: 22, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>›</button>
+        <button
+          onClick={handleSend}
+          style={{ width: 40, height: 40, borderRadius: '50%', background: '#f04e23', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+          dangerouslySetInnerHTML={{ __html: ICON_SEND }}
+        />
       </div>
 
+      {/* Settings sheet */}
+      {showSettings && currentProject && (
+        <SettingsSheet
+          project={currentProject}
+          onClose={() => setShowSettings(false)}
+          onModelChange={v => updateProjectSettings('model', v)}
+          onEffortChange={v => updateProjectSettings('effort', v)}
+          onOpenDesktop={() => { sendEvent('open-claude-desktop', { projectId: currentId }); setShowSettings(false); }}
+        />
+      )}
     </main>
   );
 }
@@ -224,7 +228,7 @@ function MessageRow({ msg }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUser ? 'flex-end' : 'flex-start' }}>
       {!isUser && <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#b0a09a', marginBottom: 4, paddingLeft: 4 }}>Claude Code</div>}
-      <div style={{ maxWidth: '88%', borderRadius: 18, padding: '10px 14px', ...(isUser ? { background: '#f04e23', color: '#fff', borderBottomRightRadius: 4, fontSize: 14, fontWeight: 500, lineHeight: 1.5 } : { background: '#1a1a1a', color: '#e8e2d8', borderBottomLeftRadius: 4, fontFamily: "'SF Mono', 'Fira Code', ui-monospace, monospace", fontSize: 12, lineHeight: 1.75, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }) }}>
+      <div style={{ maxWidth: '88%', borderRadius: 18, padding: '10px 14px', ...(isUser ? { background: '#f04e23', color: '#fff', borderBottomRightRadius: 4, fontSize: 14, fontWeight: 500, lineHeight: 1.5 } : { background: '#1a1a1a', color: '#e8e2d8', borderBottomLeftRadius: 4, fontFamily: "'SF Mono','Fira Code',ui-monospace,monospace", fontSize: 12, lineHeight: 1.75, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }) }}>
         {msg.text}
       </div>
       <div style={{ fontSize: 9, color: '#b0a09a', marginTop: 3, paddingLeft: 4, paddingRight: 4 }}>{msg.time}</div>
@@ -237,7 +241,7 @@ function TypingIndicator() {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
       <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#b0a09a', marginBottom: 4, paddingLeft: 4 }}>Claude Code</div>
       <div style={{ background: '#1a1a1a', borderRadius: 18, borderBottomLeftRadius: 4, padding: '12px 16px', display: 'flex', gap: 5, alignItems: 'center' }}>
-        {[0, 1, 2].map(i => <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#f0a040', animation: `blink 1.2s ${i * 0.2}s infinite` }} />)}
+        {[0,1,2].map(i => <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#f0a040', animation: `blink 1.2s ${i*0.2}s infinite` }} />)}
       </div>
     </div>
   );
