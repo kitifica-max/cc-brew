@@ -124,6 +124,8 @@ function startSession() {
     }
   };
 
+  bridge.onGetProjectState = () => broadcastProjects();
+
   bridge.onOpenClaudeDesktop = (projectId) => {
     const project = listProjects().find(p => p.id === projectId);
     if (!project) return;

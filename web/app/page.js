@@ -27,6 +27,7 @@ export default function CCController() {
   const chatRef = useRef(null);
   const channelRef = useRef(null);
   const currentIdRef = useRef(null);
+  const wasConnectedRef = useRef(false);
 
   useEffect(() => { currentIdRef.current = currentId; }, [currentId]);
 
@@ -67,7 +68,15 @@ export default function CCController() {
       }));
     });
 
-    ch.subscribe(s => setConnected(s === 'SUBSCRIBED'));
+    ch.subscribe(s => {
+      const isNowConnected = s === 'SUBSCRIBED';
+      setConnected(isNowConnected);
+      if (isNowConnected && wasConnectedRef.current) {
+        // Reconexión tras caída (iOS background) — pedir estado fresco
+        ch.send({ type: 'broadcast', event: 'get-project-state', payload: { token: SESSION_TOKEN } });
+      }
+      if (isNowConnected) wasConnectedRef.current = true;
+    });
     return () => { supabase.removeChannel(ch); };
   }, []);
 

@@ -1,6 +1,8 @@
 import { createClient as defaultCreateClient } from '@supabase/supabase-js';
 import WebSocket from 'ws';
 
+const ANSI_RE = /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g;
+
 const ALLOWED_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.pdf', '.txt', '.md', '.json', '.csv', '.svg', '.zip']);
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 
@@ -16,6 +18,7 @@ export default class Bridge {
     this.onSwitchProject = null;
     this.onUploadFile = null;
     this.onOpenClaudeDesktop = null;
+    this.onGetProjectState = null;
   }
 
   _validate(payload) {
@@ -50,6 +53,10 @@ export default class Bridge {
         if (!this._validate(payload)) return;
         this.onOpenClaudeDesktop?.(payload.projectId);
       })
+      .on('broadcast', { event: 'get-project-state' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this.onGetProjectState?.();
+      })
       .subscribe();
   }
 
@@ -57,7 +64,7 @@ export default class Bridge {
     this.channel?.send({
       type: 'broadcast',
       event: 'message',
-      payload: { role, text, ts: Date.now() },
+      payload: { role, text: text.replace(ANSI_RE, ''), ts: Date.now() },
     });
   }
 
