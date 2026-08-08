@@ -1,6 +1,20 @@
-node_modules/
+# Environments
 .env
-desktop/.env
-web/.env.local
+.env.*
+!.env.example
+!.env.local.example
+
+# Dependencies
+node_modules/
+
+# Builds
 desktop/dist/
-.next/
+web/.next/
+web/out/
+
+# App specific
+CCProjects/
+
+# macOS
+.DS_Store
+*.rtf
