@@ -1,0 +1,12 @@
+@import 'tailwindcss';
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Sora', sans-serif;
+  background: #fde8e4;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}

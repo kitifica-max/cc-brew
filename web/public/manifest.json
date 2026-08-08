@@ -1,0 +1,14 @@
+{
+  "name": "CC Controller",
+  "short_name": "CC Controller",
+  "description": "Control Claude Code desde tu móvil",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fde8e4",
+  "theme_color": "#f04e23",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

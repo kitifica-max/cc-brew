@@ -1,0 +1,9 @@
+{
+  "name": "cc-controller",
+  "private": true,
+  "workspaces": ["desktop", "web"],
+  "scripts": {
+    "desktop": "npm run dev --workspace=desktop",
+    "web": "npm run dev --workspace=web"
+  }
+}

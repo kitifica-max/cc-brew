@@ -1,0 +1,20 @@
+{
+  "name": "cc-controller-desktop",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "dev": "electron src/main.js",
+    "build": "electron-builder",
+    "test": "node --test src/__tests__/"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "dotenv": "^16.4.0",
+    "node-pty": "^1.0.0"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^25.0.0"
+  }
+}
