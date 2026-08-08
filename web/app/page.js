@@ -21,6 +21,8 @@ export default function CCController() {
   const [currentId, setCurrentId] = useState(null);
   const [input, setInput] = useState('');
   const [connected, setConnected] = useState(false);
+  const [desktopActive, setDesktopActive] = useState(false);
+  const desktopTimeoutRef = useRef(null);
   const [thinking, setThinking] = useState(false);
   const [view, setView] = useState('chat');
   const [showSettings, setShowSettings] = useState(false);
@@ -30,6 +32,13 @@ export default function CCController() {
   const wasConnectedRef = useRef(false);
 
   useEffect(() => { currentIdRef.current = currentId; }, [currentId]);
+
+  const resetDesktopTimeout = useCallback(() => {
+    setDesktopActive(true);
+    clearTimeout(desktopTimeoutRef.current);
+    // 45s sin heartbeat = Desktop detenido (heartbeat cada 20s)
+    desktopTimeoutRef.current = setTimeout(() => setDesktopActive(false), 45_000);
+  }, []);
 
   // Init from localStorage
   useEffect(() => {
@@ -52,7 +61,12 @@ export default function CCController() {
     const ch = supabase.channel(`session:${SESSION_ID}`);
     channelRef.current = ch;
 
+    ch.on('broadcast', { event: 'heartbeat' }, () => {
+      resetDesktopTimeout();
+    });
+
     ch.on('broadcast', { event: 'message' }, ({ payload }) => {
+      resetDesktopTimeout();
       setThinking(false);
       const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
       setProjects(prev => prev.map(p => {
@@ -62,6 +76,7 @@ export default function CCController() {
     });
 
     ch.on('broadcast', { event: 'project-state' }, ({ payload }) => {
+      resetDesktopTimeout();
       setProjects(prev => prev.map(local => {
         const remote = payload.projects?.find(r => r.id === local.id);
         return remote ? { ...local, path: remote.path } : local;
@@ -77,8 +92,8 @@ export default function CCController() {
       }
       if (isNowConnected) wasConnectedRef.current = true;
     });
-    return () => { supabase.removeChannel(ch); };
-  }, []);
+    return () => { supabase.removeChannel(ch); clearTimeout(desktopTimeoutRef.current); };
+  }, [resetDesktopTimeout]);
 
   const sendEvent = useCallback((event, payload) => {
     channelRef.current?.send({ type: 'broadcast', event, payload: { ...payload, token: SESSION_TOKEN } });
@@ -155,8 +170,8 @@ export default function CCController() {
           <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Claude Code</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
-              <div style={{ width: 7, height: 7, borderRadius: '50%', background: connected ? '#00b09b' : 'rgba(255,255,255,0.3)', boxShadow: connected ? '0 0 6px #00b09b' : 'none' }} />
-              {connected ? 'Conectado' : 'Desconectado'}
+              <div style={{ width: 7, height: 7, borderRadius: '50%', background: desktopActive ? '#00b09b' : connected ? '#f0a040' : 'rgba(255,255,255,0.3)', boxShadow: desktopActive ? '0 0 6px #00b09b' : 'none' }} />
+              {desktopActive ? 'Desktop activo' : connected ? 'Desktop detenido' : 'Sin conexión'}
             </div>
             <button
               onClick={() => setShowSettings(true)}

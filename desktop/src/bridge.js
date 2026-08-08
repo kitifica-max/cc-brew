@@ -20,6 +20,7 @@ export default class Bridge {
     this.onOpenClaudeDesktop = null;
     this.onGetProjectState = null;
     this.onSaveEnv = null;
+    this._heartbeatTimer = null;
   }
 
   _validate(payload) {
@@ -91,7 +92,15 @@ export default class Bridge {
     await this.client.storage.from('uploads').remove([storageKey]);
   }
 
+  startHeartbeat(intervalMs = 20_000) {
+    this._heartbeatTimer = setInterval(() => {
+      this.channel?.send({ type: 'broadcast', event: 'heartbeat', payload: { ts: Date.now() } });
+    }, intervalMs);
+  }
+
   disconnect() {
+    clearInterval(this._heartbeatTimer);
+    this._heartbeatTimer = null;
     if (this.channel) {
       this.client.removeChannel(this.channel);
       this.channel = null;

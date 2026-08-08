@@ -143,6 +143,7 @@ function startSession() {
   };
 
   bridge.connect();
+  bridge.startHeartbeat();
 
   setTimeout(broadcastProjects, 1000);
 
