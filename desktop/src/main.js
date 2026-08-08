@@ -5,7 +5,7 @@ import { writeFileSync } from 'fs';
 import dotenv from 'dotenv';
 import PtyManager from './pty.js';
 import Bridge from './bridge.js';
-import { createProject, switchProject, getActive, listProjects, deleteProject } from './projects.js';
+import { createProject, switchProject, getActive, listProjects, deleteProject, saveProjectEnv } from './projects.js';
 import { ALLOWED_EXTENSIONS, MAX_FILE_BYTES } from './bridge.js';
 import { extname, basename, resolve, sep } from 'path';
 import { homedir } from 'os';
@@ -125,6 +125,16 @@ function startSession() {
   };
 
   bridge.onGetProjectState = () => broadcastProjects();
+
+  bridge.onSaveEnv = (projectId, envObject) => {
+    try {
+      saveProjectEnv(projectId, envObject);
+      const project = listProjects().find(p => p.id === projectId);
+      bridge?.broadcastMessage('system', `Secretos guardados en .env: ${project?.name ?? projectId}`);
+    } catch (e) {
+      bridge?.broadcastMessage('system', `Error guardando secretos: ${e.message}`);
+    }
+  };
 
   bridge.onOpenClaudeDesktop = (projectId) => {
     const project = listProjects().find(p => p.id === projectId);

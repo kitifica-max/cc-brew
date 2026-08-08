@@ -19,6 +19,7 @@ export default class Bridge {
     this.onUploadFile = null;
     this.onOpenClaudeDesktop = null;
     this.onGetProjectState = null;
+    this.onSaveEnv = null;
   }
 
   _validate(payload) {
@@ -56,6 +57,10 @@ export default class Bridge {
       .on('broadcast', { event: 'get-project-state' }, ({ payload }) => {
         if (!this._validate(payload)) return;
         this.onGetProjectState?.();
+      })
+      .on('broadcast', { event: 'save-env' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this.onSaveEnv?.(payload.projectId, payload.env);
       })
       .subscribe();
   }
