@@ -1,9 +1,10 @@
 import { createClient as defaultCreateClient } from '@supabase/supabase-js';
+import WebSocket from 'ws';
 
 export default class Bridge {
   // ponytail: _createClient param para tests sin module mocking
   constructor({ supabaseUrl, supabaseKey, sessionId, sessionToken, _createClient = defaultCreateClient }) {
-    this.client = _createClient(supabaseUrl, supabaseKey);
+    this.client = _createClient(supabaseUrl, supabaseKey, { realtime: { transport: WebSocket } });
     this.sessionId = sessionId;
     this.sessionToken = sessionToken;
     this.channel = null;
@@ -20,11 +21,11 @@ export default class Bridge {
       .subscribe();
   }
 
-  broadcast(text) {
+  broadcastMessage(role, text) {
     this.channel?.send({
       type: 'broadcast',
-      event: 'output',
-      payload: { text, ts: Date.now() },
+      event: 'message',
+      payload: { role, text, ts: Date.now() },
     });
   }
 

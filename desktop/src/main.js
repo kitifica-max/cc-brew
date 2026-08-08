@@ -1,11 +1,22 @@
 import { app, Tray, Menu, nativeImage, shell } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import PtyManager from './pty.js';
 import Bridge from './bridge.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
+
+// Electron empaquetado tiene PATH limitado — inyectar rutas donde suele vivir claude
+const HOME = process.env.HOME || '';
+const extraPaths = [
+  `${HOME}/.npm-global/bin`,
+  `${HOME}/.local/bin`,
+  '/opt/homebrew/bin',
+  '/usr/local/bin',
+].join(':');
+process.env.PATH = `${extraPaths}:${process.env.PATH || ''}`;
 
 let tray = null;
 let pty = null;
@@ -74,7 +85,7 @@ function startSession() {
   });
 
   bridge.onInput = (text) => pty.write(text);
-  pty.onOutput = (text) => bridge.broadcast(text);
+  pty.onMessage = (role, text) => bridge?.broadcastMessage(role, text);
 
   bridge.connect();
   pty.spawn('claude', []);
