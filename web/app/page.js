@@ -134,7 +134,13 @@ export default function CCController() {
     setCurrentId(id);
     setView('chat');
     setThinking(false);
-    sendEvent('switch-project', { id });
+    const target = projects.find(p => p.id === id);
+    if (target?.path) {
+      sendEvent('switch-project', { id });
+    } else {
+      // Proyecto no existe en Electron todavía — registrarlo
+      sendEvent('create-project', { id, name: target?.name ?? id });
+    }
   }
 
   function handleDeleteProject(id) {
