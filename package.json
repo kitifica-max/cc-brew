@@ -1,9 +1,14 @@
 {
   "name": "cc-controller",
   "private": true,
-  "workspaces": ["desktop", "web"],
+  "workspaces": [
+    "web"
+  ],
   "scripts": {
-    "desktop": "npm run dev --workspace=desktop",
+    "desktop": "npm run dev --prefix desktop",
     "web": "npm run dev --workspace=web"
+  },
+  "dependencies": {
+    "@swc/helpers": "^0.5.5"
   }
 }

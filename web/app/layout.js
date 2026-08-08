@@ -7,6 +7,7 @@ export const metadata = {
   themeColor: '#f04e23',
   appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'CC Controller' },
   viewport: { width: 'device-width', initialScale: 1, maximumScale: 1 },
+  icons: { icon: '/favicon.ico', apple: '/icon-192.png' },
 };
 
 export default function RootLayout({ children }) {

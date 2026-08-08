@@ -1,6 +1,7 @@
 appId: com.cccontroller.app
 productName: CC Controller
 copyright: Copyright © 2026
+electronVersion: "30.5.1"
 
 directories:
   output: dist
