@@ -225,6 +225,7 @@ export default function CCController() {
           onModelChange={v => updateProjectSettings('model', v)}
           onEffortChange={v => updateProjectSettings('effort', v)}
           onOpenDesktop={() => { sendEvent('open-claude-desktop', { projectId: currentId }); setShowSettings(false); }}
+          onSaveEnv={(env) => { sendEvent('save-env', { projectId: currentId, env }); setShowSettings(false); }}
         />
       )}
     </main>

@@ -1,12 +1,26 @@
 'use client';
+import { useState } from 'react';
 import { MODELS, EFFORTS } from '../lib/storage';
 
 const ICON_X = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg>`;
 const ICON_CHECK = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 6L9 17l-5-5"/></svg>`;
 const ICON_MONITOR = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8m-4-4v4"/></g></svg>`;
+const ICON_KEY = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="m15.5 7.5l2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4m2-2l-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/></g></svg>`;
 
-export default function SettingsSheet({ project, onClose, onModelChange, onEffortChange, onOpenDesktop }) {
+const ENV_KEYS = ['GITHUB_TOKEN', 'NETLIFY_AUTH_TOKEN', 'SUPABASE_SERVICE_KEY'];
+const EMPTY_ENV = Object.fromEntries(ENV_KEYS.map(k => [k, '']));
+
+export default function SettingsSheet({ project, onClose, onModelChange, onEffortChange, onOpenDesktop, onSaveEnv }) {
+  const [envData, setEnvData] = useState(EMPTY_ENV);
+
   if (!project) return null;
+
+  function handleSaveEnv() {
+    const filtered = Object.fromEntries(Object.entries(envData).filter(([, v]) => v.trim() !== ''));
+    if (Object.keys(filtered).length === 0) return;
+    onSaveEnv(filtered);
+    setEnvData(EMPTY_ENV);
+  }
 
   return (
     <>
@@ -81,6 +95,42 @@ export default function SettingsSheet({ project, onClose, onModelChange, onEffor
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Env / Secrets */}
+        <div style={{ marginBottom: 24, padding: 16, background: '#f9f5f4', borderRadius: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+            <span style={{ display: 'flex', width: 14, height: 14, color: '#f04e23' }} dangerouslySetInnerHTML={{ __html: ICON_KEY }} />
+            <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#b0a09a' }}>
+              Entorno / Secretos (.env)
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
+            {ENV_KEYS.map(key => (
+              <input
+                key={key}
+                type="password"
+                placeholder={key}
+                value={envData[key]}
+                onChange={e => setEnvData(prev => ({ ...prev, [key]: e.target.value }))}
+                style={{
+                  background: '#fff', border: '1.5px solid #f0d8d2', borderRadius: 10,
+                  padding: '10px 14px', fontSize: 12, fontFamily: 'Sora, sans-serif',
+                  outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box',
+                }}
+              />
+            ))}
+          </div>
+          <button
+            onClick={handleSaveEnv}
+            style={{
+              width: '100%', background: '#f04e23', border: 'none', borderRadius: 10,
+              padding: '10px', fontSize: 12, fontWeight: 700, color: '#fff',
+              cursor: 'pointer', fontFamily: 'Sora, sans-serif',
+            }}
+          >
+            Guardar e Inyectar en Local
+          </button>
         </div>
 
         {/* Open in Claude Desktop */}
