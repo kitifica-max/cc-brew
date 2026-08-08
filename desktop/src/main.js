@@ -7,7 +7,7 @@ import PtyManager from './pty.js';
 import Bridge from './bridge.js';
 import { createProject, switchProject, getActive, listProjects, deleteProject } from './projects.js';
 import { ALLOWED_EXTENSIONS, MAX_FILE_BYTES } from './bridge.js';
-import { extname, join } from 'path';
+import { extname, basename, resolve, sep } from 'path';
 import { homedir } from 'os';
 import { exec } from 'child_process';
 
@@ -100,23 +100,27 @@ function startSession() {
   };
 
   bridge.onUploadFile = async (storageKey, filename, projectId) => {
+    let downloaded = false;
     try {
       const projects = listProjects();
       const project = projects.find(p => p.id === projectId);
       if (!project) throw new Error('Project not found');
 
-      const ext = extname(filename).toLowerCase();
-      if (!ALLOWED_EXTENSIONS.has(ext)) throw new Error(`Extension no permitida: ${ext}`);
-
+      const safeName = basename(filename);
+      if (!safeName || safeName.startsWith('.')) throw new Error('Nombre de archivo inválido');
+      const ext = extname(safeName).toLowerCase();
+      if (!ALLOWED_EXTENSIONS.has(ext)) throw new Error(`Extensión no permitida: ${ext}`);
       const buffer = await bridge.downloadFromStorage(storageKey);
-      if (buffer.length > MAX_FILE_BYTES) throw new Error('Archivo demasiado grande (max 10MB)');
-
-      const destPath = join(project.path, filename);
+      downloaded = true;
+      if (buffer.length > MAX_FILE_BYTES) throw new Error('Archivo demasiado grande (máx 10MB)');
+      const destPath = resolve(project.path, safeName);
+      if (!destPath.startsWith(resolve(project.path) + sep)) throw new Error('Ruta inválida');
       writeFileSync(destPath, buffer);
-      await bridge.deleteFromStorage(storageKey);
-      bridge?.broadcastMessage('system', `Archivo guardado: ${filename}`);
+      bridge?.broadcastMessage('system', `Archivo guardado: ${safeName}`);
     } catch (e) {
       bridge?.broadcastMessage('system', `Error subiendo archivo: ${e.message}`);
+    } finally {
+      if (downloaded) await bridge.deleteFromStorage(storageKey).catch(() => {});
     }
   };
 

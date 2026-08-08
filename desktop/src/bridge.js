@@ -19,7 +19,7 @@ export default class Bridge {
   }
 
   _validate(payload) {
-    return payload.token === this.sessionToken;
+    return payload?.token === this.sessionToken;
   }
 
   connect() {
