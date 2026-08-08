@@ -157,7 +157,7 @@ export default function Terminal() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
           placeholder="Escribe un comando..."
-          style={{ flex: 1, border: 'none', outline: 'none', fontSize: 12, fontWeight: 600, color: '#1a1a1a', fontFamily: 'Sora, sans-serif', background: 'transparent' }}
+          style={{ flex: 1, border: 'none', outline: 'none', fontSize: 16, fontWeight: 600, color: '#1a1a1a', fontFamily: 'Sora, sans-serif', background: 'transparent' }}
         />
         <button
           onClick={handleSend}
