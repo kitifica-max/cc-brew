@@ -87,11 +87,11 @@ export default function CCController() {
     ch.subscribe(s => {
       const isNowConnected = s === 'SUBSCRIBED';
       setConnected(isNowConnected);
-      if (isNowConnected && wasConnectedRef.current) {
-        // Reconexión tras caída (iOS background) — pedir estado fresco
+      if (isNowConnected) {
+        // Primera conexión y reconexiones (iOS background) — pedir estado fresco
         ch.send({ type: 'broadcast', event: 'get-project-state', payload: { token: SESSION_TOKEN } });
+        wasConnectedRef.current = true;
       }
-      if (isNowConnected) wasConnectedRef.current = true;
     });
     return () => { supabase.removeChannel(ch); clearTimeout(desktopTimeoutRef.current); };
   }, [resetDesktopTimeout]);
@@ -200,7 +200,7 @@ export default function CCController() {
       <div ref={chatRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 14px 8px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {messages.length === 0 && (
           <div style={{ textAlign: 'center', color: '#b0a09a', fontSize: 12, fontWeight: 600, marginTop: 40 }}>
-            {currentProject?.path ? `~/CCProjects/${currentProject.name}` : 'Creando directorio...'}
+            {currentProject?.path ? currentProject.path.replace(/^\/Users\/[^/]+/, '~') : 'Creando directorio...'}
           </div>
         )}
         {messages.map(msg => <MessageRow key={msg.id} msg={msg} />)}

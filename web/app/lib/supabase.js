@@ -7,3 +7,4 @@ export const supabase = createClient(
 
 export const SESSION_ID = process.env.NEXT_PUBLIC_SESSION_ID ?? 'main';
 export const SESSION_TOKEN = process.env.NEXT_PUBLIC_SESSION_TOKEN ?? '';
+if (!SESSION_TOKEN && typeof window !== 'undefined') console.warn('[CC Controller] NEXT_PUBLIC_SESSION_TOKEN no configurado');

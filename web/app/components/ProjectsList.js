@@ -9,6 +9,7 @@ const ICON_PLUS = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1
 export default function ProjectsList({ projects, currentId, onSwitch, onDelete, onCreate, onBack }) {
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
+  const [confirmId, setConfirmId] = useState(null);
 
   function handleCreate() {
     const name = newName.trim();
@@ -54,11 +55,24 @@ export default function ProjectsList({ projects, currentId, onSwitch, onDelete, 
               <div style={{ fontSize: 10, fontWeight: 600, color: isActive ? 'rgba(255,255,255,0.65)' : '#b0a09a' }}>
                 {modelLabel} · {p.effort} · {p.messages.length} msgs · {new Date(p.createdAt).toLocaleDateString('es', { day: 'numeric', month: 'short' })}
               </div>
-              <button
-                onClick={e => { e.stopPropagation(); if (confirm(`Eliminar "${p.name}"?`)) onDelete(p.id); }}
-                style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 6, color: isActive ? 'rgba(255,255,255,0.5)' : '#ccc' }}
-                dangerouslySetInnerHTML={{ __html: ICON_TRASH }}
-              />
+              {confirmId === p.id ? (
+                <div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <button
+                    onClick={e => { e.stopPropagation(); onDelete(p.id); setConfirmId(null); }}
+                    style={{ background: '#dc2626', border: 'none', borderRadius: 8, padding: '5px 10px', fontSize: 11, fontWeight: 700, color: '#fff', cursor: 'pointer' }}
+                  >Sí</button>
+                  <button
+                    onClick={e => { e.stopPropagation(); setConfirmId(null); }}
+                    style={{ background: isActive ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)', border: 'none', borderRadius: 8, padding: '5px 10px', fontSize: 11, fontWeight: 700, color: isActive ? '#fff' : '#555', cursor: 'pointer' }}
+                  >No</button>
+                </div>
+              ) : (
+                <button
+                  onClick={e => { e.stopPropagation(); setConfirmId(p.id); }}
+                  style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 6, color: isActive ? 'rgba(255,255,255,0.5)' : '#ccc' }}
+                  dangerouslySetInnerHTML={{ __html: ICON_TRASH }}
+                />
+              )}
             </div>
           );
         })}

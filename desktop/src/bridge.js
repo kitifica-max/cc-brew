@@ -3,7 +3,7 @@ import WebSocket from 'ws';
 
 const ANSI_RE = /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g;
 
-const ALLOWED_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.pdf', '.txt', '.md', '.json', '.csv', '.svg', '.zip']);
+const ALLOWED_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.pdf', '.txt', '.md', '.markdown', '.json', '.csv', '.svg', '.zip']);
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 
 export default class Bridge {
