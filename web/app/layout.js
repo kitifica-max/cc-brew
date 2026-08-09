@@ -4,10 +4,15 @@ export const metadata = {
   title: 'CC Controller',
   description: 'Control Claude Code desde tu móvil',
   manifest: '/manifest.json',
-  themeColor: '#f04e23',
   appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'CC Controller' },
-  viewport: { width: 'device-width', initialScale: 1, maximumScale: 1 },
   icons: { icon: '/favicon.ico', apple: '/icon-192.png' },
+};
+
+export const viewport = {
+  themeColor: '#f04e23',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({ children }) {

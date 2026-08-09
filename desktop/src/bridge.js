@@ -10,6 +10,7 @@ export default class Bridge {
   // ponytail: _createClient param para tests sin module mocking
   constructor({ supabaseUrl, supabaseKey, sessionId, sessionToken, _createClient = defaultCreateClient }) {
     this.client = _createClient(supabaseUrl, supabaseKey, { realtime: { transport: WebSocket } });
+    this.supabaseKey = supabaseKey;
     this.sessionId = sessionId;
     this.sessionToken = sessionToken;
     this.channel = null;
@@ -29,8 +30,11 @@ export default class Bridge {
   }
 
   connect() {
+    // Canal privado: Realtime exige un JWT autorizado para entrar. La service_role
+    // key del desktop salta las políticas RLS de `realtime.messages`.
+    this.client.realtime.setAuth(this.supabaseKey);
     this.channel = this.client
-      .channel(`session:${this.sessionId}`)
+      .channel(`session:${this.sessionId}`, { config: { private: true } })
       .on('broadcast', { event: 'input' }, ({ payload }) => {
         if (!this._validate(payload)) return;
         this.onInput?.(

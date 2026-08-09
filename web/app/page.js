@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { supabase, SESSION_ID, SESSION_TOKEN } from './lib/supabase';
+import { supabase, SESSION_ID, getSessionToken } from './lib/supabase';
 import { loadProjects, saveProjects, makeProject } from './lib/storage';
+import AuthGate from './components/AuthGate';
 import ProjectsList from './components/ProjectsList';
 import SettingsSheet from './components/SettingsSheet';
 import FileUpload from './components/FileUpload';
@@ -9,14 +10,23 @@ import FileUpload from './components/FileUpload';
 const ICON_SETTINGS = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M14 17H5M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></g></svg>`;
 const ICON_SEND = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11zm7.318-19.539l-10.94 10.939"/></svg>`;
 
+// Cada mensaje es un turno nuevo de `claude --print --continue`, así que estos
+// atajos solo tienen sentido como respuesta a una pregunta del turno anterior.
 const QUICK = [
-  { label: '⌃C', text: '\x03' },
-  { label: '↵', text: '\n' },
-  { label: 'y', text: 'y\n' },
-  { label: 'n', text: 'n\n' },
+  { label: 'sí', text: 'sí\n' },
+  { label: 'no', text: 'no\n' },
+  { label: 'continúa', text: 'continúa\n' },
 ];
 
-export default function CCController() {
+export default function Page() {
+  return (
+    <AuthGate>
+      <CCController />
+    </AuthGate>
+  );
+}
+
+function CCController() {
   const [projects, setProjects] = useState([]);
   const [currentId, setCurrentId] = useState(null);
   const [input, setInput] = useState('');
@@ -58,7 +68,7 @@ export default function CCController() {
 
   // Supabase
   useEffect(() => {
-    const ch = supabase.channel(`session:${SESSION_ID}`);
+    const ch = supabase.channel(`session:${SESSION_ID}`, { config: { private: true } });
     channelRef.current = ch;
 
     ch.on('broadcast', { event: 'heartbeat' }, () => {
@@ -84,20 +94,32 @@ export default function CCController() {
       }));
     });
 
-    ch.subscribe(s => {
-      const isNowConnected = s === 'SUBSCRIBED';
-      setConnected(isNowConnected);
-      if (isNowConnected) {
-        // Primera conexión y reconexiones (iOS background) — pedir estado fresco
-        ch.send({ type: 'broadcast', event: 'get-project-state', payload: { token: SESSION_TOKEN } });
-        wasConnectedRef.current = true;
-      }
+    // El canal es privado: Realtime valida el JWT del usuario contra las políticas
+    // RLS de `realtime.messages` antes de dejarlo entrar.
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      await supabase.realtime.setAuth(data.session?.access_token ?? null);
+      ch.subscribe(s => {
+        const isNowConnected = s === 'SUBSCRIBED';
+        setConnected(isNowConnected);
+        if (isNowConnected) {
+          // Primera conexión y reconexiones (iOS background) — pedir estado fresco
+          ch.send({ type: 'broadcast', event: 'get-project-state', payload: { token: getSessionToken() } });
+          wasConnectedRef.current = true;
+        }
+      });
+    })();
+
+    // El JWT caduca; Realtime necesita el nuevo tras cada refresco.
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      supabase.realtime.setAuth(session?.access_token ?? null);
     });
-    return () => { supabase.removeChannel(ch); clearTimeout(desktopTimeoutRef.current); };
+
+    return () => { sub.subscription.unsubscribe(); supabase.removeChannel(ch); clearTimeout(desktopTimeoutRef.current); };
   }, [resetDesktopTimeout]);
 
   const sendEvent = useCallback((event, payload) => {
-    channelRef.current?.send({ type: 'broadcast', event, payload: { ...payload, token: SESSION_TOKEN } });
+    channelRef.current?.send({ type: 'broadcast', event, payload: { ...payload, token: getSessionToken() } });
   }, []);
 
   const sendRaw = useCallback((text, continueConv = true) => {

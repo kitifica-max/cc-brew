@@ -626,7 +626,7 @@ svg { display: block; }
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         </div>
         <h3>Chat en tiempo real</h3>
-        <p>Respuestas de Claude Code aparecen token por token. Indicador de escritura mientras Claude trabaja.</p>
+        <p>La respuesta de Claude Code llega en cuanto termina el prompt. Indicador de escritura mientras Claude trabaja.</p>
         <div class="chat-preview">
           <div class="chat-bubble user">Crea un componente Button en TypeScript</div>
           <div class="chat-bubble ai">Creating src/components/Button.tsx...
@@ -759,12 +759,11 @@ export interface ButtonProps {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
         <h3>Acciones rápidas</h3>
-        <p>Envía señales de control sin tipear. Cancela, confirma o envía Enter con un tap.</p>
+        <p>Responde a Claude sin tipear: confirma, descarta o pídele que siga con un tap.</p>
         <div class="quick-chips">
-          <span class="qchip">⌃C</span>
-          <span class="qchip">↵</span>
-          <span class="qchip">y ↵</span>
-          <span class="qchip">n ↵</span>
+          <span class="qchip">sí</span>
+          <span class="qchip">no</span>
+          <span class="qchip">continúa</span>
         </div>
       </div>
 
@@ -782,7 +781,7 @@ export interface ButtonProps {
       <div class="step-card">
         <div class="step-n">1</div>
         <h3>PWA recibe tu prompt</h3>
-        <p>Escribes en la PWA desde el iPhone. El mensaje se transmite por Supabase Broadcast con token de sesión validado en cada evento.</p>
+        <p>Inicias sesión en la PWA y escribes desde el iPhone. El mensaje viaja por un canal privado de Supabase Broadcast, con token de sesión validado en cada evento.</p>
         <span class="step-code">sendEvent('input', { text, token })</span>
       </div>
       <div class="step-card">
@@ -794,7 +793,7 @@ export interface ButtonProps {
       <div class="step-card">
         <div class="step-n">3</div>
         <h3>Respuesta en tiempo real</h3>
-        <p>La salida se limpia de códigos ANSI y se transmite de vuelta por Supabase Broadcast. Aparece en tu iPhone en menos de 100ms.</p>
+        <p>La salida se limpia de códigos ANSI y vuelve por Supabase Broadcast en cuanto Claude termina.</p>
         <span class="step-code">broadcast('message', { text })</span>
       </div>
     </div>
@@ -835,9 +834,9 @@ export interface ButtonProps {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <div class="sec-body">
-          <h4>SESSION_TOKEN en cada evento</h4>
-          <p>Cada evento PWA→Electron incluye el token. Sin él, el evento se ignora silenciosamente. Sin logs, sin respuesta.</p>
-          <span class="sec-chip">payload.token === SESSION_TOKEN</span>
+          <h4>Login + canal privado</h4>
+          <p>La PWA exige Supabase Auth y solo los usuarios autorizados entran al canal. Encima, cada evento PWA→Electron incluye el token de sesión: sin él se ignora en silencio.</p>
+          <span class="sec-chip">private channel · payload.token</span>
         </div>
       </div>
       <div class="sec-card">
@@ -855,9 +854,9 @@ export interface ButtonProps {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
         <div class="sec-body">
-          <h4>API keys nunca en la PWA</h4>
-          <p>La PWA actúa como transmisor de paso. Las keys se envían una vez y se limpian del estado inmediatamente. Nunca en localStorage.</p>
-          <span class="sec-chip">No localStorage · No Supabase DB</span>
+          <h4>API keys nunca en el bundle</h4>
+          <p>Las keys que envías se transmiten una vez y se limpian del estado. El token de emparejamiento se introduce a mano en el dispositivo: nunca se compila en el JavaScript público.</p>
+          <span class="sec-chip">Sin secretos en el build</span>
         </div>
       </div>
       <div class="sec-card">
@@ -910,9 +909,11 @@ export interface ButtonProps {
 <span class="ck">NEXT_PUBLIC_SUPABASE_URL</span>=<span class="cv">"..."</span>
 <span class="ck">NEXT_PUBLIC_SUPABASE_ANON_KEY</span>=<span class="cv">"..."</span>
 &nbsp;
-<span class="cm"># Mismo token que el desktop</span>
+<span class="cm"># Mismo session id que el desktop</span>
 <span class="ck">NEXT_PUBLIC_SESSION_ID</span>=<span class="cv">"cc-session-01"</span>
-<span class="ck">NEXT_PUBLIC_SESSION_TOKEN</span>=<span class="cv">"tu-token-32-chars"</span>
+&nbsp;
+<span class="cm"># El SESSION_TOKEN no va aquí: sería público.</span>
+<span class="cm"># La PWA lo pide al emparejar el dispositivo.</span>
 &nbsp;
 <span class="cm"># Deploy a Netlify</span>
 <span class="cc">cd web && npm run build</span>
@@ -944,5 +945,5 @@ export interface ButtonProps {
     <a href="#how" class="footer-link">Arquitectura</a>
     <a href="#setup" class="footer-link">Instalación</a>
   </div>
-  <small>Boilerplate comercial · Modifica y usa en proyectos propios o de clientes · No redistribuir como producto independiente</small>
+  <small>Licencia MIT · Úsalo, modifícalo y redistribúyelo libremente</small>
 </footer>

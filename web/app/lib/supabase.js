@@ -6,5 +6,20 @@ export const supabase = createClient(
 );
 
 export const SESSION_ID = process.env.NEXT_PUBLIC_SESSION_ID ?? 'main';
-export const SESSION_TOKEN = process.env.NEXT_PUBLIC_SESSION_TOKEN ?? '';
-if (!SESSION_TOKEN && typeof window !== 'undefined') console.warn('[CC Controller] NEXT_PUBLIC_SESSION_TOKEN no configurado');
+
+const TOKEN_KEY = 'cc-session-token';
+
+// El token de emparejamiento nunca se compila en el bundle: se introduce una vez
+// en la PWA y vive solo en este dispositivo.
+export function getSessionToken() {
+  if (typeof window === 'undefined') return '';
+  try { return localStorage.getItem(TOKEN_KEY) ?? ''; } catch { return ''; }
+}
+
+export function setSessionToken(token) {
+  try { localStorage.setItem(TOKEN_KEY, token); } catch {}
+}
+
+export function clearSessionToken() {
+  try { localStorage.removeItem(TOKEN_KEY); } catch {}
+}

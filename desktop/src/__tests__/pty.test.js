@@ -1,64 +1,78 @@
-import { describe, it, test, mock, beforeEach } from 'node:test';
+import { describe, it, test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import PtyManager from '../pty.js';
 
-function makeMockPty() {
-  const proc = {
-    _onData: null,
-    onData(cb) { this._onData = cb; },
-    write: mock.fn(),
-    kill: mock.fn(),
-  };
-  return { lib: { spawn: mock.fn(() => proc) }, proc };
-}
-
 describe('PtyManager', () => {
-  let mgr, proc;
+  let mgr;
 
   beforeEach(() => {
-    const { lib, proc: p } = makeMockPty();
-    proc = p;
-    mgr = new PtyManager(lib);
+    mgr = new PtyManager();
+    mgr.spawn('true', [], '/tmp');
   });
 
-  it('starts not running', () => {
+  it('starts idle', () => {
     assert.equal(mgr.running, false);
   });
 
-  it('spawn sets running=true', () => {
-    mgr.spawn();
-    assert.equal(mgr.running, true);
+  it('spawn announces the session without launching a process', () => {
+    let announced = null;
+    const m = new PtyManager();
+    m.onMessage = (role, text) => { announced = { role, text }; };
+    m.spawn('true', [], '/tmp');
+    assert.deepEqual(announced, { role: 'system', text: 'Sesión iniciada' });
+    assert.equal(m.running, false);
   });
 
-  it('calls onOutput when process emits data', () => {
-    let received = '';
-    mgr.onOutput = (d) => { received = d; };
-    mgr.spawn();
-    proc._onData('hello');
-    assert.equal(received, 'hello');
+  it('ignores blank messages', () => {
+    mgr.write('   \n');
+    assert.equal(mgr._queue.length, 0);
+    assert.equal(mgr.running, false);
   });
 
-  it('write forwards to process', () => {
-    mgr.spawn();
-    mgr.write('y\n');
-    assert.equal(proc.write.mock.calls[0].arguments[0], 'y\n');
-  });
-
-  it('kill sets running=false', () => {
-    mgr.spawn();
+  it('queues messages while one is in flight', () => {
+    mgr._busy = true;
+    mgr.write('primero');
+    mgr.write('segundo');
+    assert.deepEqual(mgr._queue.map(q => q.msg), ['primero', 'segundo']);
     mgr.kill();
+  });
+
+  it('kill empties the queue', () => {
+    mgr._busy = true;
+    mgr.write('hola');
+    mgr.kill();
+    assert.equal(mgr._queue.length, 0);
     assert.equal(mgr.running, false);
+  });
+
+  it('runs the command with the expected flags and reports its output', async () => {
+    const m = new PtyManager();
+    m.spawn('echo', [], '/tmp');
+    const output = new Promise(resolve => { m.onMessage = (_role, text) => resolve(text); });
+    m.write('hola', true, 'claude-opus-5', 'high');
+    assert.equal(await output, '--print --continue --model claude-opus-5 --effort high');
   });
 });
 
-test('write builds correct args for model and effort', () => {
+test('write keeps model and effort with the queued message', () => {
   const pty = new PtyManager();
-  pty.spawn('echo', [], '/tmp');
+  pty.spawn('true', [], '/tmp');
   pty._busy = true;
   pty.write('hello', true, 'claude-opus-5', 'high');
   const queued = pty._queue[0];
   assert.equal(queued.model, 'claude-opus-5');
   assert.equal(queued.effort, 'high');
   assert.equal(queued.continueConv, true);
+  pty.kill();
+});
+
+test('write falls back to safe defaults for unknown model and effort', () => {
+  const pty = new PtyManager();
+  pty.spawn('true', [], '/tmp');
+  pty._busy = true;
+  pty.write('hello', true, '--dangerously-skip-permissions', 'turbo');
+  const queued = pty._queue[0];
+  assert.equal(queued.model, 'claude-sonnet-4-6');
+  assert.equal(queued.effort, 'medium');
   pty.kill();
 });
