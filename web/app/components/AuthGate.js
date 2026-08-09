@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
-import { supabase, getSessionToken, setSessionToken } from '../lib/supabase';
+import { supabase, getSessionToken, setSessionToken, CONFIGURED } from '../lib/supabase';
 
 const SHELL = { height: '100dvh', background: '#fde8e4', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 24px', fontFamily: 'Sora, sans-serif' };
 const CARD = { background: '#fff', borderRadius: 24, padding: 24, boxShadow: '0 12px 40px rgba(240,78,35,0.12)' };
@@ -14,6 +14,7 @@ export default function AuthGate({ children }) {
   const [hasToken, setHasToken] = useState(false);
 
   useEffect(() => {
+    if (!CONFIGURED) { setStatus('unconfigured'); return; }
     supabase.auth.getSession().then(({ data }) => {
       setStatus(data.session ? 'ready' : 'anon');
       setHasToken(Boolean(getSessionToken()));
@@ -30,9 +31,24 @@ export default function AuthGate({ children }) {
   }, []);
 
   if (status === 'loading') return <main style={SHELL} />;
+  if (status === 'unconfigured') return <Unconfigured />;
   if (status === 'anon') return <SignIn />;
   if (!hasToken) return <PairDevice onSubmit={handleToken} />;
   return children;
+}
+
+function Unconfigured() {
+  return (
+    <main style={SHELL}>
+      <div style={CARD}>
+        <div style={TITLE}>Falta configurar Supabase</div>
+        <div style={{ ...HINT, marginBottom: 0 }}>
+          Define <code>NEXT_PUBLIC_SUPABASE_URL</code> y <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> en el
+          entorno del despliegue y vuelve a publicar.
+        </div>
+      </div>
+    </main>
+  );
 }
 
 function SignIn() {
