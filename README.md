@@ -48,15 +48,29 @@ iPhone (PWA)  ──── Supabase Realtime ────  Mac (Electron)
 3. **Public bucket**: OFF (privado)
 4. Crea el bucket
 
-### 1.3 Política RLS para uploads desde la PWA
+### 1.3 Autenticación y políticas
 
-La PWA (anon key) necesita permiso para subir archivos. Ve a **SQL Editor** y ejecuta:
+CC Controller exige que quien abra la PWA inicie sesión: el canal de Supabase
+da control total sobre tu Mac, así que no puede quedar abierto al público.
+
+1. **Authentication → Providers → Email**: activa el proveedor. Basta con
+   *Magic Link* / OTP (sin contraseña).
+2. **SQL Editor**: ejecuta [`scripts/setup-supabase.sql`](scripts/setup-supabase.sql).
+   Crea la tabla `public.cc_allowed_users`, la función `public.cc_can_access()`,
+   las políticas de Realtime Authorization para canales privados y las de
+   Storage restringidas a usuarios autorizados.
+3. **Realtime → Settings**: activa *Realtime Authorization* (canales privados).
+4. Autoriza tu propio usuario (después de tu primer login) con la consulta que
+   viene comentada al final del script:
 
 ```sql
-CREATE POLICY "anon_insert_uploads" ON storage.objects
-FOR INSERT TO anon
-WITH CHECK (bucket_id = 'uploads');
+INSERT INTO public.cc_allowed_users (user_id, session_id)
+SELECT id, 'cc-session-01' FROM auth.users WHERE email = 'tu@correo.com'
+ON CONFLICT (user_id) DO UPDATE SET session_id = EXCLUDED.session_id, active = true;
 ```
+
+Las columnas `active` y `expires_at` permiten revocar el acceso sin borrar la
+cuenta.
 
 ### 1.4 Obtener las llaves
 
@@ -91,10 +105,13 @@ Edita `.env.local`:
 NEXT_PUBLIC_SUPABASE_URL="https://tu-proyecto.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="tu-anon-key"
 NEXT_PUBLIC_SESSION_ID="cc-session-01"
-NEXT_PUBLIC_SESSION_TOKEN="un-token-secreto-largo-y-aleatorio"
 ```
 
-> **Seguridad:** `SESSION_TOKEN` es la única barrera entre el canal de Supabase y tu Mac. Usa al menos 32 caracteres aleatorios. Genera uno con:
+> **Seguridad:** el `SESSION_TOKEN` **no** se configura aquí. Cualquier variable
+> `NEXT_PUBLIC_*` termina en el JavaScript que sirve Netlify, y un token público
+> equivale a dar ejecución remota en tu Mac a quien encuentre la URL. La PWA lo
+> pide una sola vez tras iniciar sesión y lo guarda en el navegador del
+> dispositivo. Genera el token con:
 > ```bash
 > openssl rand -hex 32
 > ```
@@ -114,7 +131,8 @@ npm run dev
    - **Base directory:** `web`
    - **Build command:** `npm run build`
    - **Publish directory:** `web/.next`
-4. En **Site configuration → Environment variables**, agrega las 4 variables de `.env.local`
+4. En **Site configuration → Environment variables**, agrega las 3 variables de `.env.local`
+   (nunca el `SESSION_TOKEN`)
 5. Redeploy
 
 ---
@@ -144,7 +162,8 @@ SESSION_TOKEN="un-token-secreto-largo-y-aleatorio"
 PWA_URL="tu-app.netlify.app"
 ```
 
-> **Importante:** `SESSION_ID` y `SESSION_TOKEN` deben ser exactamente iguales en Desktop y PWA.
+> **Importante:** el `SESSION_ID` debe coincidir con `NEXT_PUBLIC_SESSION_ID` de la
+> PWA, y el `SESSION_TOKEN` es el que introducirás a mano en la PWA la primera vez.
 
 ### 3.3 Correr en desarrollo
 
@@ -175,7 +194,11 @@ Instala el DMG arrastrando a Applications. Al abrir, CC Controller vive en el tr
 1. Abre CC Controller desde Applications (queda en el tray)
 2. Clic derecho → **Iniciar sesión**
 3. Abre la PWA en tu iPhone (agrégala a la pantalla de inicio para usarla como app nativa)
-4. Escribe mensajes — Claude Code responde en tiempo real
+4. La primera vez: inicia sesión con tu correo (recibes un enlace/código) y pega
+   el `SESSION_TOKEN` de `~/.config/cc-controller/.env`. Queda guardado en el
+   dispositivo.
+5. Escribe mensajes — Claude Code responde cuando termina de procesar el prompt
+   (`claude --print` no transmite token a token).
 
 ### Proyectos
 
@@ -205,11 +228,18 @@ Formatos permitidos: `.png .jpg .jpeg .gif .pdf .txt .md .json .csv .svg .zip` (
 
 | Medida | Descripción |
 |---|---|
-| `SESSION_TOKEN` | Cada evento PWA→Electron requiere este token. Sin él, el evento se ignora silenciosamente. |
+| Supabase Auth | La PWA no funciona sin iniciar sesión; solo los usuarios de `cc_allowed_users` (con `active = true` y sin expirar) pasan. |
+| Canal privado | El canal `session:<id>` usa Realtime Authorization: sin un JWT autorizado no se puede leer ni escribir en el Broadcast. |
+| `SESSION_TOKEN` | Segunda barrera: cada evento PWA→Electron lo requiere. Ya no se compila en el bundle; se introduce en el dispositivo. |
 | Path traversal | Electron valida que todos los archivos y proyectos queden dentro de `~/CCProjects/`. |
 | Storage temporal | Los archivos subidos se eliminan de Supabase inmediatamente después de descargarse. |
 | `.env` permisos | Los archivos de secretos se crean con `mode 0o600`. |
-| Llave de servicio | `SUPABASE_SERVICE_KEY` solo existe en `desktop/.env`, nunca en el frontend. |
+| Llave de servicio | `SUPABASE_SERVICE_KEY` solo existe en la config del desktop, nunca en el frontend. |
+| Storage con RLS | Subir y leer en `uploads` requiere sesión autenticada y autorizada para ese `session_id`. |
+
+> El `SESSION_TOKEN` guardado en el navegador es un secreto compartido: si
+> pierdes el teléfono, rota el token en `~/.config/cc-controller/.env` y
+> reinicia el desktop.
 
 ---
 
@@ -241,6 +271,7 @@ cc-controller/
 │   ├── app/
 │   │   ├── page.js           # Chat UI principal
 │   │   ├── components/
+│   │   │   ├── AuthGate.js        # Login Supabase + emparejamiento del token
 │   │   │   ├── SettingsSheet.js   # Modelo, effort, secretos
 │   │   │   ├── ProjectsList.js    # Lista y gestión de proyectos
 │   │   │   └── FileUpload.js      # Subida de archivos
@@ -250,7 +281,7 @@ cc-controller/
 │   └── .env.local.example    # Template de variables
 │
 └── scripts/
-    └── setup-storage-policy.sql   # Política RLS para uploads
+    └── setup-supabase.sql    # Auth, Realtime Authorization y RLS de Storage
 ```
 
 ---
@@ -267,10 +298,25 @@ cc-controller/
 → Caracteres ANSI. El bridge los filtra automáticamente. Si persisten, asegúrate de tener la versión más reciente del DMG.
 
 **La subida de archivos falla con error 403**
-→ La política RLS de Supabase Storage no está configurada. Ejecuta el SQL del Paso 1.3.
+→ Falta ejecutar `scripts/setup-supabase.sql` o tu usuario no está en
+`cc_allowed_users` con el `session_id` correcto.
+
+**La PWA se queda en "Conectando" o el canal no suscribe**
+→ Realtime Authorization está activo pero tu usuario no está autorizado.
+Revisa `cc_allowed_users` (`active`, `expires_at`, `session_id`).
+
+**Electron no acepta mis mensajes**
+→ El token guardado en el dispositivo no coincide con el `SESSION_TOKEN` del
+Mac. Borra los datos del sitio en el navegador y vuelve a emparejar.
+
+**DMG sin firmar: "no se puede abrir porque proviene de un desarrollador no identificado"**
+→ El build no está firmado ni notarizado. Ábrelo con clic derecho → *Abrir*, o
+firma tú mismo poniendo `notarize: true` en `desktop/electron-builder.yml` con
+un certificado *Developer ID Application* y las variables `APPLE_ID`,
+`APPLE_APP_SPECIFIC_PASSWORD` y `APPLE_TEAM_ID`.
 
 ---
 
 ## Licencia
 
-Boilerplate comercial. Puedes modificarlo y usarlo en proyectos propios o de clientes. No redistribuir como producto independiente.
+[MIT](LICENSE) — úsalo, modifícalo y redistribúyelo libremente.

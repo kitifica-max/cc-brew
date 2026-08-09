@@ -11,11 +11,13 @@ function makeMockClient() {
     send,
     subscribe: mock.fn(() => channel),
   };
+  const setAuth = mock.fn();
   const client = {
     channel: mock.fn(() => channel),
     removeChannel,
+    realtime: { setAuth },
   };
-  return { client, channel, handlers, send, removeChannel };
+  return { client, channel, handlers, send, removeChannel, setAuth };
 }
 
 const OPTS = {
@@ -40,6 +42,12 @@ describe('Bridge', () => {
   it('connect subscribes to correct channel', () => {
     bridge.connect();
     assert.equal(bridge.client.channel.mock.calls[0].arguments[0], 'session:main');
+  });
+
+  it('connect opens the channel as private and authenticates', () => {
+    bridge.connect();
+    assert.deepEqual(bridge.client.channel.mock.calls[0].arguments[1], { config: { private: true } });
+    assert.equal(bridge.client.realtime.setAuth.mock.calls[0].arguments[0], 'key');
   });
 
   it('broadcastMessage sends message event with role and text', () => {
@@ -108,7 +116,7 @@ test('connect subscribes to all new events', () => {
     subscribe: () => mockChannel,
     send: () => {},
   };
-  const mockClient = { channel: () => mockChannel, removeChannel: () => {} };
+  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} } };
   const b = new Bridge({ supabaseUrl: 'x', supabaseKey: 'x', sessionId: 's', sessionToken: 't', _createClient: () => mockClient });
   b.connect();
   assert.ok(events.includes('create-project'), 'missing create-project');
@@ -124,7 +132,7 @@ test('rejects create-project with wrong token', () => {
     subscribe: () => mockChannel,
     send: () => {},
   };
-  const mockClient = { channel: () => mockChannel, removeChannel: () => {} };
+  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} } };
   const b = new Bridge({ supabaseUrl: 'x', supabaseKey: 'x', sessionId: 's', sessionToken: 'tok', _createClient: () => mockClient });
   b.connect();
   let called = false;
@@ -140,7 +148,7 @@ test('calls onCreateProject with correct args', () => {
     subscribe: () => mockChannel,
     send: () => {},
   };
-  const mockClient = { channel: () => mockChannel, removeChannel: () => {} };
+  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} } };
   const b = new Bridge({ supabaseUrl: 'x', supabaseKey: 'x', sessionId: 's', sessionToken: 'tok', _createClient: () => mockClient });
   b.connect();
   let result = null;
@@ -156,7 +164,7 @@ test('calls onSwitchProject with id', () => {
     subscribe: () => mockChannel,
     send: () => {},
   };
-  const mockClient = { channel: () => mockChannel, removeChannel: () => {} };
+  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} } };
   const b = new Bridge({ supabaseUrl: 'x', supabaseKey: 'x', sessionId: 's', sessionToken: 'tok', _createClient: () => mockClient });
   b.connect();
   let received = null;
@@ -172,7 +180,7 @@ test('calls onUploadFile with storageKey, filename, projectId', () => {
     subscribe: () => mockChannel,
     send: () => {},
   };
-  const mockClient = { channel: () => mockChannel, removeChannel: () => {} };
+  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} } };
   const b = new Bridge({ supabaseUrl: 'x', supabaseKey: 'x', sessionId: 's', sessionToken: 'tok', _createClient: () => mockClient });
   b.connect();
   let args = null;
@@ -188,7 +196,7 @@ test('calls onOpenClaudeDesktop with projectId', () => {
     subscribe: () => mockChannel,
     send: () => {},
   };
-  const mockClient = { channel: () => mockChannel, removeChannel: () => {} };
+  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} } };
   const b = new Bridge({ supabaseUrl: 'x', supabaseKey: 'x', sessionId: 's', sessionToken: 'tok', _createClient: () => mockClient });
   b.connect();
   let received = null;

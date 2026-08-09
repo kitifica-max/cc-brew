@@ -1,7 +1,12 @@
 import { spawn } from 'child_process';
 
+const DEFAULT_TIMEOUT_MS = 10 * 60_000;
+const MODEL_RE = /^[a-z0-9][a-z0-9.-]{0,63}$/;
+const EFFORTS = new Set(['high', 'medium', 'low']);
+
 export default class PtyManager {
-  constructor() {
+  constructor(timeoutMs = Number(process.env.CLAUDE_TIMEOUT_MS) || DEFAULT_TIMEOUT_MS) {
+    this.timeoutMs = timeoutMs;
     this._command = 'claude';
     this._cwd = process.env.HOME;
     this._queue = [];
@@ -22,6 +27,9 @@ export default class PtyManager {
     if (text === '\x03') return;
     const msg = text.replace(/\n+$/, '').trim();
     if (!msg) return;
+    // model y effort acaban en argv: solo valores con forma conocida.
+    if (!MODEL_RE.test(model)) model = 'claude-sonnet-4-6';
+    if (!EFFORTS.has(effort)) effort = 'medium';
     this._queue.push({ msg, continueConv, model, effort, projectId });
     this._flush();
   }
@@ -43,13 +51,16 @@ export default class PtyManager {
     });
 
     this._currentProc = proc;
+    // Si el proceso muere antes de leer stdin, el EPIPE tumbaría el proceso principal.
+    proc.stdin.on('error', () => {});
+    proc.on('error', (e) => chunks.push(`[ERROR: ${e.message}]`));
     proc.stdin.write(msg + '\n');
     proc.stdin.end();
 
     const timeout = setTimeout(() => {
       proc.kill('SIGTERM');
-      chunks.push('[TIMEOUT: sin respuesta en 2 min]');
-    }, 120_000);
+      chunks.push(`[TIMEOUT: sin respuesta en ${Math.round(this.timeoutMs / 60_000)} min]`);
+    }, this.timeoutMs);
 
     proc.stdout.on('data', (d) => chunks.push(d.toString()));
     proc.stderr.on('data', (d) => chunks.push(d.toString()));
