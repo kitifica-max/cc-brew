@@ -20,7 +20,8 @@ export default function FileUpload({ currentProject, sendEvent, onFileSent }) {
 
     setUploading(true);
     try {
-      const storageKey = `uploads/${SESSION_ID}/${Date.now()}-${file.name}`;
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const storageKey = `uploads/${SESSION_ID}/${Date.now()}-${safeName}`;
       const { error } = await supabase.storage.from('uploads').upload(storageKey, file);
       if (error) throw error;
 

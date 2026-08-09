@@ -81,8 +81,11 @@ function startSession() {
 
   bridge = new Bridge({ supabaseUrl: SUPABASE_URL, supabaseKey: SUPABASE_SERVICE_KEY, sessionId: SESSION_ID, sessionToken: SESSION_TOKEN });
 
-  bridge.onInput = (text, continueConv, model, effort) => pty.write(text, continueConv, model, effort);
-  pty.onMessage = (role, text) => bridge?.broadcastMessage(role, text);
+  bridge.onInput = (text, continueConv, model, effort) => {
+    const projectId = getActive()?.id ?? null;
+    pty.write(text, continueConv, model, effort, projectId);
+  };
+  pty.onMessage = (role, text, projectId) => bridge?.broadcastMessage(role, text, projectId);
 
   bridge.onCreateProject = (id, name) => {
     try {
@@ -117,9 +120,10 @@ function startSession() {
       if (!safeName || safeName.startsWith('.')) throw new Error('Nombre de archivo inválido');
       const ext = extname(safeName).toLowerCase();
       if (!ALLOWED_EXTENSIONS.has(ext)) throw new Error(`Extensión no permitida: ${ext}`);
+      const meta = await bridge.getFileMeta(storageKey);
+      if (meta?.metadata?.size > MAX_FILE_BYTES) throw new Error('Archivo demasiado grande (máx 10MB)');
       const buffer = await bridge.downloadFromStorage(storageKey);
       downloaded = true;
-      if (buffer.length > MAX_FILE_BYTES) throw new Error('Archivo demasiado grande (máx 10MB)');
       const destPath = resolve(project.path, safeName);
       if (!destPath.startsWith(resolve(project.path) + sep)) throw new Error('Ruta inválida');
       writeFileSync(destPath, buffer);

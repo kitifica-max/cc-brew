@@ -93,7 +93,7 @@ export function saveProjectEnv(id, envObject) {
     if (!key || value === undefined || value === null) continue;
     const safeKey = key.replace(/[^a-zA-Z0-9_]/g, '');
     if (!safeKey) continue;
-    const safeValue = String(value).replace(/"/g, '\\"');
+    const safeValue = String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
     envContent += `${safeKey}="${safeValue}"${EOL}`;
   }
 

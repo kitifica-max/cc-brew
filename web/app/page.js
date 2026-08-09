@@ -68,9 +68,10 @@ export default function CCController() {
     ch.on('broadcast', { event: 'message' }, ({ payload }) => {
       resetDesktopTimeout();
       setThinking(false);
+      const targetId = payload.projectId ?? currentIdRef.current;
       const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
       setProjects(prev => prev.map(p => {
-        if (p.id !== currentIdRef.current) return p;
+        if (p.id !== targetId) return p;
         return { ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: payload.role, text: payload.text, time }] };
       }));
     });

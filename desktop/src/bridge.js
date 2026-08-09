@@ -71,12 +71,20 @@ export default class Bridge {
       .subscribe();
   }
 
-  broadcastMessage(role, text) {
+  broadcastMessage(role, text, projectId = null) {
     this.channel?.send({
       type: 'broadcast',
       event: 'message',
-      payload: { role, text: text.replace(ANSI_RE, ''), ts: Date.now() },
+      payload: { role, text: text.replace(ANSI_RE, ''), ts: Date.now(), ...(projectId && { projectId }) },
     });
+  }
+
+  async getFileMeta(storageKey) {
+    const parts = storageKey.split('/');
+    const folder = parts.slice(0, -1).join('/');
+    const name = parts[parts.length - 1];
+    const { data } = await this.client.storage.from('uploads').list(folder, { search: name });
+    return data?.[0] ?? null;
   }
 
   broadcastProjectState(projects, activeId) {

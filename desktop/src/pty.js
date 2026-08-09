@@ -18,18 +18,18 @@ export default class PtyManager {
     this.onMessage?.('system', 'Sesión iniciada');
   }
 
-  write(text, continueConv = true, model = 'claude-sonnet-4-6', effort = 'medium') {
+  write(text, continueConv = true, model = 'claude-sonnet-4-6', effort = 'medium', projectId = null) {
     if (text === '\x03') return;
     const msg = text.replace(/\n+$/, '').trim();
     if (!msg) return;
-    this._queue.push({ msg, continueConv, model, effort });
+    this._queue.push({ msg, continueConv, model, effort, projectId });
     this._flush();
   }
 
   _flush() {
     if (this._busy || !this._queue.length) return;
     this._busy = true;
-    const { msg, continueConv, model, effort } = this._queue.shift();
+    const { msg, continueConv, model, effort, projectId } = this._queue.shift();
     const chunks = [];
 
     const args = ['--print'];
@@ -46,12 +46,18 @@ export default class PtyManager {
     proc.stdin.write(msg + '\n');
     proc.stdin.end();
 
+    const timeout = setTimeout(() => {
+      proc.kill('SIGTERM');
+      chunks.push('[TIMEOUT: sin respuesta en 2 min]');
+    }, 120_000);
+
     proc.stdout.on('data', (d) => chunks.push(d.toString()));
     proc.stderr.on('data', (d) => chunks.push(d.toString()));
     proc.on('close', () => {
+      clearTimeout(timeout);
       this._currentProc = null;
       const response = chunks.join('').trim();
-      if (response) this.onMessage?.('claude', response);
+      if (response) this.onMessage?.('claude', response, projectId);
       this._busy = false;
       this._flush();
     });
