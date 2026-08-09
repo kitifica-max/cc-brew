@@ -150,6 +150,7 @@ export default function CCController() {
       if (id === currentId) setCurrentId(next[0].id);
       return next;
     });
+    sendEvent('delete-project', { id });
   }
 
   function updateProjectSettings(field, value) {

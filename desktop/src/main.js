@@ -12,6 +12,9 @@ import { homedir } from 'os';
 import { exec } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// Production: ~/.config/cc-controller/.env (not bundled in DMG)
+// Dev: desktop/.env (fallback, dotenv skips already-set vars)
+dotenv.config({ path: path.join(process.env.HOME || homedir(), '.config', 'cc-controller', '.env') });
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const HOME = process.env.HOME || homedir();
@@ -64,7 +67,11 @@ function broadcastProjects() {
 function startSession() {
   const { SUPABASE_URL, SUPABASE_SERVICE_KEY, SESSION_ID, SESSION_TOKEN } = process.env;
   if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY || !SESSION_ID || !SESSION_TOKEN) {
-    console.error('Missing env vars. Check desktop/.env');
+    console.error('Missing env vars. Copy .env.example to ~/.config/cc-controller/.env');
+    return;
+  }
+  if (SESSION_TOKEN.length < 16) {
+    console.error('SESSION_TOKEN inseguro — mínimo 16 caracteres');
     return;
   }
 
@@ -126,8 +133,14 @@ function startSession() {
 
   bridge.onGetProjectState = () => broadcastProjects();
 
+  bridge.onDeleteProject = (id) => {
+    deleteProject(id);
+    broadcastProjects();
+  };
+
   bridge.onSaveEnv = (projectId, envObject) => {
     try {
+      if (!envObject || typeof envObject !== 'object' || Array.isArray(envObject)) return;
       saveProjectEnv(projectId, envObject);
       const project = listProjects().find(p => p.id === projectId);
       bridge?.broadcastMessage('system', `Secretos guardados en .env: ${project?.name ?? projectId}`);

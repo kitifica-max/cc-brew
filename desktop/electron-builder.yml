@@ -10,7 +10,6 @@ directories:
 files:
   - src/**/*
   - assets/tray-icon.png
-  - .env
   - package.json
   - node_modules/**/*
 

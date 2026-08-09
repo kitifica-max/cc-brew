@@ -20,6 +20,7 @@ export default class Bridge {
     this.onOpenClaudeDesktop = null;
     this.onGetProjectState = null;
     this.onSaveEnv = null;
+    this.onDeleteProject = null;
     this._heartbeatTimer = null;
   }
 
@@ -62,6 +63,10 @@ export default class Bridge {
       .on('broadcast', { event: 'save-env' }, ({ payload }) => {
         if (!this._validate(payload)) return;
         this.onSaveEnv?.(payload.projectId, payload.env);
+      })
+      .on('broadcast', { event: 'delete-project' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this.onDeleteProject?.(payload.id);
       })
       .subscribe();
   }

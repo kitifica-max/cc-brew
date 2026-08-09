@@ -6,10 +6,11 @@ export default class PtyManager {
     this._cwd = process.env.HOME;
     this._queue = [];
     this._busy = false;
+    this._currentProc = null;
     this.onMessage = null;
   }
 
-  get running() { return true; }
+  get running() { return this._currentProc !== null || this._busy; }
 
   spawn(command = 'claude', args = [], cwd = process.env.HOME) {
     this._command = command;
@@ -41,12 +42,14 @@ export default class PtyManager {
       env: { ...process.env, NO_COLOR: '1' },
     });
 
+    this._currentProc = proc;
     proc.stdin.write(msg + '\n');
     proc.stdin.end();
 
     proc.stdout.on('data', (d) => chunks.push(d.toString()));
     proc.stderr.on('data', (d) => chunks.push(d.toString()));
     proc.on('close', () => {
+      this._currentProc = null;
       const response = chunks.join('').trim();
       if (response) this.onMessage?.('claude', response);
       this._busy = false;
@@ -57,5 +60,7 @@ export default class PtyManager {
   kill() {
     this._queue = [];
     this._busy = false;
+    this._currentProc?.kill('SIGTERM');
+    this._currentProc = null;
   }
 }
