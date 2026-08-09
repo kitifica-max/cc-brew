@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logos/logoccc2.svg" alt="CC Controller" width="640"/>
+</p>
+
 # CC Controller — Remote Claude Code Bridge
 
 Control Claude Code desde tu iPhone (o cualquier móvil) usando una PWA como control remoto. El Mac ejecuta Claude Code localmente; el teléfono envía y recibe mensajes en tiempo real vía Supabase Realtime.
