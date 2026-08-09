@@ -1,0 +1,948 @@
+<title>CC Controller — Control Claude Code desde tu iPhone</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* ─── TOKENS ─────────────────────────────────── */
+:root {
+  --orange:        #f04e23;
+  --orange-dim:    rgba(240,78,35,0.18);
+  --orange-glow:   rgba(240,78,35,0.35);
+  --teal:          #00b09b;
+  --teal-dim:      rgba(0,176,155,0.18);
+  --ink:           #0d0d0d;
+  --ink-2:         #171717;
+  --ink-3:         #222;
+  --ink-4:         #2d2d2d;
+  --border:        rgba(255,255,255,0.08);
+  --border-warm:   rgba(240,78,35,0.2);
+  --text:          #f5f0ee;
+  --text-2:        rgba(245,240,238,0.55);
+  --text-3:        rgba(245,240,238,0.3);
+  --white:         #ffffff;
+  --radius-card:   20px;
+  --radius-sm:     12px;
+  --gap:           14px;
+  --transition:    150ms ease;
+  --transition-md: 200ms ease;
+}
+
+/* ─── RESET ──────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--ink); color: var(--text);
+  line-height: 1.5; -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ─── NAV ─────────────────────────────────────── */
+nav {
+  position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+  z-index: 100; display: flex; align-items: center; gap: 0;
+  background: rgba(13,13,13,0.85); backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--border); border-radius: 100px;
+  padding: 8px 8px 8px 20px;
+  width: min(calc(100% - 32px), 700px);
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; flex: 1; }
+.nav-logo-mark { width: 26px; height: 26px; flex-shrink: 0; }
+.nav-brand { font-size: 13px; font-weight: 700; letter-spacing: -0.01em; }
+.nav-brand em { font-style: normal; color: var(--orange); }
+.nav-links { display: flex; gap: 4px; margin-right: 8px; }
+.nav-link {
+  font-size: 12px; font-weight: 500; color: var(--text-2); padding: 6px 14px;
+  border-radius: 100px; cursor: pointer;
+  transition: color var(--transition), background var(--transition);
+}
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+.nav-cta {
+  background: var(--orange); color: #fff; font-size: 12px; font-weight: 700;
+  padding: 8px 18px; border-radius: 100px; cursor: pointer; border: none;
+  transition: background var(--transition), transform var(--transition);
+  white-space: nowrap; display: flex; align-items: center; gap: 6px;
+}
+.nav-cta:hover { background: #d93e16; transform: scale(1.02); }
+@media (max-width: 600px) { .nav-links { display: none; } nav { padding: 8px 8px 8px 16px; } }
+
+/* ─── HERO ────────────────────────────────────── */
+.hero {
+  min-height: 100svh; display: flex; align-items: center;
+  padding: 100px 20px 60px;
+  position: relative; overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 700px 500px at 65% 40%, rgba(240,78,35,0.07), transparent),
+    radial-gradient(ellipse 400px 400px at 20% 80%, rgba(0,176,155,0.05), transparent);
+}
+.hero-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 0%, black 30%, transparent 100%);
+}
+.hero-inner {
+  position: relative; z-index: 1; max-width: 1120px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 420px; gap: 60px; align-items: center;
+  width: 100%;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  border: 1px solid var(--border-warm); border-radius: 100px;
+  padding: 5px 14px 5px 8px; margin-bottom: 24px;
+  font-size: 11px; font-weight: 600; color: var(--text-2);
+}
+.hero-badge-dot { width: 18px; height: 18px; border-radius: 50%; background: var(--orange-dim); border: 1px solid var(--border-warm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.hero-badge-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); animation: heroPulse 2s ease-in-out infinite; }
+@keyframes heroPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+.hero h1 {
+  font-size: clamp(2.6rem, 6vw, 4rem); font-weight: 800;
+  line-height: 1.05; letter-spacing: -0.04em; color: var(--text);
+  text-wrap: balance; margin-bottom: 20px;
+}
+.hero h1 span { color: var(--orange); }
+.hero-sub {
+  font-size: 16px; color: var(--text-2); line-height: 1.7;
+  max-width: 440px; margin-bottom: 40px;
+}
+.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--orange); color: #fff; font-weight: 700; font-size: 14px;
+  padding: 13px 24px; border-radius: 100px; border: none; cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+  min-height: 44px;
+}
+.btn-primary:hover { background: #d93e16; transform: translateY(-1px); }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border); color: var(--text-2); font-weight: 600; font-size: 14px;
+  padding: 13px 24px; border-radius: 100px; background: none; cursor: pointer;
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+  min-height: 44px;
+}
+.btn-ghost:hover { border-color: rgba(255,255,255,0.2); color: var(--text); background: rgba(255,255,255,0.04); }
+
+/* ─── FLOW CARD (Hero right) ──────────────────── */
+.flow-card {
+  background: var(--ink-2); border: 1px solid var(--border);
+  border-radius: var(--radius-card); padding: 24px;
+  position: relative; overflow: hidden;
+}
+.flow-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 300px 200px at 50% -50%, rgba(240,78,35,0.06), transparent);
+  pointer-events: none;
+}
+.flow-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.flow-title { font-size: 11px; font-weight: 700; color: var(--text-3); letter-spacing: 0.12em; text-transform: uppercase; }
+.flow-live { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; color: var(--teal); }
+.flow-live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--teal); animation: heroPulse 2s 0.3s ease-in-out infinite; }
+.flow-nodes { display: flex; flex-direction: column; gap: 10px; }
+.flow-node {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--ink-3); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px 16px;
+}
+.flow-node-icon {
+  width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.flow-node-icon.o { background: rgba(240,78,35,0.12); }
+.flow-node-icon.t { background: rgba(0,176,155,0.12); }
+.flow-node-icon.w { background: rgba(255,255,255,0.06); }
+.flow-node-info { flex: 1; min-width: 0; }
+.flow-node-label { font-size: 13px; font-weight: 700; color: var(--text); }
+.flow-node-sub { font-size: 10px; color: var(--text-3); margin-top: 1px; }
+.flow-node-status { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.flow-node-status.active { background: var(--orange); box-shadow: 0 0 8px var(--orange); animation: heroPulse 2s ease-in-out infinite; }
+.flow-node-status.bridge { background: var(--teal); box-shadow: 0 0 8px var(--teal); animation: heroPulse 2s 0.5s ease-in-out infinite; }
+.flow-node-status.mac { background: rgba(255,255,255,0.4); animation: heroPulse 2s 1s ease-in-out infinite; }
+.flow-connector { display: flex; align-items: center; padding: 0 20px; gap: 8px; }
+.flow-line { flex: 1; height: 1px; position: relative; overflow: hidden; border-radius: 2px; background: rgba(255,255,255,0.06); }
+.flow-line::after {
+  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(to right, transparent, var(--orange), transparent);
+  animation: slideRight 2s linear infinite;
+}
+.flow-line.back::after { background: linear-gradient(to right, transparent, var(--teal), transparent); animation-delay: 1s; animation-duration: 2.4s; }
+.flow-arrow { font-size: 10px; color: var(--text-3); flex-shrink: 0; }
+.flow-tag { font-size: 9px; font-weight: 700; color: var(--text-3); letter-spacing: 0.06em; white-space: nowrap; }
+@keyframes slideRight { from { left: -100%; } to { left: 100%; } }
+
+/* ─── STATS ───────────────────────────────────── */
+.stats { padding: 0 20px; }
+.stats-inner {
+  max-width: 1120px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap);
+}
+.stat-card {
+  background: var(--ink-2); border: 1px solid var(--border);
+  border-radius: var(--radius-card); padding: 24px;
+  transition: border-color var(--transition-md), transform var(--transition-md);
+  cursor: default;
+}
+.stat-card:hover { border-color: var(--border-warm); transform: translateY(-2px); }
+.stat-num { font-size: 36px; font-weight: 800; letter-spacing: -0.04em; color: var(--text); line-height: 1; margin-bottom: 6px; }
+.stat-num span { color: var(--orange); }
+.stat-label { font-size: 12px; font-weight: 500; color: var(--text-3); }
+
+/* ─── BENTO ───────────────────────────────────── */
+.bento { padding: 64px 20px; }
+.bento-inner { max-width: 1120px; margin: 0 auto; }
+.section-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--orange); margin-bottom: 12px; display: block; }
+.section-title { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; text-wrap: balance; margin-bottom: 40px; }
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: auto;
+  gap: var(--gap);
+}
+
+/* Cards */
+.bc {
+  background: var(--ink-2); border: 1px solid var(--border);
+  border-radius: var(--radius-card); padding: 28px;
+  position: relative; overflow: hidden;
+  transition: border-color var(--transition-md), transform var(--transition-md), box-shadow var(--transition-md);
+  cursor: default;
+}
+.bc:hover { border-color: rgba(240,78,35,0.22); transform: translateY(-2px); box-shadow: 0 16px 40px rgba(0,0,0,0.3); }
+.bc::before {
+  content: ''; position: absolute; inset: 0; border-radius: var(--radius-card); pointer-events: none;
+  background: radial-gradient(ellipse 200px 200px at var(--mx,50%) var(--my,0%), rgba(240,78,35,0.04), transparent);
+  opacity: 0; transition: opacity var(--transition-md);
+}
+.bc:hover::before { opacity: 1; }
+
+/* Grid placements */
+.bc-realtime  { grid-column: 1 / 4; grid-row: 1; }
+.bc-projects  { grid-column: 4 / 7; grid-row: 1; }
+.bc-files     { grid-column: 1 / 3; grid-row: 2; }
+.bc-status    { grid-column: 3 / 5; grid-row: 2; }
+.bc-env       { grid-column: 5 / 7; grid-row: 2; }
+.bc-model     { grid-column: 1 / 4; grid-row: 3; }
+.bc-quick     { grid-column: 4 / 7; grid-row: 3; }
+
+.bc-icon {
+  width: 44px; height: 44px; border-radius: 11px; margin-bottom: 18px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--orange-dim); border: 1px solid var(--border-warm);
+  color: var(--orange);
+}
+.bc h3 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 8px; }
+.bc p { font-size: 13px; color: var(--text-2); line-height: 1.65; }
+
+/* Chat preview inside realtime card */
+.chat-preview { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+.chat-bubble {
+  border-radius: 14px; padding: 10px 14px; font-size: 12px; max-width: 85%;
+  font-family: system-ui, sans-serif; line-height: 1.5;
+}
+.chat-bubble.user { background: var(--orange); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+.chat-bubble.ai { background: var(--ink-3); color: var(--text); border-bottom-left-radius: 4px; font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace; font-size: 11px; }
+.chat-typing { display: flex; gap: 4px; align-items: center; padding: 10px 14px; background: var(--ink-3); border-radius: 14px; border-bottom-left-radius: 4px; width: fit-content; }
+.chat-typing span { width: 5px; height: 5px; border-radius: 50%; background: var(--orange); animation: typing 1.2s ease-in-out infinite; }
+.chat-typing span:nth-child(2) { animation-delay: 0.15s; }
+.chat-typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typing { 0%, 60%, 100% { opacity: 0.3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+
+/* Projects preview */
+.projects-preview { margin-top: 20px; display: flex; flex-direction: column; gap: 6px; }
+.project-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--ink-3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px;
+  transition: border-color var(--transition);
+}
+.project-row.active { border-color: var(--border-warm); }
+.project-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+.project-row.active .project-dot { background: var(--orange); }
+.project-name { font-size: 12px; font-weight: 600; color: var(--text-2); flex: 1; }
+.project-row.active .project-name { color: var(--text); }
+.project-path { font-size: 10px; color: var(--text-3); font-family: 'SF Mono', ui-monospace, monospace; }
+
+/* Status indicator */
+.status-display { margin-top: 20px; }
+.status-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--border); }
+.status-row:first-child { border-top: none; padding-top: 0; }
+.status-indicator { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.status-indicator.green { background: var(--teal); box-shadow: 0 0 10px var(--teal); }
+.status-indicator.orange { background: #f0a040; }
+.status-indicator.gray { background: rgba(255,255,255,0.2); }
+.status-label { font-size: 12px; font-weight: 600; color: var(--text); }
+.status-desc { font-size: 11px; color: var(--text-3); margin-left: auto; }
+
+/* File upload preview */
+.file-preview { margin-top: 18px; }
+.file-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--ink-3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px; margin-top: 8px;
+}
+.file-ext { font-size: 9px; font-weight: 800; background: var(--orange); color: #fff; border-radius: 5px; padding: 2px 5px; }
+.file-name { font-size: 11px; color: var(--text-2); flex: 1; font-family: 'SF Mono', ui-monospace, monospace; }
+.file-size { font-size: 10px; color: var(--text-3); }
+
+/* Model selector preview */
+.model-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+.chip {
+  padding: 7px 14px; border-radius: 100px; font-size: 12px; font-weight: 600;
+  border: 1px solid var(--border); color: var(--text-2);
+  transition: all var(--transition); cursor: pointer;
+}
+.chip.active { background: var(--orange-dim); border-color: var(--border-warm); color: var(--orange); }
+.chip:hover:not(.active) { border-color: rgba(255,255,255,0.15); color: var(--text); }
+.effort-bar { margin-top: 16px; }
+.effort-label { font-size: 10px; font-weight: 700; color: var(--text-3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+.effort-track { height: 4px; background: var(--ink-4); border-radius: 4px; position: relative; }
+.effort-fill { height: 100%; border-radius: 4px; background: linear-gradient(to right, var(--teal), var(--orange)); width: 60%; }
+
+/* Quick actions */
+.quick-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+.qchip {
+  padding: 10px 20px; border-radius: 100px; font-size: 13px; font-weight: 700;
+  background: var(--ink-3); border: 1px solid var(--border); color: var(--text-2);
+  font-family: 'SF Mono', ui-monospace, monospace;
+  transition: all var(--transition); cursor: pointer; min-height: 44px; display: flex; align-items: center;
+}
+.qchip:hover { background: var(--orange-dim); border-color: var(--border-warm); color: var(--orange); }
+
+/* Env card */
+.env-inputs { margin-top: 18px; display: flex; flex-direction: column; gap: 6px; }
+.env-row {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--ink-3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;
+}
+.env-key { font-size: 10px; font-weight: 700; color: var(--teal); font-family: 'SF Mono', ui-monospace, monospace; min-width: 60px; }
+.env-val { font-size: 11px; color: var(--text-3); font-family: 'SF Mono', ui-monospace, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ─── HOW IT WORKS ────────────────────────────── */
+.how { padding: 64px 20px; }
+.how-inner { max-width: 1120px; margin: 0 auto; }
+.steps-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap); position: relative; margin-top: 40px;
+}
+.steps-grid::before {
+  content: ''; position: absolute;
+  top: 27px; left: calc(16.666% + 24px); right: calc(16.666% + 24px);
+  height: 1px; background: linear-gradient(to right, transparent, var(--border-warm), transparent);
+}
+.step-card {
+  background: var(--ink-2); border: 1px solid var(--border);
+  border-radius: var(--radius-card); padding: 28px 24px;
+  position: relative; overflow: hidden;
+  transition: border-color var(--transition-md);
+}
+.step-card:hover { border-color: var(--border-warm); }
+.step-n {
+  width: 54px; height: 54px; border-radius: 50%; background: var(--ink);
+  border: 1px solid var(--border-warm); color: var(--orange);
+  font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px; position: relative; z-index: 1;
+}
+.step-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+.step-card p { font-size: 13px; color: var(--text-2); line-height: 1.65; }
+.step-code {
+  display: inline-block; margin-top: 12px; font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+  font-size: 11px; color: var(--teal); background: rgba(0,176,155,0.08);
+  border: 1px solid rgba(0,176,155,0.2); padding: 4px 10px; border-radius: 6px;
+}
+
+/* Stack table */
+.arch-table {
+  margin-top: 40px; background: var(--ink-2); border: 1px solid var(--border);
+  border-radius: var(--radius-card); overflow: hidden;
+}
+.arch-row {
+  display: grid; grid-template-columns: 100px 1fr 160px;
+  gap: 20px; align-items: center; padding: 16px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background var(--transition);
+  cursor: default;
+}
+.arch-row:last-child { border-bottom: none; }
+.arch-row:hover { background: rgba(255,255,255,0.02); }
+.arch-badge {
+  font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 100px;
+  text-align: center; letter-spacing: 0.02em;
+}
+.arch-badge.e { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--border-warm); }
+.arch-badge.n { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); border: 1px solid var(--border); }
+.arch-badge.s { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(0,176,155,0.25); }
+.arch-badge.nl { background: rgba(0,216,180,0.07); color: rgba(0,216,180,0.65); border: 1px solid rgba(0,216,180,0.15); }
+.arch-desc { font-size: 13px; color: var(--text-2); line-height: 1.5; }
+.arch-role { font-size: 11px; color: var(--text-3); text-align: right; }
+
+/* ─── SECURITY ────────────────────────────────── */
+.security { padding: 64px 20px; }
+.security-inner { max-width: 1120px; margin: 0 auto; }
+.security-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: var(--gap); margin-top: 40px;
+}
+.sec-card {
+  background: var(--ink-2); border: 1px solid var(--border);
+  border-radius: var(--radius-card); padding: 28px;
+  display: flex; gap: 18px;
+  transition: border-color var(--transition-md), transform var(--transition-md);
+  cursor: default;
+}
+.sec-card:hover { border-color: var(--border-warm); transform: translateY(-2px); }
+.sec-icon {
+  width: 42px; height: 42px; border-radius: 11px; flex-shrink: 0;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; color: var(--text-2);
+}
+.sec-body h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+.sec-body p { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+.sec-chip {
+  display: inline-block; margin-top: 10px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+  font-family: 'SF Mono', ui-monospace, monospace;
+  padding: 3px 10px; border-radius: 6px;
+  background: rgba(240,78,35,0.08); color: rgba(240,78,35,0.7);
+  border: 1px solid rgba(240,78,35,0.15);
+}
+
+/* ─── SETUP ───────────────────────────────────── */
+.setup { padding: 64px 20px; }
+.setup-inner { max-width: 1120px; margin: 0 auto; }
+.setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); margin-top: 40px; }
+.code-card { background: var(--ink-2); border: 1px solid var(--border); border-radius: var(--radius-card); overflow: hidden; }
+.code-top {
+  padding: 14px 18px; display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.dots { display: flex; gap: 5px; }
+.dots span { width: 10px; height: 10px; border-radius: 50%; }
+.dots span:nth-child(1) { background: #ff5f56; }
+.dots span:nth-child(2) { background: #ffbd2e; }
+.dots span:nth-child(3) { background: #27c93f; }
+.code-file { font-size: 11px; font-weight: 700; color: var(--text-3); letter-spacing: 0.08em; font-family: 'SF Mono', ui-monospace, monospace; }
+.code-body {
+  padding: 22px; font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+  font-size: 12px; line-height: 2.1; overflow-x: auto;
+}
+.cm { color: rgba(255,255,255,0.2); }
+.ck { color: var(--teal); }
+.cv { color: rgba(255,255,255,0.5); }
+.cc { color: var(--orange); }
+.cd { color: rgba(255,255,255,0.2); }
+
+/* ─── FOOTER ──────────────────────────────────── */
+footer {
+  padding: 80px 20px 60px; text-align: center;
+  border-top: 1px solid var(--border);
+}
+.footer-logo { width: 52px; height: 52px; margin: 0 auto 20px; }
+footer h3 { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
+footer p { font-size: 13px; color: var(--text-3); margin-bottom: 36px; max-width: 400px; margin-left: auto; margin-right: auto; }
+.footer-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
+.footer-link {
+  font-size: 12px; font-weight: 600; color: var(--text-3); cursor: pointer;
+  padding: 9px 18px; border: 1px solid var(--border); border-radius: 100px; min-height: 44px;
+  display: flex; align-items: center;
+  transition: color var(--transition), border-color var(--transition);
+}
+.footer-link:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+footer small { font-size: 11px; color: var(--text-3); opacity: 0.6; }
+
+/* ─── RESPONSIVE ──────────────────────────────── */
+@media (max-width: 1024px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+  .flow-card { max-width: 480px; }
+  .bento-grid { grid-template-columns: repeat(4, 1fr); }
+  .bc-realtime  { grid-column: 1 / 3; }
+  .bc-projects  { grid-column: 3 / 5; }
+  .bc-files     { grid-column: 1 / 3; }
+  .bc-status    { grid-column: 3 / 5; }
+  .bc-env       { grid-column: 1 / 3; }
+  .bc-model     { grid-column: 3 / 5; }
+  .bc-quick     { grid-column: 1 / 5; }
+  .stats-inner  { grid-template-columns: repeat(2, 1fr); }
+  .steps-grid   { grid-template-columns: 1fr; gap: 12px; }
+  .steps-grid::before { display: none; }
+}
+@media (max-width: 680px) {
+  .bento-grid { grid-template-columns: 1fr; }
+  .bc-realtime, .bc-projects, .bc-files, .bc-status, .bc-env, .bc-model, .bc-quick {
+    grid-column: 1 / 2;
+  }
+  .security-grid { grid-template-columns: 1fr; }
+  .setup-grid { grid-template-columns: 1fr; }
+  .arch-row { grid-template-columns: 80px 1fr; }
+  .arch-role { display: none; }
+}
+
+/* ─── ICONS (inline SVG helpers) ─────────────── */
+svg { display: block; }
+</style>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <svg class="nav-logo-mark" viewBox="0 0 459.86 459.86" xmlns="http://www.w3.org/2000/svg">
+      <rect fill="#2a2a2a" width="459.86" height="459.86" rx="60.76"/>
+      <path fill="#ff582a" d="M350.71,202.18h0c-9.72,0-18.35,5.87-22.29,14.75-2.74,6.18-6.69,11.84-11.84,17-10.69,10.69-23.5,16.21-38.41,16.57-.52.01-1.04.04-1.57.04-15.58,0-28.88-5.51-39.89-16.52-1.26-1.26-2.45-2.56-3.56-3.88-8.63-10.21-12.96-22.22-12.96-36.01s4.34-25.84,13.01-36.07c-1.11-1.33-2.3-2.63-3.55-3.9-11.06-10.95-24.38-16.44-39.95-16.44-.53,0-1.06.02-1.59.04-10.83,16.56-16.28,35.35-16.28,56.38,0,21.03,5.45,39.82,16.28,56.38,4.06,6.2,8.85,12.11,14.43,17.68,9.32,9.32,19.52,16.49,30.58,21.57,13.24,6.08,27.73,9.14,43.48,9.14,28.9,0,53.62-10.26,74.15-30.79,9.68-9.68,17.06-20.32,22.14-31.92,7.02-16.03-4.68-34.01-22.18-34.01Z"/>
+      <path fill="#ff582a" d="M278.22,137.74c14.88.37,27.67,5.83,38.35,16.41,5.16,5.22,9.11,10.93,11.84,17.13,3.93,8.9,12.58,14.78,22.31,14.78h0c17.49,0,29.19-17.96,22.19-33.99-5.08-11.65-12.47-22.34-22.17-32.1-20.53-20.42-45.24-30.63-74.15-30.63-15.73,0-30.2,3.06-43.43,9.12,11.08,5.06,21.3,12.22,30.64,21.51,5.57,5.61,10.36,11.54,14.41,17.77Z"/>
+      <path fill="#ff9477" d="M188.1,250.5c-14.91-.36-27.69-5.84-38.33-16.49-11.02-11.01-16.52-24.31-16.52-39.89s5.5-28.87,16.52-39.89c10.2-10.2,23.95-16.09,38.33-16.49.53-.01,1.06-.04,1.59-.04,15.57,0,28.88,5.49,39.95,16.44,1.26,1.27,2.44,2.57,3.55,3.9,3.45,4.13,6.22,8.54,8.29,13.23,3.93,8.9,12.57,14.78,22.31,14.78h0c17.49,0,29.19-17.96,22.19-33.99-2.16-4.95-4.77-9.72-7.76-14.33-4.05-6.23-8.83-12.16-14.41-17.77-9.34-9.29-19.56-16.45-30.64-21.51-13.26-6.06-27.76-9.12-43.5-9.12-28.91,0-53.59,10.24-74.07,30.71-20.47,20.47-30.71,45.16-30.71,74.07s10.24,53.59,30.71,74.07c20.47,20.47,45.16,30.71,74.07,30.71,15.73,0,30.2-3.06,43.45-9.14-11.07-5.08-21.27-12.25-30.58-21.57-5.58-5.58-10.37-11.48-14.43-17.68Z"/>
+    </svg>
+    <span class="nav-brand">CC <em>Controller</em></span>
+  </div>
+  <div class="nav-links">
+    <a href="#features" class="nav-link">Funciones</a>
+    <a href="#how" class="nav-link">Cómo funciona</a>
+    <a href="#setup" class="nav-link">Instalación</a>
+  </div>
+  <a href="#" class="nav-cta">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+    GitHub
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge">
+        <div class="hero-badge-dot"><div class="hero-badge-pulse"></div></div>
+        Supabase Realtime · &lt;100ms latencia
+      </div>
+      <h1>Controla <span>Claude Code</span><br>desde tu iPhone</h1>
+      <p class="hero-sub">PWA en tu móvil. Electron en tu Mac. Supabase como puente en tiempo real. Sin exponer tu máquina, sin servidores propios.</p>
+      <div class="hero-actions">
+        <a href="#" class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+          Ver repositorio
+        </a>
+        <a href="#features" class="btn-ghost">Ver funciones →</a>
+      </div>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-header">
+        <span class="flow-title">Conexión activa</span>
+        <div class="flow-live"><div class="flow-live-dot"></div>En vivo</div>
+      </div>
+      <div class="flow-nodes">
+        <div class="flow-node">
+          <div class="flow-node-icon o">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f04e23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <div class="flow-node-info">
+            <div class="flow-node-label">iPhone / PWA</div>
+            <div class="flow-node-sub">Next.js · Netlify</div>
+          </div>
+          <div class="flow-node-status active"></div>
+        </div>
+
+        <div class="flow-connector">
+          <div class="flow-line"></div>
+          <span class="flow-tag">prompt · archivo</span>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-line back"></div>
+          <span class="flow-tag">respuesta</span>
+        </div>
+
+        <div class="flow-node">
+          <div class="flow-node-icon t">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00b09b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div class="flow-node-info">
+            <div class="flow-node-label">Supabase Realtime</div>
+            <div class="flow-node-sub">Broadcast · sin DB · &lt;100ms</div>
+          </div>
+          <div class="flow-node-status bridge"></div>
+        </div>
+
+        <div class="flow-connector">
+          <div class="flow-line"></div>
+          <span class="flow-tag">evento validado</span>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-line back"></div>
+          <span class="flow-tag">output</span>
+        </div>
+
+        <div class="flow-node">
+          <div class="flow-node-icon w">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div class="flow-node-info">
+            <div class="flow-node-label">Mac / Electron</div>
+            <div class="flow-node-sub">claude --print · ~/CCProjects/</div>
+          </div>
+          <div class="flow-node-status mac"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stats-inner">
+    <div class="stat-card">
+      <div class="stat-num"><span>&lt;</span>100ms</div>
+      <div class="stat-label">Latencia Supabase Broadcast</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Servidores propios requeridos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num"><span>600</span></div>
+      <div class="stat-label">Permisos de archivo .env</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">3</div>
+      <div class="stat-label">Piezas: Electron + PWA + Supabase</div>
+    </div>
+  </div>
+</section>
+
+<!-- BENTO FEATURES -->
+<section class="bento" id="features">
+  <div class="bento-inner">
+    <span class="section-eyebrow">Funciones</span>
+    <h2 class="section-title">Todo lo que necesitas<br>para trabajar desde el móvil</h2>
+
+    <div class="bento-grid">
+
+      <!-- Chat realtime (2×1) -->
+      <div class="bc bc-realtime">
+        <div class="bc-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3>Chat en tiempo real</h3>
+        <p>Respuestas de Claude Code aparecen token por token. Indicador de escritura mientras Claude trabaja.</p>
+        <div class="chat-preview">
+          <div class="chat-bubble user">Crea un componente Button en TypeScript</div>
+          <div class="chat-bubble ai">Creating src/components/Button.tsx...
+
+export interface ButtonProps {
+  variant?: 'primary' | 'ghost';
+  children: React.ReactNode;
+}</div>
+          <div class="chat-typing"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+
+      <!-- Proyectos (2×1) -->
+      <div class="bc bc-projects">
+        <div class="bc-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3>Gestión de proyectos</h3>
+        <p>Cada proyecto tiene su directorio aislado en el Mac. Crea, cambia y organiza desde el móvil.</p>
+        <div class="projects-preview">
+          <div class="project-row active">
+            <div class="project-dot"></div>
+            <div class="project-name">landing-page</div>
+            <div class="project-path">~/CCProjects/landing-page</div>
+          </div>
+          <div class="project-row">
+            <div class="project-dot"></div>
+            <div class="project-name">api-backend</div>
+            <div class="project-path">~/CCProjects/api-backend</div>
+          </div>
+          <div class="project-row">
+            <div class="project-dot"></div>
+            <div class="project-name">mobile-app</div>
+            <div class="project-path">~/CCProjects/mobile-app</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Archivos (1×1) -->
+      <div class="bc bc-files">
+        <div class="bc-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        </div>
+        <h3>Subir archivos</h3>
+        <p>Desde iPhone al directorio del proyecto. Storage temporal, eliminado al instante.</p>
+        <div class="file-preview">
+          <div class="file-item">
+            <span class="file-ext">PNG</span>
+            <span class="file-name">screenshot.png</span>
+            <span class="file-size">284 KB</span>
+          </div>
+          <div class="file-item">
+            <span class="file-ext">PDF</span>
+            <span class="file-name">design-brief.pdf</span>
+            <span class="file-size">1.2 MB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado desktop (1×1) -->
+      <div class="bc bc-status">
+        <div class="bc-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        </div>
+        <h3>Estado del desktop</h3>
+        <p>Heartbeat cada 20s. Sin señal en 45s → detenido.</p>
+        <div class="status-display">
+          <div class="status-row">
+            <div class="status-indicator green"></div>
+            <div class="status-label">Desktop activo</div>
+            <div class="status-desc">Heartbeat OK</div>
+          </div>
+          <div class="status-row">
+            <div class="status-indicator orange"></div>
+            <div class="status-label">Desktop detenido</div>
+            <div class="status-desc">Sin heartbeat</div>
+          </div>
+          <div class="status-row">
+            <div class="status-indicator gray"></div>
+            <div class="status-label">Sin conexión</div>
+            <div class="status-desc">Supabase offline</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Env vars (1×1) -->
+      <div class="bc bc-env">
+        <div class="bc-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h3>Secretos seguros</h3>
+        <p>API keys se transmiten una vez. Electron las escribe en .env con permisos 600.</p>
+        <div class="env-inputs">
+          <div class="env-row">
+            <span class="env-key">GITHUB</span>
+            <span class="env-val">ghp_••••••••••••••••</span>
+          </div>
+          <div class="env-row">
+            <span class="env-key">NETLIFY</span>
+            <span class="env-val">nfp_••••••••••••••</span>
+          </div>
+          <div class="env-row">
+            <span class="env-key">SUPABASE</span>
+            <span class="env-val">eyJhbG••••••••••••</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modelo (2×1) -->
+      <div class="bc bc-model">
+        <div class="bc-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        </div>
+        <h3>Modelo y esfuerzo</h3>
+        <p>Elige el modelo de Claude y el nivel de razonamiento por proyecto.</p>
+        <div class="model-chips">
+          <span class="chip active">claude-sonnet-4-5</span>
+          <span class="chip">claude-opus-4</span>
+          <span class="chip">claude-haiku-4-5</span>
+        </div>
+        <div class="effort-bar">
+          <div class="effort-label">Effort — medium</div>
+          <div class="effort-track"><div class="effort-fill"></div></div>
+        </div>
+      </div>
+
+      <!-- Quick actions (2×1) -->
+      <div class="bc bc-quick">
+        <div class="bc-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h3>Acciones rápidas</h3>
+        <p>Envía señales de control sin tipear. Cancela, confirma o envía Enter con un tap.</p>
+        <div class="quick-chips">
+          <span class="qchip">⌃C</span>
+          <span class="qchip">↵</span>
+          <span class="qchip">y ↵</span>
+          <span class="qchip">n ↵</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="how-inner">
+    <span class="section-eyebrow">Arquitectura</span>
+    <h2 class="section-title">Tres piezas. Sin complejidad<br>innecesaria.</h2>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-n">1</div>
+        <h3>PWA recibe tu prompt</h3>
+        <p>Escribes en la PWA desde el iPhone. El mensaje se transmite por Supabase Broadcast con token de sesión validado en cada evento.</p>
+        <span class="step-code">sendEvent('input', { text, token })</span>
+      </div>
+      <div class="step-card">
+        <div class="step-n">2</div>
+        <h3>Electron ejecuta Claude</h3>
+        <p>El desktop recibe el evento, valida el token y ejecuta <code style="font-family:monospace;font-size:11px">claude --print</code> dentro del directorio del proyecto activo en tu Mac.</p>
+        <span class="step-code">claude --print --continue</span>
+      </div>
+      <div class="step-card">
+        <div class="step-n">3</div>
+        <h3>Respuesta en tiempo real</h3>
+        <p>La salida se limpia de códigos ANSI y se transmite de vuelta por Supabase Broadcast. Aparece en tu iPhone en menos de 100ms.</p>
+        <span class="step-code">broadcast('message', { text })</span>
+      </div>
+    </div>
+
+    <div class="arch-table">
+      <div class="arch-row">
+        <span class="arch-badge e">Electron 30</span>
+        <span class="arch-desc">Tray app, gestiona procesos Claude, escribe proyectos y .env en disco local</span>
+        <span class="arch-role">Mac · Node.js</span>
+      </div>
+      <div class="arch-row">
+        <span class="arch-badge n">Next.js 14</span>
+        <span class="arch-desc">PWA instalable, UI de chat, subida de archivos, configuración de modelo</span>
+        <span class="arch-role">iPhone · Netlify</span>
+      </div>
+      <div class="arch-row">
+        <span class="arch-badge s">Supabase</span>
+        <span class="arch-desc">Canal Broadcast para mensajes (sin DB), Storage para archivos en tránsito</span>
+        <span class="arch-role">Backend · Realtime</span>
+      </div>
+      <div class="arch-row">
+        <span class="arch-badge nl">Netlify</span>
+        <span class="arch-desc">Deploy automático de la PWA, variables de entorno por interfaz gráfica</span>
+        <span class="arch-role">CDN · Edge</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECURITY -->
+<section class="security">
+  <div class="security-inner">
+    <span class="section-eyebrow">Seguridad</span>
+    <h2 class="section-title">Diseñado para no comprometer tu Mac</h2>
+    <div class="security-grid">
+      <div class="sec-card">
+        <div class="sec-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="sec-body">
+          <h4>SESSION_TOKEN en cada evento</h4>
+          <p>Cada evento PWA→Electron incluye el token. Sin él, el evento se ignora silenciosamente. Sin logs, sin respuesta.</p>
+          <span class="sec-chip">payload.token === SESSION_TOKEN</span>
+        </div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        </div>
+        <div class="sec-body">
+          <h4>Path traversal protection</h4>
+          <p>Electron valida que todos los archivos y proyectos queden dentro de <code style="font-size:11px;font-family:monospace">~/CCProjects/</code>. Rutas absolutas externas rechazadas.</p>
+          <span class="sec-chip">path.startsWith(PROJECTS_BASE)</span>
+        </div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="sec-body">
+          <h4>API keys nunca en la PWA</h4>
+          <p>La PWA actúa como transmisor de paso. Las keys se envían una vez y se limpian del estado inmediatamente. Nunca en localStorage.</p>
+          <span class="sec-chip">No localStorage · No Supabase DB</span>
+        </div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div class="sec-body">
+          <h4>.env con permisos 600</h4>
+          <p>Los secretos se escriben en <code style="font-size:11px;font-family:monospace">~/CCProjects/&lt;slug&gt;/.env</code> con <code style="font-size:11px;font-family:monospace">mode 0o600</code>. Solo el propietario puede leerlos.</p>
+          <span class="sec-chip">writeFileSync(path, content, &#x7b;mode: 0o600&#x7d;)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SETUP -->
+<section class="setup" id="setup">
+  <div class="setup-inner">
+    <span class="section-eyebrow">Instalación</span>
+    <h2 class="section-title">Listo en 10 minutos</h2>
+    <div class="setup-grid">
+      <div class="code-card">
+        <div class="code-top">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="code-file">desktop/.env</span>
+        </div>
+        <div class="code-body">
+<span class="cm"># Supabase → Project Settings → API</span>
+<span class="ck">SUPABASE_URL</span>=<span class="cv">"https://tu-proyecto.supabase.co"</span>
+<span class="ck">SUPABASE_SERVICE_KEY</span>=<span class="cv">"tu-service-role-key"</span>
+&nbsp;
+<span class="cm"># Sesión — igual en Desktop y PWA</span>
+<span class="ck">SESSION_ID</span>=<span class="cv">"cc-session-01"</span>
+<span class="ck">SESSION_TOKEN</span>=<span class="cv">"$(openssl rand -hex 32)"</span>
+<span class="ck">PWA_URL</span>=<span class="cv">"tu-app.netlify.app"</span>
+&nbsp;
+<span class="cm"># Compilar DMG</span>
+<span class="cc">cd desktop && npm run build</span>
+<span class="cd"># → dist/CC Controller-1.0.0-arm64.dmg</span>
+        </div>
+      </div>
+      <div class="code-card">
+        <div class="code-top">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="code-file">web/.env.local</span>
+        </div>
+        <div class="code-body">
+<span class="cm"># Supabase (anon key — pública OK)</span>
+<span class="ck">NEXT_PUBLIC_SUPABASE_URL</span>=<span class="cv">"..."</span>
+<span class="ck">NEXT_PUBLIC_SUPABASE_ANON_KEY</span>=<span class="cv">"..."</span>
+&nbsp;
+<span class="cm"># Mismo token que el desktop</span>
+<span class="ck">NEXT_PUBLIC_SESSION_ID</span>=<span class="cv">"cc-session-01"</span>
+<span class="ck">NEXT_PUBLIC_SESSION_TOKEN</span>=<span class="cv">"tu-token-32-chars"</span>
+&nbsp;
+<span class="cm"># Deploy a Netlify</span>
+<span class="cc">cd web && npm run build</span>
+<span class="cd"># base=web · cmd=build · dir=.next</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <svg viewBox="0 0 459.86 459.86" xmlns="http://www.w3.org/2000/svg">
+      <rect fill="#2a2a2a" width="459.86" height="459.86" rx="60.76"/>
+      <path fill="#ff582a" d="M350.71,202.18h0c-9.72,0-18.35,5.87-22.29,14.75-2.74,6.18-6.69,11.84-11.84,17-10.69,10.69-23.5,16.21-38.41,16.57-.52.01-1.04.04-1.57.04-15.58,0-28.88-5.51-39.89-16.52-1.26-1.26-2.45-2.56-3.56-3.88-8.63-10.21-12.96-22.22-12.96-36.01s4.34-25.84,13.01-36.07c-1.11-1.33-2.3-2.63-3.55-3.9-11.06-10.95-24.38-16.44-39.95-16.44-.53,0-1.06.02-1.59.04-10.83,16.56-16.28,35.35-16.28,56.38,0,21.03,5.45,39.82,16.28,56.38,4.06,6.2,8.85,12.11,14.43,17.68,9.32,9.32,19.52,16.49,30.58,21.57,13.24,6.08,27.73,9.14,43.48,9.14,28.9,0,53.62-10.26,74.15-30.79,9.68-9.68,17.06-20.32,22.14-31.92,7.02-16.03-4.68-34.01-22.18-34.01Z"/>
+      <path fill="#ff582a" d="M278.22,137.74c14.88.37,27.67,5.83,38.35,16.41,5.16,5.22,9.11,10.93,11.84,17.13,3.93,8.9,12.58,14.78,22.31,14.78h0c17.49,0,29.19-17.96,22.19-33.99-5.08-11.65-12.47-22.34-22.17-32.1-20.53-20.42-45.24-30.63-74.15-30.63-15.73,0-30.2,3.06-43.43,9.12,11.08,5.06,21.3,12.22,30.64,21.51,5.57,5.61,10.36,11.54,14.41,17.77Z"/>
+      <path fill="#ff9477" d="M188.1,250.5c-14.91-.36-27.69-5.84-38.33-16.49-11.02-11.01-16.52-24.31-16.52-39.89s5.5-28.87,16.52-39.89c10.2-10.2,23.95-16.09,38.33-16.49.53-.01,1.06-.04,1.59-.04,15.57,0,28.88,5.49,39.95,16.44,1.26,1.27,2.44,2.57,3.55,3.9,3.45,4.13,6.22,8.54,8.29,13.23,3.93,8.9,12.57,14.78,22.31,14.78h0c17.49,0,29.19-17.96,22.19-33.99-2.16-4.95-4.77-9.72-7.76-14.33-4.05-6.23-8.83-12.16-14.41-17.77-9.34-9.29-19.56-16.45-30.64-21.51-13.26-6.06-27.76-9.12-43.5-9.12-28.91,0-53.59,10.24-74.07,30.71-20.47,20.47-30.71,45.16-30.71,74.07s10.24,53.59,30.71,74.07c20.47,20.47,45.16,30.71,74.07,30.71,15.73,0,30.2-3.06,43.45-9.14-11.07-5.08-21.27-12.25-30.58-21.57-5.58-5.58-10.37-11.48-14.43-17.68Z"/>
+    </svg>
+  </div>
+  <h3>CC Controller</h3>
+  <p>Control remoto de Claude Code · Electron + PWA + Supabase Realtime</p>
+  <div class="footer-btns">
+    <a href="#" class="btn-primary" style="font-size:13px">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+      Ver en GitHub
+    </a>
+    <a href="#features" class="footer-link">Funciones</a>
+    <a href="#how" class="footer-link">Arquitectura</a>
+    <a href="#setup" class="footer-link">Instalación</a>
+  </div>
+  <small>Boilerplate comercial · Modifica y usa en proyectos propios o de clientes · No redistribuir como producto independiente</small>
+</footer>
