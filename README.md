@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logos/logoccc2.svg" alt="CC Controller" width="640"/>
+  <img src="logos/logoccc2.svg" alt="CC Controller" width="160"/>
 </p>
 
 # CC Controller — Remote Claude Code Bridge
