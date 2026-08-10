@@ -1,4 +1,4 @@
-import { app, Tray, Menu, nativeImage, shell } from 'electron';
+import { app, Tray, Menu, nativeImage, shell, clipboard, dialog } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { writeFileSync } from 'fs';
@@ -51,7 +51,23 @@ function buildMenu(status) {
   } else {
     items.push({ type: 'separator' }, { label: 'Iniciar', click: startSession });
   }
-  items.push({ type: 'separator' }, { label: 'Salir', click: () => app.quit() });
+  items.push(
+    { type: 'separator' },
+    {
+      label: 'Copiar SESSION_TOKEN',
+      click: () => {
+        const token = process.env.SESSION_TOKEN;
+        if (!token) {
+          dialog.showMessageBox({ type: 'warning', message: 'SESSION_TOKEN no configurado en ~/.config/cc-controller/.env' });
+          return;
+        }
+        clipboard.writeText(token);
+        dialog.showMessageBox({ type: 'info', message: 'SESSION_TOKEN copiado al portapapeles.\nPégalo en la PWA → Settings → Session Token.' });
+      },
+    },
+    { type: 'separator' },
+    { label: 'Salir', click: () => app.quit() }
+  );
   return Menu.buildFromTemplate(items);
 }
 
