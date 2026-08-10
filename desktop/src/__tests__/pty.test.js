@@ -48,7 +48,9 @@ describe('PtyManager', () => {
   it('runs the command with the expected flags and reports its output', async () => {
     const m = new PtyManager();
     m.spawn('echo', [], '/tmp');
-    const output = new Promise(resolve => { m.onMessage = (_role, text) => resolve(text); });
+    const output = new Promise(resolve => {
+      m.onChunk = (_id, text, done) => { if (!done) resolve(text.trim()); };
+    });
     m.write('hola', true, 'claude-opus-5', 'high');
     assert.equal(await output, '--print --continue --model claude-opus-5 --effort high');
   });
