@@ -563,10 +563,10 @@ svg { display: block; }
     <div>
       <div class="hero-badge">
         <div class="hero-badge-dot"><div class="hero-badge-pulse"></div></div>
-        Supabase Realtime · &lt;100ms latencia
+        Streaming en vivo · Historia · Sin cuenta requerida
       </div>
       <h1>Controla <span>Claude Code</span><br>desde tu iPhone</h1>
-      <p class="hero-sub">PWA en tu móvil. Electron en tu Mac. Supabase como puente en tiempo real. Sin exponer tu máquina, sin servidores propios.</p>
+      <p class="hero-sub">Descarga la app, copia un código de emparejamiento y ya. Sin Supabase propio, sin variables de entorno. Las respuestas llegan token a token, y el historial persiste entre sesiones.</p>
       <div class="hero-actions">
         <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.0.0-arm64.dmg" class="btn-primary">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -574,7 +574,7 @@ svg { display: block; }
         </a>
         <a href="https://github.com/kitifica-max/cc-controller/releases/tag/v1.0.0" target="_blank" rel="noopener" class="btn-ghost">Ver todas las versiones →</a>
       </div>
-      <p style="font-size:11px;color:var(--text-3);margin-top:10px;">Apple Silicon · macOS 12+ · Requiere Claude Code CLI</p>
+      <p style="font-size:11px;color:var(--text-3);margin-top:10px;">Apple Silicon · macOS 12+ · Requiere Claude Code CLI · Sin cuenta Supabase</p>
     </div>
 
     <div class="flow-card">
@@ -645,15 +645,15 @@ svg { display: block; }
     </div>
     <div class="stat-card">
       <div class="stat-num">0</div>
-      <div class="stat-label">Servidores propios requeridos</div>
+      <div class="stat-label">Cuentas externas requeridas</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num"><span>600</span></div>
-      <div class="stat-label">Permisos de archivo .env</div>
+      <div class="stat-num"><span>200</span></div>
+      <div class="stat-label">Mensajes en historial persistente</div>
     </div>
     <div class="stat-card">
       <div class="stat-num">3</div>
-      <div class="stat-label">Piezas: Electron + PWA + Supabase</div>
+      <div class="stat-label">Pasos para empezar: descarga, código, listo</div>
     </div>
   </div>
 </section>
@@ -671,8 +671,8 @@ svg { display: block; }
         <div class="bc-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         </div>
-        <h3>Chat en tiempo real</h3>
-        <p>La respuesta de Claude Code llega en cuanto termina el prompt. Indicador de escritura mientras Claude trabaja.</p>
+        <h3>Streaming en tiempo real</h3>
+        <p>Las respuestas llegan token a token mientras Claude escribe, no al terminar. Indicador de escritura y cursor naranja parpadeante mientras genera.</p>
         <div class="chat-preview">
           <div class="chat-bubble user">Crea un componente Button en TypeScript</div>
           <div class="chat-bubble ai">Creating src/components/Button.tsx...
@@ -763,9 +763,13 @@ export interface ButtonProps {
         <div class="bc-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
-        <h3>Secretos seguros</h3>
-        <p>API keys se transmiten una vez. Electron las escribe en .env con permisos 600.</p>
+        <h3>Código de emparejamiento</h3>
+        <p>Un clic genera tu código. Pégalo en la PWA. La infraestructura Supabase ya viene incluida — sin crear cuenta ni configurar nada.</p>
         <div class="env-inputs">
+          <div class="env-row">
+            <span class="env-key">SESSION</span>
+            <span class="env-val">a3f9b2:8d7c••••••••••••••••••••••</span>
+          </div>
           <div class="env-row">
             <span class="env-key">GITHUB</span>
             <span class="env-val">ghp_••••••••••••••••</span>
@@ -773,10 +777,6 @@ export interface ButtonProps {
           <div class="env-row">
             <span class="env-key">NETLIFY</span>
             <span class="env-val">nfp_••••••••••••••</span>
-          </div>
-          <div class="env-row">
-            <span class="env-key">SUPABASE</span>
-            <span class="env-val">eyJhbG••••••••••••</span>
           </div>
         </div>
       </div>
@@ -838,9 +838,9 @@ export interface ButtonProps {
       </div>
       <div class="step-card">
         <div class="step-n">3</div>
-        <h3>Respuesta en tiempo real</h3>
-        <p>La salida se limpia de códigos ANSI y vuelve por Supabase Broadcast en cuanto Claude termina.</p>
-        <span class="step-code">broadcast('message', { text })</span>
+        <h3>Streaming token a token</h3>
+        <p>Cada chunk de stdout llega como evento <code style="font-family:monospace;font-size:11px">chunk</code> por Supabase Broadcast. La PWA muestra texto creciendo en vivo con cursor naranja. Al terminar, el mensaje queda en historial.</p>
+        <span class="step-code">broadcast('chunk', { text, done })</span>
       </div>
     </div>
 
@@ -880,9 +880,9 @@ export interface ButtonProps {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <div class="sec-body">
-          <h4>Login + canal privado</h4>
-          <p>La PWA exige Supabase Auth y solo los usuarios autorizados entran al canal. Encima, cada evento PWA→Electron incluye el token de sesión: sin él se ignora en silencio.</p>
-          <span class="sec-chip">private channel · payload.token</span>
+          <h4>Login + token de sesión</h4>
+          <p>La PWA exige autenticación por email y contraseña. Cada evento PWA→Electron incluye el token de sesión generado al instalar: sin él, el evento se ignora en silencio.</p>
+          <span class="sec-chip">supabase auth · payload.token</span>
         </div>
       </div>
       <div class="sec-card">
@@ -948,11 +948,11 @@ export interface ButtonProps {
         <div class="setup-step-icon">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
         </div>
-        <h3>Configura la app</h3>
-        <p>Al abrirla por primera vez aparece un wizard. Conecta tu proyecto Supabase y la app genera tu <strong>SESSION_TOKEN</strong> automáticamente.</p>
+        <h3>Genera tu código</h3>
+        <p>Al abrirla por primera vez, un clic genera tu <strong>código de emparejamiento</strong>. Sin crear cuenta Supabase, sin copiar URLs ni API keys.</p>
         <div class="setup-req">
-          <span class="setup-req-item">✓ Supabase (plan gratuito)</span>
           <span class="setup-req-item">✓ Claude Code CLI instalado</span>
+          <span class="setup-req-item">✓ Eso es todo</span>
         </div>
       </div>
 
@@ -964,7 +964,7 @@ export interface ButtonProps {
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
         </div>
         <h3>Empareja tu iPhone</h3>
-        <p>Abre <strong>ccc.kitifica.com</strong> en Safari, inicia sesión con tu email y pega el SESSION_TOKEN en Settings.</p>
+        <p>Abre <strong>ccc.kitifica.com</strong> en Safari, crea una cuenta y pega el <strong>código de emparejamiento</strong> en la pantalla de configuración. Listo.</p>
         <a href="https://ccc.kitifica.com" target="_blank" rel="noopener" class="setup-dl-btn">
           Abrir PWA →
         </a>
@@ -987,7 +987,7 @@ export interface ButtonProps {
     </svg>
   </div>
   <h3>CC Controller</h3>
-  <p>Control remoto de Claude Code · Electron + PWA + Supabase Realtime</p>
+  <p>Control remoto de Claude Code · Streaming · Historia · Sin config</p>
   <div class="footer-btns">
     <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.0.0-arm64.dmg" class="btn-primary" style="font-size:13px">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
