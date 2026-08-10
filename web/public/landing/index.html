@@ -195,6 +195,35 @@ nav {
 .stat-num span { color: var(--orange); }
 .stat-label { font-size: 12px; font-weight: 500; color: var(--text-3); }
 
+/* ─── WHY SECTION ────────────────────────────── */
+.why { padding: 64px 20px 0; }
+.why-inner { max-width: 1120px; margin: 0 auto; }
+.why-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap); margin-top: 40px;
+}
+.why-card {
+  background: var(--ink-2); border: 1px solid var(--border);
+  border-radius: var(--radius-card); padding: 32px 28px;
+  transition: border-color var(--transition-md), transform var(--transition-md);
+  cursor: default; position: relative; overflow: hidden;
+}
+.why-card:hover { border-color: var(--border-warm); transform: translateY(-2px); }
+.why-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px; background: linear-gradient(to right, var(--orange), transparent);
+  opacity: 0; transition: opacity var(--transition-md);
+}
+.why-card:hover::after { opacity: 1; }
+.why-num {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.12em;
+  color: var(--orange); text-transform: uppercase; margin-bottom: 20px;
+}
+.why-card h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 12px; line-height: 1.2; }
+.why-card p { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+.why-card code { font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px; color: var(--teal); background: rgba(0,176,155,0.08); padding: 1px 5px; border-radius: 4px; }
+@media (max-width: 768px) { .why-grid { grid-template-columns: 1fr; } }
+
 /* ─── BENTO ───────────────────────────────────── */
 .bento { padding: 64px 20px; }
 .bento-inner { max-width: 1120px; margin: 0 auto; }
@@ -566,7 +595,7 @@ svg { display: block; }
         Streaming en vivo · Historia · Sin cuenta requerida
       </div>
       <h1>Controla <span>Claude Code</span><br>desde tu iPhone</h1>
-      <p class="hero-sub">Descarga la app, copia un código de emparejamiento y ya. Sin Supabase propio, sin variables de entorno. Las respuestas llegan token a token, y el historial persiste entre sesiones.</p>
+      <p class="hero-sub">Inicia una tarea en Claude Code. Sal de tu escritorio. Revisa el progreso y responde desde tu iPhone — sin SSH, sin túneles, sin config de red.</p>
       <div class="hero-actions">
         <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.0.0-arm64.dmg" class="btn-primary">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -654,6 +683,35 @@ svg { display: block; }
     <div class="stat-card">
       <div class="stat-num">3</div>
       <div class="stat-label">Pasos para empezar: descarga, código, listo</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section class="why">
+  <div class="why-inner">
+    <span class="section-eyebrow">Por qué</span>
+    <h2 class="section-title">Claude Code trabaja en tu Mac.<br>Tú decides desde dónde.</h2>
+    <div class="why-grid">
+
+      <div class="why-card">
+        <div class="why-num">01</div>
+        <h3>Trabaja sin estar pegado a la pantalla</h3>
+        <p>Inicia un refactor largo, un análisis de código o una generación de features. Claude trabaja en tu Mac mientras tú estás en el café, en una reunión o en el sofá. Revisas el progreso desde el iPhone y respondes cuando lo necesita.</p>
+      </div>
+
+      <div class="why-card">
+        <div class="why-num">02</div>
+        <h3>Sin SSH, sin túneles, sin abrir puertos</h3>
+        <p>Supabase actúa de puente en tiempo real. Tu Mac nunca expone un puerto al exterior. No hay VPN que configurar, no hay ngrok, no hay nada que mantener. Descargas la app, generas un código de emparejamiento y conectas.</p>
+      </div>
+
+      <div class="why-card">
+        <div class="why-num">03</div>
+        <h3>El CLI real, no un wrapper de API</h3>
+        <p>CC Controller ejecuta <code>claude --print</code> directamente en tu Mac con acceso total a tus archivos, tu PATH y tus herramientas. No es un chatbot genérico. Es la misma experiencia de Claude Code que ya usas, controlada desde el móvil.</p>
+      </div>
+
     </div>
   </div>
 </section>
