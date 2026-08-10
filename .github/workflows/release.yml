@@ -46,17 +46,21 @@ jobs:
           hdiutil detach '/Volumes/CC Controller' 2>/dev/null || true
           npx electron-builder --mac dmg --x64 --publish never
 
-      # Un .app sin firma ninguna arranca como "la app está dañada" en Apple
+      # Un .app sin firma real arranca como "la app está dañada" en Apple
       # Silicon, y eso solo se ve al instalar: mejor romper el release aquí.
+      # `linker-signed` es la firma que deja el compilador y no cuenta: se
+      # invalida en cuanto electron-builder toca el bundle.
       - name: Verificar firma ad-hoc
         working-directory: desktop
-        # `--deep --strict` reporta un falso negativo sobre los recursos del
-        # bundle de Electron; lo que importa es que exista la firma ad-hoc.
         run: |
           for app in 'dist/mac-arm64/CC Controller.app' 'dist/mac/CC Controller.app'; do
             codesign -dv --verbose=2 "$app" 2>&1 | tee /tmp/sig.txt
             grep -q 'Signature=adhoc' /tmp/sig.txt
-            codesign --verify --verbose=2 "$app" || true
+            if grep -q 'linker-signed' /tmp/sig.txt; then
+              echo "::error::$app solo tiene la firma del linker"
+              exit 1
+            fi
+            codesign --verify --strict "$app"
           done
 
       - uses: softprops/action-gh-release@v2

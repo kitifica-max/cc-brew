@@ -7,6 +7,9 @@ directories:
   output: dist
   buildResources: assets
 
+# Firma ad-hoc del .app antes de empaquetar el DMG.
+afterPack: scripts/adhoc-sign.cjs
+
 files:
   - src/**/*
   - assets/tray-icon.png
@@ -19,9 +22,9 @@ mac:
   # Firma ad-hoc: en Apple Silicon un binario sin ninguna firma no arranca
   # ("la app está dañada"). Esto no es notarización; el usuario sigue teniendo
   # que abrirla con clic derecho la primera vez (ver "DMG sin firmar" en el README).
-  # Con un certificado "Developer ID Application" quita esta línea y pon
+  # Con un certificado "Developer ID Application" quita `identity: null` y pon
   # `notarize: true` junto a APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD y APPLE_TEAM_ID.
-  identity: "-"
+  identity: null
   hardenedRuntime: true
   gatekeeperAssess: false
   entitlements: assets/entitlements.mac.plist
