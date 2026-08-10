@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ccc.kitifica.com/sitemap.xml

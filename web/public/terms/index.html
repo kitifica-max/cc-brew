@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Términos de Uso — CC Controller</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Términos de uso de CC Controller. Condiciones para usar la aplicación y la PWA.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://ccc.kitifica.com/terms/">
+  <meta property="og:title" content="Términos de Uso — CC Controller">
+  <meta property="og:url" content="https://ccc.kitifica.com/terms/">
+  <meta property="og:type" content="website">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --orange: #f04e23;
+      --teal:   #00b09b;
+      --bg:     #0e0e0f;
+      --surface:#1a1a1b;
+      --border: rgba(255,255,255,0.08);
+      --text:   #e8e8e8;
+      --muted:  #888;
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Sora', system-ui, sans-serif; line-height: 1.7; }
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 24px;
+      background: rgba(14,14,15,0.9); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-weight: 700; font-size: 15px; }
+    .nav-icon { width: 28px; height: 28px; background: var(--orange); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+    .nav-icon svg { width: 16px; height: 16px; fill: #fff; }
+    .nav-back { color: var(--muted); text-decoration: none; font-size: 13px; }
+    .nav-back:hover { color: var(--text); }
+    main { max-width: 720px; margin: 0 auto; padding: 64px 24px 96px; }
+    .page-label { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--orange); margin-bottom: 12px; }
+    h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 800; line-height: 1.15; margin-bottom: 8px; }
+    .updated { font-size: 13px; color: var(--muted); margin-bottom: 48px; }
+    h2 { font-size: 18px; font-weight: 700; margin: 40px 0 12px; color: var(--text); }
+    p, li { font-size: 15px; color: #bbb; margin-bottom: 12px; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 6px; }
+    a { color: var(--teal); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { font-family: monospace; font-size: 13px; background: rgba(255,255,255,0.07); padding: 2px 6px; border-radius: 4px; }
+    .highlight { background: rgba(240,78,35,0.07); border-left: 3px solid var(--orange); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+    .highlight p { margin: 0; color: #ccc; }
+    footer { text-align: center; padding: 32px 24px; border-top: 1px solid var(--border); }
+    footer a { color: var(--muted); font-size: 13px; margin: 0 12px; }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="/landing/" class="nav-brand">
+    <div class="nav-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+    </div>
+    CC Controller
+  </a>
+  <a href="/landing/" class="nav-back">← Volver al inicio</a>
+</nav>
+
+<main>
+  <div class="page-label">Legal</div>
+  <h1>Términos de Uso</h1>
+  <p class="updated">Última actualización: 10 de agosto de 2026</p>
+
+  <div class="highlight">
+    <p><strong>Resumen:</strong> CC Controller es software de código abierto bajo licencia MIT. Lo usas tal como está, bajo tu propia responsabilidad.</p>
+  </div>
+
+  <h2>1. Aceptación</h2>
+  <p>Al descargar, instalar o usar CC Controller (la aplicación de escritorio, la PWA, o cualquier componente del repositorio), aceptas estos términos. Si no estás de acuerdo, no uses el software.</p>
+
+  <h2>2. Descripción del servicio</h2>
+  <p>CC Controller es una herramienta para desarrolladores que permite controlar Claude Code CLI desde un dispositivo móvil mediante una PWA. Consiste en:</p>
+  <ul>
+    <li>Una aplicación de escritorio Electron para macOS.</li>
+    <li>Una PWA (Progressive Web App) accesible desde cualquier navegador móvil moderno.</li>
+    <li>Un canal de comunicación en tiempo real usando Supabase Realtime.</li>
+  </ul>
+
+  <h2>3. Licencia</h2>
+  <p>CC Controller se distribuye bajo la <a href="https://github.com/kitifica-max/cc-controller/blob/main/LICENSE" target="_blank" rel="noopener">Licencia MIT</a>. Puedes usar, copiar, modificar, fusionar, publicar, distribuir y sublicenciar el software libremente, siempre que se incluya el aviso de copyright original.</p>
+
+  <h2>4. Uso aceptable</h2>
+  <p>CC Controller está diseñado para uso legítimo de desarrollo de software. Queda prohibido:</p>
+  <ul>
+    <li>Usar el software para actividades ilegales o que violen derechos de terceros.</li>
+    <li>Intentar comprometer la seguridad de otros usuarios o del servicio de Supabase.</li>
+    <li>Distribuir versiones modificadas que contengan malware o código malicioso.</li>
+    <li>Usar el servicio de relay de Supabase bundled para fines distintos al funcionamiento normal de la app.</li>
+  </ul>
+
+  <h2>5. Requisitos de terceros</h2>
+  <p>CC Controller requiere:</p>
+  <ul>
+    <li><strong>Claude Code CLI</strong>: sujeto a los <a href="https://www.anthropic.com/legal/consumer-terms" target="_blank" rel="noopener">Términos de Uso de Anthropic</a>. Se requiere una suscripción activa a Claude.</li>
+    <li><strong>Supabase</strong>: el relay usa una instancia gestionada por Kitifica, sujeta a los <a href="https://supabase.com/terms" target="_blank" rel="noopener">Términos de Supabase</a>.</li>
+  </ul>
+  <p>Kitifica no es responsable de cambios en los servicios de terceros que afecten el funcionamiento de CC Controller.</p>
+
+  <h2>6. Sin garantías</h2>
+  <p>CC Controller se provee <strong>"tal como está"</strong> (<em>as is</em>), sin garantías de ningún tipo, expresas o implícitas. Kitifica no garantiza que el software esté libre de errores, sea continuo o seguro.</p>
+
+  <h2>7. Limitación de responsabilidad</h2>
+  <p>En ningún caso Kitifica será responsable por daños directos, indirectos, incidentales, especiales o consecuentes derivados del uso o la imposibilidad de uso de CC Controller, incluso si se advirtió de la posibilidad de dichos daños.</p>
+
+  <h2>8. Disponibilidad del servicio relay</h2>
+  <p>Kitifica se reserva el derecho de modificar, suspender o descontinuar el servicio de relay (instancia de Supabase bundled) en cualquier momento, con o sin previo aviso. El código fuente completo está disponible para que cualquier usuario pueda alojar su propia instancia.</p>
+
+  <h2>9. Modificaciones a los términos</h2>
+  <p>Kitifica puede actualizar estos términos en cualquier momento. Los cambios se publicarán en esta página. El uso continuado tras los cambios implica la aceptación.</p>
+
+  <h2>10. Contacto</h2>
+  <p>Para consultas: <a href="mailto:kitifica@gmail.com">kitifica@gmail.com</a></p>
+</main>
+
+<footer>
+  <a href="/landing/">Inicio</a>
+  <a href="/privacy/">Privacidad</a>
+  <a href="/contact/">Contacto</a>
+  <a href="https://github.com/kitifica-max/cc-controller" target="_blank" rel="noopener">GitHub</a>
+</footer>
+</body>
+</html>
