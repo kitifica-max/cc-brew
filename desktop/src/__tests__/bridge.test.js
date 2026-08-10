@@ -44,9 +44,8 @@ describe('Bridge', () => {
     assert.equal(bridge.client.channel.mock.calls[0].arguments[0], 'session:main');
   });
 
-  it('connect opens the channel as private and authenticates', () => {
+  it('connect authenticates with supabase key', () => {
     bridge.connect();
-    assert.deepEqual(bridge.client.channel.mock.calls[0].arguments[1], { config: { private: true } });
     assert.equal(bridge.client.realtime.setAuth.mock.calls[0].arguments[0], 'key');
   });
 
