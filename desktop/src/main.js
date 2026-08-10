@@ -8,13 +8,11 @@ import PtyManager from './pty.js';
 import Bridge from './bridge.js';
 import { createProject, switchProject, getActive, listProjects, deleteProject, saveProjectEnv } from './projects.js';
 import { ALLOWED_EXTENSIONS, MAX_FILE_BYTES } from './bridge.js';
+import { getSupabaseConfig } from './supabase-config.js';
+import { createFileAuthStorage, AUTH_STORAGE_KEY } from './auth-store.js';
 import { extname, basename, resolve, sep } from 'path';
 import { homedir } from 'os';
 import { exec } from 'child_process';
-
-// Bundled: usuarios no necesitan cuenta propia de Supabase
-const BUNDLED_SUPABASE_URL = 'https://qombceeynlvgkmoffcoa.supabase.co';
-const BUNDLED_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvbWJjZWV5bmx2Z2ttb2ZmY29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxOTM4MTgsImV4cCI6MjEwMTc2OTgxOH0.fksDXB7RD7vMIpdjLPdjH3uLfkJ_IlYqTvOc64FiptE';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Production: ~/.config/cc-controller/.env (not bundled in DMG)
@@ -79,9 +77,10 @@ function buildMenu(status) {
       { type: 'separator' },
       { label: 'Detener', click: stopSession },
       { label: 'Reiniciar', click: () => { stopSession(); startSession(); } },
+      { label: 'Cerrar sesión', click: signOutAndSetup },
     ].filter(Boolean));
   } else {
-    items.push({ type: 'separator' }, { label: 'Iniciar', click: startSession });
+    items.push({ type: 'separator' }, { label: 'Iniciar', click: () => { startSession(); } });
   }
   if (updateAvailable) {
     items.push(
@@ -119,7 +118,7 @@ function broadcastProjects() {
   bridge?.broadcastProjectState(listProjects(), getActive()?.id ?? null);
 }
 
-function startSession() {
+async function startSession() {
   const { SESSION_ID, SESSION_TOKEN } = process.env;
   if (!SESSION_ID || !SESSION_TOKEN) {
     console.error('Missing SESSION_ID or SESSION_TOKEN in ~/.config/cc-controller/.env');
@@ -130,14 +129,31 @@ function startSession() {
     return;
   }
 
-  const supabaseUrl = process.env.SUPABASE_URL || BUNDLED_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY || BUNDLED_SUPABASE_ANON_KEY;
+  const { url: supabaseUrl, key: supabaseKey } = getSupabaseConfig();
+
+  bridge = new Bridge({
+    supabaseUrl,
+    supabaseKey,
+    sessionId: SESSION_ID,
+    sessionToken: SESSION_TOKEN,
+    authStorage: createFileAuthStorage(),
+  });
+
+  // El canal es privado: sin JWT válido Realtime rechaza la suscripción.
+  if (!(await bridge.restoreSession())) {
+    bridge = null;
+    await dialog.showMessageBox({
+      type: 'warning',
+      message: 'Tu sesión de CC Controller expiró.',
+      detail: 'Vuelve a iniciar sesión con el mismo correo que usas en la PWA.',
+    });
+    await openSetupWindow();
+    return;
+  }
 
   const active = getActive();
   pty = new PtyManager();
   pty.spawn('claude', [], active?.path ?? HOME);
-
-  bridge = new Bridge({ supabaseUrl, supabaseKey, sessionId: SESSION_ID, sessionToken: SESSION_TOKEN });
 
   bridge.onInput = (text, continueConv, model, effort) => {
     const projectId = getActive()?.id ?? null;
@@ -220,7 +236,13 @@ function startSession() {
     exec(`osascript -e 'tell application "Terminal" to do script "cd \\"${path}\\" && claude"' -e 'tell application "Terminal" to activate'`);
   };
 
-  bridge.connect();
+  try {
+    bridge.connect();
+  } catch (e) {
+    stopSession();
+    dialog.showMessageBox({ type: 'error', message: 'No se pudo conectar', detail: e.message });
+    return;
+  }
   bridge.startHeartbeat();
 
   setTimeout(broadcastProjects, 1000);
@@ -240,6 +262,13 @@ function stopSession() {
   if (powerBlockId !== null) { powerSaveBlocker.stop(powerBlockId); powerBlockId = null; }
   pty = null; bridge = null; startTime = null; uptimeInterval = null;
   setTrayMenu('stopped');
+}
+
+async function signOutAndSetup() {
+  if (bridge) await bridge.signOut().catch(() => {});
+  createFileAuthStorage().removeItem(AUTH_STORAGE_KEY);
+  stopSession();
+  await openSetupWindow();
 }
 
 app.whenReady().then(async () => {

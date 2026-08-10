@@ -2,6 +2,15 @@ import { describe, it, test, mock, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import Bridge, { ALLOWED_EXTENSIONS, MAX_FILE_BYTES } from '../bridge.js';
 
+function makeMockAuth(session = { access_token: 'jwt' }) {
+  return {
+    getSession: async () => ({ data: { session } }),
+    signInWithPassword: mock.fn(async () => ({ data: { session: { access_token: 'jwt-fresh' } }, error: null })),
+    signOut: mock.fn(async () => ({ error: null })),
+    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: mock.fn() } } }),
+  };
+}
+
 function makeMockClient() {
   const handlers = {};
   const send = mock.fn();
@@ -16,6 +25,7 @@ function makeMockClient() {
     channel: mock.fn(() => channel),
     removeChannel,
     realtime: { setAuth },
+    auth: makeMockAuth(),
   };
   return { client, channel, handlers, send, removeChannel, setAuth };
 }
@@ -30,23 +40,38 @@ const OPTS = {
 describe('Bridge', () => {
   let bridge, send, handlers, removeChannel;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const mock_ = makeMockClient();
     send = mock_.send;
     handlers = mock_.handlers;
     removeChannel = mock_.removeChannel;
     bridge = new Bridge({ ...OPTS, _createClient: () => mock_.client });
+    await bridge.restoreSession();
     send.mock.resetCalls();
   });
 
-  it('connect subscribes to correct channel', () => {
+  it('connect subscribes to the private channel', () => {
     bridge.connect();
-    assert.equal(bridge.client.channel.mock.calls[0].arguments[0], 'session:main');
+    const [topic, opts] = bridge.client.channel.mock.calls[0].arguments;
+    assert.equal(topic, 'session:main');
+    assert.equal(opts.config.private, true);
   });
 
-  it('connect authenticates with supabase key', () => {
+  it('connect authenticates realtime with the user JWT, not the anon key', () => {
     bridge.connect();
-    assert.equal(bridge.client.realtime.setAuth.mock.calls[0].arguments[0], 'key');
+    assert.equal(bridge.client.realtime.setAuth.mock.calls[0].arguments[0], 'jwt');
+  });
+
+  it('connect throws without a supabase session', () => {
+    const b = new Bridge({ ...OPTS, _createClient: () => makeMockClient().client });
+    assert.throws(() => b.connect(), /sesi/i);
+  });
+
+  it('signIn stores the access token', async () => {
+    const b = new Bridge({ ...OPTS, _createClient: () => makeMockClient().client });
+    await b.signIn('a@b.c', 'pw');
+    b.connect();
+    assert.equal(b.client.realtime.setAuth.mock.calls[0].arguments[0], 'jwt-fresh');
   });
 
   it('broadcastMessage sends message event with role and text', () => {
@@ -117,15 +142,16 @@ describe('Bridge', () => {
   });
 });
 
-test('connect subscribes to all new events', () => {
+test('connect subscribes to all new events', async () => {
   const events = [];
   const mockChannel = {
     on(type, { event }, cb) { events.push(event); return mockChannel; },
     subscribe: () => mockChannel,
     send: () => {},
   };
-  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} } };
+  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} }, auth: makeMockAuth() };
   const b = new Bridge({ supabaseUrl: 'x', supabaseKey: 'x', sessionId: 's', sessionToken: 't', _createClient: () => mockClient });
+  await b.restoreSession();
   b.connect();
   assert.ok(events.includes('create-project'), 'missing create-project');
   assert.ok(events.includes('switch-project'), 'missing switch-project');
@@ -133,15 +159,16 @@ test('connect subscribes to all new events', () => {
   assert.ok(events.includes('open-claude-desktop'), 'missing open-claude-desktop');
 });
 
-test('rejects create-project with wrong token', () => {
+test('rejects create-project with wrong token', async () => {
   const handlers = {};
   const mockChannel = {
     on(type, { event }, cb) { handlers[event] = cb; return mockChannel; },
     subscribe: () => mockChannel,
     send: () => {},
   };
-  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} } };
+  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} }, auth: makeMockAuth() };
   const b = new Bridge({ supabaseUrl: 'x', supabaseKey: 'x', sessionId: 's', sessionToken: 'tok', _createClient: () => mockClient });
+  await b.restoreSession();
   b.connect();
   let called = false;
   b.onCreateProject = () => { called = true; };
@@ -149,15 +176,16 @@ test('rejects create-project with wrong token', () => {
   assert.equal(called, false);
 });
 
-test('calls onCreateProject with correct args', () => {
+test('calls onCreateProject with correct args', async () => {
   const handlers = {};
   const mockChannel = {
     on(type, { event }, cb) { handlers[event] = cb; return mockChannel; },
     subscribe: () => mockChannel,
     send: () => {},
   };
-  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} } };
+  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} }, auth: makeMockAuth() };
   const b = new Bridge({ supabaseUrl: 'x', supabaseKey: 'x', sessionId: 's', sessionToken: 'tok', _createClient: () => mockClient });
+  await b.restoreSession();
   b.connect();
   let result = null;
   b.onCreateProject = (id, name) => { result = { id, name }; };
@@ -165,15 +193,16 @@ test('calls onCreateProject with correct args', () => {
   assert.deepEqual(result, { id: 'p1', name: 'My Project' });
 });
 
-test('calls onSwitchProject with id', () => {
+test('calls onSwitchProject with id', async () => {
   const handlers = {};
   const mockChannel = {
     on(type, { event }, cb) { handlers[event] = cb; return mockChannel; },
     subscribe: () => mockChannel,
     send: () => {},
   };
-  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} } };
+  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} }, auth: makeMockAuth() };
   const b = new Bridge({ supabaseUrl: 'x', supabaseKey: 'x', sessionId: 's', sessionToken: 'tok', _createClient: () => mockClient });
+  await b.restoreSession();
   b.connect();
   let received = null;
   b.onSwitchProject = (id) => { received = id; };
@@ -181,15 +210,16 @@ test('calls onSwitchProject with id', () => {
   assert.equal(received, 'p2');
 });
 
-test('calls onUploadFile with storageKey, filename, projectId', () => {
+test('calls onUploadFile with storageKey, filename, projectId', async () => {
   const handlers = {};
   const mockChannel = {
     on(type, { event }, cb) { handlers[event] = cb; return mockChannel; },
     subscribe: () => mockChannel,
     send: () => {},
   };
-  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} } };
+  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} }, auth: makeMockAuth() };
   const b = new Bridge({ supabaseUrl: 'x', supabaseKey: 'x', sessionId: 's', sessionToken: 'tok', _createClient: () => mockClient });
+  await b.restoreSession();
   b.connect();
   let args = null;
   b.onUploadFile = (sk, fn, pid) => { args = { sk, fn, pid }; };
@@ -197,15 +227,16 @@ test('calls onUploadFile with storageKey, filename, projectId', () => {
   assert.deepEqual(args, { sk: 'uploads/abc.pdf', fn: 'abc.pdf', pid: 'p1' });
 });
 
-test('calls onOpenClaudeDesktop with projectId', () => {
+test('calls onOpenClaudeDesktop with projectId', async () => {
   const handlers = {};
   const mockChannel = {
     on(type, { event }, cb) { handlers[event] = cb; return mockChannel; },
     subscribe: () => mockChannel,
     send: () => {},
   };
-  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} } };
+  const mockClient = { channel: () => mockChannel, removeChannel: () => {}, realtime: { setAuth: () => {} }, auth: makeMockAuth() };
   const b = new Bridge({ supabaseUrl: 'x', supabaseKey: 'x', sessionId: 's', sessionToken: 'tok', _createClient: () => mockClient });
+  await b.restoreSession();
   b.connect();
   let received = null;
   b.onOpenClaudeDesktop = (pid) => { received = pid; };

@@ -91,7 +91,9 @@ function CCController() {
 
   // Supabase — reconnectKey re-crea canal en iOS background o network recovery
   useEffect(() => {
-    const ch = supabase.channel(`session:${getSessionId()}`);
+    // private: sin esto Realtime ignora las políticas de `realtime.messages`
+    // y el canal queda abierto a cualquiera con la anon key.
+    const ch = supabase.channel(`session:${getSessionId()}`, { config: { private: true } });
     channelRef.current = ch;
 
     ch.on('broadcast', { event: 'heartbeat' }, () => {
