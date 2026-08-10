@@ -64,23 +64,32 @@ export default function AuthGate({ children }) {
 }
 
 function SignIn() {
+  const [mode, setMode] = useState('login'); // 'login' | 'signup' | 'confirm'
   const [email, setEmail] = useState('');
-  const [sent, setSent] = useState(false);
+  const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
 
-  async function handleSubmit() {
-    const address = email.trim();
-    if (!address) return;
+  async function handleLogin() {
+    const addr = email.trim();
+    if (!addr || !password) return;
     setBusy(true);
     setError(null);
-    const { error: err } = await supabase.auth.signInWithOtp({
-      email: address,
-      options: { emailRedirectTo: window.location.origin },
-    });
+    const { error: err } = await supabase.auth.signInWithPassword({ email: addr, password });
+    setBusy(false);
+    if (err) setError(err.message === 'Invalid login credentials' ? 'Correo o contraseña incorrectos' : err.message);
+  }
+
+  async function handleSignup() {
+    const addr = email.trim();
+    if (!addr || !password) return;
+    if (password.length < 6) { setError('Mínimo 6 caracteres'); return; }
+    setBusy(true);
+    setError(null);
+    const { error: err } = await supabase.auth.signUp({ email: addr, password });
     setBusy(false);
     if (err) setError(err.message);
-    else setSent(true);
+    else setMode('confirm');
   }
 
   const hero = (
@@ -97,43 +106,57 @@ function SignIn() {
     </>
   );
 
-  const card = sent ? (
+  const inputStyle = { width: '100%', boxSizing: 'border-box', background: '#f5f5f5', border: '1.5px solid #e0e0e0', borderRadius: 14, padding: '14px 16px', fontSize: 16, fontWeight: 500, color: '#1a1a1a', fontFamily: F, outline: 'none', minHeight: 52, touchAction: 'manipulation' };
+  const btnStyle = (disabled) => ({ width: '100%', marginTop: 12, background: disabled ? '#c0a090' : '#f04e23', border: 'none', borderRadius: 14, padding: '15px 20px', fontSize: 15, fontWeight: 700, color: '#fff', cursor: disabled ? 'default' : 'pointer', fontFamily: F, minHeight: 52, touchAction: 'manipulation', transition: 'background 200ms' });
+
+  const card = mode === 'confirm' ? (
     <div style={{ textAlign: 'center', padding: '8px 0' }}>
       <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M20 6L9 17l-5-5" stroke="#f04e23" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </div>
-      <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1a1a1a' }}>Enlace enviado</p>
+      <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1a1a1a' }}>Confirma tu cuenta</p>
       <p style={{ margin: '8px 0 0', fontSize: 13, color: '#666666', lineHeight: 1.5 }}>
-        Revisa <strong>{email}</strong> y abre el enlace en este mismo dispositivo.
+        Revisa <strong>{email}</strong> y abre el enlace de confirmación. Luego vuelve aquí e inicia sesión.
       </p>
+      <button onClick={() => setMode('login')} style={{ ...btnStyle(false), marginTop: 20 }}>
+        Ir a iniciar sesión
+      </button>
     </div>
   ) : (
     <>
       <p style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 500, color: '#666666', lineHeight: 1.55 }}>
-        Entra con tu correo. Solo cuentas autorizadas pueden acceder al canal de tu Mac.
+        {mode === 'login' ? 'Inicia sesión con tu cuenta.' : 'Crea una cuenta nueva.'}
       </p>
       <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#999999', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6, fontFamily: F }}>
         Correo electrónico
       </label>
       <input
-        type="email"
-        inputMode="email"
-        autoComplete="email"
-        placeholder="tu@correo.com"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        onKeyDown={e => { if (e.key === 'Enter') handleSubmit(); }}
-        style={{ width: '100%', boxSizing: 'border-box', background: '#f5f5f5', border: '1.5px solid #e0e0e0', borderRadius: 14, padding: '14px 16px', fontSize: 16, fontWeight: 500, color: '#1a1a1a', fontFamily: F, outline: 'none', minHeight: 52, touchAction: 'manipulation' }}
+        type="email" inputMode="email" autoComplete="email" placeholder="tu@correo.com"
+        value={email} onChange={e => setEmail(e.target.value)}
+        onKeyDown={e => { if (e.key === 'Enter') document.getElementById('cc-pwd')?.focus(); }}
+        style={inputStyle}
+      />
+      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#999999', letterSpacing: '0.06em', textTransform: 'uppercase', margin: '14px 0 6px', fontFamily: F }}>
+        Contraseña
+      </label>
+      <input
+        id="cc-pwd"
+        type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} placeholder="••••••••"
+        value={password} onChange={e => setPassword(e.target.value)}
+        onKeyDown={e => { if (e.key === 'Enter') mode === 'login' ? handleLogin() : handleSignup(); }}
+        style={inputStyle}
       />
       {error && <p style={{ margin: '10px 0 0', fontSize: 12, color: '#dc2626', fontWeight: 500 }}>{error}</p>}
+      <button onClick={mode === 'login' ? handleLogin : handleSignup} disabled={busy} style={btnStyle(busy)}>
+        {busy ? (mode === 'login' ? 'Entrando...' : 'Creando cuenta...') : (mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta')}
+      </button>
       <button
-        onClick={handleSubmit}
-        disabled={busy}
-        style={{ width: '100%', marginTop: 12, background: busy ? '#c0a090' : '#f04e23', border: 'none', borderRadius: 14, padding: '15px 20px', fontSize: 15, fontWeight: 700, color: '#fff', cursor: busy ? 'default' : 'pointer', fontFamily: F, minHeight: 52, touchAction: 'manipulation', transition: 'background 200ms' }}
+        onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(null); }}
+        style={{ width: '100%', marginTop: 8, background: 'none', border: 'none', padding: '10px', fontSize: 13, fontWeight: 600, color: '#f04e23', cursor: 'pointer', fontFamily: F }}
       >
-        {busy ? 'Enviando...' : 'Enviar enlace de acceso'}
+        {mode === 'login' ? '¿Sin cuenta? Crear una' : '¿Ya tienes cuenta? Inicia sesión'}
       </button>
     </>
   );
