@@ -1,4 +1,4 @@
--- CC Controller — configuración de Supabase
+-- CC Controller - configuracion de Supabase (ejecutar completo)
 -- Ejecutar completo en el SQL Editor: https://supabase.com/dashboard/project/_/sql/new
 --
 -- Qué hace:
@@ -9,14 +9,13 @@
 -- Sin esto, el canal de Supabase es público: cualquiera con la anon key puede
 -- ejecutar comandos en el Mac y leer todo lo que responde Claude.
 --
--- OJO: estas políticas solo se evalúan si los clientes se conectan al canal con
--- `{ config: { private: true } }` y se desactiva "Allow public access" en
--- Realtime Settings. Hoy la PWA y el desktop abren el canal en modo público,
--- así que el script queda instalado pero inactivo.
+-- La PWA y el desktop ya abren el canal con `{ config: { private: true } }`.
+-- Falta un paso manual: desactiva "Allow public access" en
+-- Dashboard > Realtime > Settings, o los canales públicos siguen permitidos.
 
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 -- 1. Usuarios autorizados
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 
 CREATE TABLE IF NOT EXISTS public.cc_allowed_users (
   user_id    uuid PRIMARY KEY REFERENCES auth.users (id) ON DELETE CASCADE,
@@ -35,11 +34,12 @@ CREATE POLICY "cc_read_own_row" ON public.cc_allowed_users
   FOR SELECT TO authenticated
   USING (user_id = auth.uid());
 
--- Nadie escribe desde el cliente: altas y bajas van con la service_role key.
+-- Nadie escribe desde el cliente: altas y bajas se hacen desde el SQL Editor
+-- (o con la service_role key desde un backend), nunca desde el Mac ni la PWA.
 
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 -- 2. Predicado de acceso
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 
 CREATE OR REPLACE FUNCTION public.cc_can_access(channel_topic text)
 RETURNS boolean
@@ -58,10 +58,12 @@ AS $$
   );
 $$;
 
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 -- 3. Realtime Authorization (canal privado)
--- ─────────────────────────────────────────────────────────────
--- La service_role key del desktop salta RLS, así que Electron sigue funcionando.
+-- ============================================================
+-- El desktop inicia sesión con la misma cuenta que la PWA (Electron guarda la
+-- sesión en ~/.config/cc-controller/auth.json), así que estas políticas también
+-- lo cubren a él. No hace falta service_role key en el Mac.
 
 DROP POLICY IF EXISTS "cc_realtime_read" ON realtime.messages;
 CREATE POLICY "cc_realtime_read" ON realtime.messages
@@ -79,9 +81,9 @@ CREATE POLICY "cc_realtime_write" ON realtime.messages
     AND public.cc_can_access((SELECT realtime.topic()))
   );
 
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 -- 4. Storage (bucket `uploads`, privado)
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 -- Las claves tienen la forma `uploads/<session_id>/<timestamp>-<nombre>`,
 -- así que el segundo segmento identifica la sesión.
 
@@ -103,11 +105,21 @@ CREATE POLICY "cc_read_own_session" ON storage.objects
     AND public.cc_can_access('session:' || split_part(name, '/', 2))
   );
 
--- ─────────────────────────────────────────────────────────────
+-- El desktop borra el archivo del bucket después de descargarlo al proyecto.
+DROP POLICY IF EXISTS "cc_delete_own_session" ON storage.objects;
+CREATE POLICY "cc_delete_own_session" ON storage.objects
+  FOR DELETE TO authenticated
+  USING (
+    bucket_id = 'uploads'
+    AND public.cc_can_access('session:' || split_part(name, '/', 2))
+  );
+
+-- ============================================================
 -- 5. Darte de alta a ti mismo
--- ─────────────────────────────────────────────────────────────
--- Entra una vez en la PWA con tu correo (magic link) para que exista tu usuario,
--- y después ejecuta esto sustituyendo el correo y el SESSION_ID:
+-- ============================================================
+-- Entra una vez en la PWA con tu correo para que exista tu usuario, y después
+-- ejecuta esto sustituyendo el correo y el SESSION_ID (el que muestra el setup
+-- del Mac, antes de los dos puntos del código de emparejamiento):
 
 -- INSERT INTO public.cc_allowed_users (user_id, session_id)
 -- SELECT id, 'cc-session-01' FROM auth.users WHERE email = 'tu@correo.com'

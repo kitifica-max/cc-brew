@@ -267,15 +267,42 @@
     <button class="btn" id="btn0" onclick="goStep1()" disabled>Continuar →</button>
   </div>
 
+  <!-- STEP A: Supabase account -->
+  <div class="step" id="stepAuth">
+    <div>
+      <div class="step-label">Paso 1 de 3</div>
+      <h2 id="authTitle">Inicia sesión</h2>
+    </div>
+
+    <p style="font-size:13px;color:#555;line-height:1.6;">
+      Usa la misma cuenta que en la PWA. El canal es privado: sin esta sesión, Supabase
+      no deja que esta Mac se conecte.
+    </p>
+
+    <div class="field">
+      <label for="authEmail">Correo electrónico</label>
+      <input type="text" id="authEmail" placeholder="tu@correo.com" autocomplete="username">
+    </div>
+    <div class="field">
+      <label for="authPassword">Contraseña</label>
+      <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <div class="error" id="authError"></div>
+
+    <button class="btn" id="btnAuth" onclick="submitAuth()">Entrar →</button>
+    <button class="token-btn" id="btnAuthMode" onclick="toggleAuthMode()">¿Sin cuenta? Crear una</button>
+  </div>
+
   <!-- STEP 1: Generate pairing code -->
   <div class="step" id="step1">
     <div>
-      <div class="step-label">Paso 1 de 2</div>
+      <div class="step-label">Paso 2 de 3</div>
       <h2>Genera tu código de emparejamiento</h2>
     </div>
 
     <p style="font-size:13px;color:#555;line-height:1.6;">
-      Se generará un código único que conecta esta Mac con tu iPhone. No necesitas cuenta de Supabase.
+      Se generará un código único que conecta esta Mac con tu iPhone.
     </p>
 
     <button class="btn" id="btn1" onclick="goStep2()">Generar código →</button>
@@ -284,7 +311,7 @@
   <!-- STEP 2: Pairing code ready -->
   <div class="step" id="step2">
     <div>
-      <div class="step-label">Paso 2 de 2</div>
+      <div class="step-label">Paso 3 de 3</div>
       <h2>Código listo</h2>
     </div>
 
@@ -304,7 +331,7 @@
       </div>
       <div class="hint-row">
         <div class="hint-num">2</div>
-        <span>Abre <strong>ccc.kitifica.com</strong> en tu iPhone y crea una cuenta.</span>
+        <span>Abre <strong>ccc.kitifica.com</strong> en tu iPhone y entra con la misma cuenta.</span>
       </div>
       <div class="hint-row">
         <div class="hint-num">3</div>
@@ -320,6 +347,7 @@
 <script>
   let pairingCode = '';
   let revealed = false;
+  let authMode = 'login';
 
   window.addEventListener('DOMContentLoaded', async () => {
     const ok = await window.cc.checkClaude();
@@ -345,6 +373,41 @@
 
   function goStep1() {
     document.getElementById('step0').classList.remove('active');
+    document.getElementById('stepAuth').classList.add('active');
+    document.getElementById('authEmail').focus();
+  }
+
+  function toggleAuthMode() {
+    authMode = authMode === 'login' ? 'signup' : 'login';
+    document.getElementById('authTitle').textContent = authMode === 'login' ? 'Inicia sesión' : 'Crea tu cuenta';
+    document.getElementById('btnAuth').textContent = authMode === 'login' ? 'Entrar →' : 'Crear cuenta →';
+    document.getElementById('btnAuthMode').textContent = authMode === 'login'
+      ? '¿Sin cuenta? Crear una'
+      : '¿Ya tienes cuenta? Inicia sesión';
+  }
+
+  async function submitAuth() {
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    const err = document.getElementById('authError');
+    const btn = document.getElementById('btnAuth');
+    err.classList.remove('visible');
+    if (!email || !password) {
+      err.textContent = 'Escribe tu correo y contraseña';
+      err.classList.add('visible');
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = 'Conectando...';
+    const res = await window.cc.signIn({ email, password, mode: authMode });
+    btn.disabled = false;
+    btn.textContent = authMode === 'login' ? 'Entrar →' : 'Crear cuenta →';
+    if (!res.ok) {
+      err.textContent = res.error;
+      err.classList.add('visible');
+      return;
+    }
+    document.getElementById('stepAuth').classList.remove('active');
     document.getElementById('step1').classList.add('active');
   }
 
@@ -389,9 +452,9 @@
   }
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && document.getElementById('step1').classList.contains('active')) {
-      goStep2();
-    }
+    if (e.key !== 'Enter') return;
+    if (document.getElementById('stepAuth').classList.contains('active')) submitAuth();
+    else if (document.getElementById('step1').classList.contains('active')) goStep2();
   });
 </script>
 </body>

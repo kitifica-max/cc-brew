@@ -1,5 +1,6 @@
 import { createClient as defaultCreateClient } from '@supabase/supabase-js';
 import WebSocket from 'ws';
+import { AUTH_STORAGE_KEY } from './auth-store.js';
 
 const ANSI_RE = /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g;
 const MAX_HISTORY = 200;
@@ -9,8 +10,16 @@ const MAX_FILE_BYTES = 10 * 1024 * 1024;
 
 export default class Bridge {
   // ponytail: _createClient param para tests sin module mocking
-  constructor({ supabaseUrl, supabaseKey, sessionId, sessionToken, _createClient = defaultCreateClient }) {
-    this.client = _createClient(supabaseUrl, supabaseKey, { realtime: { transport: WebSocket } });
+  constructor({ supabaseUrl, supabaseKey, sessionId, sessionToken, authStorage = null, _createClient = defaultCreateClient }) {
+    this.client = _createClient(supabaseUrl, supabaseKey, {
+      realtime: { transport: WebSocket },
+      auth: {
+        persistSession: Boolean(authStorage),
+        autoRefreshToken: true,
+        detectSessionInUrl: false,
+        ...(authStorage ? { storage: authStorage, storageKey: AUTH_STORAGE_KEY } : {}),
+      },
+    });
     this.supabaseKey = supabaseKey;
     this.sessionId = sessionId;
     this.sessionToken = sessionToken;
@@ -26,6 +35,28 @@ export default class Bridge {
     this._heartbeatTimer = null;
     this._history = [];
     this._streamBuffers = new Map(); // msgId → { parts: string[], projectId }
+    this._accessToken = null;
+    this._authSub = null;
+  }
+
+  // El canal es privado: Realtime evalúa las políticas de `realtime.messages`
+  // contra el JWT del usuario, así que la anon key no basta para conectarse.
+  async signIn(email, password) {
+    const { data, error } = await this.client.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    this._accessToken = data.session.access_token;
+    return data.session;
+  }
+
+  async restoreSession() {
+    const { data } = await this.client.auth.getSession();
+    this._accessToken = data?.session?.access_token ?? null;
+    return Boolean(this._accessToken);
+  }
+
+  async signOut() {
+    this._accessToken = null;
+    await this.client.auth.signOut();
   }
 
   _validate(payload) {
@@ -50,9 +81,18 @@ export default class Bridge {
   }
 
   connect() {
-    this.client.realtime.setAuth(this.supabaseKey);
+    if (!this._accessToken) {
+      throw new Error('Sin sesión de Supabase: inicia sesión antes de conectar');
+    }
+    this.client.realtime.setAuth(this._accessToken);
+    this._authSub = this.client.auth.onAuthStateChange?.((_event, session) => {
+      if (!session?.access_token) return;
+      this._accessToken = session.access_token;
+      this.client.realtime.setAuth(session.access_token);
+    })?.data?.subscription ?? null;
+
     this.channel = this.client
-      .channel(`session:${this.sessionId}`)
+      .channel(`session:${this.sessionId}`, { config: { private: true } })
       .on('broadcast', { event: 'input' }, ({ payload }) => {
         if (!this._validate(payload)) return;
         this.onInput?.(
@@ -169,6 +209,8 @@ export default class Bridge {
     clearInterval(this._heartbeatTimer);
     this._heartbeatTimer = null;
     this._streamBuffers.clear();
+    this._authSub?.unsubscribe();
+    this._authSub = null;
     if (this.channel) {
       this.client.removeChannel(this.channel);
       this.channel = null;

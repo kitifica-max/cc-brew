@@ -45,10 +45,11 @@ Arrastra CC Controller a Applications. Al abrir, aparece en el tray (barra super
 
 La primera vez que CC Controller corre, abre una ventana de configuración automáticamente. El asistente:
 
-1. Genera un `SESSION_ID` único para tu instalación
-2. Genera un `SESSION_TOKEN` aleatorio (mín. 32 chars)
-3. Muestra el **código de emparejamiento** (`sessionId:token`)
-4. Guarda la config en `~/.config/cc-controller/.env`
+1. Pide tu correo y contraseña — la misma cuenta que usas en la PWA
+2. Genera un `SESSION_ID` único para tu instalación
+3. Genera un `SESSION_TOKEN` aleatorio (mín. 32 chars)
+4. Muestra el **código de emparejamiento** (`sessionId:token`)
+5. Guarda la config en `~/.config/cc-controller/.env` y la sesión en `~/.config/cc-controller/auth.json` (ambos `600`)
 
 Copia el código de emparejamiento — lo necesitas en el paso 3.
 
@@ -102,7 +103,8 @@ El DMG no está notarizado (el certificado de Apple cuesta $99/año). Lo que sí
 
 | Medida | Detalle |
 |---|---|
-| **Código de emparejamiento** | `SESSION_ID` único por instalación + `SESSION_TOKEN` ≥ 32 chars. Sin ese par exacto, cualquier evento llega y se descarta en silencio. |
+| **Canal privado** | El canal `session:<id>` es privado: Supabase evalúa Row Level Security sobre `realtime.messages` con el JWT de tu cuenta (ver `scripts/setup-supabase.sql`). Sin sesión autorizada no hay suscripción — ni para enviar ni para leer. |
+| **Código de emparejamiento** | `SESSION_ID` único por instalación + `SESSION_TOKEN` ≥ 32 chars. Segunda capa: sin ese par exacto, cualquier evento llega y se descarta en silencio. |
 | **Sin puertos abiertos** | El Mac no escucha en ningún puerto. Todo viaja por Supabase WebSocket (WSS/TLS). Sin SSH, sin ngrok, sin IP expuesta. |
 | **Path traversal bloqueado** | Toda ruta de archivo se valida dentro de `~/CCProjects/`. Paths con `../` o rutas absolutas externas rechazadas. |
 | **Whitelist de archivos** | Solo extensiones permitidas, máx. 10 MB. Archivo eliminado de Supabase Storage inmediatamente tras descargarse. |
@@ -110,7 +112,7 @@ El DMG no está notarizado (el certificado de Apple cuesta $99/año). Lo que sí
 | **Hardened Runtime** | `hardenedRuntime: true` en el build de Electron. |
 | **Open source** | Todo el código está en GitHub. Sin binarios opacos ni dependencias sin fuente. |
 
-> Si pierdes el iPhone: cambia `SESSION_TOKEN` en `~/.config/cc-controller/.env` y reinicia CC Controller. El dispositivo anterior no puede reconectar.
+> Si pierdes el iPhone: cambia `SESSION_TOKEN` en `~/.config/cc-controller/.env` y reinicia CC Controller. El dispositivo anterior no puede reconectar. Para cortar también el acceso de esa cuenta, pon `active = false` en `public.cc_allowed_users`.
 
 ---
 
