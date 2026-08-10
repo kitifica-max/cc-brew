@@ -10,13 +10,13 @@ import FileUpload from './components/FileUpload';
 const ICON_SETTINGS = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M14 17H5M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></g></svg>`;
 const ICON_SEND = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11zm7.318-19.539l-10.94 10.939"/></svg>`;
 
-// Cada mensaje es un turno nuevo de `claude --print --continue`, así que estos
-// atajos solo tienen sentido como respuesta a una pregunta del turno anterior.
 const QUICK = [
   { label: 'sí', text: 'sí\n' },
   { label: 'no', text: 'no\n' },
   { label: 'continúa', text: 'continúa\n' },
 ];
+
+const THINKING_TIMEOUT_MS = 3 * 60 * 1000;
 
 export default function Page() {
   return (
@@ -34,8 +34,10 @@ function CCController() {
   const [desktopActive, setDesktopActive] = useState(false);
   const desktopTimeoutRef = useRef(null);
   const [thinking, setThinking] = useState(false);
+  const thinkingTimerRef = useRef(null);
   const [view, setView] = useState('chat');
   const [showSettings, setShowSettings] = useState(false);
+  const [reconnectKey, setReconnectKey] = useState(0);
   const chatRef = useRef(null);
   const channelRef = useRef(null);
   const currentIdRef = useRef(null);
@@ -46,8 +48,21 @@ function CCController() {
   const resetDesktopTimeout = useCallback(() => {
     setDesktopActive(true);
     clearTimeout(desktopTimeoutRef.current);
-    // 45s sin heartbeat = Desktop detenido (heartbeat cada 20s)
     desktopTimeoutRef.current = setTimeout(() => setDesktopActive(false), 45_000);
+  }, []);
+
+  // iOS background + network reconnect
+  useEffect(() => {
+    function onVisible() {
+      if (document.visibilityState === 'visible') setReconnectKey(k => k + 1);
+    }
+    function onOnline() { setReconnectKey(k => k + 1); }
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('online', onOnline);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('online', onOnline);
+    };
   }, []);
 
   // Init from localStorage
@@ -66,7 +81,14 @@ function CCController() {
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: 'smooth' });
   }, [projects, thinking, currentId]);
 
-  // Supabase
+  const addSystemMsg = useCallback((text) => {
+    const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+    setProjects(prev => prev.map(p => p.id !== currentIdRef.current ? p : {
+      ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: 'system', text, time }],
+    }));
+  }, []);
+
+  // Supabase — reconnectKey re-crea canal en iOS background o network recovery
   useEffect(() => {
     const ch = supabase.channel(`session:${SESSION_ID}`);
     channelRef.current = ch;
@@ -77,6 +99,7 @@ function CCController() {
 
     ch.on('broadcast', { event: 'message' }, ({ payload }) => {
       resetDesktopTimeout();
+      clearTimeout(thinkingTimerRef.current);
       setThinking(false);
       const targetId = payload.projectId ?? currentIdRef.current;
       const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
@@ -94,8 +117,6 @@ function CCController() {
       }));
     });
 
-    // El canal es privado: Realtime valida el JWT del usuario contra las políticas
-    // RLS de `realtime.messages` antes de dejarlo entrar.
     (async () => {
       const { data } = await supabase.auth.getSession();
       await supabase.realtime.setAuth(data.session?.access_token ?? null);
@@ -103,20 +124,25 @@ function CCController() {
         const isNowConnected = s === 'SUBSCRIBED';
         setConnected(isNowConnected);
         if (isNowConnected) {
-          // Primera conexión y reconexiones (iOS background) — pedir estado fresco
           ch.send({ type: 'broadcast', event: 'get-project-state', payload: { token: getSessionToken() } });
           wasConnectedRef.current = true;
+        }
+        if (s === 'CHANNEL_ERROR' || s === 'TIMED_OUT') {
+          addSystemMsg('⚠️ Error de conexión — verifica tu Session Token en Configuración');
         }
       });
     })();
 
-    // El JWT caduca; Realtime necesita el nuevo tras cada refresco.
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       supabase.realtime.setAuth(session?.access_token ?? null);
     });
 
-    return () => { sub.subscription.unsubscribe(); supabase.removeChannel(ch); clearTimeout(desktopTimeoutRef.current); };
-  }, [resetDesktopTimeout]);
+    return () => {
+      sub.subscription.unsubscribe();
+      supabase.removeChannel(ch);
+      clearTimeout(desktopTimeoutRef.current);
+    };
+  }, [resetDesktopTimeout, reconnectKey, addSystemMsg]);
 
   const sendEvent = useCallback((event, payload) => {
     channelRef.current?.send({ type: 'broadcast', event, payload: { ...payload, token: getSessionToken() } });
@@ -142,6 +168,16 @@ function CCController() {
     sendRaw(text + '\n', !isNewStart);
     setInput('');
     setThinking(true);
+    clearTimeout(thinkingTimerRef.current);
+    thinkingTimerRef.current = setTimeout(() => {
+      setThinking(false);
+      addSystemMsg('⚠️ Sin respuesta en 3 min — verifica que el desktop esté activo');
+    }, THINKING_TIMEOUT_MS);
+  }
+
+  function cancelThinking() {
+    clearTimeout(thinkingTimerRef.current);
+    setThinking(false);
   }
 
   function handleCreateProject(name) {
@@ -150,6 +186,7 @@ function CCController() {
     setCurrentId(p.id);
     setView('chat');
     setThinking(false);
+    clearTimeout(thinkingTimerRef.current);
     sendEvent('create-project', { id: p.id, name });
   }
 
@@ -157,11 +194,11 @@ function CCController() {
     setCurrentId(id);
     setView('chat');
     setThinking(false);
+    clearTimeout(thinkingTimerRef.current);
     const target = projects.find(p => p.id === id);
     if (target?.path) {
       sendEvent('switch-project', { id });
     } else {
-      // Proyecto no existe en Electron todavía — registrarlo
       sendEvent('create-project', { id, name: target?.name ?? id });
     }
   }
@@ -226,7 +263,7 @@ function CCController() {
           </div>
         )}
         {messages.map(msg => <MessageRow key={msg.id} msg={msg} />)}
-        {thinking && <TypingIndicator />}
+        {thinking && <TypingIndicator onCancel={cancelThinking} />}
       </div>
 
       {/* Quick actions */}
@@ -262,7 +299,6 @@ function CCController() {
         />
       </div>
 
-      {/* Settings sheet */}
       {showSettings && currentProject && (
         <SettingsSheet
           project={currentProject}
@@ -277,26 +313,110 @@ function CCController() {
   );
 }
 
+// ─── Markdown renderer (sin dependencias externas) ───────────────────────────
+
+function CodeBlock({ code, lang }) {
+  const [copied, setCopied] = useState(false);
+  function copy() {
+    navigator.clipboard.writeText(code).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = code; ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    });
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+  return (
+    <div style={{ margin: '6px 0', borderRadius: 10, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 10px', background: 'rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <span style={{ fontSize: 10, color: '#888', fontFamily: 'ui-monospace,monospace' }}>{lang || 'code'}</span>
+        <button onClick={copy} style={{ background: 'none', border: 'none', color: copied ? '#00b09b' : '#666', cursor: 'pointer', fontSize: 11, fontWeight: 600, fontFamily: 'Sora,sans-serif', padding: '2px 0' }}>
+          {copied ? '✓ copiado' : 'copiar'}
+        </button>
+      </div>
+      <pre style={{ margin: 0, padding: '10px 12px', overflowX: 'auto', fontSize: 12, lineHeight: 1.6, color: '#e8e2d8', fontFamily: "'SF Mono','Fira Code',ui-monospace,monospace", background: '#111' }}>
+        <code>{code}</code>
+      </pre>
+    </div>
+  );
+}
+
+function InlineSegment({ text }) {
+  const parts = text.split(/(`[^`\n]+`)/g);
+  return (
+    <>
+      {parts.map((p, i) => {
+        if (p.startsWith('`') && p.endsWith('`') && p.length > 2) {
+          return <code key={i} style={{ background: 'rgba(255,255,255,0.12)', padding: '1px 5px', borderRadius: 4, fontSize: 11, fontFamily: "'SF Mono','Fira Code',ui-monospace,monospace" }}>{p.slice(1, -1)}</code>;
+        }
+        const boldParts = p.split(/(\*\*[^*\n]+\*\*)/g);
+        return boldParts.map((b, j) => {
+          if (b.startsWith('**') && b.endsWith('**') && b.length > 4) return <strong key={j}>{b.slice(2, -2)}</strong>;
+          return <span key={j}>{b}</span>;
+        });
+      })}
+    </>
+  );
+}
+
+function MessageContent({ text }) {
+  const parts = text.split(/(```[\s\S]*?```)/g);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part.startsWith('```')) {
+          const nl = part.indexOf('\n');
+          const lang = nl > 3 ? part.slice(3, nl).trim() : '';
+          const code = nl > 3 ? part.slice(nl + 1, -3) : part.slice(3, -3);
+          return <CodeBlock key={i} code={code} lang={lang} />;
+        }
+        if (!part) return null;
+        return (
+          <span key={i} style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            {part.split('\n').map((line, j, arr) => (
+              <span key={j}><InlineSegment text={line} />{j < arr.length - 1 && '\n'}</span>
+            ))}
+          </span>
+        );
+      })}
+    </>
+  );
+}
+
 function MessageRow({ msg }) {
   const isUser = msg.role === 'user';
-  if (msg.role === 'system') return <div style={{ textAlign: 'center', fontSize: 10, fontWeight: 600, color: '#999999', padding: '4px 0' }}>{msg.text}</div>;
+  if (msg.role === 'system') return (
+    <div style={{ textAlign: 'center', fontSize: 10, fontWeight: 600, color: '#999999', padding: '4px 0' }}>{msg.text}</div>
+  );
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUser ? 'flex-end' : 'flex-start' }}>
       {!isUser && <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#999999', marginBottom: 4, paddingLeft: 4 }}>Claude Code</div>}
-      <div style={{ maxWidth: '88%', borderRadius: 18, padding: '10px 14px', ...(isUser ? { background: '#f04e23', color: '#fff', borderBottomRightRadius: 4, fontSize: 14, fontWeight: 500, lineHeight: 1.5 } : { background: '#1a1a1a', color: '#e8e2d8', borderBottomLeftRadius: 4, fontFamily: "'SF Mono','Fira Code',ui-monospace,monospace", fontSize: 12, lineHeight: 1.75, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }) }}>
-        {msg.text}
+      <div style={{
+        maxWidth: '92%', borderRadius: 18, padding: '10px 14px',
+        ...(isUser
+          ? { background: '#f04e23', color: '#fff', borderBottomRightRadius: 4, fontSize: 14, fontWeight: 500, lineHeight: 1.5 }
+          : { background: '#1a1a1a', color: '#e8e2d8', borderBottomLeftRadius: 4, fontSize: 13, lineHeight: 1.7 }),
+      }}>
+        {isUser ? msg.text : <MessageContent text={msg.text} />}
       </div>
       <div style={{ fontSize: 9, color: '#999999', marginTop: 3, paddingLeft: 4, paddingRight: 4 }}>{msg.time}</div>
     </div>
   );
 }
 
-function TypingIndicator() {
+function TypingIndicator({ onCancel }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
       <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#999999', marginBottom: 4, paddingLeft: 4 }}>Claude Code</div>
-      <div style={{ background: '#1a1a1a', borderRadius: 18, borderBottomLeftRadius: 4, padding: '12px 16px', display: 'flex', gap: 5, alignItems: 'center' }}>
-        {[0,1,2].map(i => <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#f0a040', animation: `blink 1.2s ${i*0.2}s infinite` }} />)}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ background: '#1a1a1a', borderRadius: 18, borderBottomLeftRadius: 4, padding: '12px 16px', display: 'flex', gap: 5, alignItems: 'center' }}>
+          {[0, 1, 2].map(i => <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#f0a040', animation: `blink 1.2s ${i * 0.2}s infinite` }} />)}
+        </div>
+        <button
+          onClick={onCancel}
+          title="Cancelar"
+          style={{ background: 'rgba(0,0,0,0.08)', border: 'none', borderRadius: '50%', width: 26, height: 26, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: 16, lineHeight: 1 }}
+        >×</button>
       </div>
     </div>
   );

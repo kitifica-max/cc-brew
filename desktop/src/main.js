@@ -1,4 +1,4 @@
-import { app, Tray, Menu, nativeImage, shell, clipboard, dialog } from 'electron';
+import { app, Tray, Menu, nativeImage, shell, clipboard, dialog, powerSaveBlocker } from 'electron';
 import { needsSetup, openSetupWindow } from './setup-window.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -27,6 +27,7 @@ let pty = null;
 let bridge = null;
 let startTime = null;
 let uptimeInterval = null;
+let powerBlockId = null;
 
 function getUptime() {
   if (!startTime) return '--:--';
@@ -181,6 +182,9 @@ function startSession() {
 
   setTimeout(broadcastProjects, 1000);
 
+  // Mantener Mac despierta mientras la sesión corra
+  if (powerBlockId === null) powerBlockId = powerSaveBlocker.start('prevent-app-suspension');
+
   startTime = Date.now();
   setTrayMenu('running');
   uptimeInterval = setInterval(() => { if (pty?.running) setTrayMenu('running'); }, 30_000);
@@ -190,6 +194,7 @@ function stopSession() {
   clearInterval(uptimeInterval);
   pty?.kill();
   bridge?.disconnect();
+  if (powerBlockId !== null) { powerSaveBlocker.stop(powerBlockId); powerBlockId = null; }
   pty = null; bridge = null; startTime = null; uptimeInterval = null;
   setTrayMenu('stopped');
 }
