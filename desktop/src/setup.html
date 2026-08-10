@@ -399,9 +399,15 @@
     }
     btn.disabled = true;
     btn.textContent = 'Conectando...';
-    const res = await window.cc.signIn({ email, password, mode: authMode });
-    btn.disabled = false;
-    btn.textContent = authMode === 'login' ? 'Entrar →' : 'Crear cuenta →';
+    let res;
+    try {
+      res = await window.cc.signIn({ email, password, mode: authMode });
+    } catch (e) {
+      res = { ok: false, error: e && e.message ? e.message : 'No se pudo iniciar sesión' };
+    } finally {
+      btn.disabled = false;
+      btn.textContent = authMode === 'login' ? 'Entrar →' : 'Crear cuenta →';
+    }
     if (!res.ok) {
       err.textContent = res.error;
       err.classList.add('visible');
