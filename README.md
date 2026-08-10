@@ -4,186 +4,62 @@
 
 # CC Controller — Remote Claude Code Bridge
 
-Control Claude Code desde tu iPhone (o cualquier móvil) usando una PWA como control remoto. El Mac ejecuta Claude Code localmente; el teléfono envía y recibe mensajes en tiempo real vía Supabase Realtime.
+Controla Claude Code desde tu iPhone usando una PWA como control remoto. El Mac ejecuta Claude Code localmente; el teléfono envía y recibe mensajes en tiempo real vía Supabase Realtime.
 
 ```
-iPhone (PWA)  ──── Supabase Realtime ────  Mac (Electron)
-  Escribe prompt                              claude --print
-  Ve la respuesta          ◄──────           Transmite output
-  Sube archivos            ──────►           Guarda en ~/CCProjects/
+iPhone (PWA)  ──── Supabase Realtime ────  Mac (Electron tray)
+  Escribe prompt                              claude CLI
+  Ve streaming token a token   ◄──────       Transmite output
+  Sube archivos                ──────►       Guarda en ~/CCProjects/
 ```
 
-## Arquitectura
-
-| Componente | Tecnología | Rol |
-|---|---|---|
-| **Desktop** | Electron 30 + Node.js | Ejecuta `claude --print` localmente, gestiona proyectos |
-| **PWA** | Next.js 14 + Netlify | Control remoto desde el móvil |
-| **Bridge** | Supabase Realtime (Broadcast) | Canal WebSocket entre ambos extremos |
-| **Storage** | Supabase Storage (`uploads`) | Tránsito temporal de archivos |
+**Sin cuenta Supabase. Sin SSH. Sin túneles. Sin config de red.**
 
 ---
 
-## Requisitos Previos
+## Requisitos
 
-- **Mac** con [Claude Code](https://claude.ai/code) instalado y configurado (`claude` en PATH)
-- **Node.js** ≥ 18
-- Cuenta en [Supabase](https://supabase.com) (plan gratuito suficiente)
-- Cuenta en [Netlify](https://netlify.com) (plan gratuito suficiente)
+- **Mac** con macOS 12+ (Apple Silicon o Intel)
+- **Claude Code CLI** instalado: `npm install -g @anthropic-ai/claude-code`
+- Suscripción activa a Claude (Max o Pro — requerida por el CLI)
+- iPhone o cualquier móvil con navegador moderno
 
 ---
 
-## Paso 1 — Supabase (Backend)
+## Instalación en 3 pasos
 
-### 1.1 Crear proyecto
+### 1 — Descargar el DMG
 
-1. Ve a [supabase.com](https://supabase.com) → **New project**
-2. Elige región cercana a tu Mac
-3. Anota la contraseña de base de datos (no la necesitarás, pero guárdala)
+Desde [GitHub Releases](https://github.com/kitifica-max/cc-controller/releases/latest):
 
-### 1.2 Bucket de Storage
-
-1. En el sidebar: **Storage** → **New bucket**
-2. Nombre: `uploads`
-3. **Public bucket**: OFF (privado)
-4. Crea el bucket
-
-### 1.3 Autenticación y políticas
-
-CC Controller exige que quien abra la PWA inicie sesión: el canal de Supabase
-da control total sobre tu Mac, así que no puede quedar abierto al público.
-
-1. **Authentication → Providers → Email**: activa el proveedor. Basta con
-   *Magic Link* / OTP (sin contraseña).
-2. **SQL Editor**: ejecuta [`scripts/setup-supabase.sql`](scripts/setup-supabase.sql).
-   Crea la tabla `public.cc_allowed_users`, la función `public.cc_can_access()`,
-   las políticas de Realtime Authorization para canales privados y las de
-   Storage restringidas a usuarios autorizados.
-3. **Realtime → Settings**: activa *Realtime Authorization* (canales privados).
-4. Autoriza tu propio usuario (después de tu primer login) con la consulta que
-   viene comentada al final del script:
-
-```sql
-INSERT INTO public.cc_allowed_users (user_id, session_id)
-SELECT id, 'cc-session-01' FROM auth.users WHERE email = 'tu@correo.com'
-ON CONFLICT (user_id) DO UPDATE SET session_id = EXCLUDED.session_id, active = true;
-```
-
-Las columnas `active` y `expires_at` permiten revocar el acceso sin borrar la
-cuenta.
-
-### 1.4 Obtener las llaves
-
-Ve a **Project Settings → API**:
-
-| Variable | Dónde encontrarla |
+| Chip | Archivo |
 |---|---|
-| `SUPABASE_URL` | Project URL |
-| `SUPABASE_ANON_KEY` | `anon` / `public` |
-| `SUPABASE_SERVICE_KEY` | `service_role` (nunca expongas esta llave) |
+| Apple Silicon (M1/M2/M3/M4) | `CC.Controller-*-arm64.dmg` |
+| Intel | `CC.Controller-*.dmg` |
 
----
+> **DMG sin firmar:** macOS bloqueará la apertura por defecto. Clic derecho → *Abrir* → confirmar. Esto es un paso único. Ver sección [Seguridad](#seguridad) para más detalle.
 
-## Paso 2 — PWA (Web / Next.js)
+Arrastra CC Controller a Applications. Al abrir, aparece en el tray (barra superior) sin ícono en el Dock.
 
-### 2.1 Instalar dependencias
+### 2 — Setup inicial
 
-```bash
-cd web
-npm install
-```
+La primera vez que CC Controller corre, abre una ventana de configuración automáticamente. El asistente:
 
-### 2.2 Configurar variables de entorno
+1. Genera un `SESSION_ID` único para tu instalación
+2. Genera un `SESSION_TOKEN` aleatorio (mín. 32 chars)
+3. Muestra el **código de emparejamiento** (`sessionId:token`)
+4. Guarda la config en `~/.config/cc-controller/.env`
 
-```bash
-cp .env.local.example .env.local
-```
+Copia el código de emparejamiento — lo necesitas en el paso 3.
 
-Edita `.env.local`:
+### 3 — Emparejar con la PWA
 
-```env
-NEXT_PUBLIC_SUPABASE_URL="https://tu-proyecto.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="tu-anon-key"
-NEXT_PUBLIC_SESSION_ID="cc-session-01"
-```
+1. Abre [cc-controller.netlify.app](https://cc-controller.netlify.app) en tu iPhone
+2. Agrega a la pantalla de inicio (Share → Add to Home Screen) para usarla como app nativa
+3. Pega el código de emparejamiento cuando la PWA lo solicite
+4. En CC Controller (tray) → clic derecho → **Iniciar**
 
-> **Seguridad:** el `SESSION_TOKEN` **no** se configura aquí. Cualquier variable
-> `NEXT_PUBLIC_*` termina en el JavaScript que sirve Netlify, y un token público
-> equivale a dar ejecución remota en tu Mac a quien encuentre la URL. La PWA lo
-> pide una sola vez tras iniciar sesión y lo guarda en el navegador del
-> dispositivo. Genera el token con:
-> ```bash
-> openssl rand -hex 32
-> ```
-
-### 2.3 Correr en desarrollo
-
-```bash
-npm run dev
-# Abre http://localhost:3000
-```
-
-### 2.4 Desplegar en Netlify
-
-1. Haz fork/push del repo a tu GitHub
-2. En Netlify: **Add new site → Import from Git**
-3. Build settings:
-   - **Base directory:** `web`
-   - **Build command:** `npm run build`
-   - **Publish directory:** `web/.next`
-4. En **Site configuration → Environment variables**, agrega las 3 variables de `.env.local`
-   (nunca el `SESSION_TOKEN`)
-5. Redeploy
-
----
-
-## Paso 3 — Desktop (Electron / Mac)
-
-### 3.1 Instalar dependencias
-
-```bash
-cd desktop
-npm install
-```
-
-### 3.2 Configurar variables de entorno
-
-```bash
-cp .env.example .env
-```
-
-Edita `desktop/.env`:
-
-```env
-SUPABASE_URL="https://tu-proyecto.supabase.co"
-SUPABASE_SERVICE_KEY="tu-service-role-key"
-SESSION_ID="cc-session-01"
-SESSION_TOKEN="un-token-secreto-largo-y-aleatorio"
-PWA_URL="tu-app.netlify.app"
-```
-
-> **Importante:** el `SESSION_ID` debe coincidir con `NEXT_PUBLIC_SESSION_ID` de la
-> PWA, y el `SESSION_TOKEN` es el que introducirás a mano en la PWA la primera vez.
-
-### 3.3 Correr en desarrollo
-
-```bash
-npm run dev
-```
-
-Aparecerá un ícono en el tray (barra superior del Mac). Clic derecho → **Iniciar**.
-
-### 3.4 Construir el ejecutable
-
-```bash
-npm run build
-```
-
-Genera en `desktop/dist/`:
-- `CC Controller-1.0.0-arm64.dmg` → Apple Silicon
-- `CC Controller-1.0.0.dmg` → Intel
-
-Instala el DMG arrastrando a Applications. Al abrir, CC Controller vive en el tray sin ícono en el Dock.
+Listo. Escribe desde el iPhone, Claude Code responde con streaming token a token.
 
 ---
 
@@ -191,132 +67,130 @@ Instala el DMG arrastrando a Applications. Al abrir, CC Controller vive en el tr
 
 ### Flujo normal
 
-1. Abre CC Controller desde Applications (queda en el tray)
-2. Clic derecho → **Iniciar sesión**
-3. Abre la PWA en tu iPhone (agrégala a la pantalla de inicio para usarla como app nativa)
-4. La primera vez: inicia sesión con tu correo (recibes un enlace/código) y pega
-   el `SESSION_TOKEN` de `~/.config/cc-controller/.env`. Queda guardado en el
-   dispositivo.
-5. Escribe mensajes — Claude Code responde cuando termina de procesar el prompt
-   (`claude --print` no transmite token a token).
+1. CC Controller debe estar corriendo en el tray (barra superior del Mac)
+2. Clic derecho → **Iniciar** para iniciar la sesión
+3. Abre la PWA en el iPhone → chat activo
 
 ### Proyectos
 
-- Toca el nombre del proyecto en el header → abre la lista de proyectos
+- Toca el nombre del proyecto en el header de la PWA → lista de proyectos
 - **Nuevo proyecto:** CC Controller crea `~/CCProjects/<slug>/` en el Mac
+- **Abrir en Claude Code:** botón en el header → abre Terminal con `cd <proyecto> && claude`
 - Claude Code siempre corre dentro del directorio del proyecto activo
 
-### Variables de entorno (.env)
+### Subir archivos desde iPhone
 
-Desde la PWA: **ícono de ajustes → Entorno / Secretos**. Las claves que ingreses se transmiten una sola vez por Supabase Realtime y se guardan exclusivamente en:
+Toca el ícono de clip en la barra de entrada. El archivo viaja a Supabase Storage temporalmente, Electron lo descarga al directorio del proyecto y lo elimina de Storage inmediatamente.
+
+Formatos permitidos: `.png .jpg .jpeg .gif .pdf .txt .md .json .csv .svg .zip` (máx. 10 MB)
+
+### Variables de entorno
+
+Settings (⚙️) → Entorno. Las claves se guardan exclusivamente en:
 
 ```
 ~/CCProjects/<proyecto>/.env
 ```
 
-con permisos `600` (solo el usuario propietario puede leerlas). **Nunca se almacenan en la PWA ni en Supabase.**
-
-### Subir archivos desde iPhone
-
-Toca el ícono de clip en la barra de entrada. El archivo se sube a Supabase Storage temporalmente, Electron lo descarga al directorio del proyecto y lo elimina de Storage de inmediato.
-
-Formatos permitidos: `.png .jpg .jpeg .gif .pdf .txt .md .json .csv .svg .zip` (máx. 10 MB)
+con permisos `600`. Nunca se almacenan en la PWA ni en Supabase.
 
 ---
 
 ## Seguridad
 
-| Medida | Descripción |
+El DMG no está notarizado (el certificado de Apple cuesta $99/año). Lo que sí existe es código completamente abierto: puedes leer `desktop/src/main.js`, `bridge.js` y `pty.js` antes de ejecutar.
+
+| Medida | Detalle |
 |---|---|
-| Supabase Auth | La PWA no funciona sin iniciar sesión; solo los usuarios de `cc_allowed_users` (con `active = true` y sin expirar) pasan. |
-| Canal privado | El canal `session:<id>` usa Realtime Authorization: sin un JWT autorizado no se puede leer ni escribir en el Broadcast. |
-| `SESSION_TOKEN` | Segunda barrera: cada evento PWA→Electron lo requiere. Ya no se compila en el bundle; se introduce en el dispositivo. |
-| Path traversal | Electron valida que todos los archivos y proyectos queden dentro de `~/CCProjects/`. |
-| Storage temporal | Los archivos subidos se eliminan de Supabase inmediatamente después de descargarse. |
-| `.env` permisos | Los archivos de secretos se crean con `mode 0o600`. |
-| Llave de servicio | `SUPABASE_SERVICE_KEY` solo existe en la config del desktop, nunca en el frontend. |
-| Storage con RLS | Subir y leer en `uploads` requiere sesión autenticada y autorizada para ese `session_id`. |
+| **Código de emparejamiento** | `SESSION_ID` único por instalación + `SESSION_TOKEN` ≥ 32 chars. Sin ese par exacto, cualquier evento llega y se descarta en silencio. |
+| **Sin puertos abiertos** | El Mac no escucha en ningún puerto. Todo viaja por Supabase WebSocket (WSS/TLS). Sin SSH, sin ngrok, sin IP expuesta. |
+| **Path traversal bloqueado** | Toda ruta de archivo se valida dentro de `~/CCProjects/`. Paths con `../` o rutas absolutas externas rechazadas. |
+| **Whitelist de archivos** | Solo extensiones permitidas, máx. 10 MB. Archivo eliminado de Supabase Storage inmediatamente tras descargarse. |
+| **Secretos con permisos 600** | `.env` de cada proyecto escrito con `mode 0o600` — solo el usuario del sistema puede leerlo. |
+| **Hardened Runtime** | `hardenedRuntime: true` en el build de Electron. |
+| **Open source** | Todo el código está en GitHub. Sin binarios opacos ni dependencias sin fuente. |
 
-> El `SESSION_TOKEN` guardado en el navegador es un secreto compartido: si
-> pierdes el teléfono, rota el token en `~/.config/cc-controller/.env` y
-> reinicia el desktop.
+> Si pierdes el iPhone: cambia `SESSION_TOKEN` en `~/.config/cc-controller/.env` y reinicia CC Controller. El dispositivo anterior no puede reconectar.
 
 ---
 
-## Mantener el Mac Despierto
+## Arquitectura
 
-Claude Code necesita que el Mac esté activo para responder. Si el Mac se duerme, el WebSocket de Electron se cae.
+```
+desktop/src/
+├── main.js          # Entry point — tray, setup, event wiring, powerSaveBlocker
+├── bridge.js        # Supabase Realtime bridge (broadcast + storage)
+├── pty.js           # Claude CLI runner (child_process + streaming)
+├── projects.js      # ProjectManager (~/.config + ~/CCProjects)
+└── setup-window.js  # Wizard de primer setup
 
-**Opciones:**
-- **[Amphetamine](https://apps.apple.com/us/app/amphetamine/id937984704)** (gratis, Mac App Store) — mantiene el Mac despierto mientras CC Controller corre
-- `caffeinate -d` en terminal — evita el modo de espera de pantalla
-- Configurar **System Settings → Lock Screen → Turn display off** a "Never" mientras trabajes remotamente
+web/app/
+├── page.js                    # Chat UI principal con streaming
+└── components/
+    ├── AuthGate.js            # Emparejamiento de código
+    ├── SettingsSheet.js       # Modelo, effort, secretos, proyectos
+    ├── ProjectsList.js        # Lista y gestión de proyectos
+    └── FileUpload.js          # Subida de archivos
+```
+
+| Componente | Tecnología | Rol |
+|---|---|---|
+| Desktop | Electron 30 + Node.js | Ejecuta `claude` CLI, gestiona proyectos |
+| PWA | Next.js 14 + Netlify | Control remoto desde el móvil |
+| Bridge | Supabase Realtime (Broadcast) | Canal WebSocket cifrado entre ambos |
+| Storage | Supabase Storage (`uploads`) | Tránsito temporal de archivos |
+
+Supabase está **bundled** — los devs no necesitan cuenta propia.
 
 ---
 
-## Estructura del Repositorio
+## Desarrollo Local
 
+```bash
+# Desktop
+cd desktop && npm install && npm run dev
+
+# PWA
+cd web && npm install && npm run dev
 ```
-cc-controller/
-├── desktop/                  # Electron (Mac)
-│   ├── src/
-│   │   ├── main.js           # Entry point, tray, event wiring
-│   │   ├── bridge.js         # Supabase Realtime bridge
-│   │   ├── pty.js            # claude --print runner
-│   │   └── projects.js       # ProjectManager (~/.config + ~/CCProjects)
-│   ├── .env.example          # Template de variables
-│   └── electron-builder.yml  # Config para generar DMG
-│
-├── web/                      # Next.js PWA
-│   ├── app/
-│   │   ├── page.js           # Chat UI principal
-│   │   ├── components/
-│   │   │   ├── AuthGate.js        # Login Supabase + emparejamiento del token
-│   │   │   ├── SettingsSheet.js   # Modelo, effort, secretos
-│   │   │   ├── ProjectsList.js    # Lista y gestión de proyectos
-│   │   │   └── FileUpload.js      # Subida de archivos
-│   │   └── lib/
-│   │       ├── supabase.js        # Cliente Supabase
-│   │       └── storage.js         # localStorage helpers
-│   └── .env.local.example    # Template de variables
-│
-└── scripts/
-    └── setup-supabase.sql    # Auth, Realtime Authorization y RLS de Storage
+
+### Construir DMG
+
+```bash
+cd desktop
+# Apple Silicon
+npm run build -- --mac --arm64
+
+# Intel (separado para evitar conflicto de volúmenes hdiutil)
+npm run build -- --mac --x64
 ```
+
+Los DMGs quedan en `desktop/dist/`.
 
 ---
 
 ## Solución de Problemas
 
 **"Desktop detenido" en la PWA aunque Electron corra**
-→ Electron envía heartbeat cada 20s. Si la PWA no recibe uno en 45s, marca el desktop como detenido. Verifica que Electron tenga sesión iniciada (clic derecho en tray → Iniciar).
+→ Electron envía heartbeat cada 20s. Si la PWA no recibe uno en 45s, marca el desktop como detenido. Verifica: clic derecho en tray → Iniciar.
 
-**"Project not found" al cambiar de proyecto**
-→ Ocurre si el `projects.json` de Electron no tiene el proyecto del PWA. La PWA reenvía automáticamente `create-project` cuando el proyecto no tiene path confirmado.
+**"no se puede abrir porque proviene de un desarrollador no identificado"**
+→ Clic derecho → Abrir → confirmar. Solo ocurre la primera vez.
+
+**La PWA pide código de emparejamiento otra vez**
+→ El localStorage del navegador fue borrado. Abre CC Controller → clic derecho → Copiar código de emparejamiento (o revisa `~/.config/cc-controller/.env`).
 
 **La respuesta de Claude tiene caracteres extraños (`[0m`, `[31m`)**
-→ Caracteres ANSI. El bridge los filtra automáticamente. Si persisten, asegúrate de tener la versión más reciente del DMG.
+→ Caracteres ANSI. El bridge los filtra automáticamente. Si persisten, actualiza al DMG más reciente.
 
-**La subida de archivos falla con error 403**
-→ Falta ejecutar `scripts/setup-supabase.sql` o tu usuario no está en
-`cc_allowed_users` con el `session_id` correcto.
+**La subida de archivos falla**
+→ Verifica que la extensión del archivo esté en la whitelist y que el archivo sea menor a 10 MB.
 
-**La PWA se queda en "Conectando" o el canal no suscribe**
-→ Realtime Authorization está activo pero tu usuario no está autorizado.
-Revisa `cc_allowed_users` (`active`, `expires_at`, `session_id`).
-
-**Electron no acepta mis mensajes**
-→ El token guardado en el dispositivo no coincide con el `SESSION_TOKEN` del
-Mac. Borra los datos del sitio en el navegador y vuelve a emparejar.
-
-**DMG sin firmar: "no se puede abrir porque proviene de un desarrollador no identificado"**
-→ El build no está firmado ni notarizado. Ábrelo con clic derecho → *Abrir*, o
-firma tú mismo poniendo `notarize: true` en `desktop/electron-builder.yml` con
-un certificado *Developer ID Application* y las variables `APPLE_ID`,
-`APPLE_APP_SPECIFIC_PASSWORD` y `APPLE_TEAM_ID`.
+**El Mac se duerme y la sesión se cae**
+→ CC Controller activa `prevent-display-sleep` automáticamente mientras la sesión corre. Si el Mac igual se duerme, revisa System Settings → Battery → Prevent automatic sleeping.
 
 ---
 
 ## Licencia
 
-[MIT](LICENSE) — úsalo, modifícalo y redistribúyelo libremente.
+[MIT](LICENSE)

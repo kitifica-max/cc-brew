@@ -939,16 +939,27 @@ export interface ButtonProps {
 <section class="security">
   <div class="security-inner">
     <span class="section-eyebrow">Seguridad</span>
-    <h2 class="section-title">Diseñado para no comprometer tu Mac</h2>
+    <h2 class="section-title">Sin firma de Apple.<br>Con código que puedes leer.</h2>
+    <p class="section-sub" style="max-width:560px;margin:0 auto 48px">El DMG no está notarizado — el certificado de Apple cuesta $99/año. Lo que sí existe es código abierto: puedes leer <code style="font-family:monospace;font-size:13px">main.js</code>, <code style="font-family:monospace;font-size:13px">bridge.js</code> y <code style="font-family:monospace;font-size:13px">pty.js</code> antes de ejecutar cualquier cosa.</p>
     <div class="security-grid">
       <div class="sec-card">
         <div class="sec-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <div class="sec-body">
-          <h4>Login + token de sesión</h4>
-          <p>La PWA exige autenticación por email y contraseña. Cada evento PWA→Electron incluye el token de sesión generado al instalar: sin él, el evento se ignora en silencio.</p>
-          <span class="sec-chip">supabase auth · payload.token</span>
+          <h4>Código de emparejamiento</h4>
+          <p>El token generado en el setup (mín. 16 chars) + tu SESSION_ID único. Sin ese par exacto, cualquier evento llega y se descarta en silencio. No hay backdoor.</p>
+          <span class="sec-chip">SESSION_ID + SESSION_TOKEN</span>
+        </div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+        </div>
+        <div class="sec-body">
+          <h4>Sin puertos abiertos</h4>
+          <p>El Mac no escucha en ningún puerto. Todo viaja por Supabase WebSocket (WSS/TLS). Sin SSH, sin túneles ngrok, sin IP del Mac expuesta en internet.</p>
+          <span class="sec-chip">wss:// solo — 0 puertos locales</span>
         </div>
       </div>
       <div class="sec-card">
@@ -956,9 +967,9 @@ export interface ButtonProps {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
         </div>
         <div class="sec-body">
-          <h4>Path traversal protection</h4>
-          <p>Electron valida que todos los archivos y proyectos queden dentro de <code style="font-size:11px;font-family:monospace">~/CCProjects/</code>. Rutas absolutas externas rechazadas.</p>
-          <span class="sec-chip">path.startsWith(PROJECTS_BASE)</span>
+          <h4>Path traversal bloqueado</h4>
+          <p>Electron valida que toda ruta de archivo quede dentro de <code style="font-size:11px;font-family:monospace">~/CCProjects/</code>. Rutas absolutas o con <code style="font-size:11px;font-family:monospace">../</code> rechazadas explícitamente.</p>
+          <span class="sec-chip">destPath.startsWith(project.path + sep)</span>
         </div>
       </div>
       <div class="sec-card">
@@ -966,9 +977,9 @@ export interface ButtonProps {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
         <div class="sec-body">
-          <h4>API keys nunca en el bundle</h4>
-          <p>Las keys que envías se transmiten una vez y se limpian del estado. El token de emparejamiento se introduce a mano en el dispositivo: nunca se compila en el JavaScript público.</p>
-          <span class="sec-chip">Sin secretos en el build</span>
+          <h4>Whitelist de archivos</h4>
+          <p>Solo extensiones permitidas (<code style="font-size:11px;font-family:monospace">.png .jpg .pdf .txt .md .json .csv .svg .zip</code>). Máx. 10 MB. El archivo se elimina de Supabase Storage inmediatamente tras descargarse.</p>
+          <span class="sec-chip">ALLOWED_EXTENSIONS · MAX_FILE_BYTES</span>
         </div>
       </div>
       <div class="sec-card">
@@ -976,9 +987,19 @@ export interface ButtonProps {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         </div>
         <div class="sec-body">
-          <h4>.env con permisos 600</h4>
-          <p>Los secretos se escriben en <code style="font-size:11px;font-family:monospace">~/CCProjects/&lt;slug&gt;/.env</code> con <code style="font-size:11px;font-family:monospace">mode 0o600</code>. Solo el propietario puede leerlos.</p>
-          <span class="sec-chip">writeFileSync(path, content, &#x7b;mode: 0o600&#x7d;)</span>
+          <h4>Secretos con permisos 600</h4>
+          <p>Las variables de entorno se guardan en <code style="font-size:11px;font-family:monospace">~/CCProjects/&lt;slug&gt;/.env</code> con <code style="font-size:11px;font-family:monospace">mode 0o600</code>. Solo el usuario del sistema puede leerlas.</p>
+          <span class="sec-chip">writeFileSync(path, data, {mode: 0o600})</span>
+        </div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 9h.01M15 9h.01M9.5 13a3.5 3.5 0 0 0 5 0"/></svg>
+        </div>
+        <div class="sec-body">
+          <h4>Código abierto y auditable</h4>
+          <p>El repositorio completo está en GitHub. Antes de instalar puedes revisar cada línea. No hay código ofuscado ni binarios de terceros sin fuente.</p>
+          <span class="sec-chip"><a href="https://github.com/kitifica-max/cc-controller" target="_blank" rel="noopener" style="color:inherit">github.com/kitifica-max/cc-controller</a></span>
         </div>
       </div>
     </div>
