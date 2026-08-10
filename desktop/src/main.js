@@ -191,8 +191,8 @@ function startSession() {
 
   setTimeout(broadcastProjects, 1000);
 
-  // Mantener Mac despierta mientras la sesión corra
-  if (powerBlockId === null) powerBlockId = powerSaveBlocker.start('prevent-app-suspension');
+  // Mantener pantalla y Mac despierta mientras la sesión corra
+  if (powerBlockId === null) powerBlockId = powerSaveBlocker.start('prevent-display-sleep');
 
   startTime = Date.now();
   setTrayMenu('running');
