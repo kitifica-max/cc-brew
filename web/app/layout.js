@@ -28,6 +28,7 @@ export default function RootLayout({ children }) {
             navigator.serviceWorker.register('/sw.js');
           }
         `}} />
+        <script src="/kap/kitifica-install-popup.js" defer />
       </body>
     </html>
   );
