@@ -1,4 +1,4 @@
-import { app, Tray, Menu, nativeImage, shell, clipboard, dialog, powerSaveBlocker } from 'electron';
+import { app, Tray, Menu, nativeImage, shell, clipboard, dialog, powerSaveBlocker, net } from 'electron';
 import { needsSetup, openSetupWindow } from './setup-window.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -32,6 +32,32 @@ let bridge = null;
 let startTime = null;
 let uptimeInterval = null;
 let powerBlockId = null;
+let updateAvailable = null; // { version, url } | null
+
+function checkForUpdates() {
+  const req = net.request({
+    method: 'GET',
+    url: 'https://api.github.com/repos/kitifica-max/cc-controller/releases/latest',
+    headers: { 'User-Agent': 'CC-Controller-App' },
+  });
+  req.on('response', (res) => {
+    let body = '';
+    res.on('data', (chunk) => { body += chunk; });
+    res.on('end', () => {
+      try {
+        const { tag_name, html_url } = JSON.parse(body);
+        const latest = tag_name?.replace(/^v/, '');
+        const current = app.getVersion();
+        if (latest && latest !== current) {
+          updateAvailable = { version: latest, url: html_url };
+          if (tray) setTrayMenu(pty?.running ? 'running' : 'stopped');
+        }
+      } catch (_) {}
+    });
+  });
+  req.on('error', () => {});
+  req.end();
+}
 
 function getUptime() {
   if (!startTime) return '--:--';
@@ -56,6 +82,13 @@ function buildMenu(status) {
     ].filter(Boolean));
   } else {
     items.push({ type: 'separator' }, { label: 'Iniciar', click: startSession });
+  }
+  if (updateAvailable) {
+    items.push(
+      { type: 'separator' },
+      { label: `Nueva versión disponible: v${updateAvailable.version}`, enabled: false },
+      { label: 'Descargar actualización →', click: () => shell.openExternal(updateAvailable.url) }
+    );
   }
   items.push(
     { type: 'separator' },
@@ -219,6 +252,10 @@ app.whenReady().then(async () => {
   if (needsSetup()) {
     await openSetupWindow();
   }
+
+  // Check for updates 5s after launch, then every 4h
+  setTimeout(checkForUpdates, 5_000);
+  setInterval(checkForUpdates, 4 * 60 * 60 * 1_000);
 });
 
 app.on('window-all-closed', (e) => e.preventDefault());
