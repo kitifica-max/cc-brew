@@ -16,10 +16,12 @@ files:
 mac:
   category: public.app-category.developer-tools
   icon: assets/tray-icon.png
-  # Firma y notarización: pon `notarize: true` cuando tengas un certificado
-  # "Developer ID Application" y las variables APPLE_ID,
-  # APPLE_APP_SPECIFIC_PASSWORD y APPLE_TEAM_ID. Sin ellas el DMG sale sin
-  # firmar y macOS lo bloquea (ver "DMG sin firmar" en el README).
+  # Firma ad-hoc: en Apple Silicon un binario sin ninguna firma no arranca
+  # ("la app está dañada"). Esto no es notarización; el usuario sigue teniendo
+  # que abrirla con clic derecho la primera vez (ver "DMG sin firmar" en el README).
+  # Con un certificado "Developer ID Application" quita esta línea y pon
+  # `notarize: true` junto a APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD y APPLE_TEAM_ID.
+  identity: "-"
   hardenedRuntime: true
   gatekeeperAssess: false
   entitlements: assets/entitlements.mac.plist
