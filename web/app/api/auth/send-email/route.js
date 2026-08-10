@@ -1,8 +1,7 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   let body;
   try { body = await req.json(); } catch {
     return Response.json({ error: 'Invalid JSON' }, { status: 400 });
