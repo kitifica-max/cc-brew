@@ -183,7 +183,8 @@ function startSession() {
   bridge.onOpenClaudeDesktop = (projectId) => {
     const project = listProjects().find(p => p.id === projectId);
     if (!project) return;
-    exec(`open -a "Claude" "${project.path}"`);
+    const path = project.path.replace(/"/g, '\\"');
+    exec(`osascript -e 'tell application "Terminal" to do script "cd \\"${path}\\" && claude"' -e 'tell application "Terminal" to activate'`);
   };
 
   bridge.connect();
