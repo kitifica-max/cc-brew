@@ -661,7 +661,7 @@ svg { display: block; }
         </a>
         <a href="https://github.com/kitifica-max/cc-controller/releases/tag/v1.0.0" target="_blank" rel="noopener" class="btn-ghost">Ver todas las versiones →</a>
       </div>
-      <p style="font-size:11px;color:var(--text-3);margin-top:10px;">Apple Silicon · macOS 12+ · Requiere Claude Code CLI · Sin cuenta Supabase</p>
+      <p style="font-size:11px;color:var(--text-3);margin-top:10px;">Apple Silicon · macOS 12+ · Requiere Claude Code CLI · Sin cuenta Supabase<span id="hero-dl-count" style="display:none"> · <span id="hero-dl-num"></span> descargas</span></p>
     </div>
 
     <div class="flow-card">
@@ -735,8 +735,8 @@ svg { display: block; }
       <div class="stat-label">Cuentas externas requeridas</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num"><span>200</span></div>
-      <div class="stat-label">Mensajes en historial persistente</div>
+      <div class="stat-num" id="stat-dl-count"><span>—</span></div>
+      <div class="stat-label">Descargas del DMG</div>
     </div>
     <div class="stat-card">
       <div class="stat-num">3</div>
@@ -1172,3 +1172,20 @@ export interface ButtonProps {
     <a href="/contact/" style="color:var(--muted);font-size:12px;text-decoration:none;">Contacto</a>
   </div>
 </footer>
+
+<script>
+fetch('https://api.github.com/repos/kitifica-max/cc-controller/releases')
+  .then(r => r.json())
+  .then(releases => {
+    if (!Array.isArray(releases)) return;
+    const total = releases.reduce((sum, rel) =>
+      sum + (rel.assets || []).reduce((s, a) => s + (a.download_count || 0), 0), 0);
+    if (total === 0) return;
+    const statEl = document.getElementById('stat-dl-count');
+    if (statEl) statEl.innerHTML = '<span>' + total.toLocaleString('es') + '</span>';
+    const heroNum = document.getElementById('hero-dl-num');
+    const heroWrap = document.getElementById('hero-dl-count');
+    if (heroNum && heroWrap) { heroNum.textContent = total.toLocaleString('es'); heroWrap.style.display = 'inline'; }
+  })
+  .catch(() => {});
+</script>
