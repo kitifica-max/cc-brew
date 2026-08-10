@@ -38,18 +38,21 @@ jobs:
       # /Volumes/CC Controller y el `hdiutil detach` de uno tumba al otro.
       - name: Construir DMG arm64
         working-directory: desktop
-        # Sin certificado de Apple: DMG sin firmar, igual que los releases previos.
         run: npx electron-builder --mac dmg --arm64 --publish never
-        env:
-          CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Construir DMG x64
         working-directory: desktop
         run: |
           hdiutil detach '/Volumes/CC Controller' 2>/dev/null || true
           npx electron-builder --mac dmg --x64 --publish never
-        env:
-          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      # Un .app sin firma ninguna arranca como "la app está dañada" en Apple
+      # Silicon, y eso solo se ve al instalar: mejor romper el release aquí.
+      - name: Verificar firma ad-hoc
+        working-directory: desktop
+        run: |
+          codesign --verify --deep --strict 'dist/mac-arm64/CC Controller.app'
+          codesign --verify --deep --strict 'dist/mac/CC Controller.app'
 
       - uses: softprops/action-gh-release@v2
         with:
