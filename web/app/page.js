@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { supabase, SESSION_ID, getSessionToken } from './lib/supabase';
+import { supabase, getSessionId, getSessionToken } from './lib/supabase';
 import { loadProjects, saveProjects, makeProject } from './lib/storage';
 import AuthGate from './components/AuthGate';
 import ProjectsList from './components/ProjectsList';
@@ -38,6 +38,7 @@ function CCController() {
   const [view, setView] = useState('chat');
   const [showSettings, setShowSettings] = useState(false);
   const [reconnectKey, setReconnectKey] = useState(0);
+  const [streamingMsg, setStreamingMsg] = useState(null); // {msgId, text} | null
   const chatRef = useRef(null);
   const channelRef = useRef(null);
   const currentIdRef = useRef(null);
@@ -79,7 +80,7 @@ function CCController() {
   // Scroll
   useEffect(() => {
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: 'smooth' });
-  }, [projects, thinking, currentId]);
+  }, [projects, thinking, streamingMsg, currentId]);
 
   const addSystemMsg = useCallback((text) => {
     const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
@@ -90,11 +91,35 @@ function CCController() {
 
   // Supabase — reconnectKey re-crea canal en iOS background o network recovery
   useEffect(() => {
-    const ch = supabase.channel(`session:${SESSION_ID}`);
+    const ch = supabase.channel(`session:${getSessionId()}`);
     channelRef.current = ch;
 
     ch.on('broadcast', { event: 'heartbeat' }, () => {
       resetDesktopTimeout();
+    });
+
+    ch.on('broadcast', { event: 'chunk' }, ({ payload }) => {
+      resetDesktopTimeout();
+      const { msgId, text, done, projectId: pId } = payload;
+      clearTimeout(thinkingTimerRef.current);
+      setThinking(false);
+      if (done) {
+        setStreamingMsg(prev => {
+          if (prev?.msgId === msgId) {
+            const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+            const targetId = pId ?? currentIdRef.current;
+            setProjects(ps => ps.map(p => p.id !== targetId ? p : {
+              ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: 'claude', text: prev.text, time }],
+            }));
+            return null;
+          }
+          return prev;
+        });
+      } else {
+        setStreamingMsg(prev => prev?.msgId === msgId
+          ? { msgId, text: prev.text + text }
+          : { msgId, text });
+      }
     });
 
     ch.on('broadcast', { event: 'message' }, ({ payload }) => {
@@ -106,6 +131,22 @@ function CCController() {
       setProjects(prev => prev.map(p => {
         if (p.id !== targetId) return p;
         return { ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: payload.role, text: payload.text, time }] };
+      }));
+    });
+
+    ch.on('broadcast', { event: 'history' }, ({ payload }) => {
+      if (!payload.messages?.length) return;
+      setProjects(prev => prev.map(p => {
+        if (p.messages.length > 0) return p; // no sobreescribir si ya hay mensajes
+        const msgs = payload.messages
+          .filter(m => m.projectId === p.id || (!m.projectId && p.id === currentIdRef.current))
+          .map(m => ({
+            id: Math.random().toString(36).slice(2),
+            role: m.role === 'claude' ? 'assistant' : m.role,
+            text: m.text,
+            time: new Date(m.ts).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }),
+          }));
+        return msgs.length ? { ...p, messages: msgs } : p;
       }));
     });
 
@@ -263,7 +304,8 @@ function CCController() {
           </div>
         )}
         {messages.map(msg => <MessageRow key={msg.id} msg={msg} />)}
-        {thinking && <TypingIndicator onCancel={cancelThinking} />}
+        {streamingMsg && <StreamingRow text={streamingMsg.text} onCancel={cancelThinking} />}
+        {thinking && !streamingMsg && <TypingIndicator onCancel={cancelThinking} />}
       </div>
 
       {/* Quick actions */}
@@ -400,6 +442,25 @@ function MessageRow({ msg }) {
         {isUser ? msg.text : <MessageContent text={msg.text} />}
       </div>
       <div style={{ fontSize: 9, color: '#999999', marginTop: 3, paddingLeft: 4, paddingRight: 4 }}>{msg.time}</div>
+    </div>
+  );
+}
+
+function StreamingRow({ text, onCancel }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+      <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#999999', marginBottom: 4, paddingLeft: 4 }}>Claude Code</div>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+        <div style={{ maxWidth: '92%', background: '#1a1a1a', color: '#e8e2d8', borderRadius: 18, borderBottomLeftRadius: 4, padding: '10px 14px', fontSize: 13, lineHeight: 1.7 }}>
+          <MessageContent text={text} />
+          <span style={{ display: 'inline-block', width: 8, height: 14, background: '#f04e23', borderRadius: 2, marginLeft: 2, verticalAlign: 'text-bottom', animation: 'blink 1s step-end infinite' }} />
+        </div>
+        <button
+          onClick={onCancel}
+          title="Cancelar"
+          style={{ background: 'rgba(0,0,0,0.08)', border: 'none', borderRadius: '50%', width: 26, height: 26, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: 16, lineHeight: 1, marginTop: 8, flexShrink: 0 }}
+        >×</button>
+      </div>
     </div>
   );
 }

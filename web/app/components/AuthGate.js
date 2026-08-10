@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
-import { supabase, getSessionToken, setSessionToken, CONFIGURED } from '../lib/supabase';
+import { supabase, getSessionToken, setSessionToken, setSessionId, CONFIGURED } from '../lib/supabase';
 
 const F = "'Sora', -apple-system, BlinkMacSystemFont, sans-serif";
 
@@ -51,8 +51,9 @@ export default function AuthGate({ children }) {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  const handleToken = useCallback((token) => {
+  const handleToken = useCallback((token, sessionId) => {
     setSessionToken(token);
+    if (sessionId) setSessionId(sessionId);
     setHasToken(true);
   }, []);
 
@@ -171,7 +172,19 @@ function SignIn() {
 }
 
 function PairDevice({ onSubmit }) {
-  const [token, setToken] = useState('');
+  const [code, setCode] = useState('');
+
+  function handleSubmit() {
+    const val = code.trim();
+    if (!val) return;
+    // Pairing code format: "sessionId:token" or just "token" (legacy)
+    const idx = val.indexOf(':');
+    if (idx > 0 && idx < val.length - 1) {
+      onSubmit(val.slice(idx + 1), val.slice(0, idx));
+    } else {
+      onSubmit(val, null);
+    }
+  }
 
   const hero = (
     <>
@@ -190,23 +203,22 @@ function PairDevice({ onSubmit }) {
   const card = (
     <>
       <p style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 500, color: '#666666', lineHeight: 1.55 }}>
-        Pega el <code style={{ background: '#f0f0f0', borderRadius: 6, padding: '2px 6px', fontSize: 12, color: '#f04e23' }}>SESSION_TOKEN</code> de <code style={{ background: '#f0f0f0', borderRadius: 6, padding: '2px 6px', fontSize: 12, color: '#1a1a1a' }}>~/.config/cc-controller/.env</code>.
-        Se guarda solo en este dispositivo.
+        Pega el código de emparejamiento de la app de escritorio. Se guarda solo en este dispositivo.
       </p>
       <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#999999', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6, fontFamily: F }}>
-        Session Token
+        Código de emparejamiento
       </label>
       <input
         type="password"
         autoComplete="off"
         placeholder="••••••••••••••••"
-        value={token}
-        onChange={e => setToken(e.target.value)}
-        onKeyDown={e => { if (e.key === 'Enter' && token.trim()) onSubmit(token.trim()); }}
+        value={code}
+        onChange={e => setCode(e.target.value)}
+        onKeyDown={e => { if (e.key === 'Enter') handleSubmit(); }}
         style={{ width: '100%', boxSizing: 'border-box', background: '#f5f5f5', border: '1.5px solid #e0e0e0', borderRadius: 14, padding: '14px 16px', fontSize: 16, fontWeight: 500, color: '#1a1a1a', fontFamily: F, outline: 'none', minHeight: 52, touchAction: 'manipulation' }}
       />
       <button
-        onClick={() => token.trim() && onSubmit(token.trim())}
+        onClick={handleSubmit}
         style={{ width: '100%', marginTop: 12, background: '#f04e23', border: 'none', borderRadius: 14, padding: '15px 20px', fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: F, minHeight: 52, touchAction: 'manipulation' }}
       >
         Emparejar dispositivo

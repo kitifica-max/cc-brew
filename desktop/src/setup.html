@@ -267,41 +267,29 @@
     <button class="btn" id="btn0" onclick="goStep1()" disabled>Continuar →</button>
   </div>
 
-  <!-- STEP 1: Credentials -->
+  <!-- STEP 1: Generate pairing code -->
   <div class="step" id="step1">
     <div>
-      <div class="step-label">Paso 1 de 3</div>
-      <h2>Conecta tu proyecto Supabase</h2>
+      <div class="step-label">Paso 1 de 2</div>
+      <h2>Genera tu código de emparejamiento</h2>
     </div>
 
-    <div class="field">
-      <label>Supabase URL</label>
-      <input type="url" id="surl" placeholder="https://xxxx.supabase.co" autocomplete="off" spellcheck="false">
-    </div>
+    <p style="font-size:13px;color:#555;line-height:1.6;">
+      Se generará un código único que conecta esta Mac con tu iPhone. No necesitas cuenta de Supabase.
+    </p>
 
-    <div class="field">
-      <label>Service Role Key</label>
-      <input type="password" id="skey" placeholder="eyJhbGci..." autocomplete="off" spellcheck="false">
-    </div>
-
-    <div class="field">
-      <label>URL de la PWA</label>
-      <input type="url" id="pwa" placeholder="https://ccc.kitifica.com" value="https://ccc.kitifica.com" autocomplete="off" spellcheck="false">
-    </div>
-
-    <p class="error" id="err1">Completa Supabase URL y Service Key.</p>
-
-    <button class="btn" id="btn1" onclick="goStep2()">Generar token de sesión →</button>
+    <button class="btn" id="btn1" onclick="goStep2()">Generar código →</button>
   </div>
 
-  <!-- STEP 2: Token ready -->
+  <!-- STEP 2: Pairing code ready -->
   <div class="step" id="step2">
     <div>
-      <div class="step-label">Paso 2 de 3</div>
-      <h2>Token generado</h2>
+      <div class="step-label">Paso 2 de 2</div>
+      <h2>Código listo</h2>
     </div>
 
     <div class="token-box">
+      <p style="font-size:11px;color:#999;margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Código de emparejamiento</p>
       <div class="token-value" id="tokenVal">—</div>
       <div class="token-actions">
         <button class="token-btn" id="revealBtn" onclick="toggleReveal()">Revelar</button>
@@ -312,15 +300,15 @@
     <div class="steps-hint">
       <div class="hint-row">
         <div class="hint-num">1</div>
-        <span>Copia el token con el botón de arriba.</span>
+        <span>Copia el código con el botón de arriba.</span>
       </div>
       <div class="hint-row">
         <div class="hint-num">2</div>
-        <span>Abre la PWA en tu iPhone (<strong>ccc.kitifica.com</strong>) e inicia sesión.</span>
+        <span>Abre <strong>ccc.kitifica.com</strong> en tu iPhone y crea una cuenta.</span>
       </div>
       <div class="hint-row">
         <div class="hint-num">3</div>
-        <span>Ve a Settings → <strong>Session Token</strong> → pega el token.</span>
+        <span>En la pantalla de emparejamiento, pega el código.</span>
       </div>
     </div>
 
@@ -330,18 +318,15 @@
 </div>
 
 <script>
-  let generatedToken = '';
+  let pairingCode = '';
   let revealed = false;
 
-  // Run on load
   window.addEventListener('DOMContentLoaded', async () => {
     const ok = await window.cc.checkClaude();
     const row = document.getElementById('checkClaude');
     const sub = document.getElementById('claudeSub');
     const btn = document.getElementById('btn0');
     const warn = document.getElementById('claudeWarning');
-
-    // Replace spinner with icon
     const icon = row.querySelector('.check-spinner');
     if (ok) {
       icon.className = 'check-ok';
@@ -364,29 +349,18 @@
   }
 
   async function goStep2() {
-    const surl = document.getElementById('surl').value.trim();
-    const skey = document.getElementById('skey').value.trim();
-    const pwa  = document.getElementById('pwa').value.trim();
-    const err  = document.getElementById('err1');
-
-    if (!surl || !skey) { err.classList.add('visible'); return; }
-    err.classList.remove('visible');
-
     const btn = document.getElementById('btn1');
     btn.disabled = true;
-    btn.textContent = 'Guardando...';
-
+    btn.textContent = 'Generando...';
     try {
-      const result = await window.cc.save({ supabaseUrl: surl, supabaseKey: skey, pwaUrl: pwa || undefined });
-      generatedToken = result.token;
-      document.getElementById('tokenVal').textContent = generatedToken;
+      const result = await window.cc.save({});
+      pairingCode = result.pairingCode;
+      document.getElementById('tokenVal').textContent = pairingCode;
       document.getElementById('step1').classList.remove('active');
       document.getElementById('step2').classList.add('active');
     } catch (e) {
       btn.disabled = false;
-      btn.textContent = 'Generar token de sesión →';
-      err.textContent = 'Error: ' + e.message;
-      err.classList.add('visible');
+      btn.textContent = 'Generar código →';
     }
   }
 
@@ -397,9 +371,9 @@
   }
 
   function copyToken() {
-    navigator.clipboard.writeText(generatedToken).catch(() => {
+    navigator.clipboard.writeText(pairingCode).catch(() => {
       const ta = document.createElement('textarea');
-      ta.value = generatedToken;
+      ta.value = pairingCode;
       ta.style.cssText = 'position:fixed;opacity:0';
       document.body.appendChild(ta); ta.select(); document.execCommand('copy');
       document.body.removeChild(ta);
@@ -414,7 +388,6 @@
     window.cc.close();
   }
 
-  // Allow Enter to proceed
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && document.getElementById('step1').classList.contains('active')) {
       goStep2();

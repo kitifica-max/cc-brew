@@ -13,6 +13,7 @@ export default class PtyManager {
     this._busy = false;
     this._currentProc = null;
     this.onMessage = null;
+    this.onChunk = null; // (msgId, text, done, projectId) => void
   }
 
   get running() { return this._currentProc !== null || this._busy; }
@@ -27,7 +28,6 @@ export default class PtyManager {
     if (text === '\x03') return;
     const msg = text.replace(/\n+$/, '').trim();
     if (!msg) return;
-    // model y effort acaban en argv: solo valores con forma conocida.
     if (!MODEL_RE.test(model)) model = 'claude-sonnet-4-6';
     if (!EFFORTS.has(effort)) effort = 'medium';
     this._queue.push({ msg, continueConv, model, effort, projectId });
@@ -38,7 +38,8 @@ export default class PtyManager {
     if (this._busy || !this._queue.length) return;
     this._busy = true;
     const { msg, continueConv, model, effort, projectId } = this._queue.shift();
-    const chunks = [];
+    const msgId = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    const stderrChunks = [];
 
     const args = ['--print'];
     if (continueConv) args.push('--continue');
@@ -53,22 +54,25 @@ export default class PtyManager {
     this._currentProc = proc;
     // Si el proceso muere antes de leer stdin, el EPIPE tumbaría el proceso principal.
     proc.stdin.on('error', () => {});
-    proc.on('error', (e) => chunks.push(`[ERROR: ${e.message}]`));
+    proc.on('error', (e) => stderrChunks.push(`[ERROR: ${e.message}]`));
     proc.stdin.write(msg + '\n');
     proc.stdin.end();
 
     const timeout = setTimeout(() => {
       proc.kill('SIGTERM');
-      chunks.push(`[TIMEOUT: sin respuesta en ${Math.round(this.timeoutMs / 60_000)} min]`);
+      stderrChunks.push(`[TIMEOUT: sin respuesta en ${Math.round(this.timeoutMs / 60_000)} min]`);
     }, this.timeoutMs);
 
-    proc.stdout.on('data', (d) => chunks.push(d.toString()));
-    proc.stderr.on('data', (d) => chunks.push(d.toString()));
+    proc.stdout.on('data', (d) => {
+      this.onChunk?.(msgId, d.toString(), false, projectId);
+    });
+    proc.stderr.on('data', (d) => stderrChunks.push(d.toString()));
+
     proc.on('close', () => {
       clearTimeout(timeout);
       this._currentProc = null;
-      const response = chunks.join('').trim();
-      if (response) this.onMessage?.('claude', response, projectId);
+      const errText = stderrChunks.join('').trim();
+      this.onChunk?.(msgId, errText ? '\n' + errText : '', true, projectId);
       this._busy = false;
       this._flush();
     });

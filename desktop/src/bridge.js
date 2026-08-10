@@ -2,6 +2,7 @@ import { createClient as defaultCreateClient } from '@supabase/supabase-js';
 import WebSocket from 'ws';
 
 const ANSI_RE = /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g;
+const MAX_HISTORY = 200;
 
 const ALLOWED_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.pdf', '.txt', '.md', '.markdown', '.json', '.csv', '.svg', '.zip']);
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
@@ -23,15 +24,32 @@ export default class Bridge {
     this.onSaveEnv = null;
     this.onDeleteProject = null;
     this._heartbeatTimer = null;
+    this._history = [];
+    this._streamBuffers = new Map(); // msgId → { parts: string[], projectId }
   }
 
   _validate(payload) {
     return payload?.token === this.sessionToken;
   }
 
+  _addToHistory(entry) {
+    this._history.push({ ...entry, ts: entry.ts ?? Date.now() });
+    if (this._history.length > MAX_HISTORY) this._history.shift();
+  }
+
+  _sendHistory(projectId = null) {
+    const msgs = this._history.filter(m =>
+      projectId === null || m.projectId === projectId || m.projectId === null
+    );
+    if (!msgs.length) return;
+    this.channel?.send({
+      type: 'broadcast',
+      event: 'history',
+      payload: { messages: msgs.slice(-100), ts: Date.now() },
+    });
+  }
+
   connect() {
-    // Canal privado: Realtime exige un JWT autorizado para entrar. La service_role
-    // key del desktop salta las políticas RLS de `realtime.messages`.
     this.client.realtime.setAuth(this.supabaseKey);
     this.channel = this.client
       .channel(`session:${this.sessionId}`)
@@ -63,6 +81,7 @@ export default class Bridge {
       .on('broadcast', { event: 'get-project-state' }, ({ payload }) => {
         if (!this._validate(payload)) return;
         this.onGetProjectState?.();
+        this._sendHistory(payload.projectId ?? null);
       })
       .on('broadcast', { event: 'save-env' }, ({ payload }) => {
         if (!this._validate(payload)) return;
@@ -75,11 +94,42 @@ export default class Bridge {
       .subscribe();
   }
 
+  broadcastChunk(msgId, text, done, projectId = null) {
+    const clean = text ? text.replace(ANSI_RE, '') : '';
+
+    if (!this._streamBuffers.has(msgId)) {
+      this._streamBuffers.set(msgId, { parts: [], projectId });
+    }
+    const buf = this._streamBuffers.get(msgId);
+    if (clean) buf.parts.push(clean);
+
+    if (done) {
+      const fullText = buf.parts.join('').trim();
+      this._streamBuffers.delete(msgId);
+      if (fullText) {
+        this._addToHistory({ role: 'claude', text: fullText, projectId: buf.projectId });
+      }
+      this.channel?.send({
+        type: 'broadcast',
+        event: 'chunk',
+        payload: { msgId, text: '', done: true, projectId: buf.projectId, ts: Date.now() },
+      });
+    } else if (clean) {
+      this.channel?.send({
+        type: 'broadcast',
+        event: 'chunk',
+        payload: { msgId, text: clean, done: false, ts: Date.now() },
+      });
+    }
+  }
+
   broadcastMessage(role, text, projectId = null) {
+    const clean = text.replace(ANSI_RE, '');
+    this._addToHistory({ role, text: clean, projectId });
     this.channel?.send({
       type: 'broadcast',
       event: 'message',
-      payload: { role, text: text.replace(ANSI_RE, ''), ts: Date.now(), ...(projectId && { projectId }) },
+      payload: { role, text: clean, ts: Date.now(), ...(projectId && { projectId }) },
     });
   }
 

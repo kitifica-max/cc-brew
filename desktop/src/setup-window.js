@@ -9,14 +9,14 @@ import { exec } from 'child_process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export function needsSetup() {
-  return !process.env.SESSION_TOKEN || !process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY;
+  return !process.env.SESSION_TOKEN || !process.env.SESSION_ID;
 }
 
 export function openSetupWindow() {
   return new Promise((resolve) => {
     const win = new BrowserWindow({
       width: 480,
-      height: 660,
+      height: 560,
       resizable: false,
       minimizable: false,
       title: 'CC Controller — Configuración',
@@ -38,26 +38,19 @@ export function openSetupWindow() {
       exec('which claude', (err) => res(!err));
     }));
 
-    ipcMain.handle('setup:save', (_, { supabaseUrl, supabaseKey, pwaUrl }) => {
+    ipcMain.handle('setup:save', () => {
       const token = randomBytes(32).toString('hex');
+      const sessionId = randomBytes(6).toString('hex'); // 12-char unique ID
       const configDir = path.join(homedir(), '.config', 'cc-controller');
       mkdirSync(configDir, { recursive: true });
       const lines = [
-        `SUPABASE_URL=${supabaseUrl}`,
-        `SUPABASE_SERVICE_KEY=${supabaseKey}`,
-        `SESSION_ID=main`,
+        `SESSION_ID=${sessionId}`,
         `SESSION_TOKEN=${token}`,
+        `PWA_URL=https://ccc.kitifica.com`,
       ];
-      if (pwaUrl) lines.push(`PWA_URL=${pwaUrl}`);
       writeFileSync(path.join(configDir, '.env'), lines.join('\n') + '\n');
-      Object.assign(process.env, {
-        SUPABASE_URL: supabaseUrl,
-        SUPABASE_SERVICE_KEY: supabaseKey,
-        SESSION_ID: 'main',
-        SESSION_TOKEN: token,
-      });
-      if (pwaUrl) process.env.PWA_URL = pwaUrl;
-      return { token };
+      Object.assign(process.env, { SESSION_ID: sessionId, SESSION_TOKEN: token, PWA_URL: 'https://ccc.kitifica.com' });
+      return { token, sessionId, pairingCode: `${sessionId}:${token}` };
     });
 
     ipcMain.handle('setup:close', () => {

@@ -12,6 +12,10 @@ import { extname, basename, resolve, sep } from 'path';
 import { homedir } from 'os';
 import { exec } from 'child_process';
 
+// Bundled: usuarios no necesitan cuenta propia de Supabase
+const BUNDLED_SUPABASE_URL = 'https://qombceeynlvgkmoffcoa.supabase.co';
+const BUNDLED_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvbWJjZWV5bmx2Z2ttb2ZmY29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxOTM4MTgsImV4cCI6MjEwMTc2OTgxOH0.fksDXB7RD7vMIpdjLPdjH3uLfkJ_IlYqTvOc64FiptE';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Production: ~/.config/cc-controller/.env (not bundled in DMG)
 // Dev: desktop/.env (fallback, dotenv skips already-set vars)
@@ -83,9 +87,9 @@ function broadcastProjects() {
 }
 
 function startSession() {
-  const { SUPABASE_URL, SUPABASE_SERVICE_KEY, SESSION_ID, SESSION_TOKEN } = process.env;
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY || !SESSION_ID || !SESSION_TOKEN) {
-    console.error('Missing env vars. Copy .env.example to ~/.config/cc-controller/.env');
+  const { SESSION_ID, SESSION_TOKEN } = process.env;
+  if (!SESSION_ID || !SESSION_TOKEN) {
+    console.error('Missing SESSION_ID or SESSION_TOKEN in ~/.config/cc-controller/.env');
     return;
   }
   if (SESSION_TOKEN.length < 16) {
@@ -93,17 +97,22 @@ function startSession() {
     return;
   }
 
+  const supabaseUrl = process.env.SUPABASE_URL || BUNDLED_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY || BUNDLED_SUPABASE_ANON_KEY;
+
   const active = getActive();
   pty = new PtyManager();
   pty.spawn('claude', [], active?.path ?? HOME);
 
-  bridge = new Bridge({ supabaseUrl: SUPABASE_URL, supabaseKey: SUPABASE_SERVICE_KEY, sessionId: SESSION_ID, sessionToken: SESSION_TOKEN });
+  bridge = new Bridge({ supabaseUrl, supabaseKey, sessionId: SESSION_ID, sessionToken: SESSION_TOKEN });
 
   bridge.onInput = (text, continueConv, model, effort) => {
     const projectId = getActive()?.id ?? null;
+    bridge._addToHistory({ role: 'user', text: text.trim(), projectId });
     pty.write(text, continueConv, model, effort, projectId);
   };
   pty.onMessage = (role, text, projectId) => bridge?.broadcastMessage(role, text, projectId);
+  pty.onChunk = (msgId, text, done, projectId) => bridge?.broadcastChunk(msgId, text, done, projectId);
 
   bridge.onCreateProject = (id, name) => {
     try {
