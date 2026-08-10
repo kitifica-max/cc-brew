@@ -2,12 +2,38 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase, getSessionToken, setSessionToken, CONFIGURED } from '../lib/supabase';
 
-const SHELL = { height: '100dvh', background: '#fde8e4', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 24px', fontFamily: 'Sora, sans-serif' };
-const CARD = { background: '#fff', borderRadius: 24, padding: 24, boxShadow: '0 12px 40px rgba(240,78,35,0.12)' };
-const INPUT = { width: '100%', boxSizing: 'border-box', background: '#fde8e4', border: '1.5px solid #f0d8d2', borderRadius: 14, padding: '12px 16px', fontSize: 16, fontWeight: 500, color: '#1a1a1a', fontFamily: 'Sora, sans-serif', outline: 'none' };
-const BUTTON = { width: '100%', marginTop: 12, background: '#f04e23', border: 'none', borderRadius: 14, padding: 14, fontSize: 14, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: 'Sora, sans-serif' };
-const TITLE = { fontSize: 20, fontWeight: 800, color: '#1a1a1a', marginBottom: 6 };
-const HINT = { fontSize: 12, fontWeight: 500, color: '#b0a09a', marginBottom: 16, lineHeight: 1.5 };
+const F = "'Sora', -apple-system, BlinkMacSystemFont, sans-serif";
+
+function LogoMark({ size = 80 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 302.21 302.21" xmlns="http://www.w3.org/2000/svg"
+      style={{ borderRadius: Math.round(size * 0.225), flexShrink: 0, display: 'block' }}>
+      <rect width="302.21" height="302.21" rx="68" ry="68" fill="#fde8e4"/>
+      <path fill="#ff582a" d="M242.73,157.22h0c-7.37,0-13.92,4.45-16.91,11.19-2.08,4.69-5.07,8.99-8.99,12.9-8.11,8.11-17.83,12.29-29.14,12.57-.4,0-.79.03-1.19.03-11.82,0-21.91-4.18-30.26-12.53-.96-.96-1.86-1.94-2.7-2.95-6.55-7.75-9.83-16.85-9.83-27.32s3.29-19.6,9.87-27.36c-.84-1.01-1.74-2-2.7-2.96-8.39-8.31-18.5-12.47-30.31-12.47-.4,0-.8.02-1.2.03-8.22,12.57-12.35,26.82-12.35,42.77,0,15.96,4.13,30.21,12.35,42.77,3.08,4.71,6.71,9.18,10.94,13.42,7.07,7.07,14.81,12.51,23.2,16.36,10.05,4.61,21.04,6.93,32.99,6.93,21.93,0,40.68-7.78,56.25-23.36,7.34-7.34,12.94-15.42,16.8-24.22,5.33-12.16-3.55-25.8-16.83-25.8Z"/>
+      <path fill="#ff582a" d="M187.74,108.33c11.29.28,20.99,4.42,29.1,12.45,3.91,3.96,6.91,8.29,8.98,13,2.98,6.75,9.54,11.21,16.92,11.21h0c13.27,0,22.14-13.62,16.83-25.78-3.86-8.83-9.46-16.95-16.82-24.35-15.57-15.49-34.32-23.23-56.25-23.23-11.93,0-22.91,2.32-32.95,6.92,8.4,3.84,16.16,9.27,23.25,16.32,4.23,4.25,7.86,8.75,10.93,13.48Z"/>
+      <path fill="#ff9477" d="M176.78,157.22c-7.37,0-13.92,4.45-16.91,11.19-1.58,3.56-3.69,6.9-6.33,10.01.85,1,1.75,1.99,2.7,2.95,8.35,8.36,18.44,12.53,30.26,12.53.4,0,.79-.02,1.19-.03,2.28-3.49,4.26-7.1,5.91-10.86,5.33-12.16-3.55-25.8-16.83-25.8Z"/>
+      <path fill="#ff9477" d="M119.38,193.88c-11.31-.27-21.01-4.43-29.08-12.51-8.36-8.35-12.53-18.44-12.53-30.26s4.18-21.91,12.53-30.26c7.74-7.74,18.17-12.2,29.08-12.51.4-.01.8-.03,1.2-.03,11.81,0,21.91,4.16,30.31,12.47.95.97,1.85,1.95,2.7,2.96,2.62,3.13,4.72,6.48,6.29,10.03,2.98,6.75,9.54,11.21,16.92,11.21h0c13.27,0,22.14-13.62,16.83-25.78-1.64-3.76-3.62-7.38-5.89-10.87-3.07-4.73-6.7-9.23-10.93-13.48-7.09-7.05-14.84-12.48-23.25-16.32-10.06-4.6-21.06-6.92-33-6.92-21.93,0-40.66,7.76-56.19,23.29-15.53,15.53-23.3,34.26-23.3,56.19s7.76,40.66,23.3,56.19c15.53,15.53,34.26,23.3,56.19,23.3,11.93,0,22.91-2.32,32.96-6.93-8.39-3.85-16.13-9.29-23.2-16.36-4.23-4.23-7.87-8.71-10.94-13.42Z"/>
+    </svg>
+  );
+}
+
+function Shell({ hero, card, footer }) {
+  return (
+    <main style={{ minHeight: '100dvh', background: '#1a1a1a', display: 'flex', flexDirection: 'column', fontFamily: F, overscrollBehavior: 'none' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '56px 32px 40px', gap: 14 }}>
+        {hero}
+      </div>
+      <div style={{ background: '#fde8e4', borderRadius: '36px 36px 0 0', padding: '28px 20px 0' }}>
+        <div style={{ background: '#fff', borderRadius: 20, padding: '24px 20px', boxShadow: '0 8px 40px rgba(240,78,35,0.10)' }}>
+          {card}
+        </div>
+        <div style={{ textAlign: 'center', padding: '16px 0 max(20px, env(safe-area-inset-bottom, 20px))' }}>
+          {footer}
+        </div>
+      </div>
+    </main>
+  );
+}
 
 export default function AuthGate({ children }) {
   const [status, setStatus] = useState('loading');
@@ -30,25 +56,11 @@ export default function AuthGate({ children }) {
     setHasToken(true);
   }, []);
 
-  if (status === 'loading') return <main style={SHELL} />;
+  if (status === 'loading') return <main style={{ height: '100dvh', background: '#1a1a1a' }} />;
   if (status === 'unconfigured') return <Unconfigured />;
   if (status === 'anon') return <SignIn />;
   if (!hasToken) return <PairDevice onSubmit={handleToken} />;
   return children;
-}
-
-function Unconfigured() {
-  return (
-    <main style={SHELL}>
-      <div style={CARD}>
-        <div style={TITLE}>Falta configurar Supabase</div>
-        <div style={{ ...HINT, marginBottom: 0 }}>
-          Define <code>NEXT_PUBLIC_SUPABASE_URL</code> y <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> en el
-          entorno del despliegue y vuelve a publicar.
-        </div>
-      </div>
-    </main>
-  );
 }
 
 function SignIn() {
@@ -71,58 +83,136 @@ function SignIn() {
     else setSent(true);
   }
 
-  return (
-    <main style={SHELL}>
-      <div style={CARD}>
-        <div style={TITLE}>CC Controller</div>
-        {sent ? (
-          <div style={HINT}>Te enviamos un enlace a <strong>{email}</strong>. Ábrelo en este mismo teléfono para entrar.</div>
-        ) : (
-          <>
-            <div style={HINT}>Entra con tu correo. Solo las cuentas autorizadas pueden abrir el canal de tu Mac.</div>
-            <input
-              type="email"
-              inputMode="email"
-              autoComplete="email"
-              placeholder="tu@correo.com"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') handleSubmit(); }}
-              style={INPUT}
-            />
-            {error && <div style={{ ...HINT, color: '#dc2626', marginTop: 10, marginBottom: 0 }}>{error}</div>}
-            <button onClick={handleSubmit} disabled={busy} style={{ ...BUTTON, opacity: busy ? 0.6 : 1 }}>
-              {busy ? 'Enviando...' : 'Enviar enlace de acceso'}
-            </button>
-          </>
-        )}
+  const hero = (
+    <>
+      <LogoMark size={80} />
+      <div style={{ textAlign: 'center', marginTop: 4 }}>
+        <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+          CC Controller
+        </h1>
+        <p style={{ margin: '8px 0 0', fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.45)', letterSpacing: '-0.01em' }}>
+          Controla Claude Code desde tu iPhone
+        </p>
       </div>
-    </main>
+    </>
   );
+
+  const card = sent ? (
+    <div style={{ textAlign: 'center', padding: '8px 0' }}>
+      <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#fde8e4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M20 6L9 17l-5-5" stroke="#f04e23" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </div>
+      <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1a1a1a' }}>Enlace enviado</p>
+      <p style={{ margin: '8px 0 0', fontSize: 13, color: '#6b5e5a', lineHeight: 1.5 }}>
+        Revisa <strong>{email}</strong> y abre el enlace en este mismo dispositivo.
+      </p>
+    </div>
+  ) : (
+    <>
+      <p style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 500, color: '#6b5e5a', lineHeight: 1.55 }}>
+        Entra con tu correo. Solo cuentas autorizadas pueden acceder al canal de tu Mac.
+      </p>
+      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#b0a09a', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6, fontFamily: F }}>
+        Correo electrónico
+      </label>
+      <input
+        type="email"
+        inputMode="email"
+        autoComplete="email"
+        placeholder="tu@correo.com"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        onKeyDown={e => { if (e.key === 'Enter') handleSubmit(); }}
+        style={{ width: '100%', boxSizing: 'border-box', background: '#fdf6f4', border: '1.5px solid #f0d8d2', borderRadius: 14, padding: '14px 16px', fontSize: 16, fontWeight: 500, color: '#1a1a1a', fontFamily: F, outline: 'none', minHeight: 52, touchAction: 'manipulation' }}
+      />
+      {error && <p style={{ margin: '10px 0 0', fontSize: 12, color: '#dc2626', fontWeight: 500 }}>{error}</p>}
+      <button
+        onClick={handleSubmit}
+        disabled={busy}
+        style={{ width: '100%', marginTop: 12, background: busy ? '#c0a090' : '#f04e23', border: 'none', borderRadius: 14, padding: '15px 20px', fontSize: 15, fontWeight: 700, color: '#fff', cursor: busy ? 'default' : 'pointer', fontFamily: F, minHeight: 52, touchAction: 'manipulation', transition: 'background 200ms' }}
+      >
+        {busy ? 'Enviando...' : 'Enviar enlace de acceso'}
+      </button>
+    </>
+  );
+
+  const footer = (
+    <p style={{ margin: 0, fontSize: 11, fontWeight: 500, color: '#b0a09a', letterSpacing: '0.03em' }}>
+      kitifica.com · CC Controller
+    </p>
+  );
+
+  return <Shell hero={hero} card={card} footer={footer} />;
 }
 
 function PairDevice({ onSubmit }) {
   const [token, setToken] = useState('');
 
-  return (
-    <main style={SHELL}>
-      <div style={CARD}>
-        <div style={TITLE}>Emparejar con tu Mac</div>
-        <div style={HINT}>
-          Pega el <code>SESSION_TOKEN</code> de <code>~/.config/cc-controller/.env</code>. Se guarda solo en este
-          dispositivo; nunca viaja al servidor ni se compila en la app.
-        </div>
-        <input
-          type="password"
-          autoComplete="off"
-          placeholder="SESSION_TOKEN"
-          value={token}
-          onChange={e => setToken(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter' && token.trim()) onSubmit(token.trim()); }}
-          style={INPUT}
-        />
-        <button onClick={() => token.trim() && onSubmit(token.trim())} style={BUTTON}>Emparejar</button>
+  const hero = (
+    <>
+      <LogoMark size={80} />
+      <div style={{ textAlign: 'center', marginTop: 4 }}>
+        <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+          Emparejar Mac
+        </h1>
+        <p style={{ margin: '8px 0 0', fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.45)', letterSpacing: '-0.01em' }}>
+          Conecta este iPhone con tu Mac
+        </p>
       </div>
-    </main>
+    </>
+  );
+
+  const card = (
+    <>
+      <p style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 500, color: '#6b5e5a', lineHeight: 1.55 }}>
+        Pega el <code style={{ background: '#fde8e4', borderRadius: 6, padding: '2px 6px', fontSize: 12, color: '#f04e23' }}>SESSION_TOKEN</code> de <code style={{ background: '#fde8e4', borderRadius: 6, padding: '2px 6px', fontSize: 12, color: '#1a1a1a' }}>~/.config/cc-controller/.env</code>.
+        Se guarda solo en este dispositivo.
+      </p>
+      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#b0a09a', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6, fontFamily: F }}>
+        Session Token
+      </label>
+      <input
+        type="password"
+        autoComplete="off"
+        placeholder="••••••••••••••••"
+        value={token}
+        onChange={e => setToken(e.target.value)}
+        onKeyDown={e => { if (e.key === 'Enter' && token.trim()) onSubmit(token.trim()); }}
+        style={{ width: '100%', boxSizing: 'border-box', background: '#fdf6f4', border: '1.5px solid #f0d8d2', borderRadius: 14, padding: '14px 16px', fontSize: 16, fontWeight: 500, color: '#1a1a1a', fontFamily: F, outline: 'none', minHeight: 52, touchAction: 'manipulation' }}
+      />
+      <button
+        onClick={() => token.trim() && onSubmit(token.trim())}
+        style={{ width: '100%', marginTop: 12, background: '#f04e23', border: 'none', borderRadius: 14, padding: '15px 20px', fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: F, minHeight: 52, touchAction: 'manipulation' }}
+      >
+        Emparejar dispositivo
+      </button>
+    </>
+  );
+
+  const footer = (
+    <p style={{ margin: 0, fontSize: 11, fontWeight: 500, color: '#b0a09a', letterSpacing: '0.03em' }}>
+      kitifica.com · CC Controller
+    </p>
+  );
+
+  return <Shell hero={hero} card={card} footer={footer} />;
+}
+
+function Unconfigured() {
+  return (
+    <Shell
+      hero={<><LogoMark size={80} /><h1 style={{ margin: '4px 0 0', fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em' }}>CC Controller</h1></>}
+      card={
+        <>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#1a1a1a' }}>Falta configurar Supabase</p>
+          <p style={{ margin: '8px 0 0', fontSize: 13, color: '#6b5e5a', lineHeight: 1.55 }}>
+            Define <code style={{ background: '#fde8e4', borderRadius: 4, padding: '1px 5px', fontSize: 11 }}>NEXT_PUBLIC_SUPABASE_URL</code> y <code style={{ background: '#fde8e4', borderRadius: 4, padding: '1px 5px', fontSize: 11 }}>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> en Netlify y redespliega.
+          </p>
+        </>
+      }
+      footer={<p style={{ margin: 0, fontSize: 11, color: '#b0a09a' }}>kitifica.com</p>}
+    />
   );
 }
