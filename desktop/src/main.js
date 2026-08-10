@@ -1,4 +1,5 @@
 import { app, Tray, Menu, nativeImage, shell, clipboard, dialog } from 'electron';
+import { needsSetup, openSetupWindow } from './setup-window.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { writeFileSync } from 'fs';
@@ -193,12 +194,16 @@ function stopSession() {
   setTrayMenu('stopped');
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   app.dock?.hide();
   const iconPath = path.join(__dirname, '../assets/tray-icon.png');
   const icon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
   tray = new Tray(icon);
   setTrayMenu('stopped');
+
+  if (needsSetup()) {
+    await openSetupWindow();
+  }
 });
 
 app.on('window-all-closed', (e) => e.preventDefault());
