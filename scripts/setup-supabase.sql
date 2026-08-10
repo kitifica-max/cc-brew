@@ -1,4 +1,4 @@
--- CC Controller — configuración de Supabase
+-- CC Controller - configuracion de Supabase (ejecutar completo)
 -- Ejecutar completo en el SQL Editor: https://supabase.com/dashboard/project/_/sql/new
 --
 -- Qué hace:
@@ -11,11 +11,11 @@
 --
 -- La PWA y el desktop ya abren el canal con `{ config: { private: true } }`.
 -- Falta un paso manual: desactiva "Allow public access" en
--- Dashboard → Realtime → Settings, o los canales públicos siguen permitidos.
+-- Dashboard > Realtime > Settings, o los canales públicos siguen permitidos.
 
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 -- 1. Usuarios autorizados
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 
 CREATE TABLE IF NOT EXISTS public.cc_allowed_users (
   user_id    uuid PRIMARY KEY REFERENCES auth.users (id) ON DELETE CASCADE,
@@ -34,11 +34,12 @@ CREATE POLICY "cc_read_own_row" ON public.cc_allowed_users
   FOR SELECT TO authenticated
   USING (user_id = auth.uid());
 
--- Nadie escribe desde el cliente: altas y bajas van con la service_role key.
+-- Nadie escribe desde el cliente: altas y bajas se hacen desde el SQL Editor
+-- (o con la service_role key desde un backend), nunca desde el Mac ni la PWA.
 
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 -- 2. Predicado de acceso
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 
 CREATE OR REPLACE FUNCTION public.cc_can_access(channel_topic text)
 RETURNS boolean
@@ -57,9 +58,9 @@ AS $$
   );
 $$;
 
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 -- 3. Realtime Authorization (canal privado)
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 -- El desktop inicia sesión con la misma cuenta que la PWA (Electron guarda la
 -- sesión en ~/.config/cc-controller/auth.json), así que estas políticas también
 -- lo cubren a él. No hace falta service_role key en el Mac.
@@ -80,9 +81,9 @@ CREATE POLICY "cc_realtime_write" ON realtime.messages
     AND public.cc_can_access((SELECT realtime.topic()))
   );
 
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 -- 4. Storage (bucket `uploads`, privado)
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 -- Las claves tienen la forma `uploads/<session_id>/<timestamp>-<nombre>`,
 -- así que el segundo segmento identifica la sesión.
 
@@ -113,9 +114,9 @@ CREATE POLICY "cc_delete_own_session" ON storage.objects
     AND public.cc_can_access('session:' || split_part(name, '/', 2))
   );
 
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 -- 5. Darte de alta a ti mismo
--- ─────────────────────────────────────────────────────────────
+-- ============================================================
 -- Entra una vez en la PWA con tu correo para que exista tu usuario, y después
 -- ejecuta esto sustituyendo el correo y el SESSION_ID (el que muestra el setup
 -- del Mac, antes de los dos puntos del código de emparejamiento):
