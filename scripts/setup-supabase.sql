@@ -8,6 +8,11 @@
 --
 -- Sin esto, el canal de Supabase es público: cualquiera con la anon key puede
 -- ejecutar comandos en el Mac y leer todo lo que responde Claude.
+--
+-- OJO: estas políticas solo se evalúan si los clientes se conectan al canal con
+-- `{ config: { private: true } }` y se desactiva "Allow public access" en
+-- Realtime Settings. Hoy la PWA y el desktop abren el canal en modo público,
+-- así que el script queda instalado pero inactivo.
 
 -- ─────────────────────────────────────────────────────────────
 -- 1. Usuarios autorizados
