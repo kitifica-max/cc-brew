@@ -6,6 +6,7 @@ import { randomBytes } from 'crypto';
 import { homedir } from 'os';
 import { exec } from 'child_process';
 import { createClient } from '@supabase/supabase-js';
+import WebSocket from 'ws';
 import { getSupabaseConfig } from './supabase-config.js';
 import { createFileAuthStorage, hasStoredSession, AUTH_STORAGE_KEY } from './auth-store.js';
 
@@ -20,6 +21,9 @@ export function needsSetup() {
 function authClient() {
   const { url, key } = getSupabaseConfig();
   return createClient(url, key, {
+    // El main de Electron corre sobre Node sin `WebSocket` global y
+    // supabase-js revienta al construir el cliente si no le damos uno.
+    realtime: { transport: WebSocket },
     auth: {
       persistSession: true,
       autoRefreshToken: false,
@@ -57,17 +61,23 @@ export function openSetupWindow() {
       exec('which claude', (err) => res(!err));
     }));
 
+    // Nunca propagar: una excepción aquí deja el botón del asistente girando
+    // para siempre, sin decirle nada al usuario.
     ipcMain.handle('setup:sign-in', async (_event, { email, password, mode }) => {
-      const client = authClient();
-      const creds = { email: String(email ?? '').trim(), password: String(password ?? '') };
-      const { error } = mode === 'signup'
-        ? await client.auth.signUp(creds)
-        : await client.auth.signInWithPassword(creds);
-      if (error) return { ok: false, error: error.message };
-      const { data } = await client.auth.getSession();
-      // signUp sin confirmar el correo no devuelve sesión.
-      if (!data.session) return { ok: false, error: 'Confirma tu correo y vuelve a iniciar sesión' };
-      return { ok: true };
+      try {
+        const client = authClient();
+        const creds = { email: String(email ?? '').trim(), password: String(password ?? '') };
+        const { error } = mode === 'signup'
+          ? await client.auth.signUp(creds)
+          : await client.auth.signInWithPassword(creds);
+        if (error) return { ok: false, error: error.message };
+        const { data } = await client.auth.getSession();
+        // signUp sin confirmar el correo no devuelve sesión.
+        if (!data.session) return { ok: false, error: 'Confirma tu correo y vuelve a iniciar sesión' };
+        return { ok: true };
+      } catch (e) {
+        return { ok: false, error: e?.message || 'Error inesperado al iniciar sesión' };
+      }
     });
 
     ipcMain.handle('setup:save', () => {
