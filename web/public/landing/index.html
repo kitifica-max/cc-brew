@@ -418,6 +418,49 @@ nav {
 .setup { padding: 64px 20px; }
 .setup-inner { max-width: 1120px; margin: 0 auto; }
 .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); margin-top: 40px; }
+
+/* New setup steps */
+.setup-steps-row {
+  display: flex; align-items: flex-start; gap: 0; margin-top: 48px;
+}
+.setup-step-card {
+  flex: 1; background: var(--ink-2); border: 1px solid var(--border);
+  border-radius: var(--radius-card); padding: 28px 24px;
+  display: flex; flex-direction: column; gap: 12px; position: relative;
+}
+.setup-step-num {
+  position: absolute; top: -14px; left: 24px;
+  background: var(--orange); color: #fff;
+  width: 28px; height: 28px; border-radius: 50%;
+  font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.setup-step-icon { margin-bottom: 4px; }
+.setup-step-card h3 { font-size: 16px; font-weight: 700; color: var(--text); margin: 0; }
+.setup-step-card p { font-size: 13px; color: var(--text-2); line-height: 1.65; margin: 0; }
+.setup-step-arrow {
+  font-size: 20px; color: var(--text-3); padding: 0 16px;
+  align-self: center; flex-shrink: 0; margin-top: 20px;
+}
+.setup-dl-btn {
+  display: inline-block; margin-top: 4px;
+  background: var(--orange); color: #fff; text-decoration: none;
+  border-radius: 10px; padding: 10px 16px;
+  font-size: 12px; font-weight: 700; text-align: center;
+  transition: opacity 150ms;
+}
+.setup-dl-btn:hover { opacity: 0.85; }
+.setup-dl-btn--ghost {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text-2);
+}
+.setup-dl-btn--ghost:hover { border-color: var(--orange); color: var(--orange); opacity: 1; }
+.setup-req { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.setup-req-item { font-size: 12px; color: var(--teal); font-weight: 600; }
+@media (max-width: 767px) {
+  .setup-steps-row { flex-direction: column; }
+  .setup-step-arrow { align-self: flex-start; padding: 8px 0 8px 24px; margin-top: 0; transform: rotate(90deg); }
+}
 .code-card { background: var(--ink-2); border: 1px solid var(--border); border-radius: var(--radius-card); overflow: hidden; }
 .code-top {
   padding: 14px 18px; display: flex; align-items: center; gap: 10px;
@@ -525,12 +568,13 @@ svg { display: block; }
       <h1>Controla <span>Claude Code</span><br>desde tu iPhone</h1>
       <p class="hero-sub">PWA en tu móvil. Electron en tu Mac. Supabase como puente en tiempo real. Sin exponer tu máquina, sin servidores propios.</p>
       <div class="hero-actions">
-        <a href="https://github.com/kitifica-max/cc-controller" target="_blank" rel="noopener" class="btn-primary">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
-          Ver repositorio
+        <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC%20Controller-1.0.0-arm64.dmg" class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Descargar para Mac
         </a>
-        <a href="#features" class="btn-ghost">Ver funciones →</a>
+        <a href="https://github.com/kitifica-max/cc-controller/releases/tag/v1.0.0" target="_blank" rel="noopener" class="btn-ghost">Ver todas las versiones →</a>
       </div>
+      <p style="font-size:11px;color:var(--text-3);margin-top:10px;">Apple Silicon · macOS 12+ · Requiere Claude Code CLI</p>
     </div>
 
     <div class="flow-card">
@@ -879,49 +923,53 @@ export interface ButtonProps {
 <section class="setup" id="setup">
   <div class="setup-inner">
     <span class="section-eyebrow">Instalación</span>
-    <h2 class="section-title">Listo en 10 minutos</h2>
-    <div class="setup-grid">
-      <div class="code-card">
-        <div class="code-top">
-          <div class="dots"><span></span><span></span><span></span></div>
-          <span class="code-file">desktop/.env</span>
+    <h2 class="section-title">Listo en 5 minutos</h2>
+    <div class="setup-steps-row">
+
+      <div class="setup-step-card">
+        <div class="setup-step-num">1</div>
+        <div class="setup-step-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </div>
-        <div class="code-body">
-<span class="cm"># Supabase → Project Settings → API</span>
-<span class="ck">SUPABASE_URL</span>=<span class="cv">"https://tu-proyecto.supabase.co"</span>
-<span class="ck">SUPABASE_SERVICE_KEY</span>=<span class="cv">"tu-service-role-key"</span>
-&nbsp;
-<span class="cm"># Sesión — igual en Desktop y PWA</span>
-<span class="ck">SESSION_ID</span>=<span class="cv">"cc-session-01"</span>
-<span class="ck">SESSION_TOKEN</span>=<span class="cv">"$(openssl rand -hex 32)"</span>
-<span class="ck">PWA_URL</span>=<span class="cv">"tu-app.netlify.app"</span>
-&nbsp;
-<span class="cm"># Compilar DMG</span>
-<span class="cc">cd desktop && npm run build</span>
-<span class="cd"># → dist/CC Controller-1.0.0-arm64.dmg</span>
+        <h3>Descarga e instala</h3>
+        <p>Descarga el DMG, ábrelo y arrastra <strong>CC Controller</strong> a tu carpeta de Aplicaciones.</p>
+        <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC%20Controller-1.0.0-arm64.dmg" class="setup-dl-btn">
+          Descargar DMG (Apple Silicon)
+        </a>
+        <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC%20Controller-1.0.0.dmg" class="setup-dl-btn setup-dl-btn--ghost">
+          Descargar DMG (Intel)
+        </a>
+      </div>
+
+      <div class="setup-step-arrow">→</div>
+
+      <div class="setup-step-card">
+        <div class="setup-step-num">2</div>
+        <div class="setup-step-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+        </div>
+        <h3>Configura la app</h3>
+        <p>Al abrirla por primera vez aparece un wizard. Conecta tu proyecto Supabase y la app genera tu <strong>SESSION_TOKEN</strong> automáticamente.</p>
+        <div class="setup-req">
+          <span class="setup-req-item">✓ Supabase (plan gratuito)</span>
+          <span class="setup-req-item">✓ Claude Code CLI instalado</span>
         </div>
       </div>
-      <div class="code-card">
-        <div class="code-top">
-          <div class="dots"><span></span><span></span><span></span></div>
-          <span class="code-file">web/.env.local</span>
+
+      <div class="setup-step-arrow">→</div>
+
+      <div class="setup-step-card">
+        <div class="setup-step-num">3</div>
+        <div class="setup-step-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
         </div>
-        <div class="code-body">
-<span class="cm"># Supabase (anon key — pública OK)</span>
-<span class="ck">NEXT_PUBLIC_SUPABASE_URL</span>=<span class="cv">"..."</span>
-<span class="ck">NEXT_PUBLIC_SUPABASE_ANON_KEY</span>=<span class="cv">"..."</span>
-&nbsp;
-<span class="cm"># Mismo session id que el desktop</span>
-<span class="ck">NEXT_PUBLIC_SESSION_ID</span>=<span class="cv">"cc-session-01"</span>
-&nbsp;
-<span class="cm"># El SESSION_TOKEN no va aquí: sería público.</span>
-<span class="cm"># La PWA lo pide al emparejar el dispositivo.</span>
-&nbsp;
-<span class="cm"># Deploy a Netlify</span>
-<span class="cc">cd web && npm run build</span>
-<span class="cd"># base=web · cmd=build · dir=.next</span>
-        </div>
+        <h3>Empareja tu iPhone</h3>
+        <p>Abre <strong>ccc.kitifica.com</strong> en Safari, inicia sesión con tu email y pega el SESSION_TOKEN en Settings.</p>
+        <a href="https://ccc.kitifica.com" target="_blank" rel="noopener" class="setup-dl-btn">
+          Abrir PWA →
+        </a>
       </div>
+
     </div>
   </div>
 </section>
@@ -941,9 +989,9 @@ export interface ButtonProps {
   <h3>CC Controller</h3>
   <p>Control remoto de Claude Code · Electron + PWA + Supabase Realtime</p>
   <div class="footer-btns">
-    <a href="https://github.com/kitifica-max/cc-controller" target="_blank" rel="noopener" class="btn-primary" style="font-size:13px">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
-      Ver en GitHub
+    <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC%20Controller-1.0.0-arm64.dmg" class="btn-primary" style="font-size:13px">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Descargar para Mac
     </a>
     <a href="#features" class="footer-link">Funciones</a>
     <a href="#how" class="footer-link">Arquitectura</a>

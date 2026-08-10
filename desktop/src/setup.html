@@ -128,6 +128,25 @@
   }
   .error.visible { display: block; }
 
+  /* Requirement checks */
+  .check-row {
+    display: flex; align-items: center; gap: 14px;
+    background: #fff; border: 1.5px solid #e0e0e0;
+    border-radius: 10px; padding: 14px;
+  }
+  .check-spinner {
+    width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid #e0e0e0; border-top-color: #f04e23;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .check-ok { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+    background: #00b09b; display: flex; align-items: center; justify-content: center; }
+  .check-fail { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+    background: #dc2626; display: flex; align-items: center; justify-content: center; }
+  .check-title { font-size: 13px; font-weight: 700; color: #1a1a1a; }
+  .check-sub { font-size: 11px; color: #999; margin-top: 2px; }
+
   /* Token display */
   .token-box {
     background: #fff;
@@ -224,10 +243,34 @@
 
 <div class="content">
 
-  <!-- STEP 1: Credentials -->
-  <div class="step active" id="step1">
+  <!-- STEP 0: Requirements check -->
+  <div class="step active" id="step0">
     <div>
-      <div class="step-label">Paso 1 de 2</div>
+      <div class="step-label">Verificando requisitos</div>
+      <h2>Comprobando tu Mac</h2>
+    </div>
+
+    <div class="check-row" id="checkClaude">
+      <div class="check-spinner"></div>
+      <div class="check-info">
+        <div class="check-title">Claude Code CLI</div>
+        <div class="check-sub" id="claudeSub">Verificando...</div>
+      </div>
+    </div>
+
+    <div id="claudeWarning" style="display:none; background:#1a1a1a; border:1px solid #333; border-radius:10px; padding:14px; font-size:12px; color:#ccc; line-height:1.6;">
+      Claude Code CLI no está instalado. Instálalo desde
+      <a href="https://claude.ai/code" style="color:#f04e23;" onclick="require('electron').shell.openExternal('https://claude.ai/code'); return false;">claude.ai/code</a>
+      y luego reinicia esta app.
+    </div>
+
+    <button class="btn" id="btn0" onclick="goStep1()" disabled>Continuar →</button>
+  </div>
+
+  <!-- STEP 1: Credentials -->
+  <div class="step" id="step1">
+    <div>
+      <div class="step-label">Paso 1 de 3</div>
       <h2>Conecta tu proyecto Supabase</h2>
     </div>
 
@@ -254,7 +297,7 @@
   <!-- STEP 2: Token ready -->
   <div class="step" id="step2">
     <div>
-      <div class="step-label">Paso 2 de 2</div>
+      <div class="step-label">Paso 2 de 3</div>
       <h2>Token generado</h2>
     </div>
 
@@ -289,6 +332,36 @@
 <script>
   let generatedToken = '';
   let revealed = false;
+
+  // Run on load
+  window.addEventListener('DOMContentLoaded', async () => {
+    const ok = await window.cc.checkClaude();
+    const row = document.getElementById('checkClaude');
+    const sub = document.getElementById('claudeSub');
+    const btn = document.getElementById('btn0');
+    const warn = document.getElementById('claudeWarning');
+
+    // Replace spinner with icon
+    const icon = row.querySelector('.check-spinner');
+    if (ok) {
+      icon.className = 'check-ok';
+      icon.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+      sub.textContent = 'Instalado y listo';
+      row.style.borderColor = '#00b09b';
+      btn.disabled = false;
+    } else {
+      icon.className = 'check-fail';
+      icon.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+      sub.textContent = 'No encontrado';
+      row.style.borderColor = '#dc2626';
+      warn.style.display = 'block';
+    }
+  });
+
+  function goStep1() {
+    document.getElementById('step0').classList.remove('active');
+    document.getElementById('step1').classList.add('active');
+  }
 
   async function goStep2() {
     const surl = document.getElementById('surl').value.trim();

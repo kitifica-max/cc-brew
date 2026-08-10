@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { writeFileSync, mkdirSync } from 'fs';
 import { randomBytes } from 'crypto';
 import { homedir } from 'os';
+import { exec } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -29,8 +30,13 @@ export function openSetupWindow() {
 
     win.loadFile(path.join(__dirname, 'setup.html'));
 
+    ipcMain.removeHandler('setup:check-claude');
     ipcMain.removeHandler('setup:save');
     ipcMain.removeHandler('setup:close');
+
+    ipcMain.handle('setup:check-claude', () => new Promise((res) => {
+      exec('which claude', (err) => res(!err));
+    }));
 
     ipcMain.handle('setup:save', (_, { supabaseUrl, supabaseKey, pwaUrl }) => {
       const token = randomBytes(32).toString('hex');
