@@ -54,7 +54,7 @@ Copia el código de emparejamiento — lo necesitas en el paso 3.
 
 ### 3 — Emparejar con la PWA
 
-1. Abre [cc-controller.netlify.app](https://cc-controller.netlify.app) en tu iPhone
+1. Abre [ccc.kitifica.com](https://ccc.kitifica.com) en tu iPhone
 2. Agrega a la pantalla de inicio (Share → Add to Home Screen) para usarla como app nativa
 3. Pega el código de emparejamiento cuando la PWA lo solicite
 4. En CC Controller (tray) → clic derecho → **Iniciar**

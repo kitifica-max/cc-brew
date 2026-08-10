@@ -118,7 +118,7 @@ export default class Bridge {
       this.channel?.send({
         type: 'broadcast',
         event: 'chunk',
-        payload: { msgId, text: clean, done: false, ts: Date.now() },
+        payload: { msgId, text: clean, done: false, projectId: buf.projectId, ts: Date.now() },
       });
     }
   }
@@ -168,6 +168,7 @@ export default class Bridge {
   disconnect() {
     clearInterval(this._heartbeatTimer);
     this._heartbeatTimer = null;
+    this._streamBuffers.clear();
     if (this.channel) {
       this.client.removeChannel(this.channel);
       this.channel = null;

@@ -101,6 +101,15 @@ describe('Bridge', () => {
     assert.equal(args[3], 'medium');
   });
 
+  it('broadcastChunk tags streaming chunks with the project', () => {
+    bridge.connect();
+    bridge.broadcastChunk('m1', 'hola', false, 'p1');
+    const call = send.mock.calls[0].arguments[0];
+    assert.equal(call.event, 'chunk');
+    assert.equal(call.payload.projectId, 'p1');
+    assert.equal(call.payload.done, false);
+  });
+
   it('disconnect removes channel', () => {
     bridge.connect();
     bridge.disconnect();

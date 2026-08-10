@@ -1,9 +1,42 @@
 import { Resend } from 'resend';
+import { createHmac, timingSafeEqual } from 'crypto';
+
+const TOLERANCE_SECONDS = 5 * 60;
+
+// Standard Webhooks: Supabase firma `id.timestamp.body` con el secreto del hook.
+function verifySignature(req, rawBody) {
+  const secret = process.env.SEND_EMAIL_HOOK_SECRET;
+  if (!secret) return false;
+
+  const id = req.headers.get('webhook-id');
+  const timestamp = req.headers.get('webhook-timestamp');
+  const header = req.headers.get('webhook-signature');
+  if (!id || !timestamp || !header) return false;
+
+  const age = Math.abs(Math.floor(Date.now() / 1000) - Number(timestamp));
+  if (!Number.isFinite(age) || age > TOLERANCE_SECONDS) return false;
+
+  const key = Buffer.from(secret.replace(/^v1,/, '').replace(/^whsec_/, ''), 'base64');
+  const expected = createHmac('sha256', key).update(`${id}.${timestamp}.${rawBody}`).digest();
+
+  return header.split(' ').some((part) => {
+    const value = part.split(',')[1];
+    if (!value) return false;
+    const provided = Buffer.from(value, 'base64');
+    return provided.length === expected.length && timingSafeEqual(provided, expected);
+  });
+}
 
 export async function POST(req) {
   const resend = new Resend(process.env.RESEND_API_KEY);
+
+  const rawBody = await req.text();
+  if (!verifySignature(req, rawBody)) {
+    return Response.json({ error: 'Invalid signature' }, { status: 401 });
+  }
+
   let body;
-  try { body = await req.json(); } catch {
+  try { body = JSON.parse(rawBody); } catch {
     return Response.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
@@ -16,7 +49,7 @@ export async function POST(req) {
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const redirectTo = redirect_to || 'https://ccc.kitifica.com';
-  const magicLink = `${supabaseUrl}/auth/v1/verify?token=${token_hash}&type=${email_action_type ?? 'magiclink'}&redirect_to=${encodeURIComponent(redirectTo)}`;
+  const magicLink = `${supabaseUrl}/auth/v1/verify?token=${encodeURIComponent(token_hash)}&type=${encodeURIComponent(email_action_type ?? 'magiclink')}&redirect_to=${encodeURIComponent(redirectTo)}`;
 
   try {
     await resend.emails.send({
