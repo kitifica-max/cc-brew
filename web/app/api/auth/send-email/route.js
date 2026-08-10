@@ -39,11 +39,11 @@ export async function POST(req) {
               <span style="font-size:15px;font-weight:800;color:#1a1a1a;letter-spacing:-0.02em;">CC Controller</span>
             </div>
             <h1 style="font-size:22px;font-weight:800;color:#1a1a1a;margin:0 0 12px;letter-spacing:-0.02em;">Tu enlace de acceso está listo</h1>
-            <p style="font-size:14px;line-height:1.65;color:#6b5e5a;margin:0 0 28px;">Haz clic para entrar. Válido por <strong style="color:#1a1a1a;">1 hora</strong>, solo desde este dispositivo.</p>
+            <p style="font-size:14px;line-height:1.65;color:#666666;margin:0 0 28px;">Haz clic para entrar. Válido por <strong style="color:#1a1a1a;">1 hora</strong>, solo desde este dispositivo.</p>
             <a href="${magicLink}" style="display:block;background:#f04e23;color:#ffffff;text-decoration:none;border-radius:14px;padding:15px 28px;font-size:14px;font-weight:700;text-align:center;">Entrar a CC Controller →</a>
           </div>
-          <div style="background:#fdf8f6;border-top:1px solid #f0ebe7;padding:18px 36px;">
-            <p style="font-size:11px;color:#b8aaa4;margin:0;line-height:1.6;">Si no pediste este enlace, ignora este correo.<br><strong style="color:#8a7a74;">kitifica.com</strong> · noreply@kitifica.com</p>
+          <div style="background:#f5f5f5;border-top:1px solid #e5e5e5;padding:18px 36px;">
+            <p style="font-size:11px;color:#aaaaaa;margin:0;line-height:1.6;">Si no pediste este enlace, ignora este correo.<br><strong style="color:#777777;">kitifica.com</strong> · noreply@kitifica.com</p>
           </div>
         </div>
       `,

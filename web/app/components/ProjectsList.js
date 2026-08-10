@@ -20,7 +20,7 @@ export default function ProjectsList({ projects, currentId, onSwitch, onDelete, 
   }
 
   return (
-    <main style={{ height: '100dvh', background: '#fde8e4', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <main style={{ height: '100dvh', background: '#f5f5f5', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       {/* Header */}
       <div style={{ background: '#f04e23', padding: '52px 20px 16px', flexShrink: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
@@ -52,7 +52,7 @@ export default function ProjectsList({ projects, currentId, onSwitch, onDelete, 
               style={{ background: isActive ? '#f04e23' : '#fff', borderRadius: 16, padding: '14px 44px 14px 16px', cursor: 'pointer', position: 'relative' }}
             >
               <div style={{ fontSize: 14, fontWeight: 700, color: isActive ? '#fff' : '#1a1a1a', marginBottom: 3 }}>{p.name}</div>
-              <div style={{ fontSize: 10, fontWeight: 600, color: isActive ? 'rgba(255,255,255,0.65)' : '#b0a09a' }}>
+              <div style={{ fontSize: 10, fontWeight: 600, color: isActive ? 'rgba(255,255,255,0.65)' : '#999999' }}>
                 {modelLabel} · {p.effort} · {p.messages.length} msgs · {new Date(p.createdAt).toLocaleDateString('es', { day: 'numeric', month: 'short' })}
               </div>
               {confirmId === p.id ? (
@@ -88,7 +88,7 @@ export default function ProjectsList({ projects, currentId, onSwitch, onDelete, 
               onChange={e => setNewName(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleCreate(); if (e.key === 'Escape') setCreating(false); }}
               placeholder="Nombre del proyecto..."
-              style={{ flex: 1, background: '#fff', border: '1.5px solid #f0d8d2', borderRadius: 14, padding: '12px 16px', fontSize: 15, fontWeight: 500, color: '#1a1a1a', fontFamily: 'Sora, sans-serif', outline: 'none' }}
+              style={{ flex: 1, background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 14, padding: '12px 16px', fontSize: 15, fontWeight: 500, color: '#1a1a1a', fontFamily: 'Sora, sans-serif', outline: 'none' }}
             />
             <button
               onClick={handleCreate}

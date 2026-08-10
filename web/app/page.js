@@ -192,7 +192,7 @@ function CCController() {
   );
 
   return (
-    <main style={{ height: '100dvh', background: '#fde8e4', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <main style={{ height: '100dvh', background: '#f5f5f5', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
       {/* Header */}
       <div style={{ background: '#f04e23', padding: '52px 20px 14px', flexShrink: 0 }}>
@@ -221,7 +221,7 @@ function CCController() {
       {/* Chat */}
       <div ref={chatRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 14px 8px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {messages.length === 0 && (
-          <div style={{ textAlign: 'center', color: '#b0a09a', fontSize: 12, fontWeight: 600, marginTop: 40 }}>
+          <div style={{ textAlign: 'center', color: '#999999', fontSize: 12, fontWeight: 600, marginTop: 40 }}>
             {currentProject?.path ? currentProject.path.replace(/^\/Users\/[^/]+/, '~') : 'Creando directorio...'}
           </div>
         )}
@@ -230,16 +230,16 @@ function CCController() {
       </div>
 
       {/* Quick actions */}
-      <div style={{ background: '#fde8e4', padding: '8px 14px 4px', display: 'flex', gap: 7, overflowX: 'auto', flexShrink: 0 }}>
+      <div style={{ background: '#f5f5f5', padding: '8px 14px 4px', display: 'flex', gap: 7, overflowX: 'auto', flexShrink: 0 }}>
         {QUICK.map(({ label, text }) => (
-          <button key={label} onClick={() => sendRaw(text)} style={{ flexShrink: 0, background: '#fff', border: '1.5px solid #f0d8d2', borderRadius: 20, padding: '7px 14px', fontSize: 11, fontWeight: 700, color: '#555', cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'Sora, sans-serif' }}>
+          <button key={label} onClick={() => sendRaw(text)} style={{ flexShrink: 0, background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 20, padding: '7px 14px', fontSize: 11, fontWeight: 700, color: '#555', cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'Sora, sans-serif' }}>
             {label}
           </button>
         ))}
       </div>
 
       {/* Input */}
-      <div style={{ background: '#fff', borderTop: '1px solid #f0d8d2', padding: '10px 14px 32px', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+      <div style={{ background: '#fff', borderTop: '1px solid #e0e0e0', padding: '10px 14px 32px', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
         <FileUpload
           currentProject={currentProject}
           sendEvent={sendEvent}
@@ -253,7 +253,7 @@ function CCController() {
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
           placeholder="Escribe un mensaje..."
-          style={{ flex: 1, background: '#fde8e4', border: '1.5px solid #f0d8d2', borderRadius: 22, padding: '10px 16px', fontSize: 16, fontWeight: 500, color: '#1a1a1a', fontFamily: 'Sora, sans-serif', outline: 'none' }}
+          style={{ flex: 1, background: '#f5f5f5', border: '1.5px solid #e0e0e0', borderRadius: 22, padding: '10px 16px', fontSize: 16, fontWeight: 500, color: '#1a1a1a', fontFamily: 'Sora, sans-serif', outline: 'none' }}
         />
         <button
           onClick={handleSend}
@@ -279,14 +279,14 @@ function CCController() {
 
 function MessageRow({ msg }) {
   const isUser = msg.role === 'user';
-  if (msg.role === 'system') return <div style={{ textAlign: 'center', fontSize: 10, fontWeight: 600, color: '#b0a09a', padding: '4px 0' }}>{msg.text}</div>;
+  if (msg.role === 'system') return <div style={{ textAlign: 'center', fontSize: 10, fontWeight: 600, color: '#999999', padding: '4px 0' }}>{msg.text}</div>;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUser ? 'flex-end' : 'flex-start' }}>
-      {!isUser && <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#b0a09a', marginBottom: 4, paddingLeft: 4 }}>Claude Code</div>}
+      {!isUser && <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#999999', marginBottom: 4, paddingLeft: 4 }}>Claude Code</div>}
       <div style={{ maxWidth: '88%', borderRadius: 18, padding: '10px 14px', ...(isUser ? { background: '#f04e23', color: '#fff', borderBottomRightRadius: 4, fontSize: 14, fontWeight: 500, lineHeight: 1.5 } : { background: '#1a1a1a', color: '#e8e2d8', borderBottomLeftRadius: 4, fontFamily: "'SF Mono','Fira Code',ui-monospace,monospace", fontSize: 12, lineHeight: 1.75, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }) }}>
         {msg.text}
       </div>
-      <div style={{ fontSize: 9, color: '#b0a09a', marginTop: 3, paddingLeft: 4, paddingRight: 4 }}>{msg.time}</div>
+      <div style={{ fontSize: 9, color: '#999999', marginTop: 3, paddingLeft: 4, paddingRight: 4 }}>{msg.time}</div>
     </div>
   );
 }
@@ -294,7 +294,7 @@ function MessageRow({ msg }) {
 function TypingIndicator() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-      <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#b0a09a', marginBottom: 4, paddingLeft: 4 }}>Claude Code</div>
+      <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#999999', marginBottom: 4, paddingLeft: 4 }}>Claude Code</div>
       <div style={{ background: '#1a1a1a', borderRadius: 18, borderBottomLeftRadius: 4, padding: '12px 16px', display: 'flex', gap: 5, alignItems: 'center' }}>
         {[0,1,2].map(i => <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#f0a040', animation: `blink 1.2s ${i*0.2}s infinite` }} />)}
       </div>

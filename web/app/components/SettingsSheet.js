@@ -39,7 +39,7 @@ export default function SettingsSheet({ project, onClose, onModelChange, onEffor
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
           <div>
             <div style={{ fontSize: 18, fontWeight: 800, color: '#1a1a1a' }}>{project.name}</div>
-            <div style={{ fontSize: 10, fontWeight: 500, color: '#b0a09a', marginTop: 2 }}>
+            <div style={{ fontSize: 10, fontWeight: 500, color: '#999999', marginTop: 2 }}>
               {project.path ?? 'Creando directorio...'}
             </div>
           </div>
@@ -52,7 +52,7 @@ export default function SettingsSheet({ project, onClose, onModelChange, onEffor
 
         {/* Model */}
         <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#b0a09a', marginBottom: 10 }}>Modelo</div>
+          <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#999999', marginBottom: 10 }}>Modelo</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {MODELS.map(m => (
               <button
@@ -60,7 +60,7 @@ export default function SettingsSheet({ project, onClose, onModelChange, onEffor
                 onClick={() => onModelChange(m.id)}
                 style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  background: project.model === m.id ? '#fde8e4' : '#f9f5f4',
+                  background: project.model === m.id ? '#f0f0f0' : '#f5f5f5',
                   border: project.model === m.id ? '1.5px solid #f04e23' : '1.5px solid transparent',
                   borderRadius: 12, padding: '10px 14px', cursor: 'pointer', textAlign: 'left',
                 }}
@@ -78,7 +78,7 @@ export default function SettingsSheet({ project, onClose, onModelChange, onEffor
 
         {/* Effort */}
         <div style={{ marginBottom: 24 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#b0a09a', marginBottom: 10 }}>Effort</div>
+          <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#999999', marginBottom: 10 }}>Effort</div>
           <div style={{ display: 'flex', gap: 8 }}>
             {EFFORTS.map(e => (
               <button
@@ -86,7 +86,7 @@ export default function SettingsSheet({ project, onClose, onModelChange, onEffor
                 onClick={() => onEffortChange(e)}
                 style={{
                   flex: 1, padding: '10px 0', borderRadius: 12, border: 'none', cursor: 'pointer',
-                  background: project.effort === e ? '#f04e23' : '#f9f5f4',
+                  background: project.effort === e ? '#f04e23' : '#f5f5f5',
                   color: project.effort === e ? '#fff' : '#555',
                   fontSize: 12, fontWeight: 700, fontFamily: 'Sora, sans-serif',
                 }}
@@ -98,10 +98,10 @@ export default function SettingsSheet({ project, onClose, onModelChange, onEffor
         </div>
 
         {/* Env / Secrets */}
-        <div style={{ marginBottom: 24, padding: 16, background: '#f9f5f4', borderRadius: 16 }}>
+        <div style={{ marginBottom: 24, padding: 16, background: '#f5f5f5', borderRadius: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
             <span style={{ display: 'flex', width: 14, height: 14, color: '#f04e23' }} dangerouslySetInnerHTML={{ __html: ICON_KEY }} />
-            <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#b0a09a' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#999999' }}>
               Entorno / Secretos (.env)
             </div>
           </div>
@@ -114,7 +114,7 @@ export default function SettingsSheet({ project, onClose, onModelChange, onEffor
                 value={envData[key]}
                 onChange={e => setEnvData(prev => ({ ...prev, [key]: e.target.value }))}
                 style={{
-                  background: '#fff', border: '1.5px solid #f0d8d2', borderRadius: 10,
+                  background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 10,
                   padding: '10px 14px', fontSize: 12, fontFamily: 'Sora, sans-serif',
                   outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box',
                 }}
