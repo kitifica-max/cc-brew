@@ -1,0 +1,49 @@
+name: Release
+
+# El DMG solo puede construirse en macOS, así que el binario sale de aquí:
+# empuja un tag `vX.Y.Z` y este job publica el release con los dos DMG.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag a publicar (vX.Y.Z)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  dmg:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Instalar dependencias
+        working-directory: desktop
+        run: npm ci
+
+      - name: Tests
+        working-directory: desktop
+        run: npm test
+
+      - name: Construir DMG (arm64 + x64)
+        working-directory: desktop
+        # Sin certificado de Apple: DMG sin firmar, igual que los releases previos.
+        run: npx electron-builder --mac --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          name: CC Controller ${{ github.event.inputs.tag || github.ref_name }}
+          generate_release_notes: true
+          files: desktop/dist/*.dmg

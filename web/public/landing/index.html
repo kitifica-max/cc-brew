@@ -650,18 +650,18 @@ svg { display: block; }
     <div>
       <div class="hero-badge">
         <div class="hero-badge-dot"><div class="hero-badge-pulse"></div></div>
-        Streaming en vivo · Historia · Sin cuenta requerida
+        Streaming en vivo · Historia · Canal privado
       </div>
       <h1>Controla <span>Claude Code</span><br>desde tu iPhone</h1>
       <p class="hero-sub">Inicia una tarea en Claude Code. Sal de tu escritorio. Revisa el progreso y responde desde tu iPhone — sin SSH, sin túneles, sin config de red.</p>
       <div class="hero-actions">
-        <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.0.1-arm64.dmg" class="btn-primary">
+        <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.1.0-arm64.dmg" class="btn-primary">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Descargar para Mac
         </a>
         <a href="https://github.com/kitifica-max/cc-controller/releases" target="_blank" rel="noopener" class="btn-ghost">Ver todas las versiones →</a>
       </div>
-      <p style="font-size:11px;color:var(--text-3);margin-top:10px;">Apple Silicon · macOS 12+ · Requiere Claude Code CLI · Sin cuenta Supabase<span id="hero-dl-count" style="display:none"> · <span id="hero-dl-num"></span> descargas</span></p>
+      <p style="font-size:11px;color:var(--text-3);margin-top:10px;">Apple Silicon · macOS 12+ · Requiere Claude Code CLI · Cuenta gratuita<span id="hero-dl-count" style="display:none"> · <span id="hero-dl-num"></span> descargas</span></p>
     </div>
 
     <div class="flow-card">
@@ -880,7 +880,7 @@ export interface ButtonProps {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
         <h3>Código de emparejamiento</h3>
-        <p>Un clic genera tu código. Pégalo en la PWA. La infraestructura Supabase ya viene incluida — sin crear cuenta ni configurar nada.</p>
+        <p>Inicias sesión con tu correo y un clic genera tu código. Pégalo en la PWA. La infraestructura Supabase ya viene incluida — nada que configurar.</p>
         <div class="env-inputs">
           <div class="env-row">
             <span class="env-key">SESSION</span>
@@ -998,7 +998,7 @@ export interface ButtonProps {
         </div>
         <div class="sec-body">
           <h4>Código de emparejamiento</h4>
-          <p>El token generado en el setup (mín. 16 chars) + tu SESSION_ID único. Sin ese par exacto, cualquier evento llega y se descarta en silencio. No hay backdoor.</p>
+          <p>Tu canal es privado: Supabase solo deja entrar a tu cuenta. Encima va el token del setup + tu SESSION_ID único; sin ese par exacto, cualquier evento llega y se descarta en silencio.</p>
           <span class="sec-chip">SESSION_ID + SESSION_TOKEN</span>
         </div>
       </div>
@@ -1070,10 +1070,10 @@ export interface ButtonProps {
         </div>
         <h3>Descarga e instala</h3>
         <p>Descarga el DMG, ábrelo y arrastra <strong>CC Controller</strong> a tu carpeta de Aplicaciones.</p>
-        <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.0.1-arm64.dmg" class="setup-dl-btn">
+        <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.1.0-arm64.dmg" class="setup-dl-btn">
           Descargar DMG (Apple Silicon)
         </a>
-        <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.0.1.dmg" class="setup-dl-btn setup-dl-btn--ghost">
+        <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.1.0.dmg" class="setup-dl-btn setup-dl-btn--ghost">
           Descargar DMG (Intel)
         </a>
       </div>
@@ -1086,7 +1086,7 @@ export interface ButtonProps {
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
         </div>
         <h3>Genera tu código</h3>
-        <p>Al abrirla por primera vez, un clic genera tu <strong>código de emparejamiento</strong>. Solo necesitas tener Claude Code CLI instalado.</p>
+        <p>Al abrirla por primera vez, inicias sesión con tu correo y un clic genera tu <strong>código de emparejamiento</strong>. Solo necesitas tener Claude Code CLI instalado.</p>
         <div class="setup-req">
           <span class="setup-req-item">✓ <a href="https://claude.ai/download" target="_blank" rel="noopener" style="color:var(--teal);text-decoration:underline;">Instala Claude Code</a> desde claude.ai/download</span>
           <span class="setup-req-item" style="color:var(--text-3);font-family:'SF Mono',ui-monospace,monospace;font-size:11px;">npm install -g @anthropic-ai/claude-code</span>
@@ -1126,7 +1126,7 @@ export interface ButtonProps {
   <h3>CC Controller</h3>
   <p>Control remoto de Claude Code · Streaming · Historia · Sin config</p>
   <div class="footer-btns">
-    <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.0.1-arm64.dmg" class="btn-primary" style="font-size:13px">
+    <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.1.0-arm64.dmg" class="btn-primary" style="font-size:13px">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Descargar para Mac
     </a>
