@@ -1,14 +1,8 @@
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const HOOK_SECRET = process.env.SUPABASE_AUTH_HOOK_SECRET;
 
 export async function POST(req) {
-  const authHeader = req.headers.get('authorization');
-  if (HOOK_SECRET && authHeader !== `Bearer ${HOOK_SECRET}`) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   let body;
   try { body = await req.json(); } catch {
     return Response.json({ error: 'Invalid JSON' }, { status: 400 });
