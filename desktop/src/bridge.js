@@ -34,7 +34,7 @@ export default class Bridge {
     // key del desktop salta las políticas RLS de `realtime.messages`.
     this.client.realtime.setAuth(this.supabaseKey);
     this.channel = this.client
-      .channel(`session:${this.sessionId}`, { config: { private: true } })
+      .channel(`session:${this.sessionId}`)
       .on('broadcast', { event: 'input' }, ({ payload }) => {
         if (!this._validate(payload)) return;
         this.onInput?.(

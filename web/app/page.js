@@ -68,7 +68,7 @@ function CCController() {
 
   // Supabase
   useEffect(() => {
-    const ch = supabase.channel(`session:${SESSION_ID}`, { config: { private: true } });
+    const ch = supabase.channel(`session:${SESSION_ID}`);
     channelRef.current = ch;
 
     ch.on('broadcast', { event: 'heartbeat' }, () => {
