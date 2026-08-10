@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { MODELS, EFFORTS } from '../lib/storage';
+import { getSessionToken, setSessionToken } from '../lib/supabase';
 
 const ICON_X = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg>`;
 const ICON_CHECK = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 6L9 17l-5-5"/></svg>`;
@@ -10,8 +11,21 @@ const ICON_KEY = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1e
 const ENV_KEYS = ['GITHUB_TOKEN', 'NETLIFY_AUTH_TOKEN', 'SUPABASE_SERVICE_KEY'];
 const EMPTY_ENV = Object.fromEntries(ENV_KEYS.map(k => [k, '']));
 
+const ICON_LINK = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></svg>`;
+
 export default function SettingsSheet({ project, onClose, onModelChange, onEffortChange, onOpenDesktop, onSaveEnv }) {
   const [envData, setEnvData] = useState(EMPTY_ENV);
+  const [newToken, setNewToken] = useState('');
+  const [tokenSaved, setTokenSaved] = useState(false);
+
+  function handleSaveToken() {
+    const t = newToken.trim();
+    if (!t) return;
+    setSessionToken(t);
+    setNewToken('');
+    setTokenSaved(true);
+    setTimeout(() => setTokenSaved(false), 2000);
+  }
 
   if (!project) return null;
 
@@ -130,6 +144,39 @@ export default function SettingsSheet({ project, onClose, onModelChange, onEffor
             }}
           >
             Guardar e Inyectar en Local
+          </button>
+        </div>
+
+        {/* Session Token */}
+        <div style={{ marginBottom: 24, padding: 16, background: '#f5f5f5', borderRadius: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+            <span style={{ display: 'flex', width: 14, height: 14, color: '#f04e23' }} dangerouslySetInnerHTML={{ __html: ICON_LINK }} />
+            <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#999999' }}>
+              Session Token
+            </div>
+          </div>
+          <input
+            type="password"
+            autoComplete="off"
+            placeholder="Nuevo SESSION_TOKEN..."
+            value={newToken}
+            onChange={e => setNewToken(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') handleSaveToken(); }}
+            style={{
+              background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 10,
+              padding: '10px 14px', fontSize: 12, fontFamily: 'Sora, sans-serif',
+              outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box', marginBottom: 8,
+            }}
+          />
+          <button
+            onClick={handleSaveToken}
+            style={{
+              width: '100%', background: tokenSaved ? '#00b09b' : '#f04e23', border: 'none', borderRadius: 10,
+              padding: '10px', fontSize: 12, fontWeight: 700, color: '#fff',
+              cursor: 'pointer', fontFamily: 'Sora, sans-serif', transition: 'background 200ms',
+            }}
+          >
+            {tokenSaved ? 'Token guardado' : 'Cambiar token'}
           </button>
         </div>
 
