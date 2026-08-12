@@ -192,10 +192,8 @@ function CCController() {
         setConnected(isNowConnected);
         if (isNowConnected) {
           ch.send({ type: 'broadcast', event: 'get-project-state', payload: { token: getSessionToken() } });
+          if (wasConnectedRef.current) addSystemMsg('✓ Conexión recuperada');
           wasConnectedRef.current = true;
-        }
-        if (s === 'CHANNEL_ERROR' || s === 'TIMED_OUT') {
-          addSystemMsg('⚠️ Error de conexión — verifica tu Session Token en Configuración');
         }
       });
     })();
