@@ -12,8 +12,6 @@ const ICON_SETTINGS = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" heigh
 const ICON_SEND = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11zm7.318-19.539l-10.94 10.939"/></svg>`;
 const ICON_MIC = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="10" height="14" x="7" y="1" rx="5"/><path d="M4 12a8 8 0 0 0 16 0M12 19v4M8 23h8"/></g></svg>`;
 const ICON_MIC_STOP = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></g></svg>`;
-const ICON_SPEAKER_ON = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></g></svg>`;
-const ICON_SPEAKER_OFF = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></g></svg>`;
 const ICON_SPINNER = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></path></svg>`;
 
 const QUICK = [
@@ -52,25 +50,13 @@ function CCController() {
 
   // ── Voice state ──────────────────────────────────────────────────────────────
   const [voiceState, setVoiceState] = useState('idle'); // 'idle' | 'listening' | 'processing'
-  const [isMuted, setIsMuted] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isFetchingTts, setIsFetchingTts] = useState(false);
+  const [awaitingFolderId, setAwaitingFolderId] = useState(null);
+  const awaitingFolderIdRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
-  const pendingTtsRef = useRef(null);
-  const isMutedRef = useRef(false);
 
-  useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
   useEffect(() => { currentIdRef.current = currentId; }, [currentId]);
-
-  // Speak when streaming finishes (streamingMsg → null)
-  useEffect(() => {
-    if (streamingMsg === null && pendingTtsRef.current) {
-      const raw = pendingTtsRef.current;
-      pendingTtsRef.current = null;
-      if (!isMutedRef.current) speakFiltered(raw, setIsSpeaking, setIsFetchingTts);
-    }
-  }, [streamingMsg]);
+  useEffect(() => { awaitingFolderIdRef.current = awaitingFolderId; }, [awaitingFolderId]);
 
   const resetDesktopTimeout = useCallback(() => {
     setDesktopActive(true);
@@ -132,7 +118,6 @@ function CCController() {
       if (done) {
         setStreamingMsg(prev => {
           if (prev?.msgId === msgId) {
-            pendingTtsRef.current = prev.text; // queue for TTS
             const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
             const targetId = pId ?? currentIdRef.current;
             setProjects(ps => ps.map(p => p.id !== targetId ? p : {
@@ -153,6 +138,13 @@ function CCController() {
       resetDesktopTimeout();
       clearTimeout(thinkingTimerRef.current);
       setThinking(false);
+      // If folder selection was canceled on Mac, clean up the temp project
+      if (awaitingFolderIdRef.current && payload.text?.includes('No se seleccionó')) {
+        const canceledId = awaitingFolderIdRef.current;
+        setProjects(prev => prev.filter(p => p.id !== canceledId));
+        setAwaitingFolderId(null);
+        return;
+      }
       const targetId = payload.projectId ?? currentIdRef.current;
       const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
       setProjects(prev => prev.map(p => {
@@ -181,8 +173,19 @@ function CCController() {
       resetDesktopTimeout();
       setProjects(prev => prev.map(local => {
         const remote = payload.projects?.find(r => r.id === local.id);
-        return remote ? { ...local, path: remote.path } : local;
+        return remote ? { ...local, path: remote.path, name: remote.name } : local;
       }));
+      // Auto-navigate to chat when folder is confirmed by desktop
+      setAwaitingFolderId(pending => {
+        if (!pending) return null;
+        const resolved = payload.projects?.find(r => r.id === pending && r.path);
+        if (resolved) {
+          setCurrentId(pending);
+          setView('chat');
+          return null;
+        }
+        return pending;
+      });
     });
 
     (async () => {
@@ -254,7 +257,6 @@ function CCController() {
   // ── Voice recording ───────────────────────────────────────────────────────────
   async function startRecording() {
     // Unlock AudioContext on user gesture (required on iOS before playing audio)
-    unlockAudio();
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioChunksRef.current = [];
@@ -309,13 +311,6 @@ function CCController() {
     if (voiceState === 'listening') stopRecording();
   }
 
-  function toggleMute() {
-    setIsMuted(m => {
-      if (!m) stopAudio();
-      return !m;
-    });
-  }
-
   // ── Project management ────────────────────────────────────────────────────────
   function handleCreateProject(name) {
     const p = makeProject(name);
@@ -343,10 +338,22 @@ function CCController() {
   function handleOpenFolder() {
     const p = makeProject('Carpeta del Mac');
     setProjects(prev => [p, ...prev]);
-    setCurrentId(p.id);
-    setView('chat');
-    addSystemMsg('Selecciona una carpeta en tu Mac...');
+    setAwaitingFolderId(p.id);
     sendEvent('open-folder', { id: p.id });
+  }
+
+  function handleCancelFolder() {
+    const id = awaitingFolderIdRef.current;
+    if (id) setProjects(prev => prev.filter(p => p.id !== id));
+    setAwaitingFolderId(null);
+  }
+
+  function handleRenameProject(id, name) {
+    setProjects(prev => {
+      const next = prev.map(p => p.id === id ? { ...p, name } : p);
+      saveProjects(next);
+      return next;
+    });
   }
 
   function handleDeleteProject(id) {
@@ -367,10 +374,13 @@ function CCController() {
     <ProjectsList
       projects={projects}
       currentId={currentId}
+      awaitingFolder={!!awaitingFolderId}
       onSwitch={handleSwitchProject}
       onDelete={handleDeleteProject}
+      onRename={handleRenameProject}
       onCreate={handleCreateProject}
       onOpenFolder={handleOpenFolder}
+      onCancelFolder={handleCancelFolder}
       onBack={() => setView('chat')}
     />
   );
@@ -379,8 +389,7 @@ function CCController() {
     ? 'Escuchando...'
     : voiceState === 'processing'
       ? 'Procesando...'
-      : isFetchingTts ? 'Pensando...'
-        : isSpeaking ? 'Hablando...' : null;
+      : null;
 
   return (
     <main style={{ height: '100dvh', background: '#f5f5f5', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -394,13 +403,6 @@ function CCController() {
               <div style={{ width: 7, height: 7, borderRadius: '50%', background: desktopActive ? '#00b09b' : connected ? '#f0a040' : 'rgba(255,255,255,0.3)', boxShadow: desktopActive ? '0 0 6px #00b09b' : 'none' }} />
               {desktopActive ? 'Desktop activo' : connected ? 'Desktop detenido' : 'Sin conexión'}
             </div>
-            {/* Mute toggle */}
-            <button
-              onClick={toggleMute}
-              title={isMuted ? 'Activar voz' : 'Silenciar voz'}
-              style={{ background: isMuted ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
-              dangerouslySetInnerHTML={{ __html: isMuted ? ICON_SPEAKER_OFF : ICON_SPEAKER_ON }}
-            />
             <button
               onClick={() => setShowSettings(true)}
               style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
@@ -514,73 +516,6 @@ function CCController() {
       )}
     </main>
   );
-}
-
-// ── Audio engine (Gemini TTS via Web Audio API — iOS-safe) ───────────────────
-
-let _audioCtx = null;
-let _currentSource = null;
-
-function getAudioCtx() {
-  if (!_audioCtx && typeof window !== 'undefined') {
-    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  return _audioCtx;
-}
-
-function unlockAudio() {
-  const ctx = getAudioCtx();
-  if (ctx?.state === 'suspended') ctx.resume();
-}
-
-function stopAudio() {
-  try { _currentSource?.stop(); } catch (_) {}
-  _currentSource = null;
-}
-
-async function speakFiltered(rawText, setIsSpeaking, setIsFetchingTts) {
-  const text = voiceFilter(rawText);
-  if (!text || typeof window === 'undefined') return;
-
-  // Limit to first 60 words — long text makes Gemini TTS slow (30s+)
-  const words = text.split(/\s+/);
-  const ttsText = words.length > 60 ? words.slice(0, 60).join(' ') + '...' : text;
-
-  stopAudio();
-  setIsFetchingTts(true); // "Pensando..." while fetching from Gemini
-
-  const abort = new AbortController();
-  const tid = setTimeout(() => abort.abort(), 15_000);
-
-  try {
-    const res = await fetch('/api/tts', {
-      method: 'POST',
-      signal: abort.signal,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: ttsText }),
-    });
-    clearTimeout(tid);
-    if (!res.ok) throw new Error(`TTS ${res.status}`);
-
-    const arrayBuffer = await res.arrayBuffer();
-    const ctx = getAudioCtx();
-    if (ctx.state === 'suspended') await ctx.resume();
-
-    const decoded = await ctx.decodeAudioData(arrayBuffer);
-    const source = ctx.createBufferSource();
-    source.buffer = decoded;
-    source.connect(ctx.destination);
-    source.onended = () => { setIsSpeaking(false); _currentSource = null; };
-    setIsFetchingTts(false);
-    setIsSpeaking(true); // "Hablando..." only when audio actually starts
-    source.start(0);
-    _currentSource = source;
-  } catch (e) {
-    clearTimeout(tid);
-    setIsFetchingTts(false);
-    setIsSpeaking(false);
-    console.error('[tts]', e.name === 'AbortError' ? 'TTS timeout (>15s)' : e.message);
-  }
 }
 
 // ─── Markdown renderer (sin dependencias externas) ───────────────────────────
