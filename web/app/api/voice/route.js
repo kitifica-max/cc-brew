@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 // gemini-1.5-flash: GA, soporta audio inline sin restricciones de preview
-const MODEL = process.env.GEMINI_MODEL ?? 'gemini-1.5-flash';
+const MODEL = process.env.GEMINI_MODEL ?? 'gemini-2.5-flash';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 
 // iOS Safari graba video/mp4 aunque sea solo audio — Gemini acepta audio/mp4
