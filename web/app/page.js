@@ -54,6 +54,7 @@ function CCController() {
   const [voiceState, setVoiceState] = useState('idle'); // 'idle' | 'listening' | 'processing'
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isFetchingTts, setIsFetchingTts] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const pendingTtsRef = useRef(null);
@@ -67,7 +68,7 @@ function CCController() {
     if (streamingMsg === null && pendingTtsRef.current) {
       const raw = pendingTtsRef.current;
       pendingTtsRef.current = null;
-      if (!isMutedRef.current) speakFiltered(raw, setIsSpeaking);
+      if (!isMutedRef.current) speakFiltered(raw, setIsSpeaking, setIsFetchingTts);
     }
   }, [streamingMsg]);
 
@@ -378,7 +379,8 @@ function CCController() {
     ? 'Escuchando...'
     : voiceState === 'processing'
       ? 'Procesando...'
-      : isSpeaking ? 'Hablando...' : null;
+      : isFetchingTts ? 'Pensando...'
+        : isSpeaking ? 'Hablando...' : null;
 
   return (
     <main style={{ height: '100dvh', background: '#f5f5f5', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -536,18 +538,28 @@ function stopAudio() {
   _currentSource = null;
 }
 
-async function speakFiltered(rawText, setIsSpeaking) {
+async function speakFiltered(rawText, setIsSpeaking, setIsFetchingTts) {
   const text = voiceFilter(rawText);
   if (!text || typeof window === 'undefined') return;
 
+  // Limit to first 60 words — long text makes Gemini TTS slow (30s+)
+  const words = text.split(/\s+/);
+  const ttsText = words.length > 60 ? words.slice(0, 60).join(' ') + '...' : text;
+
   stopAudio();
-  setIsSpeaking(true);
+  setIsFetchingTts(true); // "Pensando..." while fetching from Gemini
+
+  const abort = new AbortController();
+  const tid = setTimeout(() => abort.abort(), 15_000);
+
   try {
     const res = await fetch('/api/tts', {
       method: 'POST',
+      signal: abort.signal,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text: ttsText }),
     });
+    clearTimeout(tid);
     if (!res.ok) throw new Error(`TTS ${res.status}`);
 
     const arrayBuffer = await res.arrayBuffer();
@@ -559,11 +571,15 @@ async function speakFiltered(rawText, setIsSpeaking) {
     source.buffer = decoded;
     source.connect(ctx.destination);
     source.onended = () => { setIsSpeaking(false); _currentSource = null; };
+    setIsFetchingTts(false);
+    setIsSpeaking(true); // "Hablando..." only when audio actually starts
     source.start(0);
     _currentSource = source;
   } catch (e) {
+    clearTimeout(tid);
+    setIsFetchingTts(false);
     setIsSpeaking(false);
-    console.error('[tts]', e.message);
+    console.error('[tts]', e.name === 'AbortError' ? 'TTS timeout (>15s)' : e.message);
   }
 }
 
