@@ -81,6 +81,12 @@ CREATE POLICY "cc_realtime_write" ON realtime.messages
     AND public.cc_can_access((SELECT realtime.topic()))
   );
 
+-- supabase_admin es el rol interno del servidor Realtime — necesita INSERT sin restricciones
+DROP POLICY IF EXISTS "cc_realtime_system_write" ON realtime.messages;
+CREATE POLICY "cc_realtime_system_write" ON realtime.messages
+  FOR INSERT TO supabase_admin
+  WITH CHECK (true);
+
 -- ============================================================
 -- 4. Storage (bucket `uploads`, privado)
 -- ============================================================
