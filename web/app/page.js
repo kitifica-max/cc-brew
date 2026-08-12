@@ -286,14 +286,13 @@ function CCController() {
       fd.append('audio', blob, 'voice.webm');
       const res = await fetch('/api/voice', { method: 'POST', body: fd, signal: controller.signal });
       clearTimeout(tid);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const { text, error } = await res.json();
-      if (error) throw new Error(error);
-      if (text?.trim()) submitMessage(text.trim());
+      const json = await res.json();
+      if (!res.ok || json.error) throw new Error(json.error ?? `HTTP ${res.status}`);
+      if (json.text?.trim()) submitMessage(json.text.trim());
       else addSystemMsg('⚠️ Voz no reconocida — intenta de nuevo');
     } catch (err) {
       const isTimeout = err.name === 'AbortError';
-      addSystemMsg(isTimeout ? '⚠️ Tiempo de espera agotado — intenta de nuevo' : '⚠️ Error al transcribir voz');
+      addSystemMsg(isTimeout ? '⚠️ Tiempo de espera agotado' : `⚠️ Voz: ${err.message?.slice(0, 120)}`);
     } finally {
       setVoiceState('idle');
     }
