@@ -7,7 +7,7 @@ const ICON_BACK = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1
 const ICON_PLUS = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7-7v14"/></svg>`;
 const ICON_FOLDER = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`;
 
-export default function ProjectsList({ projects, currentId, onSwitch, onDelete, onCreate, onOpenFolder, onBack }) {
+export default function ProjectsList({ projects, currentId, awaitingFolder, onSwitch, onDelete, onCreate, onOpenFolder, onCancelFolder, onBack }) {
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
   const [confirmId, setConfirmId] = useState(null);
@@ -19,6 +19,29 @@ export default function ProjectsList({ projects, currentId, onSwitch, onDelete, 
     setNewName('');
     setCreating(false);
   }
+
+  if (awaitingFolder) return (
+    <main style={{ height: '100dvh', background: '#f5f5f5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, gap: 0 }}>
+      <div style={{ fontSize: 52, marginBottom: 24 }}>🖥️</div>
+      <div style={{ fontSize: 20, fontWeight: 800, color: '#1a1a1a', textAlign: 'center', letterSpacing: '-0.02em', marginBottom: 12 }}>
+        Selecciona una carpeta en tu Mac
+      </div>
+      <div style={{ fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 1.5, marginBottom: 8 }}>
+        El Finder ya está abierto en tu escritorio.
+      </div>
+      <div style={{ fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 1.5, marginBottom: 36 }}>
+        Elige la carpeta del proyecto y vuelve aquí — la app navegará al chat automáticamente.
+      </div>
+      <div style={{ width: 40, height: 40, border: '3px solid #f04e23', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite', marginBottom: 40 }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <button
+        onClick={onCancelFolder}
+        style={{ background: 'none', border: '1.5px solid #e0e0e0', borderRadius: 14, padding: '12px 28px', fontSize: 14, fontWeight: 600, color: '#666', cursor: 'pointer', fontFamily: 'Sora, sans-serif' }}
+      >
+        Cancelar
+      </button>
+    </main>
+  );
 
   return (
     <main style={{ height: '100dvh', background: '#f5f5f5', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>

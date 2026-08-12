@@ -50,10 +50,13 @@ function CCController() {
 
   // ── Voice state ──────────────────────────────────────────────────────────────
   const [voiceState, setVoiceState] = useState('idle'); // 'idle' | 'listening' | 'processing'
+  const [awaitingFolderId, setAwaitingFolderId] = useState(null);
+  const awaitingFolderIdRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
   useEffect(() => { currentIdRef.current = currentId; }, [currentId]);
+  useEffect(() => { awaitingFolderIdRef.current = awaitingFolderId; }, [awaitingFolderId]);
 
   const resetDesktopTimeout = useCallback(() => {
     setDesktopActive(true);
@@ -135,6 +138,13 @@ function CCController() {
       resetDesktopTimeout();
       clearTimeout(thinkingTimerRef.current);
       setThinking(false);
+      // If folder selection was canceled on Mac, clean up the temp project
+      if (awaitingFolderIdRef.current && payload.text?.includes('No se seleccionó')) {
+        const canceledId = awaitingFolderIdRef.current;
+        setProjects(prev => prev.filter(p => p.id !== canceledId));
+        setAwaitingFolderId(null);
+        return;
+      }
       const targetId = payload.projectId ?? currentIdRef.current;
       const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
       setProjects(prev => prev.map(p => {
@@ -163,8 +173,19 @@ function CCController() {
       resetDesktopTimeout();
       setProjects(prev => prev.map(local => {
         const remote = payload.projects?.find(r => r.id === local.id);
-        return remote ? { ...local, path: remote.path } : local;
+        return remote ? { ...local, path: remote.path, name: remote.name } : local;
       }));
+      // Auto-navigate to chat when folder is confirmed by desktop
+      setAwaitingFolderId(pending => {
+        if (!pending) return null;
+        const resolved = payload.projects?.find(r => r.id === pending && r.path);
+        if (resolved) {
+          setCurrentId(pending);
+          setView('chat');
+          return null;
+        }
+        return pending;
+      });
     });
 
     (async () => {
@@ -317,10 +338,14 @@ function CCController() {
   function handleOpenFolder() {
     const p = makeProject('Carpeta del Mac');
     setProjects(prev => [p, ...prev]);
-    setCurrentId(p.id);
-    setView('chat');
-    addSystemMsg('Selecciona una carpeta en tu Mac...');
+    setAwaitingFolderId(p.id);
     sendEvent('open-folder', { id: p.id });
+  }
+
+  function handleCancelFolder() {
+    const id = awaitingFolderIdRef.current;
+    if (id) setProjects(prev => prev.filter(p => p.id !== id));
+    setAwaitingFolderId(null);
   }
 
   function handleDeleteProject(id) {
@@ -341,10 +366,12 @@ function CCController() {
     <ProjectsList
       projects={projects}
       currentId={currentId}
+      awaitingFolder={!!awaitingFolderId}
       onSwitch={handleSwitchProject}
       onDelete={handleDeleteProject}
       onCreate={handleCreateProject}
       onOpenFolder={handleOpenFolder}
+      onCancelFolder={handleCancelFolder}
       onBack={() => setView('chat')}
     />
   );
