@@ -5,8 +5,9 @@ import { MODELS } from '../lib/storage';
 const ICON_TRASH = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11v6m4-6v6m5-11v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`;
 const ICON_BACK = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m12 19l-7-7l7-7m7 7H5"/></svg>`;
 const ICON_PLUS = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7-7v14"/></svg>`;
+const ICON_FOLDER = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`;
 
-export default function ProjectsList({ projects, currentId, onSwitch, onDelete, onCreate, onBack }) {
+export default function ProjectsList({ projects, currentId, onSwitch, onDelete, onCreate, onOpenFolder, onBack }) {
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
   const [confirmId, setConfirmId] = useState(null);
@@ -98,13 +99,22 @@ export default function ProjectsList({ projects, currentId, onSwitch, onDelete, 
             </button>
           </div>
         ) : (
-          <button
-            onClick={() => setCreating(true)}
-            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#1a1a1a', border: 'none', borderRadius: 16, padding: 16, fontSize: 14, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: 'Sora, sans-serif' }}
-          >
-            <span style={{ display: 'flex', width: 18, height: 18 }} dangerouslySetInnerHTML={{ __html: ICON_PLUS }} />
-            Nuevo proyecto
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <button
+              onClick={() => setCreating(true)}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#1a1a1a', border: 'none', borderRadius: 16, padding: 16, fontSize: 14, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: 'Sora, sans-serif' }}
+            >
+              <span style={{ display: 'flex', width: 18, height: 18 }} dangerouslySetInnerHTML={{ __html: ICON_PLUS }} />
+              Nuevo proyecto
+            </button>
+            <button
+              onClick={onOpenFolder}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 16, padding: 16, fontSize: 14, fontWeight: 700, color: '#1a1a1a', cursor: 'pointer', fontFamily: 'Sora, sans-serif' }}
+            >
+              <span style={{ display: 'flex', width: 18, height: 18 }} dangerouslySetInnerHTML={{ __html: ICON_FOLDER }} />
+              Abrir carpeta existente
+            </button>
+          </div>
         )}
       </div>
     </main>
