@@ -254,6 +254,12 @@ function CCController() {
 
   // ── Voice recording ───────────────────────────────────────────────────────────
   async function startRecording() {
+    // iOS requires speechSynthesis to be called from a user gesture to unlock it
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      const unlock = new SpeechSynthesisUtterance('');
+      unlock.volume = 0;
+      window.speechSynthesis.speak(unlock);
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioChunksRef.current = [];
@@ -502,15 +508,31 @@ function speakFiltered(rawText, setIsSpeaking) {
   const text = voiceFilter(rawText);
   if (!text || typeof window === 'undefined' || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = 'es-ES';
+
+  function doSpeak() {
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'es-ES';
+    const voices = window.speechSynthesis.getVoices();
+    const esVoice = voices.find(v => v.lang.startsWith('es'));
+    if (esVoice) utter.voice = esVoice;
+    utter.onstart = () => setIsSpeaking(true);
+    utter.onend = () => setIsSpeaking(false);
+    utter.onerror = () => setIsSpeaking(false);
+    window.speechSynthesis.speak(utter);
+  }
+
   const voices = window.speechSynthesis.getVoices();
-  const esVoice = voices.find(v => v.lang.startsWith('es'));
-  if (esVoice) utter.voice = esVoice;
-  utter.onstart = () => setIsSpeaking(true);
-  utter.onend = () => setIsSpeaking(false);
-  utter.onerror = () => setIsSpeaking(false);
-  window.speechSynthesis.speak(utter);
+  if (voices.length > 0) {
+    doSpeak();
+  } else {
+    // Voices not loaded yet (common on first call)
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.onvoiceschanged = null;
+      doSpeak();
+    };
+    // Fallback: some browsers never fire onvoiceschanged
+    setTimeout(doSpeak, 300);
+  }
 }
 
 // ─── Markdown renderer (sin dependencias externas) ───────────────────────────
