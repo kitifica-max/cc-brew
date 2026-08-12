@@ -192,10 +192,8 @@ function CCController() {
         setConnected(isNowConnected);
         if (isNowConnected) {
           ch.send({ type: 'broadcast', event: 'get-project-state', payload: { token: getSessionToken() } });
+          if (wasConnectedRef.current) addSystemMsg('✓ Conexión recuperada');
           wasConnectedRef.current = true;
-        }
-        if (s === 'CHANNEL_ERROR' || s === 'TIMED_OUT') {
-          addSystemMsg('⚠️ Error de conexión — verifica tu Session Token en Configuración');
         }
       });
     })();
@@ -254,12 +252,8 @@ function CCController() {
 
   // ── Voice recording ───────────────────────────────────────────────────────────
   async function startRecording() {
-    // iOS requires speechSynthesis to be called from a user gesture to unlock it
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      const unlock = new SpeechSynthesisUtterance('');
-      unlock.volume = 0;
-      window.speechSynthesis.speak(unlock);
-    }
+    // Unlock AudioContext on user gesture (required on iOS before playing audio)
+    unlockAudio();
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioChunksRef.current = [];
@@ -311,7 +305,7 @@ function CCController() {
 
   function toggleMute() {
     setIsMuted(m => {
-      if (!m) window.speechSynthesis?.cancel();
+      if (!m) stopAudio();
       return !m;
     });
   }
@@ -502,36 +496,56 @@ function CCController() {
   );
 }
 
-// ── TTS helper (module-level, no React deps) ──────────────────────────────────
+// ── Audio engine (Gemini TTS via Web Audio API — iOS-safe) ───────────────────
 
-function speakFiltered(rawText, setIsSpeaking) {
-  const text = voiceFilter(rawText);
-  if (!text || typeof window === 'undefined' || !window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
+let _audioCtx = null;
+let _currentSource = null;
 
-  function doSpeak() {
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'es-ES';
-    const voices = window.speechSynthesis.getVoices();
-    const esVoice = voices.find(v => v.lang.startsWith('es'));
-    if (esVoice) utter.voice = esVoice;
-    utter.onstart = () => setIsSpeaking(true);
-    utter.onend = () => setIsSpeaking(false);
-    utter.onerror = () => setIsSpeaking(false);
-    window.speechSynthesis.speak(utter);
+function getAudioCtx() {
+  if (!_audioCtx && typeof window !== 'undefined') {
+    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
+  return _audioCtx;
+}
 
-  const voices = window.speechSynthesis.getVoices();
-  if (voices.length > 0) {
-    doSpeak();
-  } else {
-    // Voices not loaded yet (common on first call)
-    window.speechSynthesis.onvoiceschanged = () => {
-      window.speechSynthesis.onvoiceschanged = null;
-      doSpeak();
-    };
-    // Fallback: some browsers never fire onvoiceschanged
-    setTimeout(doSpeak, 300);
+function unlockAudio() {
+  const ctx = getAudioCtx();
+  if (ctx?.state === 'suspended') ctx.resume();
+}
+
+function stopAudio() {
+  try { _currentSource?.stop(); } catch (_) {}
+  _currentSource = null;
+}
+
+async function speakFiltered(rawText, setIsSpeaking) {
+  const text = voiceFilter(rawText);
+  if (!text || typeof window === 'undefined') return;
+
+  stopAudio();
+  setIsSpeaking(true);
+  try {
+    const res = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+    if (!res.ok) throw new Error(`TTS ${res.status}`);
+
+    const arrayBuffer = await res.arrayBuffer();
+    const ctx = getAudioCtx();
+    if (ctx.state === 'suspended') await ctx.resume();
+
+    const decoded = await ctx.decodeAudioData(arrayBuffer);
+    const source = ctx.createBufferSource();
+    source.buffer = decoded;
+    source.connect(ctx.destination);
+    source.onended = () => { setIsSpeaking(false); _currentSource = null; };
+    source.start(0);
+    _currentSource = source;
+  } catch (e) {
+    setIsSpeaking(false);
+    console.error('[tts]', e.message);
   }
 }
 

@@ -230,11 +230,16 @@ async function startSession() {
   };
 
   bridge.onOpenFolder = async (id) => {
+    app.focus({ steal: true }); // bring app to foreground so dialog has a window
     const { canceled, filePaths } = await dialog.showOpenDialog({
       properties: ['openDirectory'],
       title: 'Seleccionar carpeta del proyecto',
+      message: 'Elige el directorio raíz del proyecto',
     });
-    if (canceled || !filePaths.length) return;
+    if (canceled || !filePaths.length) {
+      bridge?.broadcastMessage('system', '⚠️ No se seleccionó ninguna carpeta.');
+      return;
+    }
     const folderPath = filePaths[0];
     const name = path.basename(folderPath);
     try {
