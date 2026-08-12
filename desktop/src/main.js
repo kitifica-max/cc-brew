@@ -6,7 +6,7 @@ import { writeFileSync } from 'fs';
 import dotenv from 'dotenv';
 import PtyManager from './pty.js';
 import Bridge from './bridge.js';
-import { createProject, switchProject, getActive, listProjects, deleteProject, saveProjectEnv } from './projects.js';
+import { createProject, switchProject, getActive, listProjects, deleteProject, saveProjectEnv, addExistingProject } from './projects.js';
 import { ALLOWED_EXTENSIONS, MAX_FILE_BYTES } from './bridge.js';
 import { getSupabaseConfig } from './supabase-config.js';
 import { createFileAuthStorage, AUTH_STORAGE_KEY } from './auth-store.js';
@@ -226,6 +226,24 @@ async function startSession() {
       bridge?.broadcastMessage('system', `Secretos guardados en .env: ${project?.name ?? projectId}`);
     } catch (e) {
       bridge?.broadcastMessage('system', `Error guardando secretos: ${e.message}`);
+    }
+  };
+
+  bridge.onOpenFolder = async (id) => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      properties: ['openDirectory'],
+      title: 'Seleccionar carpeta del proyecto',
+    });
+    if (canceled || !filePaths.length) return;
+    const folderPath = filePaths[0];
+    const name = path.basename(folderPath);
+    try {
+      const project = addExistingProject(id, name, folderPath);
+      pty.spawn('claude', [], project.path);
+      setTrayMenu('running');
+      broadcastProjects();
+    } catch (e) {
+      bridge?.broadcastMessage('system', `Error abriendo carpeta: ${e.message}`);
     }
   };
 

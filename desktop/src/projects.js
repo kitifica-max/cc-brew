@@ -78,15 +78,20 @@ export function deleteProject(id) {
   save(data);
 }
 
+export function addExistingProject(id, name, folderPath) {
+  const projectPath = resolve(folderPath);
+  const data = load();
+  const project = { id, name, path: projectPath, createdAt: Date.now() };
+  data.projects = [...data.projects.filter(p => p.id !== id), project];
+  data.activeId = id;
+  save(data);
+  return project;
+}
+
 export function saveProjectEnv(id, envObject) {
   const data = load();
   const project = data.projects.find(p => p.id === id);
   if (!project) throw new Error(`Project not found: ${id}`);
-
-  const PROJECTS_BASE = getProjectsBase();
-  if (!project.path.startsWith(PROJECTS_BASE + '/') && project.path !== PROJECTS_BASE) {
-    throw new Error('Invalid project path');
-  }
 
   let envContent = '';
   for (const [key, value] of Object.entries(envObject)) {

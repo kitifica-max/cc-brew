@@ -32,6 +32,7 @@ export default class Bridge {
     this.onGetProjectState = null;
     this.onSaveEnv = null;
     this.onDeleteProject = null;
+    this.onOpenFolder = null;
     this._heartbeatTimer = null;
     this._history = [];
     this._streamBuffers = new Map(); // msgId → { parts: string[], projectId }
@@ -130,6 +131,10 @@ export default class Bridge {
       .on('broadcast', { event: 'delete-project' }, ({ payload }) => {
         if (!this._validate(payload)) return;
         this.onDeleteProject?.(payload.id);
+      })
+      .on('broadcast', { event: 'open-folder' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this.onOpenFolder?.(payload.id);
       })
       .subscribe();
   }

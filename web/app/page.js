@@ -334,6 +334,15 @@ function CCController() {
     }
   }
 
+  function handleOpenFolder() {
+    const p = makeProject('Carpeta del Mac');
+    setProjects(prev => [p, ...prev]);
+    setCurrentId(p.id);
+    setView('chat');
+    addSystemMsg('Selecciona una carpeta en tu Mac...');
+    sendEvent('open-folder', { id: p.id });
+  }
+
   function handleDeleteProject(id) {
     setProjects(prev => {
       const next = prev.filter(p => p.id !== id);
@@ -355,6 +364,7 @@ function CCController() {
       onSwitch={handleSwitchProject}
       onDelete={handleDeleteProject}
       onCreate={handleCreateProject}
+      onOpenFolder={handleOpenFolder}
       onBack={() => setView('chat')}
     />
   );
