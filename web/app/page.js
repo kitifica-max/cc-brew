@@ -263,7 +263,7 @@ function CCController() {
         stream.getTracks().forEach(t => t.stop());
         await transcribeAndSend();
       };
-      recorder.start();
+      recorder.start(250); // timeslice: ondataavailable fires every 250ms (required on iOS)
       mediaRecorderRef.current = recorder;
       setVoiceState('listening');
     } catch {
@@ -280,13 +280,20 @@ function CCController() {
     const mimeType = audioChunksRef.current[0]?.type ?? 'audio/webm';
     const blob = new Blob(audioChunksRef.current, { type: mimeType });
     try {
+      const controller = new AbortController();
+      const tid = setTimeout(() => controller.abort(), 20_000);
       const fd = new FormData();
       fd.append('audio', blob, 'voice.webm');
-      const res = await fetch('/api/voice', { method: 'POST', body: fd });
-      const { text } = await res.json();
+      const res = await fetch('/api/voice', { method: 'POST', body: fd, signal: controller.signal });
+      clearTimeout(tid);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const { text, error } = await res.json();
+      if (error) throw new Error(error);
       if (text?.trim()) submitMessage(text.trim());
-    } catch {
-      // ignore transcription errors silently
+      else addSystemMsg('⚠️ Voz no reconocida — intenta de nuevo');
+    } catch (err) {
+      const isTimeout = err.name === 'AbortError';
+      addSystemMsg(isTimeout ? '⚠️ Tiempo de espera agotado — intenta de nuevo' : '⚠️ Error al transcribir voz');
     } finally {
       setVoiceState('idle');
     }
