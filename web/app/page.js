@@ -41,7 +41,7 @@ function CCController() {
   const desktopTimeoutRef = useRef(null);
   const [thinking, setThinking] = useState(false);
   const thinkingTimerRef = useRef(null);
-  const [view, setView] = useState('chat');
+  const [view, setView] = useState('list');
   const [showSettings, setShowSettings] = useState(false);
   const [reconnectKey, setReconnectKey] = useState(0);
   const [streamingMsg, setStreamingMsg] = useState(null); // {msgId, text} | null
@@ -54,6 +54,7 @@ function CCController() {
   const [voiceState, setVoiceState] = useState('idle'); // 'idle' | 'listening' | 'processing'
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isFetchingTts, setIsFetchingTts] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const pendingTtsRef = useRef(null);
@@ -67,7 +68,7 @@ function CCController() {
     if (streamingMsg === null && pendingTtsRef.current) {
       const raw = pendingTtsRef.current;
       pendingTtsRef.current = null;
-      if (!isMutedRef.current) speakFiltered(raw, setIsSpeaking);
+      if (!isMutedRef.current) speakFiltered(raw, setIsSpeaking, setIsFetchingTts);
     }
   }, [streamingMsg]);
 
@@ -298,9 +299,14 @@ function CCController() {
     }
   }
 
-  function toggleMic() {
+  function handleMicDown(e) {
+    e.preventDefault(); // prevent touch → click double-fire on iOS
+    if (voiceState === 'idle') startRecording();
+  }
+
+  function handleMicUp(e) {
+    e.preventDefault();
     if (voiceState === 'listening') stopRecording();
-    else if (voiceState === 'idle') startRecording();
   }
 
   function toggleMute() {
@@ -373,7 +379,8 @@ function CCController() {
     ? 'Escuchando...'
     : voiceState === 'processing'
       ? 'Procesando...'
-      : isSpeaking ? 'Hablando...' : null;
+      : isFetchingTts ? 'Pensando...'
+        : isSpeaking ? 'Hablando...' : null;
 
   return (
     <main style={{ height: '100dvh', background: '#f5f5f5', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -401,12 +408,21 @@ function CCController() {
             />
           </div>
         </div>
-        <button onClick={() => setView('list')} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}>
-          <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1 }}>{currentProject?.name ?? 'Nuevo proyecto'}</div>
-          <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginTop: 3 }}>
-            {currentProject?.model?.split('-').slice(-2).join(' ')} · {currentProject?.effort} · {projects.length} proyecto{projects.length !== 1 ? 's' : ''} →
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button
+            onClick={() => setView('list')}
+            style={{ background: 'rgba(255,255,255,0.18)', border: 'none', borderRadius: 20, padding: '6px 12px 6px 8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, color: '#fff', flexShrink: 0 }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.02em' }}>Proyectos</span>
+          </button>
+          <div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1 }}>{currentProject?.name ?? 'Nuevo proyecto'}</div>
+            <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
+              {currentProject?.model?.split('-').slice(-2).join(' ')} · {currentProject?.effort}
+            </div>
           </div>
-        </button>
+        </div>
       </div>
 
       {/* Voice state banner */}
@@ -459,21 +475,25 @@ function CCController() {
           placeholder="Escribe un mensaje..."
           style={{ flex: 1, background: '#f5f5f5', border: '1.5px solid #e0e0e0', borderRadius: 22, padding: '10px 16px', fontSize: 16, fontWeight: 500, color: '#1a1a1a', fontFamily: 'Sora, sans-serif', outline: 'none' }}
         />
-        {/* Mic button */}
+        {/* Mic button — mantener presionado para grabar */}
         <button
-          onClick={toggleMic}
+          onPointerDown={handleMicDown}
+          onPointerUp={handleMicUp}
+          onPointerCancel={handleMicUp}
+          onPointerLeave={handleMicUp}
           disabled={voiceState === 'processing'}
-          title={voiceState === 'listening' ? 'Detener grabación' : 'Grabar mensaje de voz'}
+          title="Mantén presionado para grabar"
           style={{
-            width: 40, height: 40, borderRadius: '50%', border: '1.5px solid #e0e0e0',
-            background: voiceState === 'listening' ? '#f04e23' : '#f5f5f5',
-            color: voiceState === 'listening' ? '#fff' : '#555',
+            width: 44, height: 44, borderRadius: '50%', border: 'none',
+            background: voiceState === 'listening' ? '#f04e23' : voiceState === 'processing' ? '#e0e0e0' : '#1a1a1a',
+            color: '#fff',
             cursor: voiceState === 'processing' ? 'default' : 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            opacity: voiceState === 'processing' ? 0.6 : 1,
+            opacity: voiceState === 'processing' ? 0.5 : 1,
             animation: voiceState === 'listening' ? 'micPulse 1s ease-in-out infinite' : 'none',
+            touchAction: 'none', userSelect: 'none',
           }}
-          dangerouslySetInnerHTML={{ __html: voiceState === 'processing' ? ICON_SPINNER : voiceState === 'listening' ? ICON_MIC_STOP : ICON_MIC }}
+          dangerouslySetInnerHTML={{ __html: voiceState === 'processing' ? ICON_SPINNER : ICON_MIC }}
         />
         <button
           onClick={handleSend}
@@ -518,18 +538,28 @@ function stopAudio() {
   _currentSource = null;
 }
 
-async function speakFiltered(rawText, setIsSpeaking) {
+async function speakFiltered(rawText, setIsSpeaking, setIsFetchingTts) {
   const text = voiceFilter(rawText);
   if (!text || typeof window === 'undefined') return;
 
+  // Limit to first 60 words — long text makes Gemini TTS slow (30s+)
+  const words = text.split(/\s+/);
+  const ttsText = words.length > 60 ? words.slice(0, 60).join(' ') + '...' : text;
+
   stopAudio();
-  setIsSpeaking(true);
+  setIsFetchingTts(true); // "Pensando..." while fetching from Gemini
+
+  const abort = new AbortController();
+  const tid = setTimeout(() => abort.abort(), 15_000);
+
   try {
     const res = await fetch('/api/tts', {
       method: 'POST',
+      signal: abort.signal,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text: ttsText }),
     });
+    clearTimeout(tid);
     if (!res.ok) throw new Error(`TTS ${res.status}`);
 
     const arrayBuffer = await res.arrayBuffer();
@@ -541,11 +571,15 @@ async function speakFiltered(rawText, setIsSpeaking) {
     source.buffer = decoded;
     source.connect(ctx.destination);
     source.onended = () => { setIsSpeaking(false); _currentSource = null; };
+    setIsFetchingTts(false);
+    setIsSpeaking(true); // "Hablando..." only when audio actually starts
     source.start(0);
     _currentSource = source;
   } catch (e) {
+    clearTimeout(tid);
+    setIsFetchingTts(false);
     setIsSpeaking(false);
-    console.error('[tts]', e.message);
+    console.error('[tts]', e.name === 'AbortError' ? 'TTS timeout (>15s)' : e.message);
   }
 }
 
