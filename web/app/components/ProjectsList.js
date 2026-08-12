@@ -54,13 +54,6 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
             </div>
             <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em' }}>Proyectos</div>
           </div>
-          <button
-            onClick={onBack}
-            style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: 20, padding: '7px 14px', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
-          >
-            <span style={{ display: 'flex', width: 14, height: 14, color: '#fff' }} dangerouslySetInnerHTML={{ __html: ICON_BACK }} />
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>Volver</span>
-          </button>
         </div>
       </div>
 
