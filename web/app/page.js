@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { supabase, getSessionId, getSessionToken } from './lib/supabase';
 import { loadProjects, saveProjects, makeProject } from './lib/storage';
+import { voiceFilter } from './utils/voiceFilter';
 import AuthGate from './components/AuthGate';
 import ProjectsList from './components/ProjectsList';
 import SettingsSheet from './components/SettingsSheet';
@@ -9,6 +10,11 @@ import FileUpload from './components/FileUpload';
 
 const ICON_SETTINGS = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M14 17H5M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></g></svg>`;
 const ICON_SEND = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11zm7.318-19.539l-10.94 10.939"/></svg>`;
+const ICON_MIC = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="10" height="14" x="7" y="1" rx="5"/><path d="M4 12a8 8 0 0 0 16 0M12 19v4M8 23h8"/></g></svg>`;
+const ICON_MIC_STOP = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></g></svg>`;
+const ICON_SPEAKER_ON = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></g></svg>`;
+const ICON_SPEAKER_OFF = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></g></svg>`;
+const ICON_SPINNER = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></path></svg>`;
 
 const QUICK = [
   { label: 'sí', text: 'sí\n' },
@@ -44,7 +50,26 @@ function CCController() {
   const currentIdRef = useRef(null);
   const wasConnectedRef = useRef(false);
 
+  // ── Voice state ──────────────────────────────────────────────────────────────
+  const [voiceState, setVoiceState] = useState('idle'); // 'idle' | 'listening' | 'processing'
+  const [isMuted, setIsMuted] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const pendingTtsRef = useRef(null);
+  const isMutedRef = useRef(false);
+
+  useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
   useEffect(() => { currentIdRef.current = currentId; }, [currentId]);
+
+  // Speak when streaming finishes (streamingMsg → null)
+  useEffect(() => {
+    if (streamingMsg === null && pendingTtsRef.current) {
+      const raw = pendingTtsRef.current;
+      pendingTtsRef.current = null;
+      if (!isMutedRef.current) speakFiltered(raw, setIsSpeaking);
+    }
+  }, [streamingMsg]);
 
   const resetDesktopTimeout = useCallback(() => {
     setDesktopActive(true);
@@ -91,8 +116,6 @@ function CCController() {
 
   // Supabase — reconnectKey re-crea canal en iOS background o network recovery
   useEffect(() => {
-    // private: sin esto Realtime ignora las políticas de `realtime.messages`
-    // y el canal queda abierto a cualquiera con la anon key.
     const ch = supabase.channel(`session:${getSessionId()}`, { config: { private: true } });
     channelRef.current = ch;
 
@@ -108,6 +131,7 @@ function CCController() {
       if (done) {
         setStreamingMsg(prev => {
           if (prev?.msgId === msgId) {
+            pendingTtsRef.current = prev.text; // queue for TTS
             const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
             const targetId = pId ?? currentIdRef.current;
             setProjects(ps => ps.map(p => p.id !== targetId ? p : {
@@ -139,7 +163,7 @@ function CCController() {
     ch.on('broadcast', { event: 'history' }, ({ payload }) => {
       if (!payload.messages?.length) return;
       setProjects(prev => prev.map(p => {
-        if (p.messages.length > 0) return p; // no sobreescribir si ya hay mensajes
+        if (p.messages.length > 0) return p;
         const msgs = payload.messages
           .filter(m => m.projectId === p.id || (!m.projectId && p.id === currentIdRef.current))
           .map(m => ({
@@ -199,9 +223,8 @@ function CCController() {
   const currentProject = projects.find(p => p.id === currentId);
   const messages = currentProject?.messages ?? [];
 
-  function handleSend() {
-    const text = input.trim();
-    if (!text) return;
+  // ── Shared submit logic ───────────────────────────────────────────────────────
+  function submitMessage(text) {
     const isNewStart = currentProject?.isNewStart ?? false;
     const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
     setProjects(prev => prev.map(p => {
@@ -209,7 +232,6 @@ function CCController() {
       return { ...p, isNewStart: false, name: p.name === 'Nuevo proyecto' ? text.slice(0, 40) : p.name, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: 'user', text, time }] };
     }));
     sendRaw(text + '\n', !isNewStart);
-    setInput('');
     setThinking(true);
     clearTimeout(thinkingTimerRef.current);
     thinkingTimerRef.current = setTimeout(() => {
@@ -218,11 +240,71 @@ function CCController() {
     }, THINKING_TIMEOUT_MS);
   }
 
+  function handleSend() {
+    const text = input.trim();
+    if (!text) return;
+    submitMessage(text);
+    setInput('');
+  }
+
   function cancelThinking() {
     clearTimeout(thinkingTimerRef.current);
     setThinking(false);
   }
 
+  // ── Voice recording ───────────────────────────────────────────────────────────
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunksRef.current = [];
+      const recorder = new MediaRecorder(stream);
+      recorder.ondataavailable = e => { if (e.data.size > 0) audioChunksRef.current.push(e.data); };
+      recorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        await transcribeAndSend();
+      };
+      recorder.start();
+      mediaRecorderRef.current = recorder;
+      setVoiceState('listening');
+    } catch {
+      setVoiceState('idle');
+    }
+  }
+
+  function stopRecording() {
+    mediaRecorderRef.current?.stop();
+    setVoiceState('processing');
+  }
+
+  async function transcribeAndSend() {
+    const mimeType = audioChunksRef.current[0]?.type ?? 'audio/webm';
+    const blob = new Blob(audioChunksRef.current, { type: mimeType });
+    try {
+      const fd = new FormData();
+      fd.append('audio', blob, 'voice.webm');
+      const res = await fetch('/api/voice', { method: 'POST', body: fd });
+      const { text } = await res.json();
+      if (text?.trim()) submitMessage(text.trim());
+    } catch {
+      // ignore transcription errors silently
+    } finally {
+      setVoiceState('idle');
+    }
+  }
+
+  function toggleMic() {
+    if (voiceState === 'listening') stopRecording();
+    else if (voiceState === 'idle') startRecording();
+  }
+
+  function toggleMute() {
+    setIsMuted(m => {
+      if (!m) window.speechSynthesis?.cancel();
+      return !m;
+    });
+  }
+
+  // ── Project management ────────────────────────────────────────────────────────
   function handleCreateProject(name) {
     const p = makeProject(name);
     setProjects(prev => [p, ...prev]);
@@ -271,6 +353,12 @@ function CCController() {
     />
   );
 
+  const voiceLabel = voiceState === 'listening'
+    ? 'Escuchando...'
+    : voiceState === 'processing'
+      ? 'Procesando...'
+      : isSpeaking ? 'Hablando...' : null;
+
   return (
     <main style={{ height: '100dvh', background: '#f5f5f5', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
@@ -283,6 +371,13 @@ function CCController() {
               <div style={{ width: 7, height: 7, borderRadius: '50%', background: desktopActive ? '#00b09b' : connected ? '#f0a040' : 'rgba(255,255,255,0.3)', boxShadow: desktopActive ? '0 0 6px #00b09b' : 'none' }} />
               {desktopActive ? 'Desktop activo' : connected ? 'Desktop detenido' : 'Sin conexión'}
             </div>
+            {/* Mute toggle */}
+            <button
+              onClick={toggleMute}
+              title={isMuted ? 'Activar voz' : 'Silenciar voz'}
+              style={{ background: isMuted ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
+              dangerouslySetInnerHTML={{ __html: isMuted ? ICON_SPEAKER_OFF : ICON_SPEAKER_ON }}
+            />
             <button
               onClick={() => setShowSettings(true)}
               style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
@@ -297,6 +392,18 @@ function CCController() {
           </div>
         </button>
       </div>
+
+      {/* Voice state banner */}
+      {voiceLabel && (
+        <div style={{
+          background: voiceState === 'listening' ? '#f04e23' : voiceState === 'processing' ? '#333' : '#1a6b5a',
+          color: '#fff', textAlign: 'center', padding: '6px 14px', fontSize: 11, fontWeight: 700,
+          letterSpacing: '0.06em', flexShrink: 0,
+        }}>
+          <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#fff', marginRight: 7, verticalAlign: 'middle', animation: 'blink 1s step-end infinite' }} />
+          {voiceLabel}
+        </div>
+      )}
 
       {/* Chat */}
       <div ref={chatRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 14px 8px', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -336,6 +443,22 @@ function CCController() {
           placeholder="Escribe un mensaje..."
           style={{ flex: 1, background: '#f5f5f5', border: '1.5px solid #e0e0e0', borderRadius: 22, padding: '10px 16px', fontSize: 16, fontWeight: 500, color: '#1a1a1a', fontFamily: 'Sora, sans-serif', outline: 'none' }}
         />
+        {/* Mic button */}
+        <button
+          onClick={toggleMic}
+          disabled={voiceState === 'processing'}
+          title={voiceState === 'listening' ? 'Detener grabación' : 'Grabar mensaje de voz'}
+          style={{
+            width: 40, height: 40, borderRadius: '50%', border: '1.5px solid #e0e0e0',
+            background: voiceState === 'listening' ? '#f04e23' : '#f5f5f5',
+            color: voiceState === 'listening' ? '#fff' : '#555',
+            cursor: voiceState === 'processing' ? 'default' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            opacity: voiceState === 'processing' ? 0.6 : 1,
+            animation: voiceState === 'listening' ? 'micPulse 1s ease-in-out infinite' : 'none',
+          }}
+          dangerouslySetInnerHTML={{ __html: voiceState === 'processing' ? ICON_SPINNER : voiceState === 'listening' ? ICON_MIC_STOP : ICON_MIC }}
+        />
         <button
           onClick={handleSend}
           style={{ width: 40, height: 40, borderRadius: '50%', background: '#f04e23', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
@@ -355,6 +478,23 @@ function CCController() {
       )}
     </main>
   );
+}
+
+// ── TTS helper (module-level, no React deps) ──────────────────────────────────
+
+function speakFiltered(rawText, setIsSpeaking) {
+  const text = voiceFilter(rawText);
+  if (!text || typeof window === 'undefined' || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'es-ES';
+  const voices = window.speechSynthesis.getVoices();
+  const esVoice = voices.find(v => v.lang.startsWith('es'));
+  if (esVoice) utter.voice = esVoice;
+  utter.onstart = () => setIsSpeaking(true);
+  utter.onend = () => setIsSpeaking(false);
+  utter.onerror = () => setIsSpeaking(false);
+  window.speechSynthesis.speak(utter);
 }
 
 // ─── Markdown renderer (sin dependencias externas) ───────────────────────────
