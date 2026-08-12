@@ -708,10 +708,10 @@ svg { display: block; }
     <div>
       <div class="hero-badge">
         <div class="hero-badge-dot"><div class="hero-badge-pulse"></div></div>
-        Streaming en vivo · Voz bidireccional · Carpetas del Mac
+        Streaming en vivo · Voz a texto · Carpetas del Mac
       </div>
       <h1>Controla <span>Claude Code</span><br>desde tu iPhone</h1>
-      <p class="hero-sub">Inicia una tarea en Claude Code. Sal de tu escritorio. Habla con Claude por voz, abre cualquier carpeta de tu Mac y responde desde tu iPhone — sin SSH, sin túneles, sin config de red.</p>
+      <p class="hero-sub">Inicia una tarea en Claude Code. Sal de tu escritorio. Dicta mensajes por voz, abre cualquier carpeta de tu Mac y controla Claude desde tu iPhone — sin SSH, sin túneles, sin config de red.</p>
       <div class="hero-actions">
         <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.1.4-arm64.dmg" class="btn-primary">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -992,18 +992,14 @@ export interface ButtonProps {
         <div class="bc-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="10" height="14" x="7" y="1" rx="5"/><path d="M4 12a8 8 0 0 0 16 0M12 19v4M8 23h8"/></svg>
         </div>
-        <h3>Control por voz</h3>
-        <p>Habla con Claude manos libres. Mantén presionado el micrófono — Gemini transcribe tu voz y Claude responde en audio a través del altavoz del iPhone.</p>
+        <h3>Dicta por voz</h3>
+        <p>Manos libres, sin teclado. Mantén presionado el micrófono y habla — Gemini transcribe tu voz a texto y lo envía a Claude Code automáticamente.</p>
         <div class="voice-preview">
           <div class="voice-row">
             <div class="voice-mic">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="10" height="14" x="7" y="1" rx="5"/><path d="M4 12a8 8 0 0 0 16 0M12 19v4M8 23h8"/></svg>
             </div>
             <div class="voice-bubble">"Explícame qué hace este componente"</div>
-          </div>
-          <div class="voice-tts">
-            <div class="voice-wave"><span></span><span></span><span></span><span></span><span></span></div>
-            <span class="voice-tts-label">Claude respondiendo en voz...</span>
           </div>
           <div class="voice-row" style="justify-content:flex-end">
             <div class="voice-bubble out">Es un hook de React que sincroniza el estado con Supabase Realtime...</div>
