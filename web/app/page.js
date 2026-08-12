@@ -348,6 +348,14 @@ function CCController() {
     setAwaitingFolderId(null);
   }
 
+  function handleRenameProject(id, name) {
+    setProjects(prev => {
+      const next = prev.map(p => p.id === id ? { ...p, name } : p);
+      saveProjects(next);
+      return next;
+    });
+  }
+
   function handleDeleteProject(id) {
     setProjects(prev => {
       const next = prev.filter(p => p.id !== id);
@@ -369,6 +377,7 @@ function CCController() {
       awaitingFolder={!!awaitingFolderId}
       onSwitch={handleSwitchProject}
       onDelete={handleDeleteProject}
+      onRename={handleRenameProject}
       onCreate={handleCreateProject}
       onOpenFolder={handleOpenFolder}
       onCancelFolder={handleCancelFolder}
