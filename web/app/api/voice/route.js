@@ -15,8 +15,12 @@ export async function POST(request) {
   const base64 = Buffer.from(buf).toString('base64');
   const mimeType = audio.type || 'audio/webm';
 
+  const abort = new AbortController();
+  setTimeout(() => abort.abort(), 25_000);
+
   const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
     method: 'POST',
+    signal: abort.signal,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{

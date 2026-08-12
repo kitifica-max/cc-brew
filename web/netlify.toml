@@ -7,6 +7,9 @@
   NODE_VERSION = "20"
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SESSION_ID,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY"
 
+[functions]
+  timeout = 30
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
@@ -17,7 +20,7 @@
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    Permissions-Policy = "camera=(), microphone=(self), geolocation=(), interest-cohort=()"
 
 [[headers]]
   for = "/manifest.json"
