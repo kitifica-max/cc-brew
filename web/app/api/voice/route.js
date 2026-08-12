@@ -1,7 +1,15 @@
 import { NextResponse } from 'next/server';
 
-const GEMINI_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+// gemini-1.5-flash: GA, soporta audio inline sin restricciones de preview
+const MODEL = process.env.GEMINI_MODEL ?? 'gemini-1.5-flash';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+
+// iOS Safari graba video/mp4 aunque sea solo audio — Gemini acepta audio/mp4
+function normalizeAudioMime(type) {
+  if (!type || type === 'application/octet-stream') return 'audio/webm';
+  if (type === 'video/mp4') return 'audio/mp4';
+  return type;
+}
 
 export async function POST(request) {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -12,8 +20,12 @@ export async function POST(request) {
   if (!audio) return NextResponse.json({ error: 'no audio' }, { status: 400 });
 
   const buf = await audio.arrayBuffer();
+  if (buf.byteLength < 100) {
+    return NextResponse.json({ error: 'audio demasiado corto' }, { status: 400 });
+  }
+
   const base64 = Buffer.from(buf).toString('base64');
-  const mimeType = audio.type || 'audio/webm';
+  const mimeType = normalizeAudioMime(audio.type);
 
   const abort = new AbortController();
   setTimeout(() => abort.abort(), 25_000);
@@ -32,12 +44,13 @@ export async function POST(request) {
     }),
   });
 
+  const body = await res.text();
   if (!res.ok) {
-    const err = await res.text();
-    return NextResponse.json({ error: err }, { status: 502 });
+    console.error('[voice] Gemini error', res.status, body.slice(0, 300));
+    return NextResponse.json({ error: `Gemini ${res.status}: ${body.slice(0, 200)}` }, { status: 502 });
   }
 
-  const data = await res.json();
+  const data = JSON.parse(body);
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? '';
   return NextResponse.json({ text });
 }
