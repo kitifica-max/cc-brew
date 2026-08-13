@@ -226,6 +226,29 @@ async function startSession() {
     return;
   }
 
+  // Access check: trial / paid
+  const { data: { session: authSession } } = await bridge.client.auth.getSession();
+  if (authSession?.user) {
+    const uid = authSession.user.id;
+    const { data: access } = await bridge.client
+      .from('user_access').select('trial_ends_at, paid_at').eq('user_id', uid).single();
+    const trialEnds = access?.trial_ends_at
+      ? new Date(access.trial_ends_at)
+      : new Date(new Date(authSession.user.created_at).getTime() + 7 * 24 * 60 * 60 * 1000);
+    if (!access?.paid_at && new Date() >= trialEnds) {
+      shell.openExternal('https://ccc.kitifica.com/pago');
+      await dialog.showMessageBox({
+        type: 'info',
+        title: 'Prueba finalizada',
+        message: 'Tu prueba de 7 días ha terminado.',
+        detail: 'Completa el pago de $4.99 en el navegador para seguir usando CC Controller.',
+        buttons: ['Abrir pago'],
+      });
+      bridge = null;
+      return;
+    }
+  }
+
   const active = getActive();
   pty = new PtyManager();
   pty.spawn('claude', [], active?.path ?? HOME);

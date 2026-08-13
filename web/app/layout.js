@@ -1,4 +1,5 @@
 import './globals.css';
+import InstallPopup from './components/InstallPopup';
 
 export const metadata = {
   title: 'CC Controller',
@@ -28,7 +29,7 @@ export default function RootLayout({ children }) {
             navigator.serviceWorker.register('/sw.js');
           }
         `}} />
-        <script src="/kap/kitifica-install-popup.js" defer />
+        <InstallPopup />
       </body>
     </html>
   );
