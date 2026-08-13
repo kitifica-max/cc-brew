@@ -2,7 +2,9 @@ import { app, Tray, Menu, nativeImage, shell, clipboard, dialog, powerSaveBlocke
 import { needsSetup, openSetupWindow } from './setup-window.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { writeFileSync } from 'fs';
+import { writeFileSync, createWriteStream, unlink } from 'fs';
+import { get as httpsGet } from 'https';
+import { tmpdir } from 'os';
 import dotenv from 'dotenv';
 import PtyManager from './pty.js';
 import Bridge from './bridge.js';
@@ -31,6 +33,8 @@ let startTime = null;
 let uptimeInterval = null;
 let powerBlockId = null;
 let updateAvailable = null; // { version, url } | null
+let downloadedDmgPath = null; // path to pre-downloaded DMG, null while downloading
+let downloadInProgress = false;
 let pendingFolderId = null; // set while PWA is waiting for user to pick a folder
 
 function checkForUpdates() {
@@ -44,18 +48,59 @@ function checkForUpdates() {
     res.on('data', (chunk) => { body += chunk; });
     res.on('end', () => {
       try {
-        const { tag_name, html_url } = JSON.parse(body);
+        const { tag_name, html_url, assets } = JSON.parse(body);
         const latest = tag_name?.replace(/^v/, '');
         const current = app.getVersion();
         if (latest && latest !== current) {
           updateAvailable = { version: latest, url: html_url };
           if (tray) setTrayMenu(pty?.running ? 'running' : 'stopped');
+          // Push A: notificar que hay update disponible
+          bridge?.sendPush('CC Controller', `Nueva versión v${latest} disponible — descargando en background…`).catch(() => {});
+          // Push B: descargar DMG en background
+          const isArm = process.arch === 'arm64';
+          const asset = assets?.find(a =>
+            a.name.endsWith('.dmg') && (isArm ? a.name.includes('arm64') : !a.name.includes('arm64'))
+          );
+          if (asset?.browser_download_url) downloadUpdate(latest, asset.browser_download_url);
         }
       } catch (_) {}
     });
   });
   req.on('error', () => {});
   req.end();
+}
+
+function downloadUpdate(version, url, redirects = 0) {
+  if (downloadInProgress || downloadedDmgPath || redirects > 5) return;
+  downloadInProgress = true;
+  const dest = path.join(tmpdir(), `CC.Controller-${version}.dmg`);
+  const file = createWriteStream(dest);
+  httpsGet(url, { headers: { 'User-Agent': 'CC-Controller-App' } }, (res) => {
+    if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+      file.destroy();
+      downloadInProgress = false;
+      return downloadUpdate(version, res.headers.location, redirects + 1);
+    }
+    if (res.statusCode !== 200) { file.destroy(); downloadInProgress = false; return; }
+    res.pipe(file);
+    file.on('finish', () => {
+      file.close(() => {
+        downloadInProgress = false;
+        downloadedDmgPath = dest;
+        if (tray) setTrayMenu(pty?.running ? 'running' : 'stopped');
+        // Push B: DMG listo
+        bridge?.sendPush('CC Controller', `v${version} lista — abre el menú del tray para instalar`).catch(() => {});
+      });
+    });
+    file.on('error', () => {
+      downloadInProgress = false;
+      unlink(dest, () => {});
+    });
+  }).on('error', () => {
+    downloadInProgress = false;
+    file.destroy();
+    unlink(dest, () => {});
+  });
 }
 
 function getUptime() {
@@ -88,7 +133,9 @@ function buildMenu(status) {
     items.push(
       { type: 'separator' },
       { label: `Nueva versión disponible: v${updateAvailable.version}`, enabled: false },
-      { label: 'Descargar actualización →', click: () => shell.openExternal(updateAvailable.url) }
+      downloadedDmgPath
+        ? { label: '⬇ Instalar ahora', click: () => shell.openPath(downloadedDmgPath) }
+        : { label: downloadInProgress ? 'Descargando actualización…' : 'Descargar actualización →', enabled: !downloadInProgress, click: () => shell.openExternal(updateAvailable.url) }
     );
   }
   items.push(
