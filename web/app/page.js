@@ -448,18 +448,34 @@ function CCController() {
   }
 
   if (view === 'list') return (
-    <ProjectsList
-      projects={projects}
-      currentId={currentId}
-      awaitingFolder={!!awaitingFolderId}
-      onSwitch={handleSwitchProject}
-      onDelete={handleDeleteProject}
-      onRename={handleRenameProject}
-      onCreate={handleCreateProject}
-      onOpenFolder={handleOpenFolder}
-      onCancelFolder={handleCancelFolder}
-      onBack={() => setView('chat')}
-    />
+    <>
+      <ProjectsList
+        projects={projects}
+        currentId={currentId}
+        awaitingFolder={!!awaitingFolderId}
+        onSwitch={handleSwitchProject}
+        onDelete={handleDeleteProject}
+        onRename={handleRenameProject}
+        onCreate={handleCreateProject}
+        onOpenFolder={handleOpenFolder}
+        onCancelFolder={handleCancelFolder}
+        onBack={() => setView('chat')}
+        onShowSettings={() => { setShowSettings(true); sendEvent('get-mcp-config', { projectId: currentId }); }}
+      />
+      {showSettings && currentProject && (
+        <SettingsSheet
+          project={currentProject}
+          mcpConfig={mcpConfig}
+          onClose={() => setShowSettings(false)}
+          onModelChange={v => updateProjectSettings('model', v)}
+          onEffortChange={v => updateProjectSettings('effort', v)}
+          onSkipPermissionsChange={v => updateProjectSettings('skipPermissions', v)}
+          onOpenDesktop={() => { sendEvent('open-claude-desktop', { projectId: currentId }); setShowSettings(false); }}
+          onSaveEnv={(env) => { sendEvent('save-env', { projectId: currentId, env }); setShowSettings(false); }}
+          onSaveMcpConfig={(cfg) => { sendEvent('save-mcp-config', { projectId: currentId, mcpServers: cfg }); }}
+        />
+      )}
+    </>
   );
 
   const voiceLabel = voiceState === 'listening'
