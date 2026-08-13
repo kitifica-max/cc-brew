@@ -189,7 +189,10 @@ async function startSession() {
     pty.write(text, continueConv, model, effort, projectId);
   };
   pty.onMessage = (role, text, projectId) => bridge?.broadcastMessage(role, text, projectId);
-  pty.onChunk = (msgId, text, done, projectId) => bridge?.broadcastChunk(msgId, text, done, projectId);
+  pty.onChunk = (msgId, text, done, projectId) => {
+    bridge?.broadcastChunk(msgId, text, done, projectId);
+    if (done) bridge?.sendPush('CC Controller', 'Claude terminó — toca para ver la respuesta').catch(() => {});
+  };
 
   bridge.onCreateProject = (id, name) => {
     try {

@@ -48,6 +48,7 @@ function CCController() {
   const channelRef = useRef(null);
   const currentIdRef = useRef(null);
   const wasConnectedRef = useRef(false);
+  const unreadRef = useRef(0);
 
   // ── Voice state ──────────────────────────────────────────────────────────────
   const [voiceState, setVoiceState] = useState('idle'); // 'idle' | 'listening' | 'processing'
@@ -69,10 +70,14 @@ function CCController() {
     desktopTimeoutRef.current = setTimeout(() => setDesktopActive(false), 45_000);
   }, []);
 
-  // iOS background + network reconnect
+  // iOS background + network reconnect + badge clear on foreground
   useEffect(() => {
     function onVisible() {
-      if (document.visibilityState === 'visible') setReconnectKey(k => k + 1);
+      if (document.visibilityState === 'visible') {
+        unreadRef.current = 0;
+        navigator.clearAppBadge?.().catch(() => {});
+        setReconnectKey(k => k + 1);
+      }
     }
     function onOnline() { setReconnectKey(k => k + 1); }
     document.addEventListener('visibilitychange', onVisible);
@@ -93,6 +98,32 @@ function CCController() {
 
   // Persist
   useEffect(() => { if (projects.length) saveProjects(projects); }, [projects]);
+
+  // ── Push subscription registration ───────────────────────────────────────────
+  // Se ejecuta tras la primera conexión al canal. sendEvent disponible vía ref.
+  const registerPush = useCallback(async () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    if (!vapidKey) return;
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: (() => {
+            const b64 = vapidKey.replace(/-/g, '+').replace(/_/g, '/');
+            const raw = atob(b64 + '='.repeat((4 - b64.length % 4) % 4));
+            return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+          })(),
+        });
+      }
+      channelRef.current?.send({
+        type: 'broadcast', event: 'push-subscribe',
+        payload: { subscription: sub.toJSON(), token: typeof getSessionToken === 'function' ? getSessionToken() : '' },
+      });
+    } catch (_) {}
+  }, []);
 
   // Scroll
   useEffect(() => {
@@ -135,6 +166,10 @@ function CCController() {
             ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: 'claude', text: prev.text, time }],
           }));
           setStreamingMsg(null);
+          if (document.visibilityState !== 'visible') {
+            unreadRef.current += 1;
+            navigator.setAppBadge?.(unreadRef.current).catch(() => {});
+          }
         }
       } else {
         const current = streamingMsgRef.current;
@@ -227,6 +262,7 @@ function CCController() {
           ch.send({ type: 'broadcast', event: 'get-project-state', payload: { token: getSessionToken() } });
           if (wasConnectedRef.current) addSystemMsg('✓ Conexión recuperada');
           wasConnectedRef.current = true;
+          registerPush();
         }
       });
     })();

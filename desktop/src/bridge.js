@@ -1,5 +1,6 @@
 import { createClient as defaultCreateClient } from '@supabase/supabase-js';
 import WebSocket from 'ws';
+import webpush from 'web-push';
 import { AUTH_STORAGE_KEY } from './auth-store.js';
 
 const ANSI_RE = /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g;
@@ -38,6 +39,7 @@ export default class Bridge {
     this._heartbeatTimer = null;
     this._history = [];
     this._streamBuffers = new Map(); // msgId → { parts: string[], projectId }
+    this._pushSubscriptions = []; // Web Push subscription objects from PWA
     this._accessToken = null;
     this._authSub = null;
   }
@@ -138,6 +140,10 @@ export default class Bridge {
         if (!this._validate(payload)) return;
         this.onOpenFolder?.(payload.id);
       })
+      .on('broadcast', { event: 'push-subscribe' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this._storePushSubscription(payload.subscription);
+      })
       .subscribe();
   }
 
@@ -204,6 +210,33 @@ export default class Bridge {
 
   async deleteFromStorage(storageKey) {
     await this.client.storage.from('uploads').remove([storageKey]);
+  }
+
+  _storePushSubscription(sub) {
+    if (!sub?.endpoint) return;
+    this._pushSubscriptions = this._pushSubscriptions.filter(s => s.endpoint !== sub.endpoint);
+    this._pushSubscriptions.push(sub);
+  }
+
+  async sendPush(title, body) {
+    if (!this._pushSubscriptions.length) return;
+    const pub = process.env.VAPID_PUBLIC_KEY;
+    const priv = process.env.VAPID_PRIVATE_KEY;
+    if (!pub || !priv) return;
+    webpush.setVapidDetails('mailto:kitifica@gmail.com', pub, priv);
+    const payload = JSON.stringify({ title, body });
+    const results = await Promise.allSettled(
+      this._pushSubscriptions.map(sub => webpush.sendNotification(sub, payload))
+    );
+    // Limpiar subscripciones expiradas (410 Gone / 404 Not Found)
+    let i = results.length;
+    while (i--) {
+      const r = results[i];
+      if (r.status === 'rejected') {
+        const code = r.reason?.statusCode;
+        if (code === 410 || code === 404) this._pushSubscriptions.splice(i, 1);
+      }
+    }
   }
 
   startHeartbeat(intervalMs = 20_000) {
