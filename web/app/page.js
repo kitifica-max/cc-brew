@@ -58,7 +58,8 @@ function CCController() {
   const audioChunksRef = useRef([]);
 
   useEffect(() => { currentIdRef.current = currentId; }, [currentId]);
-  useEffect(() => { streamingMsgRef.current = streamingMsg; }, [streamingMsg]);
+  // streamingMsgRef se actualiza síncronamente en el chunk handler (no vía useEffect)
+  // para evitar race: done chunk llega antes del render → ref null → mensaje desaparece.
   useEffect(() => { awaitingFolderIdRef.current = awaitingFolderId; }, [awaitingFolderId]);
   useEffect(() => { knownProjectIdsRef.current = new Set(projects.map(p => p.id)); }, [projects]);
 
@@ -136,9 +137,12 @@ function CCController() {
           setStreamingMsg(null);
         }
       } else {
-        setStreamingMsg(prev => prev?.msgId === msgId
-          ? { msgId, text: prev.text + text }
-          : { msgId, text });
+        const current = streamingMsgRef.current;
+        const next = current?.msgId === msgId
+          ? { msgId, text: current.text + text }
+          : { msgId, text };
+        streamingMsgRef.current = next; // sync — ref listo antes del render
+        setStreamingMsg(next);
       }
     });
 
