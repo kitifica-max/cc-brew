@@ -376,7 +376,7 @@ async function startSession() {
     const project = listProjects().find(p => p.id === projectId);
     if (!project) return;
     const path = project.path.replace(/"/g, '\\"');
-    exec(`osascript -e 'tell application "Terminal" to do script "cd \\"${path}\\" && claude"' -e 'tell application "Terminal" to activate'`);
+    exec(`osascript -e 'tell application "Terminal" to do script "cd \\"${path}\\" && claude --continue"' -e 'tell application "Terminal" to activate'`);
   };
 
   try {
