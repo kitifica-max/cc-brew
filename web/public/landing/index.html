@@ -1,32 +1,26 @@
 <meta charset="UTF-8">
-<title>CC Controller — Control Claude Code desde tu iPhone</title>
+<title>CC Controller — Tu interfaz móvil para Claude Code</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- SEO básico -->
-<meta name="description" content="Controla Claude Code desde tu iPhone. App Electron para Mac + PWA para móvil conectadas por Supabase Realtime. Sin SSH, sin túneles, sin config de red.">
+<meta name="description" content="Controla Claude Code desde tu iPhone. Inicia tareas, dicta instrucciones por voz, cambia de proyecto y sigue el trabajo de Claude en tiempo real. Sin SSH. Sin túneles. $4.99 pago único.">
 <meta name="robots" content="index, follow">
 <meta name="author" content="Kitifica">
 <link rel="canonical" href="https://ccc.kitifica.com/landing/">
 
-<!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="CC Controller">
-<meta property="og:title" content="CC Controller — Control Claude Code desde tu iPhone">
-<meta property="og:description" content="Controla Claude Code desde tu iPhone. App Electron para Mac + PWA para móvil conectadas por Supabase Realtime. Sin SSH, sin túneles, sin config de red.">
+<meta property="og:title" content="CC Controller — Tu interfaz móvil para Claude Code">
+<meta property="og:description" content="Controla Claude Code desde tu iPhone. Sin SSH. Sin túneles. $4.99 pago único.">
 <meta property="og:url" content="https://ccc.kitifica.com/landing/">
 <meta property="og:image" content="https://ccc.kitifica.com/icon-512.png">
 <meta property="og:image:width" content="512">
 <meta property="og:image:height" content="512">
-<meta property="og:image:alt" content="CC Controller — logo">
 <meta property="og:locale" content="es_ES">
-
-<!-- Twitter Card -->
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="CC Controller — Control Claude Code desde tu iPhone">
-<meta name="twitter:description" content="Controla Claude Code desde tu iPhone. App Electron para Mac + PWA para móvil conectadas por Supabase Realtime.">
+<meta name="twitter:title" content="CC Controller — Tu interfaz móvil para Claude Code">
+<meta name="twitter:description" content="Controla Claude Code desde tu iPhone. Sin SSH. Sin túneles. $4.99 pago único.">
 <meta name="twitter:image" content="https://ccc.kitifica.com/icon-512.png">
 
-<!-- JSON-LD: SoftwareApplication -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -34,13 +28,12 @@
   "name": "CC Controller",
   "operatingSystem": "macOS",
   "applicationCategory": "DeveloperApplication",
-  "description": "Controla Claude Code desde tu iPhone. App Electron para Mac + PWA para móvil conectadas por Supabase Realtime. Sin SSH, sin túneles, sin config de red.",
+  "description": "Tu interfaz móvil para Claude Code. Controla proyectos, dicta instrucciones por voz y sigue el trabajo de Claude en tiempo real desde tu iPhone.",
   "url": "https://ccc.kitifica.com/landing/",
-  "downloadUrl": "https://github.com/kitifica-max/cc-controller/releases/latest",
   "softwareVersion": "1.3.1",
   "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "4.99",
     "priceCurrency": "USD"
   },
   "author": {
@@ -50,42 +43,39 @@
   }
 }
 </script>
+
 <style>
 /* ─── TOKENS ─────────────────────────────────── */
 :root {
-  --orange:        #f04e23;
-  --orange-dim:    rgba(240,78,35,0.18);
-  --orange-glow:   rgba(240,78,35,0.35);
-  --teal:          #00b09b;
-  --teal-dim:      rgba(0,176,155,0.18);
-  --ink:           #0d0d0d;
-  --ink-2:         #171717;
-  --ink-3:         #222;
-  --ink-4:         #2d2d2d;
-  --border:        rgba(255,255,255,0.08);
-  --border-warm:   rgba(240,78,35,0.2);
-  --text:          #f5f0ee;
-  --text-2:        rgba(245,240,238,0.55);
-  --text-3:        rgba(245,240,238,0.3);
-  --white:         #ffffff;
-  --radius-card:   20px;
-  --radius-sm:     12px;
-  --gap:           14px;
-  --transition:    150ms ease;
-  --transition-md: 200ms ease;
+  --orange:      #f04e23;
+  --orange-dim:  rgba(240,78,35,0.15);
+  --orange-glow: rgba(240,78,35,0.35);
+  --teal:        #00b09b;
+  --teal-dim:    rgba(0,176,155,0.15);
+  --ink:         #0d0d0d;
+  --ink-2:       #171717;
+  --ink-3:       #222;
+  --ink-4:       #2d2d2d;
+  --border:      rgba(255,255,255,0.08);
+  --border-warm: rgba(240,78,35,0.22);
+  --text:        #f5f0ee;
+  --text-2:      rgba(245,240,238,0.55);
+  --text-3:      rgba(245,240,238,0.3);
+  --radius:      20px;
+  --radius-sm:   12px;
+  --gap:         14px;
+  --tr:          150ms ease;
+  --tr-md:       200ms ease;
 }
 
-/* ─── RESET ──────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
   font-family: system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
   background: var(--ink); color: var(--text);
-  line-height: 1.5; -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden;
 }
 a { text-decoration: none; color: inherit; }
-button { font-family: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
@@ -94,42 +84,70 @@ button { font-family: inherit; }
 nav {
   position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
   z-index: 100; display: flex; align-items: center; gap: 0;
-  background: rgba(13,13,13,0.85); backdrop-filter: blur(16px) saturate(1.8);
+  background: rgba(13,13,13,0.88); backdrop-filter: blur(16px) saturate(1.8);
   border: 1px solid var(--border); border-radius: 100px;
   padding: 8px 8px 8px 20px;
-  width: min(calc(100% - 32px), 700px);
+  width: min(calc(100% - 32px), 720px);
 }
 .nav-logo { display: flex; align-items: center; gap: 10px; flex: 1; }
-.nav-logo-mark { width: 26px; height: 26px; flex-shrink: 0; }
 .nav-brand { font-size: 13px; font-weight: 700; letter-spacing: -0.01em; }
 .nav-brand em { font-style: normal; color: var(--orange); }
 .nav-links { display: flex; gap: 4px; margin-right: 8px; }
 .nav-link {
   font-size: 12px; font-weight: 500; color: var(--text-2); padding: 6px 14px;
-  border-radius: 100px; cursor: pointer;
-  transition: color var(--transition), background var(--transition);
+  border-radius: 100px; cursor: pointer; transition: color var(--tr), background var(--tr);
 }
 .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.06); }
 .nav-cta {
   background: var(--orange); color: #fff; font-size: 12px; font-weight: 700;
   padding: 8px 18px; border-radius: 100px; cursor: pointer; border: none;
-  transition: background var(--transition), transform var(--transition);
+  transition: background var(--tr), transform var(--tr);
   white-space: nowrap; display: flex; align-items: center; gap: 6px;
 }
 .nav-cta:hover { background: #d93e16; transform: scale(1.02); }
 @media (max-width: 600px) { .nav-links { display: none; } nav { padding: 8px 8px 8px 16px; } }
 
+/* ─── SHARED ──────────────────────────────────── */
+.section-eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--orange); margin-bottom: 12px; display: block;
+}
+.section-title {
+  font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800;
+  letter-spacing: -0.03em; line-height: 1.1; text-wrap: balance;
+}
+.section-sub { font-size: 16px; color: var(--text-2); line-height: 1.7; max-width: 540px; margin-top: 16px; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--orange); color: #fff; font-weight: 700; font-size: 14px;
+  padding: 13px 24px; border-radius: 100px; border: none; cursor: pointer;
+  transition: background var(--tr), transform var(--tr); min-height: 44px;
+}
+.btn-primary:hover { background: #d93e16; transform: translateY(-1px); }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border); color: var(--text-2); font-weight: 600; font-size: 14px;
+  padding: 13px 24px; border-radius: 100px; background: none; cursor: pointer;
+  transition: border-color var(--tr), color var(--tr), background var(--tr); min-height: 44px;
+}
+.btn-ghost:hover { border-color: rgba(255,255,255,0.2); color: var(--text); background: rgba(255,255,255,0.04); }
+.card {
+  background: var(--ink-2); border: 1px solid var(--border);
+  border-radius: var(--radius); transition: border-color var(--tr-md), transform var(--tr-md);
+}
+.card:hover { border-color: var(--border-warm); }
+
 /* ─── HERO ────────────────────────────────────── */
 .hero {
   min-height: 100svh; display: flex; align-items: center;
-  padding: 100px 20px 60px;
-  position: relative; overflow: hidden;
+  padding: 100px 20px 60px; position: relative; overflow: hidden;
 }
 .hero-bg {
   position: absolute; inset: 0; pointer-events: none; z-index: 0;
   background:
-    radial-gradient(ellipse 700px 500px at 65% 40%, rgba(240,78,35,0.07), transparent),
-    radial-gradient(ellipse 400px 400px at 20% 80%, rgba(0,176,155,0.05), transparent);
+    radial-gradient(ellipse 700px 500px at 60% 40%, rgba(240,78,35,0.07), transparent),
+    radial-gradient(ellipse 400px 400px at 10% 80%, rgba(0,176,155,0.04), transparent);
 }
 .hero-grid {
   position: absolute; inset: 0; pointer-events: none;
@@ -141,324 +159,297 @@ nav {
 }
 .hero-inner {
   position: relative; z-index: 1; max-width: 1120px; margin: 0 auto;
-  display: grid; grid-template-columns: 1fr 420px; gap: 60px; align-items: center;
-  width: 100%;
+  display: grid; grid-template-columns: 1fr 400px; gap: 60px; align-items: center; width: 100%;
 }
+@media (max-width: 860px) { .hero-inner { grid-template-columns: 1fr; } .hero-right { display: none; } }
 .hero-badge {
   display: inline-flex; align-items: center; gap: 7px;
   border: 1px solid var(--border-warm); border-radius: 100px;
   padding: 5px 14px 5px 8px; margin-bottom: 24px;
   font-size: 11px; font-weight: 600; color: var(--text-2);
 }
-.hero-badge-dot { width: 18px; height: 18px; border-radius: 50%; background: var(--orange-dim); border: 1px solid var(--border-warm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.hero-badge-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); animation: heroPulse 2s ease-in-out infinite; }
-@keyframes heroPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+.hero-badge-dot {
+  width: 18px; height: 18px; border-radius: 50%; background: var(--orange-dim);
+  border: 1px solid var(--border-warm); display: flex; align-items: center; justify-content: center;
+}
+.hero-badge-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.7); } }
 .hero h1 {
-  font-size: clamp(2.6rem, 6vw, 4rem); font-weight: 800;
-  line-height: 1.05; letter-spacing: -0.04em; color: var(--text);
-  text-wrap: balance; margin-bottom: 20px;
+  font-size: clamp(2.8rem, 6.5vw, 4.4rem); font-weight: 800;
+  line-height: 1.0; letter-spacing: -0.04em; color: var(--text); text-wrap: balance; margin-bottom: 20px;
 }
 .hero h1 span { color: var(--orange); }
-.hero-sub {
-  font-size: 16px; color: var(--text-2); line-height: 1.7;
-  max-width: 440px; margin-bottom: 40px;
-}
-.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-.btn-primary {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: var(--orange); color: #fff; font-weight: 700; font-size: 14px;
-  padding: 13px 24px; border-radius: 100px; border: none; cursor: pointer;
-  transition: background var(--transition), transform var(--transition);
-  min-height: 44px;
-}
-.btn-primary:hover { background: #d93e16; transform: translateY(-1px); }
-.btn-ghost {
-  display: inline-flex; align-items: center; gap: 8px;
-  border: 1px solid var(--border); color: var(--text-2); font-weight: 600; font-size: 14px;
-  padding: 13px 24px; border-radius: 100px; background: none; cursor: pointer;
-  transition: border-color var(--transition), color var(--transition), background var(--transition);
-  min-height: 44px;
-}
-.btn-ghost:hover { border-color: rgba(255,255,255,0.2); color: var(--text); background: rgba(255,255,255,0.04); }
+.hero-tagline { font-size: 17px; color: var(--text-2); line-height: 1.65; max-width: 440px; margin-bottom: 16px; }
+.hero-bullets { display: flex; flex-direction: column; gap: 6px; margin-bottom: 36px; }
+.hero-bullet { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-2); }
+.hero-bullet::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
+.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
+.hero-price-note { font-size: 12px; color: var(--text-3); }
+.hero-price-note strong { color: var(--orange); }
+.hero-reqs { font-size: 11px; color: var(--text-3); margin-top: 12px; line-height: 1.7; }
+.hero-reqs em { font-style: normal; }
 
-/* ─── FLOW CARD (Hero right) ──────────────────── */
-.flow-card {
+/* Hero right: phone mockup */
+.phone-frame {
   background: var(--ink-2); border: 1px solid var(--border);
-  border-radius: var(--radius-card); padding: 24px;
-  position: relative; overflow: hidden;
+  border-radius: 28px; padding: 20px 16px; position: relative; overflow: hidden;
 }
-.flow-card::before {
+.phone-frame::before {
   content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse 300px 200px at 50% -50%, rgba(240,78,35,0.06), transparent);
+  background: radial-gradient(ellipse 300px 200px at 50% -30%, rgba(240,78,35,0.08), transparent);
   pointer-events: none;
 }
-.flow-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-.flow-title { font-size: 11px; font-weight: 700; color: var(--text-3); letter-spacing: 0.12em; text-transform: uppercase; }
-.flow-live { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; color: var(--teal); }
-.flow-live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--teal); animation: heroPulse 2s 0.3s ease-in-out infinite; }
-.flow-nodes { display: flex; flex-direction: column; gap: 10px; }
-.flow-node {
+.phone-status { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.phone-status-live { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; color: var(--teal); }
+.phone-status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--teal); animation: pulse 2s 0.3s ease-in-out infinite; }
+.phone-status-proj { font-size: 10px; color: var(--text-3); font-family: 'SF Mono', ui-monospace, monospace; }
+.phone-msgs { display: flex; flex-direction: column; gap: 8px; }
+.msg { border-radius: 14px; padding: 10px 14px; font-size: 12px; line-height: 1.5; max-width: 88%; }
+.msg.user { background: var(--orange); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+.msg.ai { background: var(--ink-3); color: var(--text); border-bottom-left-radius: 4px; font-family: 'SF Mono',ui-monospace,monospace; font-size: 11px; }
+.msg-meta { font-size: 9px; color: var(--text-3); margin-top: 2px; }
+.msg-meta.right { text-align: right; }
+.typing { display: flex; gap: 4px; align-items: center; padding: 10px 14px; background: var(--ink-3); border-radius: 14px; border-bottom-left-radius: 4px; width: fit-content; }
+.typing span { width: 5px; height: 5px; border-radius: 50%; background: var(--orange); animation: typ 1.2s ease-in-out infinite; }
+.typing span:nth-child(2) { animation-delay: 0.15s; }
+.typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typ { 0%,60%,100% { opacity:0.3; transform:translateY(0); } 30% { opacity:1; transform:translateY(-3px); } }
+.quick-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+.qbtn {
+  padding: 7px 14px; border-radius: 100px; font-size: 11px; font-weight: 700;
+  background: var(--ink-3); border: 1px solid var(--border); color: var(--text-2);
+  cursor: pointer; transition: all var(--tr); min-height: 36px; display: flex; align-items: center;
+}
+.qbtn:hover { background: var(--orange-dim); border-color: var(--border-warm); color: var(--orange); }
+
+/* ─── AHA MOMENT ──────────────────────────────── */
+.aha { padding: 80px 20px; }
+.aha-inner { max-width: 860px; margin: 0 auto; text-align: center; }
+.aha-scene {
+  margin: 48px auto 0; max-width: 600px;
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+}
+.aha-row { display: flex; align-items: flex-start; gap: 16px; width: 100%; }
+.aha-row.right { flex-direction: row-reverse; }
+.aha-time {
+  font-size: 11px; font-weight: 700; color: var(--text-3); white-space: nowrap;
+  padding-top: 10px; min-width: 36px; font-family: 'SF Mono', ui-monospace, monospace;
+}
+.aha-device {
+  width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; margin-top: 4px;
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.aha-device.phone { background: var(--orange-dim); border: 1px solid var(--border-warm); }
+.aha-device.mac { background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
+.aha-bubble {
+  background: var(--ink-2); border: 1px solid var(--border); border-radius: 14px;
+  padding: 12px 16px; font-size: 13px; color: var(--text); line-height: 1.55; text-align: left;
+}
+.aha-bubble.sent { background: var(--orange); border-color: transparent; color: #fff; }
+.aha-connector {
+  display: flex; align-items: center; justify-content: center;
+  height: 40px; color: var(--text-3);
+}
+.aha-connector-line {
+  width: 1px; height: 100%; background: linear-gradient(to bottom, var(--border), var(--border-warm), var(--border));
+}
+.aha-punchline {
+  margin-top: 48px; font-size: 18px; font-weight: 700; color: var(--text);
+  line-height: 1.5; text-wrap: balance;
+}
+.aha-punchline em { font-style: normal; color: var(--orange); }
+
+/* ─── NOT A CHATBOT ───────────────────────────── */
+.not-chatbot { padding: 64px 20px; }
+.not-chatbot-inner { max-width: 1120px; margin: 0 auto; }
+.not-chatbot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; margin-top: 40px; }
+@media (max-width: 768px) { .not-chatbot-grid { grid-template-columns: 1fr; } }
+.arch-flow {
+  background: var(--ink-2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 28px;
+}
+.arch-node {
   display: flex; align-items: center; gap: 12px;
   background: var(--ink-3); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 14px 16px;
+  border-radius: var(--radius-sm); padding: 12px 16px;
 }
-.flow-node-icon {
-  width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
+.arch-node-icon {
+  width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
 }
-.flow-node-icon.o { background: rgba(240,78,35,0.12); }
-.flow-node-icon.t { background: rgba(0,176,155,0.12); }
-.flow-node-icon.w { background: rgba(255,255,255,0.06); }
-.flow-node-info { flex: 1; min-width: 0; }
-.flow-node-label { font-size: 13px; font-weight: 700; color: var(--text); }
-.flow-node-sub { font-size: 10px; color: var(--text-3); margin-top: 1px; }
-.flow-node-status { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.flow-node-status.active { background: var(--orange); box-shadow: 0 0 8px var(--orange); animation: heroPulse 2s ease-in-out infinite; }
-.flow-node-status.bridge { background: var(--teal); box-shadow: 0 0 8px var(--teal); animation: heroPulse 2s 0.5s ease-in-out infinite; }
-.flow-node-status.mac { background: rgba(255,255,255,0.4); animation: heroPulse 2s 1s ease-in-out infinite; }
-.flow-connector { display: flex; align-items: center; padding: 0 20px; gap: 8px; }
-.flow-line { flex: 1; height: 1px; position: relative; overflow: hidden; border-radius: 2px; background: rgba(255,255,255,0.06); }
-.flow-line::after {
+.arch-node-icon.phone-icon { background: var(--orange-dim); border: 1px solid var(--border-warm); }
+.arch-node-icon.mac-icon { background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
+.arch-node-icon.claude-icon { background: var(--teal-dim); border: 1px solid rgba(0,176,155,0.25); }
+.arch-node-label { font-size: 13px; font-weight: 700; color: var(--text); }
+.arch-node-sub { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+.arch-connector-line {
+  display: flex; align-items: center; gap: 8px; padding: 0 16px; margin: 6px 0;
+}
+.arch-line { flex: 1; height: 1px; background: rgba(255,255,255,0.06); position: relative; overflow: hidden; }
+.arch-line::after {
   content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
   background: linear-gradient(to right, transparent, var(--orange), transparent);
-  animation: slideRight 2s linear infinite;
+  animation: slide 2.4s linear infinite;
 }
-.flow-line.back::after { background: linear-gradient(to right, transparent, var(--teal), transparent); animation-delay: 1s; animation-duration: 2.4s; }
-.flow-arrow { font-size: 10px; color: var(--text-3); flex-shrink: 0; }
-.flow-tag { font-size: 9px; font-weight: 700; color: var(--text-3); letter-spacing: 0.06em; white-space: nowrap; }
-@keyframes slideRight { from { left: -100%; } to { left: 100%; } }
+@keyframes slide { from { left: -100%; } to { left: 100%; } }
+.arch-line.back::after { background: linear-gradient(to right, transparent, var(--teal), transparent); animation-delay: 1.2s; }
+.arch-arrow { font-size: 10px; color: var(--text-3); }
+.arch-label { font-size: 9px; color: var(--text-3); white-space: nowrap; }
 
-/* ─── STATS ───────────────────────────────────── */
-.stats { padding: 0 20px; }
-.stats-inner {
-  max-width: 1120px; margin: 0 auto;
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap);
-}
-.stat-card {
-  background: var(--ink-2); border: 1px solid var(--border);
-  border-radius: var(--radius-card); padding: 24px;
-  transition: border-color var(--transition-md), transform var(--transition-md);
-  cursor: default;
-}
-.stat-card:hover { border-color: var(--border-warm); transform: translateY(-2px); }
-.stat-num { font-size: 36px; font-weight: 800; letter-spacing: -0.04em; color: var(--text); line-height: 1; margin-bottom: 6px; }
-.stat-num span { color: var(--orange); }
-.stat-label { font-size: 12px; font-weight: 500; color: var(--text-3); }
+.not-chatbot-copy h2 { font-size: clamp(1.6rem, 3.5vw, 2.2rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 20px; }
+.not-chatbot-copy h2 em { font-style: normal; color: var(--orange); }
+.not-chatbot-copy p { font-size: 15px; color: var(--text-2); line-height: 1.75; margin-bottom: 16px; }
+.not-chatbot-copy p strong { color: var(--text); }
+.not-chatbot-copy p:last-child { margin-bottom: 0; }
 
-/* ─── WHY SECTION ────────────────────────────── */
-.why { padding: 64px 20px 0; }
-.why-inner { max-width: 1120px; margin: 0 auto; }
-.why-grid {
+/* ─── FEATURES ────────────────────────────────── */
+.features { padding: 64px 20px; }
+.features-inner { max-width: 1120px; margin: 0 auto; }
+.features-grid {
   display: grid; grid-template-columns: repeat(3, 1fr);
   gap: var(--gap); margin-top: 40px;
 }
-.why-card {
+@media (max-width: 768px) { .features-grid { grid-template-columns: 1fr; } }
+.feat-card {
   background: var(--ink-2); border: 1px solid var(--border);
-  border-radius: var(--radius-card); padding: 32px 28px;
-  transition: border-color var(--transition-md), transform var(--transition-md);
+  border-radius: var(--radius); padding: 28px;
+  transition: border-color var(--tr-md), transform var(--tr-md);
   cursor: default; position: relative; overflow: hidden;
 }
-.why-card:hover { border-color: var(--border-warm); transform: translateY(-2px); }
-.why-card::after {
-  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-  height: 2px; background: linear-gradient(to right, var(--orange), transparent);
-  opacity: 0; transition: opacity var(--transition-md);
+.feat-card:hover { border-color: var(--border-warm); transform: translateY(-2px); }
+.feat-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(to right, var(--orange), transparent);
+  opacity: 0; transition: opacity var(--tr-md);
 }
-.why-card:hover::after { opacity: 1; }
-.why-num {
-  font-size: 11px; font-weight: 800; letter-spacing: 0.12em;
-  color: var(--orange); text-transform: uppercase; margin-bottom: 20px;
-}
-.why-card h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 12px; line-height: 1.2; }
-.why-card p { font-size: 13px; color: var(--text-2); line-height: 1.7; }
-.why-card code { font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px; color: var(--teal); background: rgba(0,176,155,0.08); padding: 1px 5px; border-radius: 4px; }
-@media (max-width: 768px) { .why-grid { grid-template-columns: 1fr; } }
-
-/* ─── BENTO ───────────────────────────────────── */
-.bento { padding: 64px 20px; }
-.bento-inner { max-width: 1120px; margin: 0 auto; }
-.section-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--orange); margin-bottom: 12px; display: block; }
-.section-title { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; text-wrap: balance; margin-bottom: 40px; }
-.bento-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: auto;
-  gap: var(--gap);
-}
-
-/* Cards */
-.bc {
-  background: var(--ink-2); border: 1px solid var(--border);
-  border-radius: var(--radius-card); padding: 28px;
-  position: relative; overflow: hidden;
-  transition: border-color var(--transition-md), transform var(--transition-md), box-shadow var(--transition-md);
-  cursor: default;
-}
-.bc:hover { border-color: rgba(240,78,35,0.22); transform: translateY(-2px); box-shadow: 0 16px 40px rgba(0,0,0,0.3); }
-.bc::before {
-  content: ''; position: absolute; inset: 0; border-radius: var(--radius-card); pointer-events: none;
-  background: radial-gradient(ellipse 200px 200px at var(--mx,50%) var(--my,0%), rgba(240,78,35,0.04), transparent);
-  opacity: 0; transition: opacity var(--transition-md);
-}
-.bc:hover::before { opacity: 1; }
-
-/* Grid placements */
-.bc-realtime  { grid-column: 1 / 4; grid-row: 1; }
-.bc-projects  { grid-column: 4 / 7; grid-row: 1; }
-.bc-files     { grid-column: 1 / 3; grid-row: 2; }
-.bc-status    { grid-column: 3 / 5; grid-row: 2; }
-.bc-env       { grid-column: 5 / 7; grid-row: 2; }
-.bc-model     { grid-column: 1 / 4; grid-row: 3; }
-.bc-quick     { grid-column: 4 / 7; grid-row: 3; }
-.bc-voice     { grid-column: 1 / 4; grid-row: 4; }
-.bc-folder    { grid-column: 4 / 7; grid-row: 4; }
-
-.bc-icon {
+.feat-card:hover::after { opacity: 1; }
+.feat-icon {
   width: 44px; height: 44px; border-radius: 11px; margin-bottom: 18px;
   display: flex; align-items: center; justify-content: center;
+  background: var(--orange-dim); border: 1px solid var(--border-warm); color: var(--orange);
+}
+.feat-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.feat-card p { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+.feat-example {
+  margin-top: 16px; background: var(--ink-3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px; font-size: 12px; color: var(--text-3);
+  font-family: 'SF Mono', ui-monospace, monospace; line-height: 1.5;
+}
+.feat-example .highlight { color: var(--teal); }
+
+/* Feature specific visuals */
+.voice-anim { margin-top: 16px; display: flex; align-items: center; gap: 10px; }
+.voice-mic-btn {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
   background: var(--orange-dim); border: 1px solid var(--border-warm);
-  color: var(--orange);
+  display: flex; align-items: center; justify-content: center; color: var(--orange);
+  animation: micRing 2s ease-in-out infinite;
 }
-.bc h3 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 8px; }
-.bc p { font-size: 13px; color: var(--text-2); line-height: 1.65; }
+@keyframes micRing { 0%,100% { box-shadow: 0 0 0 0 rgba(240,78,35,0.4); } 50% { box-shadow: 0 0 0 8px rgba(240,78,35,0); } }
+.voice-bars { display: flex; gap: 3px; align-items: flex-end; height: 20px; }
+.voice-bars span { width: 3px; border-radius: 3px; background: var(--orange); animation: wv 1.2s ease-in-out infinite; }
+.voice-bars span:nth-child(1) { height: 7px; animation-delay: 0s; }
+.voice-bars span:nth-child(2) { height: 16px; animation-delay: 0.1s; }
+.voice-bars span:nth-child(3) { height: 11px; animation-delay: 0.2s; }
+.voice-bars span:nth-child(4) { height: 20px; animation-delay: 0.3s; }
+.voice-bars span:nth-child(5) { height: 9px; animation-delay: 0.4s; }
+@keyframes wv { 0%,100% { transform:scaleY(0.4); opacity:0.5; } 50% { transform:scaleY(1); opacity:1; } }
 
-/* Chat preview inside realtime card */
-.chat-preview { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
-.chat-bubble {
-  border-radius: 14px; padding: 10px 14px; font-size: 12px; max-width: 85%;
-  font-family: system-ui, sans-serif; line-height: 1.5;
-}
-.chat-bubble.user { background: var(--orange); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
-.chat-bubble.ai { background: var(--ink-3); color: var(--text); border-bottom-left-radius: 4px; font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace; font-size: 11px; }
-.chat-typing { display: flex; gap: 4px; align-items: center; padding: 10px 14px; background: var(--ink-3); border-radius: 14px; border-bottom-left-radius: 4px; width: fit-content; }
-.chat-typing span { width: 5px; height: 5px; border-radius: 50%; background: var(--orange); animation: typing 1.2s ease-in-out infinite; }
-.chat-typing span:nth-child(2) { animation-delay: 0.15s; }
-.chat-typing span:nth-child(3) { animation-delay: 0.3s; }
-@keyframes typing { 0%, 60%, 100% { opacity: 0.3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
-
-/* Projects preview */
-.projects-preview { margin-top: 20px; display: flex; flex-direction: column; gap: 6px; }
-.project-row {
+.proj-list { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+.proj-row {
   display: flex; align-items: center; gap: 10px;
   background: var(--ink-3); border: 1px solid var(--border);
-  border-radius: 10px; padding: 10px 12px;
-  transition: border-color var(--transition);
+  border-radius: 10px; padding: 9px 12px; transition: border-color var(--tr);
 }
-.project-row.active { border-color: var(--border-warm); }
-.project-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
-.project-row.active .project-dot { background: var(--orange); }
-.project-name { font-size: 12px; font-weight: 600; color: var(--text-2); flex: 1; }
-.project-row.active .project-name { color: var(--text); }
-.project-path { font-size: 10px; color: var(--text-3); font-family: 'SF Mono', ui-monospace, monospace; }
+.proj-row.active { border-color: var(--border-warm); }
+.proj-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+.proj-row.active .proj-dot { background: var(--orange); }
+.proj-name { font-size: 12px; font-weight: 600; color: var(--text-2); flex: 1; }
+.proj-row.active .proj-name { color: var(--text); }
+.proj-path { font-size: 10px; color: var(--text-3); font-family: 'SF Mono', ui-monospace, monospace; }
 
-/* Status indicator */
-.status-display { margin-top: 20px; }
-.status-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--border); }
-.status-row:first-child { border-top: none; padding-top: 0; }
-.status-indicator { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.status-indicator.green { background: var(--teal); box-shadow: 0 0 10px var(--teal); }
-.status-indicator.orange { background: #f0a040; }
-.status-indicator.gray { background: rgba(255,255,255,0.2); }
-.status-label { font-size: 12px; font-weight: 600; color: var(--text); }
-.status-desc { font-size: 11px; color: var(--text-3); margin-left: auto; }
+.quick-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+.q-btn {
+  padding: 9px 18px; border-radius: 100px; font-size: 12px; font-weight: 700;
+  background: var(--ink-3); border: 1px solid var(--border); color: var(--text-2);
+  cursor: pointer; transition: all var(--tr);
+}
+.q-btn:hover { background: var(--orange-dim); border-color: var(--border-warm); color: var(--orange); }
 
-/* File upload preview */
-.file-preview { margin-top: 18px; }
-.file-item {
+.model-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+.mchip {
+  padding: 7px 14px; border-radius: 100px; font-size: 12px; font-weight: 600;
+  border: 1px solid var(--border); color: var(--text-2);
+}
+.mchip.active { background: var(--orange-dim); border-color: var(--border-warm); color: var(--orange); }
+.effort-row { margin-top: 12px; }
+.effort-label { font-size: 10px; font-weight: 700; color: var(--text-3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+.effort-track { height: 4px; background: var(--ink-4); border-radius: 4px; }
+.effort-fill { height: 100%; border-radius: 4px; background: linear-gradient(to right, var(--teal), var(--orange)); width: 60%; }
+
+.stream-lines { margin-top: 16px; display: flex; flex-direction: column; gap: 4px; }
+.stream-line {
+  height: 10px; background: var(--ink-3); border-radius: 4px;
+  position: relative; overflow: hidden;
+}
+.stream-line::after {
+  content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(to right, transparent, rgba(240,78,35,0.3), rgba(240,78,35,0.6));
+  animation: stream 2s ease-out infinite;
+}
+.stream-line:nth-child(2)::after { animation-delay: 0.3s; width: 80%; }
+.stream-line:nth-child(3)::after { animation-delay: 0.6s; width: 45%; }
+.stream-line:nth-child(4)::after { animation-delay: 0.9s; width: 70%; }
+@keyframes stream { 0% { left: -100%; } 100% { left: 110%; } }
+
+.files-list { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+.file-row {
   display: flex; align-items: center; gap: 10px;
-  background: var(--ink-3); border: 1px solid var(--border);
-  border-radius: 10px; padding: 10px 12px; margin-top: 8px;
+  background: var(--ink-3); border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px;
 }
 .file-ext { font-size: 9px; font-weight: 800; background: var(--orange); color: #fff; border-radius: 5px; padding: 2px 5px; }
 .file-name { font-size: 11px; color: var(--text-2); flex: 1; font-family: 'SF Mono', ui-monospace, monospace; }
 .file-size { font-size: 10px; color: var(--text-3); }
 
-/* Model selector preview */
-.model-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
-.chip {
-  padding: 7px 14px; border-radius: 100px; font-size: 12px; font-weight: 600;
-  border: 1px solid var(--border); color: var(--text-2);
-  transition: all var(--transition); cursor: pointer;
-}
-.chip.active { background: var(--orange-dim); border-color: var(--border-warm); color: var(--orange); }
-.chip:hover:not(.active) { border-color: rgba(255,255,255,0.15); color: var(--text); }
-.effort-bar { margin-top: 16px; }
-.effort-label { font-size: 10px; font-weight: 700; color: var(--text-3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
-.effort-track { height: 4px; background: var(--ink-4); border-radius: 4px; position: relative; }
-.effort-fill { height: 100%; border-radius: 4px; background: linear-gradient(to right, var(--teal), var(--orange)); width: 60%; }
+/* ─── DIFFERENTIATOR ──────────────────────────── */
+.diff { padding: 64px 20px; }
+.diff-inner { max-width: 860px; margin: 0 auto; text-align: center; }
+.diff-inner h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 24px; }
+.diff-inner h2 em { font-style: normal; color: var(--orange); }
+.diff-inner p { font-size: 16px; color: var(--text-2); line-height: 1.75; margin-bottom: 14px; }
+.diff-inner p:last-of-type { margin-bottom: 0; }
+.diff-inner p strong { color: var(--text); }
 
-/* Quick actions */
-.quick-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
-.qchip {
-  padding: 10px 20px; border-radius: 100px; font-size: 13px; font-weight: 700;
-  background: var(--ink-3); border: 1px solid var(--border); color: var(--text-2);
-  font-family: 'SF Mono', ui-monospace, monospace;
-  transition: all var(--transition); cursor: pointer; min-height: 44px; display: flex; align-items: center;
+/* ─── COMPARISON ──────────────────────────────── */
+.comparison { padding: 64px 20px; }
+.comparison-inner { max-width: 860px; margin: 0 auto; }
+.compare-table {
+  margin-top: 40px; background: var(--ink-2); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
 }
-.qchip:hover { background: var(--orange-dim); border-color: var(--border-warm); color: var(--orange); }
-
-/* Env card */
-.env-inputs { margin-top: 18px; display: flex; flex-direction: column; gap: 6px; }
-.env-row {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--ink-3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;
+.compare-header {
+  display: grid; grid-template-columns: 1fr 180px 180px;
+  background: var(--ink-3); padding: 14px 24px; gap: 12px;
+  border-bottom: 1px solid var(--border);
 }
-.env-key { font-size: 10px; font-weight: 700; color: var(--teal); font-family: 'SF Mono', ui-monospace, monospace; min-width: 60px; }
-.env-val { font-size: 11px; color: var(--text-3); font-family: 'SF Mono', ui-monospace, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* Voice card visual */
-.voice-preview { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
-.voice-row { display: flex; align-items: center; gap: 12px; }
-.voice-mic {
-  width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
-  background: var(--orange-dim); border: 1px solid var(--border-warm);
-  display: flex; align-items: center; justify-content: center; color: var(--orange);
-  animation: micRing 2s ease-in-out infinite;
+.compare-header .col { font-size: 12px; font-weight: 700; color: var(--text-3); letter-spacing: 0.06em; text-transform: uppercase; }
+.compare-header .col.highlight { color: var(--orange); }
+.compare-row {
+  display: grid; grid-template-columns: 1fr 180px 180px;
+  padding: 14px 24px; gap: 12px; align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background var(--tr); cursor: default;
 }
-@keyframes micRing {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(240,78,35,0.4); }
-  50% { box-shadow: 0 0 0 10px rgba(240,78,35,0); }
+.compare-row:last-child { border-bottom: none; }
+.compare-row:hover { background: rgba(255,255,255,0.02); }
+.compare-row .feat-name { font-size: 13px; color: var(--text-2); }
+.compare-row .val { font-size: 14px; font-weight: 700; text-align: center; }
+.compare-row .val.yes { color: var(--teal); }
+.compare-row .val.no { color: var(--text-3); }
+.compare-row .val.special { color: var(--orange); font-size: 13px; }
+@media (max-width: 600px) {
+  .compare-header, .compare-row { grid-template-columns: 1fr 80px 80px; padding: 12px 16px; }
 }
-.voice-bubble {
-  background: var(--ink-3); border: 1px solid var(--border);
-  border-radius: 14px; border-bottom-left-radius: 4px;
-  padding: 10px 14px; font-size: 12px; color: var(--text-2); line-height: 1.5; flex: 1;
-}
-.voice-bubble.out {
-  background: var(--orange-dim); border-color: var(--border-warm);
-  color: var(--text); border-radius: 14px; border-bottom-right-radius: 4px; margin-left: auto;
-  max-width: 80%;
-}
-.voice-tts { display: flex; align-items: center; gap: 8px; padding: 8px 0; }
-.voice-wave { display: flex; gap: 3px; align-items: flex-end; height: 18px; }
-.voice-wave span {
-  width: 3px; border-radius: 3px; background: var(--teal);
-  animation: wave 1.2s ease-in-out infinite;
-}
-.voice-wave span:nth-child(1) { height: 6px; animation-delay: 0s; }
-.voice-wave span:nth-child(2) { height: 14px; animation-delay: 0.1s; }
-.voice-wave span:nth-child(3) { height: 10px; animation-delay: 0.2s; }
-.voice-wave span:nth-child(4) { height: 18px; animation-delay: 0.3s; }
-.voice-wave span:nth-child(5) { height: 8px; animation-delay: 0.4s; }
-@keyframes wave { 0%, 100% { transform: scaleY(0.4); opacity: 0.5; } 50% { transform: scaleY(1); opacity: 1; } }
-.voice-tts-label { font-size: 11px; color: var(--teal); font-weight: 600; }
-
-/* Folder card visual */
-.folder-preview { margin-top: 20px; display: flex; flex-direction: column; gap: 6px; }
-.folder-row {
-  display: flex; align-items: center; gap: 10px;
-  background: var(--ink-3); border: 1px solid var(--border);
-  border-radius: 10px; padding: 10px 12px;
-  transition: border-color var(--transition);
-}
-.folder-row.highlight { border-color: var(--border-warm); background: rgba(240,78,35,0.05); }
-.folder-icon { color: var(--orange); display: flex; flex-shrink: 0; }
-.folder-icon.dim { color: var(--text-3); }
-.folder-info { flex: 1; min-width: 0; }
-.folder-name { font-size: 12px; font-weight: 700; color: var(--text); }
-.folder-path { font-size: 10px; color: var(--text-3); font-family: 'SF Mono', ui-monospace, monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.folder-badge { font-size: 9px; font-weight: 800; background: var(--orange-dim); color: var(--orange); border: 1px solid var(--border-warm); border-radius: 6px; padding: 2px 7px; flex-shrink: 0; }
-.folder-row .folder-name.dim { color: var(--text-2); font-weight: 600; }
 
 /* ─── HOW IT WORKS ────────────────────────────── */
 .how { padding: 64px 20px; }
@@ -472,591 +463,464 @@ nav {
   top: 27px; left: calc(16.666% + 24px); right: calc(16.666% + 24px);
   height: 1px; background: linear-gradient(to right, transparent, var(--border-warm), transparent);
 }
+@media (max-width: 640px) { .steps-grid { grid-template-columns: 1fr; } .steps-grid::before { display: none; } }
 .step-card {
   background: var(--ink-2); border: 1px solid var(--border);
-  border-radius: var(--radius-card); padding: 28px 24px;
-  position: relative; overflow: hidden;
-  transition: border-color var(--transition-md);
+  border-radius: var(--radius); padding: 28px 24px; position: relative; overflow: hidden;
+  transition: border-color var(--tr-md);
 }
 .step-card:hover { border-color: var(--border-warm); }
 .step-n {
   width: 54px; height: 54px; border-radius: 50%; background: var(--ink);
   border: 1px solid var(--border-warm); color: var(--orange);
   font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center;
-  margin-bottom: 20px; position: relative; z-index: 1;
+  margin-bottom: 20px;
 }
 .step-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
 .step-card p { font-size: 13px; color: var(--text-2); line-height: 1.65; }
-.step-code {
-  display: inline-block; margin-top: 12px; font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
-  font-size: 11px; color: var(--teal); background: rgba(0,176,155,0.08);
-  border: 1px solid rgba(0,176,155,0.2); padding: 4px 10px; border-radius: 6px;
-}
+.step-note { margin-top: 14px; font-size: 12px; color: var(--text-3); }
 
-/* Stack table */
-.arch-table {
+.how-arch {
   margin-top: 40px; background: var(--ink-2); border: 1px solid var(--border);
-  border-radius: var(--radius-card); overflow: hidden;
+  border-radius: var(--radius); padding: 28px; text-align: center;
 }
-.arch-row {
-  display: grid; grid-template-columns: 100px 1fr 160px;
-  gap: 20px; align-items: center; padding: 16px 24px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  transition: background var(--transition);
-  cursor: default;
-}
-.arch-row:last-child { border-bottom: none; }
-.arch-row:hover { background: rgba(255,255,255,0.02); }
-.arch-badge {
-  font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 100px;
-  text-align: center; letter-spacing: 0.02em;
-}
-.arch-badge.e { background: var(--orange-dim); color: var(--orange); border: 1px solid var(--border-warm); }
-.arch-badge.n { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); border: 1px solid var(--border); }
-.arch-badge.s { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(0,176,155,0.25); }
-.arch-badge.nl { background: rgba(0,216,180,0.07); color: rgba(0,216,180,0.65); border: 1px solid rgba(0,216,180,0.15); }
-.arch-desc { font-size: 13px; color: var(--text-2); line-height: 1.5; }
-.arch-role { font-size: 11px; color: var(--text-3); text-align: right; }
+.how-arch-flow { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin-top: 12px; }
+.arch-item { text-align: center; padding: 0 16px; }
+.arch-item-label { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.arch-item-sub { font-size: 10px; color: var(--text-3); }
+.arch-item-icon { font-size: 22px; margin-bottom: 6px; }
+.arch-sep { color: var(--text-3); font-size: 20px; flex-shrink: 0; }
+.how-note { margin-top: 16px; font-size: 12px; color: var(--text-3); }
+.how-note em { color: var(--teal); font-style: normal; font-weight: 600; }
 
 /* ─── SECURITY ────────────────────────────────── */
 .security { padding: 64px 20px; }
 .security-inner { max-width: 1120px; margin: 0 auto; }
-.security-grid {
-  display: grid; grid-template-columns: repeat(2, 1fr);
-  gap: var(--gap); margin-top: 40px;
-}
-.sec-card {
+.sec-badges { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); margin-top: 40px; }
+@media (max-width: 640px) { .sec-badges { grid-template-columns: 1fr 1fr; } }
+.sec-badge {
   background: var(--ink-2); border: 1px solid var(--border);
-  border-radius: var(--radius-card); padding: 28px;
-  display: flex; gap: 18px;
-  transition: border-color var(--transition-md), transform var(--transition-md);
-  cursor: default;
+  border-radius: var(--radius-sm); padding: 20px;
+  display: flex; align-items: flex-start; gap: 12px;
+  transition: border-color var(--tr-md);
 }
-.sec-card:hover { border-color: var(--border-warm); transform: translateY(-2px); }
-.sec-icon {
-  width: 42px; height: 42px; border-radius: 11px; flex-shrink: 0;
+.sec-badge:hover { border-color: var(--border-warm); }
+.sec-badge-icon {
+  width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
   background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center; color: var(--text-2);
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
 }
-.sec-body h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
-.sec-body p { font-size: 13px; color: var(--text-2); line-height: 1.6; }
-.sec-chip {
-  display: inline-block; margin-top: 10px;
-  font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
-  font-family: 'SF Mono', ui-monospace, monospace;
-  padding: 3px 10px; border-radius: 6px;
-  background: rgba(240,78,35,0.08); color: rgba(240,78,35,0.7);
-  border: 1px solid rgba(240,78,35,0.15);
-}
+.sec-badge h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.sec-badge p { font-size: 11px; color: var(--text-3); line-height: 1.5; }
+.sec-oss { margin-top: 28px; text-align: center; }
+.sec-oss p { font-size: 14px; color: var(--text-2); margin-bottom: 14px; }
 
-/* ─── SETUP ───────────────────────────────────── */
-.setup { padding: 64px 20px; }
-.setup-inner { max-width: 1120px; margin: 0 auto; }
-.setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); margin-top: 40px; }
+/* ─── INSTALL ──────────────────────────────────── */
+.install { padding: 64px 20px; }
+.install-inner { max-width: 860px; margin: 0 auto; }
+.install-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); margin-top: 40px; }
+@media (max-width: 640px) { .install-steps { grid-template-columns: 1fr; } }
+.install-step {
+  background: var(--ink-2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px;
+  transition: border-color var(--tr-md);
+}
+.install-step:hover { border-color: var(--border-warm); }
+.install-num {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--orange);
+  color: #fff; font-size: 14px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; margin-bottom: 14px;
+}
+.install-step h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+.install-step p { font-size: 12px; color: var(--text-2); line-height: 1.6; }
+.install-details-wrap { margin-top: 28px; }
+.install-details-wrap details {
+  background: var(--ink-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 16px 20px;
+}
+.install-details-wrap summary {
+  font-size: 13px; font-weight: 600; color: var(--text-2); cursor: pointer; list-style: none;
+  display: flex; align-items: center; gap: 8px;
+}
+.install-details-wrap summary::before { content: '⚠️'; font-size: 14px; }
+.install-details-wrap summary::-webkit-details-marker { display: none; }
+.install-details-wrap p { font-size: 13px; color: var(--text-3); line-height: 1.65; margin-top: 12px; }
+.install-details-wrap ol { padding-left: 18px; margin-top: 8px; }
+.install-details-wrap li { font-size: 12px; color: var(--text-3); line-height: 1.7; }
 
-/* New setup steps */
-.setup-steps-row {
-  display: flex; align-items: flex-start; gap: 0; margin-top: 48px;
+/* ─── PRICE ───────────────────────────────────── */
+.price { padding: 80px 20px; }
+.price-inner { max-width: 560px; margin: 0 auto; text-align: center; }
+.price-card {
+  background: var(--ink-2); border: 2px solid var(--border-warm);
+  border-radius: 28px; padding: 40px 36px;
+  box-shadow: 0 0 80px rgba(240,78,35,0.08);
+  position: relative; overflow: hidden;
 }
-.setup-step-card {
-  flex: 1; background: var(--ink-2); border: 1px solid var(--border);
-  border-radius: var(--radius-card); padding: 28px 24px;
-  display: flex; flex-direction: column; gap: 12px; position: relative;
+.price-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 400px 300px at 50% -20%, rgba(240,78,35,0.06), transparent);
+  pointer-events: none;
 }
-.setup-step-num {
-  position: absolute; top: -14px; left: 24px;
-  background: var(--orange); color: #fff;
-  width: 28px; height: 28px; border-radius: 50%;
-  font-size: 12px; font-weight: 800;
-  display: flex; align-items: center; justify-content: center;
+.price-tag { margin-bottom: 8px; }
+.price-amount { font-size: 56px; font-weight: 900; letter-spacing: -0.05em; color: var(--text); }
+.price-currency { font-size: 22px; font-weight: 700; color: var(--text-3); vertical-align: super; margin-right: 4px; }
+.price-period { font-size: 14px; color: var(--text-3); margin-bottom: 28px; }
+.price-period em { font-style: normal; color: var(--orange); font-weight: 700; }
+.price-features { text-align: left; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.price-feat { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-2); }
+.price-feat::before { content: '✓'; color: var(--teal); font-weight: 800; font-size: 15px; flex-shrink: 0; }
+.price-cta-wrap { display: flex; flex-direction: column; gap: 12px; }
+.price-cta {
+  display: block; width: 100%;
+  background: var(--orange); color: #fff; font-size: 16px; font-weight: 800;
+  padding: 16px 24px; border-radius: 100px; border: none; cursor: pointer; text-align: center;
+  transition: background var(--tr), transform var(--tr); letter-spacing: -0.01em;
 }
-.setup-step-icon { margin-bottom: 4px; }
-.setup-step-card h3 { font-size: 16px; font-weight: 700; color: var(--text); margin: 0; }
-.setup-step-card p { font-size: 13px; color: var(--text-2); line-height: 1.65; margin: 0; }
-.setup-step-arrow {
-  font-size: 20px; color: var(--text-3); padding: 0 16px;
-  align-self: center; flex-shrink: 0; margin-top: 20px;
+.price-cta:hover { background: #d93e16; transform: translateY(-2px); }
+.price-note-row { font-size: 12px; color: var(--text-3); }
+
+/* ─── FAQ ─────────────────────────────────────── */
+.faq { padding: 64px 20px; }
+.faq-inner { max-width: 700px; margin: 0 auto; }
+.faq-list { margin-top: 40px; display: flex; flex-direction: column; gap: 12px; }
+.faq-item {
+  background: var(--ink-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); overflow: hidden;
+  transition: border-color var(--tr-md);
 }
-.setup-dl-btn {
-  display: inline-block; margin-top: 4px;
-  background: var(--orange); color: #fff; text-decoration: none;
-  border-radius: 10px; padding: 10px 16px;
-  font-size: 12px; font-weight: 700; text-align: center;
-  transition: opacity 150ms;
+.faq-item:hover { border-color: var(--border-warm); }
+.faq-q {
+  width: 100%; text-align: left; background: none; border: none;
+  padding: 18px 20px; font-size: 14px; font-weight: 700; color: var(--text);
+  cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  font-family: inherit;
 }
-.setup-dl-btn:hover { opacity: 0.85; }
-.setup-dl-btn--ghost {
-  background: transparent; border: 1px solid var(--border);
-  color: var(--text-2);
-}
-.setup-dl-btn--ghost:hover { border-color: var(--orange); color: var(--orange); opacity: 1; }
-.setup-req { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
-.setup-req-item { font-size: 12px; color: var(--teal); font-weight: 600; }
-.gatekeeper-note { margin-top: 16px; background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 12px; padding: 14px 16px; }
-.gatekeeper-note summary { list-style: none; display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
-.gatekeeper-note summary::-webkit-details-marker { display: none; }
-.gatekeeper-title { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #92400e; width: 100%; }
-.gatekeeper-chevron { margin-left: auto; flex-shrink: 0; color: #92400e; transition: transform 0.2s; }
-.gatekeeper-note[open] .gatekeeper-chevron { transform: rotate(180deg); }
-.gatekeeper-note p { font-size: 12px; color: #78350f; line-height: 1.55; margin: 10px 0 0; }
-.gatekeeper-steps { margin: 8px 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 4px; }
-.gatekeeper-steps li { font-size: 12px; color: #78350f; line-height: 1.5; }
-@media (prefers-color-scheme: dark) {
-  .gatekeeper-note { background: #1c1505; border-color: #92400e; }
-  .gatekeeper-title, .gatekeeper-chevron { color: #fbbf24; }
-  .gatekeeper-note p, .gatekeeper-steps li { color: #fde68a; }
-}
-@media (max-width: 767px) {
-  .setup-steps-row { flex-direction: column; }
-  .setup-step-arrow { align-self: flex-start; padding: 8px 0 8px 24px; margin-top: 0; transform: rotate(90deg); }
-}
-.code-card { background: var(--ink-2); border: 1px solid var(--border); border-radius: var(--radius-card); overflow: hidden; }
-.code-top {
-  padding: 14px 18px; display: flex; align-items: center; gap: 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.dots { display: flex; gap: 5px; }
-.dots span { width: 10px; height: 10px; border-radius: 50%; }
-.dots span:nth-child(1) { background: #ff5f56; }
-.dots span:nth-child(2) { background: #ffbd2e; }
-.dots span:nth-child(3) { background: #27c93f; }
-.code-file { font-size: 11px; font-weight: 700; color: var(--text-3); letter-spacing: 0.08em; font-family: 'SF Mono', ui-monospace, monospace; }
-.code-body {
-  padding: 22px; font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
-  font-size: 12px; line-height: 2.1; overflow-x: auto;
-}
-.cm { color: rgba(255,255,255,0.2); }
-.ck { color: var(--teal); }
-.cv { color: rgba(255,255,255,0.5); }
-.cc { color: var(--orange); }
-.cd { color: rgba(255,255,255,0.2); }
+.faq-q-icon { font-size: 16px; color: var(--orange); flex-shrink: 0; }
+.faq-a { padding: 0 20px 16px; font-size: 13px; color: var(--text-2); line-height: 1.7; }
+.faq-a a { color: var(--orange); text-decoration: underline; text-underline-offset: 3px; }
 
 /* ─── FOOTER ──────────────────────────────────── */
 footer {
-  padding: 80px 20px 60px; text-align: center;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border); padding: 40px 20px;
 }
-.footer-logo { width: 52px; height: 52px; margin: 0 auto 20px; }
-footer h3 { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
-footer p { font-size: 13px; color: var(--text-3); margin-bottom: 36px; max-width: 400px; margin-left: auto; margin-right: auto; }
-.footer-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
-.footer-link {
-  font-size: 12px; font-weight: 600; color: var(--text-3); cursor: pointer;
-  padding: 9px 18px; border: 1px solid var(--border); border-radius: 100px; min-height: 44px;
-  display: flex; align-items: center;
-  transition: color var(--transition), border-color var(--transition);
+.footer-inner {
+  max-width: 1120px; margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; flex-wrap: wrap;
 }
-.footer-link:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
-.footer-made-by {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  margin-bottom: 20px; flex-wrap: wrap;
-}
-.footer-made-by span { font-size: 12px; color: var(--text-3); }
-.footer-kitifica-logo { display: flex; align-items: center; }
-.footer-kitifica-logo svg { height: 22px; width: auto; }
-.footer-kitifica-logo .cls-1 { fill: rgba(255,255,255,0.55); }
-footer small { font-size: 11px; color: var(--text-3); opacity: 0.6; }
-
-/* ─── RESPONSIVE ──────────────────────────────── */
-@media (max-width: 1024px) {
-  .hero-inner { grid-template-columns: 1fr; gap: 40px; }
-  .flow-card { max-width: 480px; }
-  .bento-grid { grid-template-columns: repeat(4, 1fr); }
-  .bc-realtime  { grid-column: 1 / 3; grid-row: auto; }
-  .bc-projects  { grid-column: 3 / 5; grid-row: auto; }
-  .bc-files     { grid-column: 1 / 3; grid-row: auto; }
-  .bc-status    { grid-column: 3 / 5; grid-row: auto; }
-  .bc-env       { grid-column: 1 / 3; grid-row: auto; }
-  .bc-model     { grid-column: 3 / 5; grid-row: auto; }
-  .bc-quick     { grid-column: 1 / 5; grid-row: auto; }
-  .bc-voice     { grid-column: 1 / 3; grid-row: auto; }
-  .bc-folder    { grid-column: 3 / 5; grid-row: auto; }
-  .stats-inner  { grid-template-columns: repeat(2, 1fr); }
-  .steps-grid   { grid-template-columns: 1fr; gap: 12px; }
-  .steps-grid::before { display: none; }
-}
-@media (max-width: 680px) {
-  .bento-grid { grid-template-columns: 1fr; }
-  .bc-realtime, .bc-projects, .bc-files, .bc-status, .bc-env, .bc-model, .bc-quick, .bc-voice, .bc-folder {
-    grid-column: 1 / 2; grid-row: auto;
-  }
-  .security-grid { grid-template-columns: 1fr; }
-  .setup-grid { grid-template-columns: 1fr; }
-  .arch-row { grid-template-columns: 80px 1fr; }
-  .arch-role { display: none; }
-}
-
-/* ─── ICONS (inline SVG helpers) ─────────────── */
-svg { display: block; }
+.footer-left { }
+.footer-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.footer-name { font-size: 14px; font-weight: 800; }
+.footer-tagline { font-size: 12px; color: var(--text-3); line-height: 1.6; }
+.footer-meta { margin-top: 8px; font-size: 11px; color: var(--text-3); }
+.footer-links { display: flex; gap: 20px; align-items: center; }
+.footer-link { font-size: 12px; color: var(--text-3); transition: color var(--tr); }
+.footer-link:hover { color: var(--text); }
 </style>
 
 <!-- NAV -->
 <nav>
   <div class="nav-logo">
-    <svg class="nav-logo-mark" viewBox="0 0 302.21 302.21" xmlns="http://www.w3.org/2000/svg">
-      <rect fill="#333" width="302.21" height="302.21"/>
-      <path fill="none" d="M119.37,108.34c-10.91.3-21.34,4.77-29.08,12.51-8.36,8.36-12.53,18.44-12.53,30.26s4.18,21.91,12.53,30.26c8.07,8.08,17.77,12.24,29.08,12.51-8.22-12.57-12.35-26.82-12.35-42.77,0-15.95,4.13-30.2,12.35-42.77Z"/>
+    <svg class="nav-logo-mark" width="28" height="28" viewBox="0 0 302.21 302.21" xmlns="http://www.w3.org/2000/svg" style="border-radius:8px;flex-shrink:0">
+      <rect width="302.21" height="302.21" rx="68" ry="68" fill="#f0f0f0"/>
       <path fill="#ff582a" d="M242.73,157.22h0c-7.37,0-13.92,4.45-16.91,11.19-2.08,4.69-5.07,8.99-8.99,12.9-8.11,8.11-17.83,12.29-29.14,12.57-.4,0-.79.03-1.19.03-11.82,0-21.91-4.18-30.26-12.53-.96-.96-1.86-1.94-2.7-2.95-6.55-7.75-9.83-16.85-9.83-27.32s3.29-19.6,9.87-27.36c-.84-1.01-1.74-2-2.7-2.96-8.39-8.31-18.5-12.47-30.31-12.47-.4,0-.8.02-1.2.03-8.22,12.57-12.35,26.82-12.35,42.77,0,15.96,4.13,30.21,12.35,42.77,3.08,4.71,6.71,9.18,10.94,13.42,7.07,7.07,14.81,12.51,23.2,16.36,10.05,4.61,21.04,6.93,32.99,6.93,21.93,0,40.68-7.78,56.25-23.36,7.34-7.34,12.94-15.42,16.8-24.22,5.33-12.16-3.55-25.8-16.83-25.8Z"/>
       <path fill="#ff582a" d="M187.74,108.33c11.29.28,20.99,4.42,29.1,12.45,3.91,3.96,6.91,8.29,8.98,13,2.98,6.75,9.54,11.21,16.92,11.21h0c13.27,0,22.14-13.62,16.83-25.78-3.86-8.83-9.46-16.95-16.82-24.35-15.57-15.49-34.32-23.23-56.25-23.23-11.93,0-22.91,2.32-32.95,6.92,8.4,3.84,16.16,9.27,23.25,16.32,4.23,4.25,7.86,8.75,10.93,13.48Z"/>
       <path fill="#ff9477" d="M176.78,157.22c-7.37,0-13.92,4.45-16.91,11.19-1.58,3.56-3.69,6.9-6.33,10.01.85,1,1.75,1.99,2.7,2.95,8.35,8.36,18.44,12.53,30.26,12.53.4,0,.79-.02,1.19-.03,2.28-3.49,4.26-7.1,5.91-10.86,5.33-12.16-3.55-25.8-16.83-25.8Z"/>
       <path fill="#ff9477" d="M119.38,193.88c-11.31-.27-21.01-4.43-29.08-12.51-8.36-8.35-12.53-18.44-12.53-30.26s4.18-21.91,12.53-30.26c7.74-7.74,18.17-12.2,29.08-12.51.4-.01.8-.03,1.2-.03,11.81,0,21.91,4.16,30.31,12.47.95.97,1.85,1.95,2.7,2.96,2.62,3.13,4.72,6.48,6.29,10.03,2.98,6.75,9.54,11.21,16.92,11.21h0c13.27,0,22.14-13.62,16.83-25.78-1.64-3.76-3.62-7.38-5.89-10.87-3.07-4.73-6.7-9.23-10.93-13.48-7.09-7.05-14.84-12.48-23.25-16.32-10.06-4.6-21.06-6.92-33-6.92-21.93,0-40.66,7.76-56.19,23.29-15.53,15.53-23.3,34.26-23.3,56.19s7.76,40.66,23.3,56.19c15.53,15.53,34.26,23.3,56.19,23.3,11.93,0,22.91-2.32,32.96-6.93-8.39-3.85-16.13-9.29-23.2-16.36-4.23-4.23-7.87-8.71-10.94-13.42Z"/>
     </svg>
-    <span class="nav-brand">CC <em>Controller</em></span>
+    <span class="nav-brand"><em>CC</em> Controller</span>
   </div>
   <div class="nav-links">
-    <a href="#features" class="nav-link">Funciones</a>
-    <a href="#how" class="nav-link">Cómo funciona</a>
-    <a href="#setup" class="nav-link">Instalación</a>
+    <a class="nav-link" href="#features">Funciones</a>
+    <a class="nav-link" href="#how">Cómo funciona</a>
+    <a class="nav-link" href="#price">Precio</a>
+    <a class="nav-link" href="#faq">FAQ</a>
   </div>
-  <a href="https://github.com/kitifica-max/cc-controller" target="_blank" rel="noopener" class="nav-cta">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
-    GitHub
-  </a>
+  <a class="nav-cta" href="/pago">Comprar $4.99</a>
 </nav>
 
-<!-- HERO -->
+<!-- ═══════════════════ HERO ═══════════════════ -->
 <section class="hero">
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
   <div class="hero-inner">
-    <div>
+    <div class="hero-left">
       <div class="hero-badge">
         <div class="hero-badge-dot"><div class="hero-badge-pulse"></div></div>
-        Streaming en vivo · Voz a texto · Carpetas del Mac
+        Open Source · v1.3.1
       </div>
-      <h1>Controla <span>Claude Code</span><br>desde tu iPhone</h1>
-      <p class="hero-sub">Inicia una tarea en Claude Code. Sal de tu escritorio. Dicta mensajes por voz, abre cualquier carpeta de tu Mac y controla Claude desde tu iPhone — sin SSH, sin túneles, sin config de red.</p>
+      <h1>Tu Claude Code.<br>Tu Mac.<br><span>Tu móvil.</span></h1>
+      <p class="hero-tagline">Controla tus proyectos de Claude Code estés donde estés.</p>
+      <div class="hero-bullets">
+        <div class="hero-bullet">Inicia tareas y dicta instrucciones por voz</div>
+        <div class="hero-bullet">Cambia de proyecto y envía archivos</div>
+        <div class="hero-bullet">Sigue el trabajo de Claude en tiempo real</div>
+        <div class="hero-bullet">Sin SSH · Sin túneles · Sin abrir puertos</div>
+      </div>
       <div class="hero-actions">
-        <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.3.1-arm64.dmg" class="btn-primary">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Descargar para Mac <span style="opacity:.7;font-size:.85em">v1.3.1</span>
+        <a class="btn-primary" href="/pago">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l10 10-10 10M2 12h20"/></svg>
+          Obtener CC Controller
         </a>
-        <a href="https://github.com/kitifica-max/cc-controller/releases" target="_blank" rel="noopener" class="btn-ghost">Ver todas las versiones →</a>
+        <a class="btn-ghost" href="https://github.com/kitifica-max/cc-controller" target="_blank" rel="noopener">
+          Ver en GitHub →
+        </a>
       </div>
-      <p style="font-size:11px;color:var(--text-3);margin-top:10px;">Apple Silicon · macOS 12+ · Requiere Claude Code CLI · Cuenta gratuita<span id="hero-dl-count" style="display:none"> · <span id="hero-dl-num"></span> descargas</span></p>
+      <div class="hero-price-note"><strong>$4.99</strong> · pago único · sin suscripción</div>
+      <div class="hero-reqs">
+        Requiere macOS + Claude Code CLI · Apple Silicon / Intel<br>
+        <em>Open Source · Sin API propia · Tu código permanece en tu Mac</em>
+      </div>
     </div>
 
-    <div class="flow-card">
-      <div class="flow-header">
-        <span class="flow-title">Conexión activa</span>
-        <div class="flow-live"><div class="flow-live-dot"></div>En vivo</div>
-      </div>
-      <div class="flow-nodes">
-        <div class="flow-node">
-          <div class="flow-node-icon o">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f04e23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-          </div>
-          <div class="flow-node-info">
-            <div class="flow-node-label">iPhone / PWA</div>
-            <div class="flow-node-sub">Next.js · Netlify</div>
-          </div>
-          <div class="flow-node-status active"></div>
+    <div class="hero-right">
+      <div class="phone-frame">
+        <div class="phone-status">
+          <div class="phone-status-live"><div class="phone-status-dot"></div> EN VIVO</div>
+          <div class="phone-status-proj">mi-startup</div>
         </div>
-
-        <div class="flow-connector">
-          <div class="flow-line"></div>
-          <span class="flow-tag">prompt · archivo</span>
-          <div class="flow-arrow">↓</div>
-          <div class="flow-line back"></div>
-          <span class="flow-tag">respuesta</span>
+        <div class="phone-msgs">
+          <div>
+            <div class="msg user">Refactoriza el sistema de autenticación y ejecuta los tests.</div>
+            <div class="msg-meta right">09:42 · tú</div>
+          </div>
+          <div class="typing"><span></span><span></span><span></span></div>
+          <div>
+            <div class="msg ai">✓ Refactorizando auth middleware…<br>→ Actualizando JWT handler<br>→ Añadiendo refresh tokens<br>→ Tests: 24/24 ✓</div>
+            <div class="msg-meta">10:17 · Claude</div>
+          </div>
         </div>
-
-        <div class="flow-node">
-          <div class="flow-node-icon t">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00b09b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          </div>
-          <div class="flow-node-info">
-            <div class="flow-node-label">Supabase Realtime</div>
-            <div class="flow-node-sub">Broadcast · sin DB · &lt;100ms</div>
-          </div>
-          <div class="flow-node-status bridge"></div>
-        </div>
-
-        <div class="flow-connector">
-          <div class="flow-line"></div>
-          <span class="flow-tag">evento validado</span>
-          <div class="flow-arrow">↓</div>
-          <div class="flow-line back"></div>
-          <span class="flow-tag">output</span>
-        </div>
-
-        <div class="flow-node">
-          <div class="flow-node-icon w">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-          </div>
-          <div class="flow-node-info">
-            <div class="flow-node-label">Mac / Electron</div>
-            <div class="flow-node-sub">claude --print · ~/CCProjects/</div>
-          </div>
-          <div class="flow-node-status mac"></div>
+        <div class="quick-row">
+          <div class="qbtn">✓ sí</div>
+          <div class="qbtn">✕ no</div>
+          <div class="qbtn">→ continúa</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- STATS -->
-<section class="stats">
-  <div class="stats-inner">
-    <div class="stat-card">
-      <div class="stat-num"><span>&lt;</span>100ms</div>
-      <div class="stat-label">Latencia Supabase Broadcast</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num">0</div>
-      <div class="stat-label">Cuentas externas requeridas</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num" id="stat-dl-count"><span>—</span></div>
-      <div class="stat-label">Descargas del DMG</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num">3</div>
-      <div class="stat-label">Pasos para empezar: descarga, código, listo</div>
-    </div>
-  </div>
-</section>
+<!-- ═══════════════════ AHA MOMENT ═══════════════════ -->
+<section class="aha">
+  <div class="aha-inner">
+    <span class="section-eyebrow">Por qué lo necesitas</span>
+    <h2 class="section-title">Claude puede seguir trabajando<br>aunque tú te vayas.</h2>
+    <p class="section-sub" style="margin: 16px auto 0; text-align: center;">Imagina esto:</p>
 
-<!-- WHY -->
-<section class="why">
-  <div class="why-inner">
-    <span class="section-eyebrow">Por qué</span>
-    <h2 class="section-title">Claude Code trabaja en tu Mac.<br>Tú decides desde dónde.</h2>
-    <div class="why-grid">
-
-      <div class="why-card">
-        <div class="why-num">01</div>
-        <h3>Trabaja sin estar pegado a la pantalla</h3>
-        <p>Inicia un refactor largo, un análisis de código o una generación de features. Claude trabaja en tu Mac mientras tú estás en el café, en una reunión o en el sofá. Revisas el progreso desde el iPhone y respondes cuando lo necesita.</p>
+    <div class="aha-scene">
+      <div class="aha-row">
+        <div class="aha-time">09:42</div>
+        <div class="aha-device phone">📱</div>
+        <div class="aha-bubble sent">
+          "Refactoriza el sistema de autenticación y ejecuta los tests cuando termines."
+        </div>
       </div>
-
-      <div class="why-card">
-        <div class="why-num">02</div>
-        <h3>Sin SSH, sin túneles, sin abrir puertos</h3>
-        <p>Supabase actúa de puente en tiempo real. Tu Mac nunca expone un puerto al exterior. No hay VPN que configurar, no hay ngrok, no hay nada que mantener. Descargas la app, generas un código de emparejamiento y conectas.</p>
+      <div class="aha-connector"><div class="aha-connector-line"></div></div>
+      <div class="aha-row right">
+        <div class="aha-time">09:43</div>
+        <div class="aha-device mac">💻</div>
+        <div class="aha-bubble">
+          <strong style="color: var(--teal);">Claude Code</strong><br>
+          Trabajando en tu Mac…
+        </div>
       </div>
-
-      <div class="why-card">
-        <div class="why-num">03</div>
-        <h3>El CLI real, no un wrapper de API</h3>
-        <p>CC Controller ejecuta <code>claude --print</code> directamente en tu Mac con acceso total a tus archivos, tu PATH y tus herramientas. No es un chatbot genérico. Es la misma experiencia de Claude Code que ya usas, controlada desde el móvil.</p>
+      <div class="aha-connector"><div class="aha-connector-line"></div></div>
+      <div class="aha-row">
+        <div class="aha-time">10:17</div>
+        <div class="aha-device phone">📱</div>
+        <div class="aha-bubble" style="background: var(--ink-3); border-color: var(--border-warm);">
+          "Encontré un problema con la validación de tokens. ¿Quieres que lo corrija?"
+        </div>
       </div>
+      <div class="aha-connector"><div class="aha-connector-line"></div></div>
+      <div class="aha-row">
+        <div class="aha-time">10:17</div>
+        <div class="aha-device phone">📱</div>
+        <div class="aha-bubble sent">sí</div>
+      </div>
+    </div>
 
+    <div class="aha-punchline">
+      Respondes desde tu iPhone.<br>
+      Claude continúa.<br>
+      <em>Tú sigues con tu día.</em><br>
+      <span style="font-weight: 400; color: var(--text-2); font-size: 16px;">No tienes que estar frente a tu Mac para seguir trabajando.</span>
     </div>
   </div>
 </section>
 
-<!-- BENTO FEATURES -->
-<section class="bento" id="features">
-  <div class="bento-inner">
-    <span class="section-eyebrow">Funciones</span>
-    <h2 class="section-title">Todo lo que necesitas<br>para trabajar desde el móvil</h2>
-
-    <div class="bento-grid">
-
-      <!-- Chat realtime (2×1) -->
-      <div class="bc bc-realtime">
-        <div class="bc-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        </div>
-        <h3>Streaming en tiempo real</h3>
-        <p>Las respuestas llegan token a token mientras Claude escribe, no al terminar. Indicador de escritura y cursor naranja parpadeante mientras genera.</p>
-        <div class="chat-preview">
-          <div class="chat-bubble user">Crea un componente Button en TypeScript</div>
-          <div class="chat-bubble ai">Creating src/components/Button.tsx...
-
-export interface ButtonProps {
-  variant?: 'primary' | 'ghost';
-  children: React.ReactNode;
-}</div>
-          <div class="chat-typing"><span></span><span></span><span></span></div>
-        </div>
-      </div>
-
-      <!-- Proyectos (2×1) -->
-      <div class="bc bc-projects">
-        <div class="bc-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-        </div>
-        <h3>Proyectos nuevos</h3>
-        <p>Dale un nombre desde el iPhone y CC Controller crea la carpeta en tu Mac e inicia Claude Code automáticamente. Sin abrir el terminal.</p>
-        <div class="projects-preview">
-          <div class="project-row active">
-            <div class="project-dot"></div>
-            <div class="project-name">cc-controller</div>
-            <div class="project-path">~/Documents/DP/CC Controller</div>
+<!-- ═══════════════════ NOT A CHATBOT ═══════════════════ -->
+<section class="not-chatbot">
+  <div class="not-chatbot-inner">
+    <div class="not-chatbot-grid">
+      <div class="arch-flow">
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-3); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px;">Arquitectura</div>
+        <div class="arch-node">
+          <div class="arch-node-icon phone-icon">📱</div>
+          <div>
+            <div class="arch-node-label">Tu iPhone</div>
+            <div class="arch-node-sub">CC Controller PWA</div>
           </div>
-          <div class="project-row">
-            <div class="project-dot"></div>
-            <div class="project-name">api-backend</div>
-            <div class="project-path">~/CCProjects/api-backend</div>
+        </div>
+        <div class="arch-connector-line">
+          <div class="arch-line"></div>
+          <div class="arch-arrow">⇅</div>
+          <div class="arch-line back"></div>
+          <div class="arch-label">Supabase Realtime</div>
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-icon mac-icon">🖥️</div>
+          <div>
+            <div class="arch-node-label">Tu Mac</div>
+            <div class="arch-node-sub">CC Controller Desktop</div>
           </div>
-          <div class="project-row">
-            <div class="project-dot"></div>
-            <div class="project-name">mobile-app</div>
-            <div class="project-path">~/CCProjects/mobile-app</div>
+        </div>
+        <div class="arch-connector-line">
+          <div class="arch-line"></div>
+          <div class="arch-arrow">↓</div>
+          <div class="arch-line back" style="display:none"></div>
+          <div class="arch-label">local</div>
+        </div>
+        <div class="arch-node">
+          <div class="arch-node-icon claude-icon">⚡</div>
+          <div>
+            <div class="arch-node-label">Claude Code</div>
+            <div class="arch-node-sub">claude --print · tu entorno</div>
           </div>
         </div>
       </div>
 
-      <!-- Archivos (1×1) -->
-      <div class="bc bc-files">
-        <div class="bc-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+      <div class="not-chatbot-copy">
+        <h2>No es otro chatbot.<br><em>Es tu Claude Code.</em></h2>
+        <p>
+          CC Controller no reemplaza Claude Code ni ejecuta una versión simplificada de él.
+          <strong>Claude Code sigue ejecutándose en tu Mac</strong>, con acceso a tus proyectos,
+          archivos, herramientas y entorno local.
+        </p>
+        <p>
+          Tu iPhone se convierte en el <strong>control remoto de ese entorno</strong>.
+          Mismo Claude, mismos proyectos, mismo contexto. Solo que ahora desde el bolsillo.
+        </p>
+        <p style="color: var(--text-3); font-size: 13px;">
+          Tu código no pasa por nuestros servidores. Claude se ejecuta localmente.
+          La conexión es cifrada y privada por diseño.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FEATURES ═══════════════════ -->
+<section class="features" id="features">
+  <div class="features-inner">
+    <span class="section-eyebrow">Diseñado para trabajar con Claude Code</span>
+    <h2 class="section-title">Todo lo que necesitas,<br>en tu bolsillo.</h2>
+    <div class="features-grid">
+
+      <!-- VOICE -->
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 19v4M8 23h8"/></svg>
         </div>
-        <h3>Subir archivos</h3>
-        <p>Desde iPhone al directorio del proyecto. Storage temporal, eliminado al instante.</p>
-        <div class="file-preview">
-          <div class="file-item">
-            <span class="file-ext">PNG</span>
-            <span class="file-name">screenshot.png</span>
-            <span class="file-size">284 KB</span>
+        <h3>Habla con Claude</h3>
+        <p>Escribe menos. Haz más. Mantén presionado el micrófono y dicta tu instrucción. CC Controller convierte tu voz en texto y la envía directamente a Claude Code.</p>
+        <div class="voice-anim">
+          <div class="voice-mic-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 19v4M8 23h8"/></svg>
           </div>
-          <div class="file-item">
-            <span class="file-ext">PDF</span>
-            <span class="file-name">design-brief.pdf</span>
-            <span class="file-size">1.2 MB</span>
+          <div class="voice-bars"><span></span><span></span><span></span><span></span><span></span></div>
+        </div>
+        <div class="feat-example">"Revisa los errores del último build y corrige los que encuentres."</div>
+      </div>
+
+      <!-- PROJECTS -->
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3zM3 9h18M9 21V9"/></svg>
+        </div>
+        <h3>Controla tus proyectos</h3>
+        <p>Tus proyectos están a un toque. Abre cualquier carpeta de tu Mac desde el móvil. Crea proyectos nuevos y decide dónde trabajará Claude.</p>
+        <div class="proj-list">
+          <div class="proj-row active">
+            <div class="proj-dot"></div>
+            <div class="proj-name">mi-startup</div>
+            <div class="proj-path">~/startup</div>
+          </div>
+          <div class="proj-row">
+            <div class="proj-dot"></div>
+            <div class="proj-name">Verifíka</div>
+            <div class="proj-path">~/verifika</div>
+          </div>
+          <div class="proj-row">
+            <div class="proj-dot"></div>
+            <div class="proj-name">AKCESO</div>
+            <div class="proj-path">~/akceso</div>
           </div>
         </div>
       </div>
 
-      <!-- Estado desktop (1×1) -->
-      <div class="bc bc-status">
-        <div class="bc-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-        </div>
-        <h3>Estado del desktop</h3>
-        <p>Heartbeat cada 20s. Sin señal en 45s → detenido.</p>
-        <div class="status-display">
-          <div class="status-row">
-            <div class="status-indicator green"></div>
-            <div class="status-label">Desktop activo</div>
-            <div class="status-desc">Heartbeat OK</div>
-          </div>
-          <div class="status-row">
-            <div class="status-indicator orange"></div>
-            <div class="status-label">Desktop detenido</div>
-            <div class="status-desc">Sin heartbeat</div>
-          </div>
-          <div class="status-row">
-            <div class="status-indicator gray"></div>
-            <div class="status-label">Sin conexión</div>
-            <div class="status-desc">Supabase offline</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Env vars (1×1) -->
-      <div class="bc bc-env">
-        <div class="bc-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        </div>
-        <h3>Código de emparejamiento</h3>
-        <p>Inicias sesión con tu correo y un clic genera tu código. Pégalo en la PWA. La infraestructura Supabase ya viene incluida — nada que configurar.</p>
-        <div class="env-inputs">
-          <div class="env-row">
-            <span class="env-key">SESSION</span>
-            <span class="env-val">a3f9b2:8d7c••••••••••••••••••••••</span>
-          </div>
-          <div class="env-row">
-            <span class="env-key">GITHUB</span>
-            <span class="env-val">ghp_••••••••••••••••</span>
-          </div>
-          <div class="env-row">
-            <span class="env-key">NETLIFY</span>
-            <span class="env-val">nfp_••••••••••••••</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Modelo (2×1) -->
-      <div class="bc bc-model">
-        <div class="bc-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-        </div>
-        <h3>Modelo y esfuerzo</h3>
-        <p>Elige el modelo de Claude y el nivel de razonamiento por proyecto.</p>
-        <div class="model-chips">
-          <span class="chip active">claude-sonnet-4-5</span>
-          <span class="chip">claude-opus-4</span>
-          <span class="chip">claude-haiku-4-5</span>
-        </div>
-        <div class="effort-bar">
-          <div class="effort-label">Effort — medium</div>
-          <div class="effort-track"><div class="effort-fill"></div></div>
-        </div>
-      </div>
-
-      <!-- Quick actions (2×1) -->
-      <div class="bc bc-quick">
-        <div class="bc-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <!-- QUICK ACTIONS -->
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         </div>
         <h3>Acciones rápidas</h3>
-        <p>Responde a Claude sin tipear: confirma, descarta o pídele que siga con un tap.</p>
-        <div class="quick-chips">
-          <span class="qchip">sí</span>
-          <span class="qchip">no</span>
-          <span class="qchip">continúa</span>
+        <p>Cuando Claude te pide una decisión, responde con un toque. No todo necesita un prompt completo.</p>
+        <div class="quick-btns">
+          <div class="q-btn">✓ Confirmar</div>
+          <div class="q-btn">✕ Cancelar</div>
+          <div class="q-btn">→ Continuar</div>
+          <div class="q-btn">sí</div>
+          <div class="q-btn">no</div>
         </div>
+        <p style="font-size: 12px; color: var(--text-3); margin-top: 12px; line-height: 1.5;">Convierte tareas frecuentes en respuestas rápidas configurables.</p>
       </div>
 
-      <!-- Voz bidireccional (2×1) -->
-      <div class="bc bc-voice">
-        <div class="bc-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="10" height="14" x="7" y="1" rx="5"/><path d="M4 12a8 8 0 0 0 16 0M12 19v4M8 23h8"/></svg>
+      <!-- MODEL & EFFORT -->
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 0-14.14 0M4.93 19.07a10 10 0 0 0 14.14 0"/><path d="M20.73 11a10 10 0 0 0-17.46 0M3.27 13a10 10 0 0 0 17.46 0"/></svg>
         </div>
-        <h3>Dicta por voz</h3>
-        <p>Manos libres, sin teclado. Mantén presionado el micrófono y habla — Gemini transcribe tu voz a texto y lo envía a Claude Code automáticamente.</p>
-        <div class="voice-preview">
-          <div class="voice-row">
-            <div class="voice-mic">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="10" height="14" x="7" y="1" rx="5"/><path d="M4 12a8 8 0 0 0 16 0M12 19v4M8 23h8"/></svg>
-            </div>
-            <div class="voice-bubble">"Explícame qué hace este componente"</div>
-          </div>
-          <div class="voice-row" style="justify-content:flex-end">
-            <div class="voice-bubble out">Es un hook de React que sincroniza el estado con Supabase Realtime...</div>
-          </div>
+        <h3>Modelo y esfuerzo</h3>
+        <p>Tú decides cuánto pensar. Selecciona el modelo y nivel de esfuerzo de Claude según la tarea.</p>
+        <div class="model-chips">
+          <div class="mchip">Haiku</div>
+          <div class="mchip active">Sonnet</div>
+          <div class="mchip">Opus</div>
         </div>
+        <div class="effort-row">
+          <div class="effort-label">Esfuerzo</div>
+          <div class="effort-track"><div class="effort-fill"></div></div>
+        </div>
+        <p style="font-size: 11px; color: var(--text-3); margin-top: 10px;">Rápido · Normal · Profundo</p>
       </div>
 
-      <!-- Carpetas del Mac (2×1) -->
-      <div class="bc bc-folder">
-        <div class="bc-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      <!-- STREAMING -->
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
-        <h3>Proyectos existentes</h3>
-        <p>¿Ya tienes un repo en tu Mac? Toca "Abrir carpeta" y el Finder aparece en el desktop. Selecciona cualquier ruta — no importa dónde esté.</p>
-        <div class="folder-preview">
-          <div class="folder-row highlight">
-            <div class="folder-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            </div>
-            <div class="folder-info">
-              <div class="folder-name">CC Controller</div>
-              <div class="folder-path">~/Documents/DP/CC Controller</div>
-            </div>
-            <span class="folder-badge">ACTIVO</span>
-          </div>
-          <div class="folder-row">
-            <div class="folder-icon dim">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            </div>
-            <div class="folder-info">
-              <div class="folder-name dim">mi-startup</div>
-              <div class="folder-path">~/Desktop/proyectos/mi-startup</div>
-            </div>
-          </div>
-          <div class="folder-row">
-            <div class="folder-icon dim">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            </div>
-            <div class="folder-info">
-              <div class="folder-name dim">work-repo</div>
-              <div class="folder-path">/Users/daniel/work/work-repo</div>
-            </div>
-          </div>
+        <h3>Streaming en tiempo real</h3>
+        <p>Mira a Claude trabajar. No esperes a que termine. La respuesta aparece mientras Claude genera, token por token.</p>
+        <div class="stream-lines">
+          <div class="stream-line"></div>
+          <div class="stream-line"></div>
+          <div class="stream-line"></div>
+          <div class="stream-line"></div>
+        </div>
+        <p style="font-size: 12px; color: var(--text-3); margin-top: 12px;">Notificación push cuando Claude termina cada tarea.</p>
+      </div>
+
+      <!-- FILES -->
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <h3>Envía archivos desde el iPhone</h3>
+        <p>¿Encontraste un screenshot? Mándaselo. Envía imágenes, PDFs, documentos y otros archivos directamente al proyecto activo.</p>
+        <div class="files-list">
+          <div class="file-row"><div class="file-ext">PNG</div><div class="file-name">bug-screenshot.png</div><div class="file-size">340 KB</div></div>
+          <div class="file-row"><div class="file-ext">PDF</div><div class="file-name">especificacion.pdf</div><div class="file-size">1.2 MB</div></div>
         </div>
       </div>
 
@@ -1064,270 +928,266 @@ export interface ButtonProps {
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
+<!-- ═══════════════════ DIFFERENTIATOR ═══════════════════ -->
+<section class="diff">
+  <div class="diff-inner">
+    <span class="section-eyebrow">El verdadero diferenciador</span>
+    <h2>No construimos otra versión de Claude.<br><em>Construimos una mejor forma de trabajar con Claude Code.</em></h2>
+    <p>Claude Code sigue siendo el motor. Tu Mac sigue siendo el entorno. Tus archivos siguen estando donde siempre.</p>
+    <p><strong>CC Controller simplemente pone el control en tu bolsillo.</strong></p>
+    <p style="font-size: 14px; color: var(--text-3);">Instalas CC Controller y sigues utilizando Claude Code exactamente igual que siempre. Sin cambiar tu workflow. Sin mover tus proyectos.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════ COMPARISON ═══════════════════ -->
+<section class="comparison">
+  <div class="comparison-inner">
+    <span class="section-eyebrow">¿Por qué CC Controller?</span>
+    <h2 class="section-title">Diseñado para este workflow.</h2>
+    <div class="compare-table">
+      <div class="compare-header">
+        <div class="col">Característica</div>
+        <div class="col">Claude Code</div>
+        <div class="col highlight">CC Controller</div>
+      </div>
+      <div class="compare-row"><div class="feat-name">Claude Code en tu Mac</div><div class="val yes">✓</div><div class="val yes">✓</div></div>
+      <div class="compare-row"><div class="feat-name">Control desde móvil</div><div class="val yes">✓</div><div class="val yes">✓</div></div>
+      <div class="compare-row"><div class="feat-name">Interfaz propia para tu workflow</div><div class="val no">—</div><div class="val yes">✓</div></div>
+      <div class="compare-row"><div class="feat-name">Gestión visual de proyectos</div><div class="val no">—</div><div class="val yes">✓</div></div>
+      <div class="compare-row"><div class="feat-name">Instrucciones por voz</div><div class="val no">—</div><div class="val yes">✓</div></div>
+      <div class="compare-row"><div class="feat-name">Acciones rápidas</div><div class="val no">—</div><div class="val yes">✓</div></div>
+      <div class="compare-row"><div class="feat-name">Selección de modelo y esfuerzo</div><div class="val yes">✓</div><div class="val yes">✓</div></div>
+      <div class="compare-row"><div class="feat-name">Envío de archivos</div><div class="val yes">✓</div><div class="val yes">✓</div></div>
+      <div class="compare-row"><div class="feat-name">Open Source</div><div class="val no">—</div><div class="val yes">✓</div></div>
+      <div class="compare-row"><div class="feat-name">Precio adicional</div><div class="val no" style="font-size:11px">Incluido en Claude</div><div class="val special">$4.99 una vez</div></div>
+    </div>
+    <p style="font-size: 12px; color: var(--text-3); text-align: center; margin-top: 16px;">La ventaja no es que otros no puedan hacer X. Es que CC Controller está diseñado específicamente para este workflow.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════ HOW IT WORKS ═══════════════════ -->
 <section class="how" id="how">
   <div class="how-inner">
-    <span class="section-eyebrow">Arquitectura</span>
-    <h2 class="section-title">Tres piezas. Sin complejidad<br>innecesaria.</h2>
-
+    <span class="section-eyebrow">Así de simple funciona</span>
+    <h2 class="section-title">Empieza en minutos.</h2>
     <div class="steps-grid">
       <div class="step-card">
-        <div class="step-n">1</div>
-        <h3>PWA recibe tu prompt</h3>
-        <p>Inicias sesión en la PWA y escribes desde el iPhone. El mensaje viaja por un canal privado de Supabase Broadcast, con token de sesión validado en cada evento.</p>
-        <span class="step-code">sendEvent('input', { text, token })</span>
+        <div class="step-n">01</div>
+        <h3>Instala CC Controller</h3>
+        <p>Descarga el companion de escritorio y arrástralo a tu carpeta de Aplicaciones. Compatible con Apple Silicon e Intel.</p>
+        <div class="step-note"><a href="/pago" style="color: var(--orange);">Obtener CC Controller →</a></div>
       </div>
       <div class="step-card">
-        <div class="step-n">2</div>
-        <h3>Electron ejecuta Claude</h3>
-        <p>El desktop recibe el evento, valida el token y ejecuta <code style="font-family:monospace;font-size:11px">claude --print</code> dentro del directorio del proyecto activo en tu Mac.</p>
-        <span class="step-code">claude --print --continue</span>
+        <div class="step-n">02</div>
+        <h3>Conecta tu iPhone</h3>
+        <p>Abre <strong style="color: var(--orange);">ccc.kitifica.com</strong> en Safari desde tu iPhone. Crea tu cuenta y empareja tu dispositivo con el código del tray.</p>
+        <div class="step-note">Funciona como PWA — sin App Store.</div>
       </div>
       <div class="step-card">
-        <div class="step-n">3</div>
-        <h3>Streaming token a token</h3>
-        <p>Cada chunk de stdout llega como evento <code style="font-family:monospace;font-size:11px">chunk</code> por Supabase Broadcast. La PWA muestra texto creciendo en vivo con cursor naranja. Al terminar, el mensaje queda en historial.</p>
-        <span class="step-code">broadcast('chunk', { text, done })</span>
+        <div class="step-n">03</div>
+        <h3>Controla Claude Code</h3>
+        <p>Elige tu proyecto, envía instrucciones y recibe las respuestas de Claude en tiempo real desde cualquier lugar.</p>
+        <div class="step-note">Requiere Claude Code CLI instalado en tu Mac.</div>
       </div>
     </div>
 
-    <div class="arch-table">
-      <div class="arch-row">
-        <span class="arch-badge e">Electron 30</span>
-        <span class="arch-desc">Tray app, gestiona procesos Claude, escribe proyectos y .env en disco local</span>
-        <span class="arch-role">Mac · Node.js</span>
+    <div class="how-arch">
+      <div style="font-size: 12px; color: var(--text-3); margin-bottom: 16px;">Tu código no se ejecuta en nuestros servidores.</div>
+      <div class="how-arch-flow">
+        <div class="arch-item">
+          <div class="arch-item-icon">📱</div>
+          <div class="arch-item-label">iPhone</div>
+          <div class="arch-item-sub">CC Controller</div>
+        </div>
+        <div class="arch-sep">→</div>
+        <div class="arch-item">
+          <div class="arch-item-icon">☁️</div>
+          <div class="arch-item-label">Supabase</div>
+          <div class="arch-item-sub">Realtime Broadcast</div>
+        </div>
+        <div class="arch-sep">→</div>
+        <div class="arch-item">
+          <div class="arch-item-icon">🖥️</div>
+          <div class="arch-item-label">Mac</div>
+          <div class="arch-item-sub">Companion</div>
+        </div>
+        <div class="arch-sep">→</div>
+        <div class="arch-item">
+          <div class="arch-item-icon">⚡</div>
+          <div class="arch-item-label">Claude Code</div>
+          <div class="arch-item-sub">claude --print</div>
+        </div>
       </div>
-      <div class="arch-row">
-        <span class="arch-badge n">Next.js 14</span>
-        <span class="arch-desc">PWA instalable, UI de chat, subida de archivos, configuración de modelo</span>
-        <span class="arch-role">iPhone · Netlify</span>
-      </div>
-      <div class="arch-row">
-        <span class="arch-badge s">Supabase</span>
-        <span class="arch-desc">Canal Broadcast para mensajes (sin DB), Storage para archivos en tránsito</span>
-        <span class="arch-role">Backend · Realtime</span>
-      </div>
-      <div class="arch-row">
-        <span class="arch-badge nl">Netlify</span>
-        <span class="arch-desc">Deploy automático de la PWA, variables de entorno por interfaz gráfica</span>
-        <span class="arch-role">CDN · Edge</span>
-      </div>
+      <div class="how-note">Canales privados cifrados · <em>Sin puertos abiertos</em> · Sin acceso a tu código desde el exterior</div>
     </div>
   </div>
 </section>
 
-<!-- SECURITY -->
+<!-- ═══════════════════ SECURITY ═══════════════════ -->
 <section class="security">
   <div class="security-inner">
-    <span class="section-eyebrow">Seguridad</span>
-    <h2 class="section-title">Sin firma de Apple.<br>Con código que puedes leer.</h2>
-    <p class="section-sub" style="max-width:560px;margin:0 auto 48px">El DMG no está notarizado. Lo que sí existe es código abierto: puedes leer <code style="font-family:monospace;font-size:13px">main.js</code>, <code style="font-family:monospace;font-size:13px">bridge.js</code> y <code style="font-family:monospace;font-size:13px">pty.js</code> antes de ejecutar cualquier cosa.</p>
-    <div class="security-grid">
-      <div class="sec-card">
-        <div class="sec-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <div class="sec-body">
-          <h4>Código de emparejamiento</h4>
-          <p>Tu canal es privado: Supabase solo deja entrar a tu cuenta. Encima va el token del setup + tu SESSION_ID único; sin ese par exacto, cualquier evento llega y se descarta en silencio.</p>
-          <span class="sec-chip">SESSION_ID + SESSION_TOKEN</span>
-        </div>
-      </div>
-      <div class="sec-card">
-        <div class="sec-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
-        </div>
-        <div class="sec-body">
-          <h4>Sin puertos abiertos</h4>
-          <p>El Mac no escucha en ningún puerto. Todo viaja por Supabase WebSocket (WSS/TLS). Sin SSH, sin túneles ngrok, sin IP del Mac expuesta en internet.</p>
-          <span class="sec-chip">wss:// solo — 0 puertos locales</span>
-        </div>
-      </div>
-      <div class="sec-card">
-        <div class="sec-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-        </div>
-        <div class="sec-body">
-          <h4>Path traversal bloqueado</h4>
-          <p>Electron valida que toda ruta de archivo quede dentro de <code style="font-size:11px;font-family:monospace">~/CCProjects/</code>. Rutas absolutas o con <code style="font-size:11px;font-family:monospace">../</code> rechazadas explícitamente.</p>
-          <span class="sec-chip">destPath.startsWith(project.path + sep)</span>
-        </div>
-      </div>
-      <div class="sec-card">
-        <div class="sec-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        </div>
-        <div class="sec-body">
-          <h4>Whitelist de archivos</h4>
-          <p>Solo extensiones permitidas (<code style="font-size:11px;font-family:monospace">.png .jpg .pdf .txt .md .json .csv .svg .zip</code>). Máx. 10 MB. El archivo se elimina de Supabase Storage inmediatamente tras descargarse.</p>
-          <span class="sec-chip">ALLOWED_EXTENSIONS · MAX_FILE_BYTES</span>
-        </div>
-      </div>
-      <div class="sec-card">
-        <div class="sec-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        </div>
-        <div class="sec-body">
-          <h4>Secretos con permisos 600</h4>
-          <p>Las variables de entorno se guardan en <code style="font-size:11px;font-family:monospace">~/CCProjects/&lt;slug&gt;/.env</code> con <code style="font-size:11px;font-family:monospace">mode 0o600</code>. Solo el usuario del sistema puede leerlas.</p>
-          <span class="sec-chip">writeFileSync(path, data, {mode: 0o600})</span>
-        </div>
-      </div>
-      <div class="sec-card">
-        <div class="sec-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 9h.01M15 9h.01M9.5 13a3.5 3.5 0 0 0 5 0"/></svg>
-        </div>
-        <div class="sec-body">
-          <h4>Código abierto y auditable</h4>
-          <p>El repositorio completo está en GitHub. Antes de instalar puedes revisar cada línea. No hay código ofuscado ni binarios de terceros sin fuente.</p>
-          <span class="sec-chip"><a href="https://github.com/kitifica-max/cc-controller" target="_blank" rel="noopener" style="color:inherit">github.com/kitifica-max/cc-controller</a></span>
-        </div>
-      </div>
+    <span class="section-eyebrow">Tu código permanece en tu Mac</span>
+    <h2 class="section-title">Seguridad por diseño.</h2>
+    <div class="sec-badges">
+      <div class="sec-badge"><div class="sec-badge-icon">🔐</div><div><h4>Sin puertos abiertos</h4><p>El Mac no expone ningún servidor a Internet.</p></div></div>
+      <div class="sec-badge"><div class="sec-badge-icon">🔒</div><div><h4>Canales privados</h4><p>Supabase Realtime con autenticación JWT en cada conexión.</p></div></div>
+      <div class="sec-badge"><div class="sec-badge-icon">🪙</div><div><h4>Tokens de sesión</h4><p>Código de emparejamiento único por dispositivo, almacenado solo en tu móvil.</p></div></div>
+      <div class="sec-badge"><div class="sec-badge-icon">📁</div><div><h4>Validación de rutas</h4><p>Los archivos enviados se validan contra la ruta del proyecto activo.</p></div></div>
+      <div class="sec-badge"><div class="sec-badge-icon">🗑️</div><div><h4>Archivos temporales</h4><p>Los archivos subidos se eliminan del storage tras ser guardados localmente.</p></div></div>
+      <div class="sec-badge"><div class="sec-badge-icon">👁️</div><div><h4>Código auditable</h4><p>Todo el código fuente está disponible en GitHub. Nada que ocultar.</p></div></div>
+    </div>
+    <div class="sec-oss">
+      <p>¿Quieres comprobarlo tú mismo?</p>
+      <a class="btn-ghost" href="https://github.com/kitifica-max/cc-controller" target="_blank" rel="noopener">Ver código en GitHub →</a>
     </div>
   </div>
 </section>
 
-<!-- SETUP -->
-<section class="setup" id="setup">
-  <div class="setup-inner">
+<!-- ═══════════════════ INSTALL ═══════════════════ -->
+<section class="install">
+  <div class="install-inner">
     <span class="section-eyebrow">Instalación</span>
-    <h2 class="section-title">Listo en 5 minutos</h2>
-    <div class="setup-steps-row">
-
-      <div class="setup-step-card">
-        <div class="setup-step-num">1</div>
-        <div class="setup-step-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        </div>
-        <h3>Descarga e instala</h3>
-        <p>Descarga el DMG, ábrelo y arrastra <strong>CC Controller</strong> a tu carpeta de Aplicaciones.</p>
-        <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.3.1-arm64.dmg" class="setup-dl-btn">
-          Descargar DMG (Apple Silicon) <span style="opacity:.65;font-size:.85em">v1.3.1</span>
-        </a>
-        <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.3.1.dmg" class="setup-dl-btn setup-dl-btn--ghost">
-          Descargar DMG (Intel) <span style="opacity:.65;font-size:.85em">v1.3.1</span>
-        </a>
-        <details class="gatekeeper-note">
-          <summary class="gatekeeper-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            macOS bloqueará la app al primer intento
-            <svg class="gatekeeper-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </summary>
-          <p>Es normal — el DMG no está firmado por Apple. La PWA sí está verificada (Lighthouse: 99 Performance · 100 Best Practices · PWA instalable). Para abrir la app de escritorio:</p>
-          <ol class="gatekeeper-steps">
-            <li>Ve a <strong>Configuración del Sistema → Privacidad y Seguridad</strong></li>
-            <li>Baja hasta ver <em>"CC Controller fue bloqueado…"</em></li>
-            <li>Haz clic en <strong>Abrir de todas formas</strong></li>
-            <li>Confirma con <strong>Abrir de todas formas</strong> en el diálogo</li>
-          </ol>
-        </details>
-      </div>
-
-      <div class="setup-step-arrow">→</div>
-
-      <div class="setup-step-card">
-        <div class="setup-step-num">2</div>
-        <div class="setup-step-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
-        </div>
-        <h3>Genera tu código</h3>
-        <p>Al abrirla por primera vez, inicias sesión con tu correo y un clic genera tu <strong>código de emparejamiento</strong>. Solo necesitas tener Claude Code CLI instalado.</p>
-        <div class="setup-req">
-          <span class="setup-req-item">✓ <a href="https://claude.ai/download" target="_blank" rel="noopener" style="color:var(--teal);text-decoration:underline;">Instala Claude Code</a> desde claude.ai/download</span>
-          <span class="setup-req-item" style="color:var(--text-3);font-family:'SF Mono',ui-monospace,monospace;font-size:11px;">npm install -g @anthropic-ai/claude-code</span>
+    <h2 class="section-title">Tres pasos. Sin configuración.</h2>
+    <div class="install-steps">
+      <div class="install-step">
+        <div class="install-num">1</div>
+        <h3>Descarga CC Controller</h3>
+        <p>Descarga el DMG para tu Mac y arrástralo a Aplicaciones. Apple Silicon e Intel.</p>
+        <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;">
+          <a href="/pago" class="btn-primary" style="font-size: 13px; padding: 10px 18px; border-radius: 100px; justify-content: center; text-decoration: none;">Obtener CC Controller</a>
         </div>
       </div>
-
-      <div class="setup-step-arrow">→</div>
-
-      <div class="setup-step-card">
-        <div class="setup-step-num">3</div>
-        <div class="setup-step-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+      <div class="install-step">
+        <div class="install-num">2</div>
+        <h3>Instala Claude Code</h3>
+        <p>Si todavía no lo tienes, instala Claude Code CLI. Disponible para macOS, Linux y Windows.</p>
+        <div style="margin-top: 12px;">
+          <a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener" class="btn-ghost" style="font-size: 12px; padding: 8px 16px;">Instalar Claude Code →</a>
         </div>
-        <h3>Empareja tu iPhone</h3>
-        <p>Abre <strong>ccc.kitifica.com</strong> en Safari, crea una cuenta y pega el <strong>código de emparejamiento</strong> en la pantalla de configuración. Listo.</p>
-        <a href="https://ccc.kitifica.com" target="_blank" rel="noopener" class="setup-dl-btn">
-          Abrir PWA →
-        </a>
       </div>
+      <div class="install-step">
+        <div class="install-num">3</div>
+        <h3>Conecta tu iPhone</h3>
+        <p>Abre ccc.kitifica.com desde Safari, crea tu cuenta y pega el código de emparejamiento del tray. Listo.</p>
+      </div>
+    </div>
 
+    <div class="install-details-wrap">
+      <details>
+        <summary>¿macOS bloqueó la aplicación?</summary>
+        <p>CC Controller no está notarizado por Apple. Si macOS bloquea la apertura:</p>
+        <ol>
+          <li>Ve a <strong>Configuración del Sistema → Privacidad y Seguridad</strong></li>
+          <li>Busca el mensaje sobre CC Controller y haz clic en <strong>"Abrir igualmente"</strong></li>
+          <li>Confirma en el diálogo que aparece</li>
+        </ol>
+        <p>Solo necesitas hacerlo una vez. El código fuente está disponible en GitHub para que puedas auditarlo.</p>
+      </details>
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
+<!-- ═══════════════════ PRICE ═══════════════════ -->
+<section class="price" id="price">
+  <div class="price-inner">
+    <span class="section-eyebrow" style="text-align: center; display: block; margin-bottom: 20px;">Una compra. Sin otra suscripción.</span>
+    <div class="price-card">
+      <div class="price-tag">
+        <span class="price-currency">$</span><span class="price-amount">4.99</span>
+      </div>
+      <div class="price-period"><em>Pago único · Acceso de por vida</em></div>
+      <div class="price-features">
+        <div class="price-feat">Control de Claude Code desde tu iPhone</div>
+        <div class="price-feat">Instrucciones por voz (voz → texto)</div>
+        <div class="price-feat">Gestión visual de proyectos</div>
+        <div class="price-feat">Acciones rápidas configurables</div>
+        <div class="price-feat">Streaming en tiempo real</div>
+        <div class="price-feat">Envío de archivos al proyecto</div>
+        <div class="price-feat">Selección de modelo y esfuerzo</div>
+        <div class="price-feat">Prueba gratis de 7 días</div>
+        <div class="price-feat">Open Source · Código auditable</div>
+      </div>
+      <div class="price-cta-wrap">
+        <a class="price-cta" href="/pago">Obtener CC Controller — $4.99</a>
+        <div class="price-note-row">No pagas por tokens · No pagas una suscripción adicional · Pago seguro con 3DS</div>
+      </div>
+    </div>
+    <p style="text-align: center; font-size: 13px; color: var(--text-3); margin-top: 20px; line-height: 1.6;">
+      Claude trabaja en tu Mac. Tú decides desde dónde.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════ FAQ ═══════════════════ -->
+<section class="faq" id="faq">
+  <div class="faq-inner">
+    <span class="section-eyebrow">Preguntas frecuentes</span>
+    <h2 class="section-title">Todo lo que necesitas saber.</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.querySelector('.faq-a').style.display = this.parentElement.querySelector('.faq-a').style.display === 'none' ? 'block' : 'none'">
+          ¿Necesito Claude Code? <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a" style="display: none;">Sí. CC Controller es un complemento para Claude Code y no lo reemplaza. Necesitas tener Claude Code CLI instalado en tu Mac y un plan activo de Claude (Pro o Max).</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.querySelector('.faq-a').style.display = this.parentElement.querySelector('.faq-a').style.display === 'none' ? 'block' : 'none'">
+          ¿CC Controller ejecuta mi código en sus servidores? <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a" style="display: none;">No. Claude Code se ejecuta en tu Mac, con acceso a tu entorno local. CC Controller solo retransmite los mensajes entre tu iPhone y tu Mac mediante canales cifrados.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.querySelector('.faq-a').style.display = this.parentElement.querySelector('.faq-a').style.display === 'none' ? 'block' : 'none'">
+          ¿Necesito abrir puertos o configurar SSH? <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a" style="display: none;">No. CC Controller utiliza Supabase Realtime como canal de comunicación. Tu Mac inicia la conexión saliente; no necesitas abrir ningún puerto ni configurar SSH o túneles.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.querySelector('.faq-a').style.display = this.parentElement.querySelector('.faq-a').style.display === 'none' ? 'block' : 'none'">
+          ¿CC Controller consume mis tokens de Claude? <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a" style="display: none;">CC Controller no añade una API de IA propia. Las tareas las ejecuta tu propia instalación de Claude Code, por lo que el consumo de tokens es el mismo que si usaras Claude Code directamente.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.querySelector('.faq-a').style.display = this.parentElement.querySelector('.faq-a').style.display === 'none' ? 'block' : 'none'">
+          ¿Es una suscripción? <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a" style="display: none;">No. $4.99 es un pago único. Incluye acceso de por vida y todas las actualizaciones futuras. Hay un período de prueba gratuita de 7 días.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.querySelector('.faq-a').style.display = this.parentElement.querySelector('.faq-a').style.display === 'none' ? 'block' : 'none'">
+          ¿Puedo revisar el código fuente? <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a" style="display: none;">Sí. CC Controller es open source. Todo el código está disponible en <a href="https://github.com/kitifica-max/cc-controller" target="_blank" rel="noopener">GitHub</a>. Puedes auditarlo, compilarlo tú mismo o contribuir.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.querySelector('.faq-a').style.display = this.parentElement.querySelector('.faq-a').style.display === 'none' ? 'block' : 'none'">
+          ¿Funciona con otros agentes de coding? <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a" style="display: none;">CC Controller está diseñado y optimizado para Claude Code. Estamos explorando soporte para otros agentes de coding en futuras versiones.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
 <footer>
-  <div class="footer-logo">
-    <svg viewBox="0 0 302.21 302.21" xmlns="http://www.w3.org/2000/svg">
-      <rect fill="#333" width="302.21" height="302.21"/>
-      <path fill="none" d="M119.37,108.34c-10.91.3-21.34,4.77-29.08,12.51-8.36,8.36-12.53,18.44-12.53,30.26s4.18,21.91,12.53,30.26c8.07,8.08,17.77,12.24,29.08,12.51-8.22-12.57-12.35-26.82-12.35-42.77,0-15.95,4.13-30.2,12.35-42.77Z"/>
-      <path fill="#ff582a" d="M242.73,157.22h0c-7.37,0-13.92,4.45-16.91,11.19-2.08,4.69-5.07,8.99-8.99,12.9-8.11,8.11-17.83,12.29-29.14,12.57-.4,0-.79.03-1.19.03-11.82,0-21.91-4.18-30.26-12.53-.96-.96-1.86-1.94-2.7-2.95-6.55-7.75-9.83-16.85-9.83-27.32s3.29-19.6,9.87-27.36c-.84-1.01-1.74-2-2.7-2.96-8.39-8.31-18.5-12.47-30.31-12.47-.4,0-.8.02-1.2.03-8.22,12.57-12.35,26.82-12.35,42.77,0,15.96,4.13,30.21,12.35,42.77,3.08,4.71,6.71,9.18,10.94,13.42,7.07,7.07,14.81,12.51,23.2,16.36,10.05,4.61,21.04,6.93,32.99,6.93,21.93,0,40.68-7.78,56.25-23.36,7.34-7.34,12.94-15.42,16.8-24.22,5.33-12.16-3.55-25.8-16.83-25.8Z"/>
-      <path fill="#ff582a" d="M187.74,108.33c11.29.28,20.99,4.42,29.1,12.45,3.91,3.96,6.91,8.29,8.98,13,2.98,6.75,9.54,11.21,16.92,11.21h0c13.27,0,22.14-13.62,16.83-25.78-3.86-8.83-9.46-16.95-16.82-24.35-15.57-15.49-34.32-23.23-56.25-23.23-11.93,0-22.91,2.32-32.95,6.92,8.4,3.84,16.16,9.27,23.25,16.32,4.23,4.25,7.86,8.75,10.93,13.48Z"/>
-      <path fill="#ff9477" d="M176.78,157.22c-7.37,0-13.92,4.45-16.91,11.19-1.58,3.56-3.69,6.9-6.33,10.01.85,1,1.75,1.99,2.7,2.95,8.35,8.36,18.44,12.53,30.26,12.53.4,0,.79-.02,1.19-.03,2.28-3.49,4.26-7.1,5.91-10.86,5.33-12.16-3.55-25.8-16.83-25.8Z"/>
-      <path fill="#ff9477" d="M119.38,193.88c-11.31-.27-21.01-4.43-29.08-12.51-8.36-8.35-12.53-18.44-12.53-30.26s4.18-21.91,12.53-30.26c7.74-7.74,18.17-12.2,29.08-12.51.4-.01.8-.03,1.2-.03,11.81,0,21.91,4.16,30.31,12.47.95.97,1.85,1.95,2.7,2.96,2.62,3.13,4.72,6.48,6.29,10.03,2.98,6.75,9.54,11.21,16.92,11.21h0c13.27,0,22.14-13.62,16.83-25.78-1.64-3.76-3.62-7.38-5.89-10.87-3.07-4.73-6.7-9.23-10.93-13.48-7.09-7.05-14.84-12.48-23.25-16.32-10.06-4.6-21.06-6.92-33-6.92-21.93,0-40.66,7.76-56.19,23.29-15.53,15.53-23.3,34.26-23.3,56.19s7.76,40.66,23.3,56.19c15.53,15.53,34.26,23.3,56.19,23.3,11.93,0,22.91-2.32,32.96-6.93-8.39-3.85-16.13-9.29-23.2-16.36-4.23-4.23-7.87-8.71-10.94-13.42Z"/>
-    </svg>
-  </div>
-  <h3>CC Controller</h3>
-  <p>Control remoto de Claude Code · Streaming · Historia · Sin config</p>
-  <div class="footer-btns">
-    <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.3.1-arm64.dmg" class="btn-primary" style="font-size:13px">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Descargar para Mac <span style="opacity:.7;font-size:.85em">v1.3.1</span>
-    </a>
-    <a href="#features" class="footer-link">Funciones</a>
-    <a href="#how" class="footer-link">Arquitectura</a>
-    <a href="#setup" class="footer-link">Instalación</a>
-  </div>
-  <div class="footer-made-by">
-    <span>Hecho por</span>
-    <a href="https://kitifica.com" target="_blank" rel="noopener" class="footer-kitifica-logo">
-      <svg viewBox="0 0 511.1 136.19" xmlns="http://www.w3.org/2000/svg">
-        <defs><style>.cls-1{fill:rgba(255,255,255,0.55)}</style></defs>
-        <g>
-          <g>
-            <path class="cls-1" d="M108.3,58.49v49.69c0,4.13-3.36,7.5-7.5,7.5H25.19c-4.13,0-7.5-3.36-7.5-7.5v-49.74c-3.57.07-7.14.18-10.71.23v49.51c0,10.04,8.17,18.21,18.21,18.21h75.61c10.04,0,18.21-8.17,18.21-18.21v-49.65c-3.57-.02-7.14-.03-10.71-.03Z"/>
-            <path class="cls-1" d="M87.36,24.63h-10.71v-10.73c0-1.76-1.43-3.19-3.19-3.19h-20.93c-1.76,0-3.19,1.43-3.19,3.19v10.73h-10.71v-10.73c0-7.67,6.24-13.9,13.9-13.9h20.93c7.67,0,13.9,6.24,13.9,13.9v10.73Z"/>
-            <g>
-              <g>
-                <path class="cls-1" d="M109.93,19.28H16.07C7.21,19.28,0,26.49,0,35.34v17.81c0,5.18,4.22,9.4,9.4,9.4h43.45c-.7-1.46-1.1-3.09-1.1-4.82,0-2.16.62-4.18,1.68-5.89H10.71v-16.49c0-2.95,2.4-5.36,5.36-5.36h93.86c2.95,0,5.36,2.4,5.36,5.36v16.49h-42.72c1.06,1.71,1.68,3.73,1.68,5.89,0,1.73-.4,3.36-1.1,4.82h43.45c5.18,0,9.4-4.22,9.4-9.4v-17.81c0-8.86-7.21-16.07-16.07-16.07Z"/>
-                <path class="cls-1" d="M63,68.98c4.48,0,8.34-2.63,10.15-6.43h-20.3c1.81,3.8,5.67,6.43,10.15,6.43Z"/>
-                <path class="cls-1" d="M63,46.48c-4.05,0-7.59,2.15-9.57,5.36h19.13c-1.98-3.21-5.52-5.36-9.57-5.36Z"/>
-              </g>
-              <path class="cls-1" d="M65.68,74.33h-5.36c-7.68,0-13.92-6.25-13.92-13.92v-5.36c0-7.68,6.25-13.92,13.92-13.92h5.36c7.68,0,13.92,6.25,13.92,13.92v5.36c0,7.68-6.25,13.92-13.92,13.92ZM60.32,51.84c-1.77,0-3.21,1.44-3.21,3.21v5.36c0,1.77,1.44,3.21,3.21,3.21h5.36c1.77,0,3.21-1.44,3.21-3.21v-5.36c0-1.77-1.44-3.21-3.21-3.21h-5.36Z"/>
-            </g>
-          </g>
-          <g>
-            <path class="cls-1" d="M171.94,110.22c-1.75,1.93-4.22,2.9-7.41,2.9s-5.67-.97-7.41-2.9c-1.75-1.93-2.62-4.46-2.62-7.58v-61.2c0-3.05.87-5.54,2.62-7.47,1.75-1.93,4.22-2.9,7.41-2.9s5.67.97,7.41,2.9c1.75,1.93,2.62,4.42,2.62,7.47v20.85h10.92l16.16-26.2c1.04-1.71,2.17-2.97,3.4-3.79,1.23-.82,2.92-1.23,5.07-1.23,2.82,0,5.22.97,7.19,2.9,1.97,1.93,2.95,4.2,2.95,6.8,0,2.08-.45,3.75-1.34,5.02l-17.06,25.64,17.95,26.75c.97,1.56,1.45,3.23,1.45,5.02,0,2.68-1.04,5-3.12,6.97-2.08,1.97-4.53,2.95-7.36,2.95-2.08,0-3.75-.43-5.02-1.28-1.26-.85-2.42-2.17-3.46-3.96l-17.17-26.53h-10.59v21.29c0,3.12-.87,5.65-2.62,7.58Z"/>
-            <path class="cls-1" d="M245.29,45.23c-2.27,2.16-5.29,3.23-9.09,3.23s-6.84-1.08-9.14-3.23c-2.3-2.15-3.46-5.09-3.46-8.81s1.15-6.63,3.46-8.75c2.3-2.12,5.35-3.18,9.14-3.18s6.73,1.06,9.03,3.18c2.3,2.12,3.46,5.04,3.46,8.75s-1.13,6.65-3.4,8.81ZM243.67,110.22c-1.71,1.93-4.16,2.9-7.36,2.9s-5.69-.98-7.47-2.95c-1.78-1.97-2.68-4.48-2.68-7.52v-37.35c0-3.05.87-5.54,2.62-7.47,1.75-1.93,4.25-2.9,7.52-2.9s5.65.95,7.36,2.84c1.71,1.9,2.56,4.4,2.56,7.52v37.35c0,3.12-.86,5.65-2.56,7.58Z"/>
-            <path class="cls-1" d="M288.82,95.06c1.71,0,3.16.67,4.35,2.01,1.19,1.34,1.78,3.16,1.78,5.46,0,2.68-.71,4.9-2.12,6.69-2.6,3.19-7.1,4.79-13.49,4.79-6.91,0-12.06-2.08-15.44-6.24-3.38-4.16-5.07-9.55-5.07-16.16v-19.28h-1.45c-2.38,0-4.35-.78-5.91-2.34-1.56-1.56-2.34-3.57-2.34-6.02s.78-4.35,2.34-5.91c1.56-1.56,3.53-2.34,5.91-2.34h2.45c.22-1.26.56-2.53,1-3.79,1.86-6.39,5.16-9.59,9.92-9.59,5.42,0,8.14,3.01,8.14,9.03v4.35h6.46c2.38,0,4.33.78,5.85,2.34,1.52,1.56,2.29,3.53,2.29,5.91s-.76,4.46-2.29,6.02c-1.52,1.56-3.47,2.34-5.85,2.34h-6.46v17.06c0,2.23.26,3.94.78,5.13.52,1.19,1.63,1.78,3.34,1.78.82,0,1.77-.2,2.84-.61,1.08-.41,2.06-.61,2.95-.61Z"/>
-            <path class="cls-1" d="M317.86,45.23c-2.27,2.16-5.29,3.23-9.08,3.23s-6.84-1.08-9.14-3.23c-2.3-2.15-3.46-5.09-3.46-8.81s1.15-6.63,3.46-8.75c2.3-2.12,5.35-3.18,9.14-3.18s6.73,1.06,9.03,3.18c2.3,2.12,3.46,5.04,3.46,8.75s-1.13,6.65-3.4,8.81ZM316.24,110.22c-1.71,1.93-4.16,2.9-7.36,2.9s-5.69-.98-7.47-2.95c-1.78-1.97-2.68-4.48-2.68-7.52v-37.35c0-3.05.87-5.54,2.62-7.47,1.75-1.93,4.25-2.9,7.52-2.9s5.65.95,7.36,2.84c1.71,1.9,2.56,4.4,2.56,7.52v37.35c0,3.12-.86,5.65-2.56,7.58Z"/>
-            <path class="cls-1" d="M377.78,55.71c2.68,0,4.72.76,6.13,2.28,1.41,1.52,2.12,3.55,2.12,6.08v38.57c0,3.12-.86,5.65-2.56,7.58-1.71,1.93-4.16,2.9-7.36,2.9s-5.69-.98-7.47-2.95c-1.78-1.97-2.68-4.48-2.68-7.52v-30.32h-13.82v53.51c0,3.05-.86,5.54-2.56,7.47-1.71,1.93-4.16,2.9-7.36,2.9s-5.78-.95-7.52-2.84c-1.75-1.9-2.62-4.4-2.62-7.52l-.22-53.51h-.33c-2.38,0-4.35-.78-5.91-2.34-1.56-1.56-2.34-3.57-2.34-6.02s.78-4.35,2.34-5.91c1.56-1.56,3.53-2.34,5.91-2.34h.33c.67-10.77,3.73-18.35,9.2-22.74,5.46-4.38,12.69-6.58,21.68-6.58s15.05,1.9,19.28,5.69c2.16,1.78,3.23,3.9,3.23,6.35s-.69,4.31-2.06,5.57c-1.38,1.26-3.07,1.9-5.07,1.9-1.78,0-4.16-.54-7.13-1.62-2.97-1.08-5.87-1.62-8.69-1.62-6.09,0-9.44,4.35-10.03,13.04h25.53Z"/>
-            <path class="cls-1" d="M422.03,114.01c-9.59,0-17.07-2.79-22.46-8.36-5.39-5.57-8.08-12.78-8.08-21.63s2.84-16.33,8.53-21.79c5.69-5.46,13.28-8.19,22.8-8.19,6.54,0,11.56,1.15,15.05,3.46,3.05,2.08,4.57,4.83,4.57,8.25,0,2.08-.67,3.85-2.01,5.29-1.34,1.45-3.12,2.17-5.35,2.17-1.41,0-3.2-.39-5.35-1.17-2.16-.78-4.24-1.17-6.24-1.17-3.79,0-6.76,1.25-8.92,3.73-2.16,2.49-3.23,5.67-3.23,9.53s1.08,6.93,3.23,9.42c2.16,2.49,5.13,3.73,8.92,3.73,2.01,0,4.09-.39,6.24-1.17,2.16-.78,3.94-1.17,5.35-1.17,2.23,0,4.01.72,5.35,2.17,1.34,1.45,2.01,3.18,2.01,5.18,0,3.49-1.64,6.24-4.91,8.25-3.49,2.3-8.66,3.46-15.49,3.46Z"/>
-            <path class="cls-1" d="M469.97,114.12c-7.88,0-14.12-2.77-18.73-8.31-4.61-5.54-6.91-12.76-6.91-21.68s2.38-16.16,7.13-21.74c4.76-5.57,11.15-8.36,19.17-8.36s14.23,3.23,17.5,9.7h.22v-1.34c.15-2.23.91-4.03,2.29-5.41s3.32-2.06,5.85-2.06,4.61.76,6.02,2.29c1.41,1.52,2.12,3.55,2.12,6.08v27.09c0,1.41.11,2.53.33,3.34.22.82.45,1.36.67,1.62.22.26.71.69,1.45,1.28,2.68,1.93,4.01,4.46,4.01,7.58s-.97,5.37-2.9,7.19c-1.93,1.82-4.61,2.73-8.03,2.73s-6.35-1-8.36-3.01c-2.01-2.01-3.27-4.01-3.79-6.02h-.22c-1.64,2.9-4.01,5.13-7.13,6.69-3.12,1.56-6.69,2.34-10.7,2.34ZM467.79,93.55c1.9,2.34,4.44,3.51,7.64,3.51s5.72-1.13,7.58-3.4c1.86-2.27,2.75-5.48,2.68-9.64,0-4.16-.91-7.34-2.73-9.53-1.82-2.19-4.37-3.29-7.64-3.29s-5.63,1.15-7.53,3.46c-1.9,2.3-2.84,5.46-2.84,9.48s.95,7.08,2.84,9.42Z"/>
-          </g>
-        </g>
-      </svg>
-    </a>
-  </div>
-  <small>MIT License · <a href="https://github.com/kitifica-max/cc-controller" target="_blank" rel="noopener" style="color:inherit">Código abierto en GitHub</a></small>
-  <div style="margin-top:12px;display:flex;justify-content:center;gap:24px;flex-wrap:wrap;">
-    <a href="/privacy/" style="color:var(--muted);font-size:12px;text-decoration:none;">Privacidad</a>
-    <a href="/terms/" style="color:var(--muted);font-size:12px;text-decoration:none;">Términos</a>
-    <a href="/contact/" style="color:var(--muted);font-size:12px;text-decoration:none;">Contacto</a>
+  <div class="footer-inner">
+    <div class="footer-left">
+      <div class="footer-brand">
+        <svg width="24" height="24" viewBox="0 0 302.21 302.21" xmlns="http://www.w3.org/2000/svg" style="border-radius:6px">
+          <rect width="302.21" height="302.21" rx="68" ry="68" fill="#f0f0f0"/>
+          <path fill="#ff582a" d="M242.73,157.22h0c-7.37,0-13.92,4.45-16.91,11.19-2.08,4.69-5.07,8.99-8.99,12.9-8.11,8.11-17.83,12.29-29.14,12.57-.4,0-.79.03-1.19.03-11.82,0-21.91-4.18-30.26-12.53-.96-.96-1.86-1.94-2.7-2.95-6.55-7.75-9.83-16.85-9.83-27.32s3.29-19.6,9.87-27.36c-.84-1.01-1.74-2-2.7-2.96-8.39-8.31-18.5-12.47-30.31-12.47-.4,0-.8.02-1.2.03-8.22,12.57-12.35,26.82-12.35,42.77,0,15.96,4.13,30.21,12.35,42.77,3.08,4.71,6.71,9.18,10.94,13.42,7.07,7.07,14.81,12.51,23.2,16.36,10.05,4.61,21.04,6.93,32.99,6.93,21.93,0,40.68-7.78,56.25-23.36,7.34-7.34,12.94-15.42,16.8-24.22,5.33-12.16-3.55-25.8-16.83-25.8Z"/>
+          <path fill="#ff9477" d="M119.38,193.88c-11.31-.27-21.01-4.43-29.08-12.51-8.36-8.35-12.53-18.44-12.53-30.26s4.18-21.91,12.53-30.26c7.74-7.74,18.17-12.2,29.08-12.51.4-.01.8-.03,1.2-.03,11.81,0,21.91,4.16,30.31,12.47.95.97,1.85,1.95,2.7,2.96,2.62,3.13,4.72,6.48,6.29,10.03,2.98,6.75,9.54,11.21,16.92,11.21h0c13.27,0,22.14-13.62,16.83-25.78-1.64-3.76-3.62-7.38-5.89-10.87-3.07-4.73-6.7-9.23-10.93-13.48-7.09-7.05-14.84-12.48-23.25-16.32-10.06-4.6-21.06-6.92-33-6.92-21.93,0-40.66,7.76-56.19,23.29-15.53,15.53-23.3,34.26-23.3,56.19s7.76,40.66,23.3,56.19c15.53,15.53,34.26,23.3,56.19,23.3,11.93,0,22.91-2.32,32.96-6.93-8.39-3.85-16.13-9.29-23.2-16.36-4.23-4.23-7.87-8.71-10.94-13.42Z"/>
+        </svg>
+        <span class="footer-name">CC Controller</span>
+      </div>
+      <div class="footer-tagline">Claude trabaja en tu Mac. Tú decides desde dónde.<br>Open Source · MIT License · $4.99 pago único</div>
+    </div>
+    <div class="footer-links">
+      <a class="footer-link" href="https://github.com/kitifica-max/cc-controller" target="_blank" rel="noopener">GitHub</a>
+      <a class="footer-link" href="https://kitifica.com" target="_blank" rel="noopener">Kitifica</a>
+      <a class="footer-link" href="mailto:kitifica@gmail.com">Contacto</a>
+    </div>
   </div>
 </footer>
-
-<script>
-fetch('/api/downloads')
-  .then(r => r.json())
-  .then(({ total }) => {
-    if (!total) return;
-    const statEl = document.getElementById('stat-dl-count');
-    if (statEl) statEl.innerHTML = '<span>' + total.toLocaleString('es') + '</span>';
-    const heroNum = document.getElementById('hero-dl-num');
-    const heroWrap = document.getElementById('hero-dl-count');
-    if (heroNum && heroWrap) { heroNum.textContent = total.toLocaleString('es'); heroWrap.style.display = 'inline'; }
-  })
-  .catch(() => {});
-</script>
