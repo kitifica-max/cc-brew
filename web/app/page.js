@@ -225,10 +225,25 @@ function CCController() {
             id: Math.random().toString(36).slice(2),
             role: m.role === 'claude' ? 'assistant' : m.role,
             text: m.text,
+            ...(m.imageUrl ? { imageUrl: m.imageUrl } : {}),
             time: new Date(m.ts).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }),
           }));
         return msgs.length ? { ...p, messages: msgs } : p;
       }));
+    });
+
+    ch.on('broadcast', { event: 'image' }, ({ payload }) => {
+      if (!active) return;
+      resetDesktopTimeout();
+      const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+      const targetId = payload.projectId ?? currentIdRef.current;
+      setProjects(ps => ps.map(p => p.id !== targetId ? p : {
+        ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: 'claude', imageUrl: payload.url, text: '', time }],
+      }));
+      if (document.visibilityState !== 'visible') {
+        unreadRef.current += 1;
+        navigator.setAppBadge?.(unreadRef.current).catch(() => {});
+      }
     });
 
     ch.on('broadcast', { event: 'mcp-config' }, ({ payload }) => {
@@ -724,6 +739,19 @@ function MessageRow({ msg }) {
 
   if (msg.role === 'system') return (
     <div style={{ textAlign: 'center', fontSize: 10, fontWeight: 600, color: '#999999', padding: '4px 0' }}>{msg.text}</div>
+  );
+
+  if (msg.imageUrl) return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+      <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#999999', marginBottom: 4, paddingLeft: 4 }}>Claude Code</div>
+      <div style={{ maxWidth: '92%', borderRadius: 18, borderBottomLeftRadius: 4, overflow: 'hidden', background: '#1a1a1a' }}>
+        <img src={msg.imageUrl} alt="Imagen generada" style={{ display: 'block', maxWidth: '100%', maxHeight: 420, objectFit: 'contain' }} />
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3, paddingLeft: 4 }}>
+        <span style={{ fontSize: 9, color: '#999999' }}>{msg.time}</span>
+        <a href={msg.imageUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 9, fontWeight: 600, color: '#bbb', textDecoration: 'none' }}>ver original</a>
+      </div>
+    </div>
   );
 
   function copyMsg() {

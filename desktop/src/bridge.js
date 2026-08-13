@@ -1,12 +1,17 @@
 import { createClient as defaultCreateClient } from '@supabase/supabase-js';
 import WebSocket from 'ws';
 import webpush from 'web-push';
+import { existsSync, readFileSync } from 'fs';
+import { extname, basename } from 'path';
 import { AUTH_STORAGE_KEY } from './auth-store.js';
 
 const ANSI_RE = /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g;
 // Claude Code MCP warnings que llegan a stdout en modo --print
 const MCP_WARN_RE = /Client\.\w+\(\) called but server does not advertise \w+ capability[^\n]*/g;
 const MAX_HISTORY = 200;
+const IMAGE_EXTS = new Set(['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp']);
+const IMAGE_PATH_RE = /\/((?:[^\s"'<>\\]+)\.(?:png|jpg|jpeg|gif|svg|webp))/gi;
+const IMAGE_MIME = { svg: 'image/svg+xml', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', png: 'image/png' };
 
 const ALLOWED_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.pdf', '.txt', '.md', '.markdown', '.json', '.csv', '.svg', '.zip']);
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
@@ -172,6 +177,14 @@ export default class Bridge {
       this._streamBuffers.delete(msgId);
       if (fullText) {
         this._addToHistory({ role: 'claude', text: fullText, projectId: buf.projectId });
+        // Detect image paths and broadcast them as separate image events
+        const seen = new Set();
+        let m;
+        IMAGE_PATH_RE.lastIndex = 0;
+        while ((m = IMAGE_PATH_RE.exec(fullText)) !== null) {
+          const p = '/' + m[1];
+          if (!seen.has(p)) { seen.add(p); this._uploadAndBroadcastImage(p, buf.projectId); }
+        }
       }
       this.channel?.send({
         type: 'broadcast',
@@ -185,6 +198,29 @@ export default class Bridge {
         payload: { msgId, text: clean, done: false, projectId: buf.projectId, ts: Date.now() },
       });
     }
+  }
+
+  async _uploadAndBroadcastImage(filePath, projectId = null) {
+    try {
+      if (!existsSync(filePath)) return;
+      const ext = extname(filePath).slice(1).toLowerCase();
+      if (!IMAGE_EXTS.has(ext)) return;
+      const buf = readFileSync(filePath);
+      if (buf.length > 10 * 1024 * 1024) return;
+      const key = `images/${this.sessionId}/${Date.now()}-${basename(filePath)}`;
+      const { error } = await this.client.storage.from('uploads').upload(key, buf, {
+        contentType: IMAGE_MIME[ext] ?? 'image/png',
+        upsert: true,
+      });
+      if (error) return;
+      const { data } = await this.client.storage.from('uploads').createSignedUrl(key, 3600);
+      if (!data?.signedUrl) return;
+      this._addToHistory({ role: 'claude', text: '', imageUrl: data.signedUrl, projectId });
+      this.channel?.send({
+        type: 'broadcast', event: 'image',
+        payload: { url: data.signedUrl, projectId, ts: Date.now() },
+      });
+    } catch (_) {}
   }
 
   broadcastMessage(role, text, projectId = null) {
