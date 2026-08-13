@@ -1319,13 +1319,10 @@ export interface ButtonProps {
 </footer>
 
 <script>
-fetch('https://api.github.com/repos/kitifica-max/cc-controller/releases')
+fetch('/api/downloads')
   .then(r => r.json())
-  .then(releases => {
-    if (!Array.isArray(releases)) return;
-    const total = releases.reduce((sum, rel) =>
-      sum + (rel.assets || []).reduce((s, a) => s + (a.download_count || 0), 0), 0);
-    if (total === 0) return;
+  .then(({ total }) => {
+    if (!total) return;
     const statEl = document.getElementById('stat-dl-count');
     if (statEl) statEl.innerHTML = '<span>' + total.toLocaleString('es') + '</span>';
     const heroNum = document.getElementById('hero-dl-num');
