@@ -547,6 +547,16 @@ function CCController() {
         {thinking && !streamingMsg && <TypingIndicator onCancel={cancelThinking} />}
       </div>
 
+      {/* Waiting banner */}
+      {(thinking || streamingMsg) && (
+        <div style={{ background: '#fffbeb', borderTop: '1px solid #fde68a', padding: '6px 14px', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+          <span style={{ fontSize: 11 }}>⚠️</span>
+          <span style={{ fontSize: 11, fontWeight: 600, color: '#92400e', lineHeight: 1.3 }}>
+            No cierres este chat — Claude está trabajando en tu Mac
+          </span>
+        </div>
+      )}
+
       {/* Quick actions */}
       <div style={{ background: '#f5f5f5', padding: '8px 14px 4px', display: 'flex', gap: 7, overflowX: 'auto', flexShrink: 0 }}>
         {QUICK.map(({ label, text }) => (
@@ -557,7 +567,7 @@ function CCController() {
       </div>
 
       {/* Input */}
-      <div style={{ background: '#fff', borderTop: '1px solid #e0e0e0', padding: '10px 14px 32px', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+      <div style={{ background: '#fff', borderTop: '1px solid #e0e0e0', padding: '10px 14px 6px', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
         <FileUpload
           currentProject={currentProject}
           sendEvent={sendEvent}
@@ -598,6 +608,13 @@ function CCController() {
           style={{ width: 40, height: 40, borderRadius: '50%', background: '#f04e23', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
           dangerouslySetInnerHTML={{ __html: ICON_SEND }}
         />
+      </div>
+
+      {/* Mac disclaimer */}
+      <div style={{ background: '#fff', padding: '0 14px max(20px, env(safe-area-inset-bottom, 20px))', flexShrink: 0 }}>
+        <p style={{ margin: 0, fontSize: 10, fontWeight: 500, color: '#bbb', textAlign: 'center', lineHeight: 1.4 }}>
+          Tu Mac debe estar encendida y con CC Controller abierto
+        </p>
       </div>
 
       {showSettings && currentProject && (
