@@ -3,6 +3,8 @@ import WebSocket from 'ws';
 import { AUTH_STORAGE_KEY } from './auth-store.js';
 
 const ANSI_RE = /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g;
+// Claude Code MCP warnings que llegan a stdout en modo --print
+const MCP_WARN_RE = /Client\.\w+\(\) called but server does not advertise \w+ capability[^\n]*/g;
 const MAX_HISTORY = 200;
 
 const ALLOWED_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.pdf', '.txt', '.md', '.markdown', '.json', '.csv', '.svg', '.zip']);
@@ -140,7 +142,7 @@ export default class Bridge {
   }
 
   broadcastChunk(msgId, text, done, projectId = null) {
-    const clean = text ? text.replace(ANSI_RE, '') : '';
+    const clean = text ? text.replace(ANSI_RE, '').replace(MCP_WARN_RE, '').trim() : '';
 
     if (!this._streamBuffers.has(msgId)) {
       this._streamBuffers.set(msgId, { parts: [], projectId });
