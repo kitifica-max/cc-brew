@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { MODELS, EFFORTS } from '../lib/storage';
-import { getSessionToken, setSessionToken } from '../lib/supabase';
+import { supabase, getSessionToken, setSessionToken, clearSessionToken } from '../lib/supabase';
+import { STORAGE_KEY } from '../lib/storage';
 
 const ICON_X = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg>`;
 const ICON_CHECK = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 6L9 17l-5-5"/></svg>`;
@@ -314,6 +315,22 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
         >
           <span style={{ display: 'flex', width: 18, height: 18 }} dangerouslySetInnerHTML={{ __html: ICON_MONITOR }} />
           Abrir en Claude Desktop
+        </button>
+
+        {/* Cerrar sesión */}
+        <button
+          onClick={async () => {
+            clearSessionToken();
+            localStorage.removeItem('cc-session-id');
+            await supabase.auth.signOut();
+          }}
+          style={{
+            width: '100%', marginTop: 12, background: 'none', border: '1.5px solid #ffcccc',
+            borderRadius: 14, padding: '14px 20px', fontSize: 13, fontWeight: 700,
+            color: '#dc2626', cursor: 'pointer', fontFamily: 'Sora, sans-serif',
+          }}
+        >
+          Cerrar sesión
         </button>
       </div>
     </>
