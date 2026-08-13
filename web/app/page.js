@@ -689,9 +689,22 @@ function MessageContent({ text }) {
 
 function MessageRow({ msg }) {
   const isUser = msg.role === 'user';
+  const [copied, setCopied] = useState(false);
+
   if (msg.role === 'system') return (
     <div style={{ textAlign: 'center', fontSize: 10, fontWeight: 600, color: '#999999', padding: '4px 0' }}>{msg.text}</div>
   );
+
+  function copyMsg() {
+    navigator.clipboard.writeText(msg.text).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = msg.text; ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    });
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUser ? 'flex-end' : 'flex-start' }}>
       {!isUser && <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#999999', marginBottom: 4, paddingLeft: 4 }}>Claude Code</div>}
@@ -703,7 +716,17 @@ function MessageRow({ msg }) {
       }}>
         {isUser ? msg.text : <MessageContent text={msg.text} />}
       </div>
-      <div style={{ fontSize: 9, color: '#999999', marginTop: 3, paddingLeft: 4, paddingRight: 4 }}>{msg.time}</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3, paddingLeft: 4, paddingRight: 4 }}>
+        <span style={{ fontSize: 9, color: '#999999' }}>{msg.time}</span>
+        {!isUser && (
+          <button
+            onClick={copyMsg}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: 9, fontWeight: 600, color: copied ? '#00b09b' : '#bbb', fontFamily: 'Sora, sans-serif' }}
+          >
+            {copied ? '✓ copiado' : 'copiar'}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
