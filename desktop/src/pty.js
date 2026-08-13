@@ -24,26 +24,27 @@ export default class PtyManager {
     this.onMessage?.('system', 'Sesión iniciada');
   }
 
-  write(text, continueConv = true, model = 'claude-sonnet-4-6', effort = 'medium', projectId = null) {
+  write(text, continueConv = true, model = 'claude-sonnet-4-6', effort = 'medium', projectId = null, skipPermissions = false) {
     if (text === '\x03') return;
     const msg = text.replace(/\n+$/, '').trim();
     if (!msg) return;
     if (!MODEL_RE.test(model)) model = 'claude-sonnet-4-6';
     if (!EFFORTS.has(effort)) effort = 'medium';
-    this._queue.push({ msg, continueConv, model, effort, projectId });
+    this._queue.push({ msg, continueConv, model, effort, projectId, skipPermissions: Boolean(skipPermissions) });
     this._flush();
   }
 
   _flush() {
     if (this._busy || !this._queue.length) return;
     this._busy = true;
-    const { msg, continueConv, model, effort, projectId } = this._queue.shift();
+    const { msg, continueConv, model, effort, projectId, skipPermissions } = this._queue.shift();
     const msgId = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
     const stderrChunks = [];
 
     const args = ['--print'];
     if (continueConv) args.push('--continue');
     args.push('--model', model, '--effort', effort);
+    if (skipPermissions) args.push('--dangerously-skip-permissions');
 
     const proc = spawn(this._command, args, {
       stdio: ['pipe', 'pipe', 'pipe'],

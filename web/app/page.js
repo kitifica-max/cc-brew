@@ -41,6 +41,7 @@ function CCController() {
   const thinkingTimerRef = useRef(null);
   const [view, setView] = useState('list');
   const [showSettings, setShowSettings] = useState(false);
+  const [mcpConfig, setMcpConfig] = useState({});
   const [reconnectKey, setReconnectKey] = useState(0);
   const [streamingMsg, setStreamingMsg] = useState(null); // {msgId, text} | null
   const streamingMsgRef = useRef(null);
@@ -218,6 +219,11 @@ function CCController() {
       }));
     });
 
+    ch.on('broadcast', { event: 'mcp-config' }, ({ payload }) => {
+      if (!active) return;
+      setMcpConfig(payload.mcpServers ?? {});
+    });
+
     ch.on('broadcast', { event: 'project-state' }, ({ payload }) => {
       if (!active) return;
       resetDesktopTimeout();
@@ -285,7 +291,12 @@ function CCController() {
 
   const sendRaw = useCallback((text, continueConv = true) => {
     const current = projects.find(p => p.id === currentIdRef.current);
-    sendEvent('input', { text, continue: continueConv, model: current?.model ?? 'claude-sonnet-4-6', effort: current?.effort ?? 'medium' });
+    sendEvent('input', {
+      text, continue: continueConv,
+      model: current?.model ?? 'claude-sonnet-4-6',
+      effort: current?.effort ?? 'medium',
+      skipPermissions: current?.skipPermissions ?? false,
+    });
   }, [projects, sendEvent]);
 
   const currentProject = projects.find(p => p.id === currentId);
@@ -470,7 +481,10 @@ function CCController() {
               {desktopActive ? 'Desktop activo' : connected ? 'Desktop detenido' : 'Sin conexión'}
             </div>
             <button
-              onClick={() => setShowSettings(true)}
+              onClick={() => {
+                setShowSettings(true);
+                sendEvent('get-mcp-config', { projectId: currentId });
+              }}
               style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
               dangerouslySetInnerHTML={{ __html: ICON_SETTINGS }}
             />
@@ -573,11 +587,14 @@ function CCController() {
       {showSettings && currentProject && (
         <SettingsSheet
           project={currentProject}
+          mcpConfig={mcpConfig}
           onClose={() => setShowSettings(false)}
           onModelChange={v => updateProjectSettings('model', v)}
           onEffortChange={v => updateProjectSettings('effort', v)}
+          onSkipPermissionsChange={v => updateProjectSettings('skipPermissions', v)}
           onOpenDesktop={() => { sendEvent('open-claude-desktop', { projectId: currentId }); setShowSettings(false); }}
           onSaveEnv={(env) => { sendEvent('save-env', { projectId: currentId, env }); setShowSettings(false); }}
+          onSaveMcpConfig={(cfg) => { sendEvent('save-mcp-config', { projectId: currentId, mcpServers: cfg }); }}
         />
       )}
     </main>

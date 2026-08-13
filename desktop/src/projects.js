@@ -1,7 +1,6 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, resolve } from 'path';
-import { EOL } from 'os';
-import { homedir } from 'os';
+import { EOL, homedir } from 'os';
 
 function getHome() {
   return process.env.HOME || homedir();
@@ -86,6 +85,28 @@ export function addExistingProject(id, name, folderPath) {
   data.activeId = id;
   save(data);
   return project;
+}
+
+export function readMcpConfig(id) {
+  const data = load();
+  const project = data.projects.find(p => p.id === id);
+  if (!project) return {};
+  try {
+    const raw = JSON.parse(readFileSync(join(project.path, '.claude', 'settings.json'), 'utf8'));
+    return raw.mcpServers ?? {};
+  } catch { return {}; }
+}
+
+export function saveMcpConfig(id, mcpServers) {
+  const data = load();
+  const project = data.projects.find(p => p.id === id);
+  if (!project) throw new Error(`Project not found: ${id}`);
+  const claudeDir = join(project.path, '.claude');
+  mkdirSync(claudeDir, { recursive: true });
+  const settingsPath = join(claudeDir, 'settings.json');
+  let existing = {};
+  try { existing = JSON.parse(readFileSync(settingsPath, 'utf8')); } catch {}
+  writeFileSync(settingsPath, JSON.stringify({ ...existing, mcpServers }, null, 2));
 }
 
 export function saveProjectEnv(id, envObject) {

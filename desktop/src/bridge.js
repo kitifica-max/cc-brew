@@ -36,6 +36,8 @@ export default class Bridge {
     this.onSaveEnv = null;
     this.onDeleteProject = null;
     this.onOpenFolder = null;
+    this.onGetMcpConfig = null;
+    this.onSaveMcpConfig = null;
     this._heartbeatTimer = null;
     this._history = [];
     this._streamBuffers = new Map(); // msgId → { parts: string[], projectId }
@@ -105,6 +107,7 @@ export default class Bridge {
           payload.continue !== false,
           payload.model ?? 'claude-sonnet-4-6',
           payload.effort ?? 'medium',
+          payload.skipPermissions ?? false,
         );
       })
       .on('broadcast', { event: 'create-project' }, ({ payload }) => {
@@ -143,6 +146,14 @@ export default class Bridge {
       .on('broadcast', { event: 'push-subscribe' }, ({ payload }) => {
         if (!this._validate(payload)) return;
         this._storePushSubscription(payload.subscription);
+      })
+      .on('broadcast', { event: 'get-mcp-config' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this.onGetMcpConfig?.(payload.projectId);
+      })
+      .on('broadcast', { event: 'save-mcp-config' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this.onSaveMcpConfig?.(payload.projectId, payload.mcpServers);
       })
       .subscribe();
   }
@@ -206,6 +217,13 @@ export default class Bridge {
     const { data, error } = await this.client.storage.from('uploads').download(storageKey);
     if (error) throw error;
     return Buffer.from(await data.arrayBuffer());
+  }
+
+  broadcastMcpConfig(projectId, mcpServers) {
+    this.channel?.send({
+      type: 'broadcast', event: 'mcp-config',
+      payload: { projectId, mcpServers, ts: Date.now() },
+    });
   }
 
   async deleteFromStorage(storageKey) {

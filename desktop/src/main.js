@@ -6,7 +6,7 @@ import { writeFileSync } from 'fs';
 import dotenv from 'dotenv';
 import PtyManager from './pty.js';
 import Bridge from './bridge.js';
-import { createProject, switchProject, getActive, listProjects, deleteProject, saveProjectEnv, addExistingProject } from './projects.js';
+import { createProject, switchProject, getActive, listProjects, deleteProject, saveProjectEnv, addExistingProject, readMcpConfig, saveMcpConfig } from './projects.js';
 import { ALLOWED_EXTENSIONS, MAX_FILE_BYTES } from './bridge.js';
 import { getSupabaseConfig } from './supabase-config.js';
 import { createFileAuthStorage, AUTH_STORAGE_KEY } from './auth-store.js';
@@ -183,10 +183,10 @@ async function startSession() {
   pty = new PtyManager();
   pty.spawn('claude', [], active?.path ?? HOME);
 
-  bridge.onInput = (text, continueConv, model, effort) => {
+  bridge.onInput = (text, continueConv, model, effort, skipPermissions) => {
     const projectId = getActive()?.id ?? null;
     bridge._addToHistory({ role: 'user', text: text.trim(), projectId });
-    pty.write(text, continueConv, model, effort, projectId);
+    pty.write(text, continueConv, model, effort, projectId, skipPermissions);
   };
   pty.onMessage = (role, text, projectId) => bridge?.broadcastMessage(role, text, projectId);
   pty.onChunk = (msgId, text, done, projectId) => {
@@ -243,6 +243,25 @@ async function startSession() {
   };
 
   bridge.onGetProjectState = () => broadcastProjects();
+
+  bridge.onGetMcpConfig = (projectId) => {
+    try {
+      const mcpServers = readMcpConfig(projectId);
+      bridge.broadcastMcpConfig(projectId, mcpServers);
+    } catch (e) {
+      bridge?.broadcastMessage('system', `Error leyendo MCP config: ${e.message}`);
+    }
+  };
+
+  bridge.onSaveMcpConfig = (projectId, mcpServers) => {
+    try {
+      if (!mcpServers || typeof mcpServers !== 'object' || Array.isArray(mcpServers)) return;
+      saveMcpConfig(projectId, mcpServers);
+      bridge?.broadcastMessage('system', 'MCP servers actualizados.');
+    } catch (e) {
+      bridge?.broadcastMessage('system', `Error guardando MCP config: ${e.message}`);
+    }
+  };
 
   bridge.onDeleteProject = (id) => {
     deleteProject(id);
