@@ -114,7 +114,7 @@ describe('Bridge', () => {
     bridge.onInput = (...a) => { args = a; };
     bridge.connect();
     handlers['input']({ payload: { text: 'hi', token: 'secret', model: 'claude-opus-5', effort: 'high', continue: true } });
-    assert.deepEqual(args, ['hi', true, 'claude-opus-5', 'high']);
+    assert.deepEqual(args, ['hi', true, 'claude-opus-5', 'high', false]);
   });
 
   it('onInput defaults model and effort when absent', () => {
