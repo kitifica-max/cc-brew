@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu, nativeImage, shell, clipboard, dialog, powerSaveBlocker, net } from 'electron';
+import { app, Tray, Menu, nativeImage, shell, clipboard, dialog, powerSaveBlocker, net } from 'electron';
 import { needsSetup, openSetupWindow } from './setup-window.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -230,21 +230,20 @@ async function startSession() {
   };
 
   bridge.onOpenFolder = async (id) => {
-    // macOS requires a BrowserWindow parent for the folder picker to appear
-    // (tray-only apps have no window, so the dialog would silently fail)
-    const win = new BrowserWindow({ show: false, width: 1, height: 1, alwaysOnTop: true });
-    win.show();
-    win.focus();
+    // tray-only apps have no OS-level focus; show app in Dock momentarily so
+    // the standalone dialog (no sheet parent) appears in front of other windows
+    app.show();
+    app.focus({ steal: true });
     let canceled = true;
     let filePaths = [];
     try {
-      ({ canceled, filePaths } = await dialog.showOpenDialog(win, {
+      ({ canceled, filePaths } = await dialog.showOpenDialog({
         properties: ['openDirectory'],
         title: 'Seleccionar carpeta del proyecto',
         message: 'Elige el directorio raíz del proyecto',
       }));
     } finally {
-      win.close();
+      app.hide();
     }
     if (canceled || !filePaths.length) {
       bridge?.broadcastMessage('system', '⚠️ No se seleccionó ninguna carpeta.');

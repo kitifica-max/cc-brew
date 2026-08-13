@@ -592,6 +592,20 @@ nav {
 .setup-dl-btn--ghost:hover { border-color: var(--orange); color: var(--orange); opacity: 1; }
 .setup-req { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
 .setup-req-item { font-size: 12px; color: var(--teal); font-weight: 600; }
+.gatekeeper-note { margin-top: 16px; background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 12px; padding: 14px 16px; }
+.gatekeeper-note summary { list-style: none; display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+.gatekeeper-note summary::-webkit-details-marker { display: none; }
+.gatekeeper-title { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #92400e; width: 100%; }
+.gatekeeper-chevron { margin-left: auto; flex-shrink: 0; color: #92400e; transition: transform 0.2s; }
+.gatekeeper-note[open] .gatekeeper-chevron { transform: rotate(180deg); }
+.gatekeeper-note p { font-size: 12px; color: #78350f; line-height: 1.55; margin: 10px 0 0; }
+.gatekeeper-steps { margin: 8px 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.gatekeeper-steps li { font-size: 12px; color: #78350f; line-height: 1.5; }
+@media (prefers-color-scheme: dark) {
+  .gatekeeper-note { background: #1c1505; border-color: #92400e; }
+  .gatekeeper-title, .gatekeeper-chevron { color: #fbbf24; }
+  .gatekeeper-note p, .gatekeeper-steps li { color: #fde68a; }
+}
 @media (max-width: 767px) {
   .setup-steps-row { flex-direction: column; }
   .setup-step-arrow { align-self: flex-start; padding: 8px 0 8px 24px; margin-top: 0; transform: rotate(90deg); }
@@ -1193,6 +1207,20 @@ export interface ButtonProps {
         <a href="https://github.com/kitifica-max/cc-controller/releases/latest/download/CC.Controller-1.1.4.dmg" class="setup-dl-btn setup-dl-btn--ghost">
           Descargar DMG (Intel)
         </a>
+        <details class="gatekeeper-note">
+          <summary class="gatekeeper-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            macOS bloqueará la app al primer intento
+            <svg class="gatekeeper-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <p>Es normal — el DMG no está firmado por Apple. La PWA sí está verificada (Lighthouse: 99 Performance · 100 Best Practices · PWA instalable). Para abrir la app de escritorio:</p>
+          <ol class="gatekeeper-steps">
+            <li>Ve a <strong>Configuración del Sistema → Privacidad y Seguridad</strong></li>
+            <li>Baja hasta ver <em>"CC Controller fue bloqueado…"</em></li>
+            <li>Haz clic en <strong>Abrir de todas formas</strong></li>
+            <li>Confirma con <strong>Abrir de todas formas</strong> en el diálogo</li>
+          </ol>
+        </details>
       </div>
 
       <div class="setup-step-arrow">→</div>
