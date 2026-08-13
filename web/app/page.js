@@ -52,11 +52,13 @@ function CCController() {
   const [voiceState, setVoiceState] = useState('idle'); // 'idle' | 'listening' | 'processing'
   const [awaitingFolderId, setAwaitingFolderId] = useState(null);
   const awaitingFolderIdRef = useRef(null);
+  const knownProjectIdsRef = useRef(new Set());
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
   useEffect(() => { currentIdRef.current = currentId; }, [currentId]);
   useEffect(() => { awaitingFolderIdRef.current = awaitingFolderId; }, [awaitingFolderId]);
+  useEffect(() => { knownProjectIdsRef.current = new Set(projects.map(p => p.id)); }, [projects]);
 
   const resetDesktopTimeout = useCallback(() => {
     setDesktopActive(true);
@@ -171,21 +173,33 @@ function CCController() {
 
     ch.on('broadcast', { event: 'project-state' }, ({ payload }) => {
       resetDesktopTimeout();
-      setProjects(prev => prev.map(local => {
-        const remote = payload.projects?.find(r => r.id === local.id);
-        return remote ? { ...local, path: remote.path, name: remote.name } : local;
-      }));
-      // Auto-navigate to chat when folder is confirmed by desktop
-      setAwaitingFolderId(pending => {
-        if (!pending) return null;
-        const resolved = payload.projects?.find(r => r.id === pending && r.path);
-        if (resolved) {
-          setCurrentId(pending);
-          setView('chat');
-          return null;
+      const pending = awaitingFolderIdRef.current;
+
+      // Case 1: pending id matches a remote project with path (event was received)
+      const resolvedById = pending && payload.projects?.find(r => r.id === pending && r.path);
+      // Case 2: a brand-new project appeared from desktop (event wasn't received, tray was used)
+      const resolvedNew = !resolvedById && pending && payload.projects?.find(
+        r => !knownProjectIdsRef.current.has(r.id) && r.path
+      );
+
+      setProjects(prev => {
+        const updated = prev.map(local => {
+          const remote = payload.projects?.find(r => r.id === local.id);
+          return remote ? { ...local, path: remote.path, name: remote.name } : local;
+        });
+        if (resolvedNew) {
+          // Remove temp project, add the real one from desktop
+          return [makeProject(resolvedNew.name, resolvedNew.id), ...updated.filter(p => p.id !== pending)];
         }
-        return pending;
+        return updated;
       });
+
+      if (resolvedById || resolvedNew) {
+        const targetId = resolvedById?.id ?? resolvedNew?.id;
+        setCurrentId(targetId);
+        setView('chat');
+        setAwaitingFolderId(null);
+      }
     });
 
     (async () => {
