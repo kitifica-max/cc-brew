@@ -239,8 +239,8 @@ nav {
   width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; margin-top: 4px;
   display: flex; align-items: center; justify-content: center; font-size: 16px;
 }
-.aha-device.phone { background: var(--orange-dim); border: 1px solid var(--border-warm); }
-.aha-device.mac { background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
+.aha-device.phone { background: var(--orange-dim); border: 1px solid var(--border-warm); color: var(--orange); }
+.aha-device.mac { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-2); }
 .aha-bubble {
   background: var(--ink-2); border: 1px solid var(--border); border-radius: 14px;
   padding: 12px 16px; font-size: 13px; color: var(--text); line-height: 1.55; text-align: left;
@@ -277,9 +277,9 @@ nav {
   width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center; font-size: 18px;
 }
-.arch-node-icon.phone-icon { background: var(--orange-dim); border: 1px solid var(--border-warm); }
-.arch-node-icon.mac-icon { background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
-.arch-node-icon.claude-icon { background: var(--teal-dim); border: 1px solid rgba(0,176,155,0.25); }
+.arch-node-icon.phone-icon { background: var(--orange-dim); border: 1px solid var(--border-warm); color: var(--orange); }
+.arch-node-icon.mac-icon { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-2); }
+.arch-node-icon.claude-icon { background: var(--teal-dim); border: 1px solid rgba(0,176,155,0.25); color: #00b09b; }
 .arch-node-label { font-size: 13px; font-weight: 700; color: var(--text); }
 .arch-node-sub { font-size: 11px; color: var(--text-3); margin-top: 1px; }
 .arch-connector-line {
@@ -508,7 +508,8 @@ nav {
 .sec-badge-icon {
   width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
   background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-2);
 }
 .sec-badge h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
 .sec-badge p { font-size: 11px; color: var(--text-3); line-height: 1.5; }
@@ -542,7 +543,7 @@ nav {
   font-size: 13px; font-weight: 600; color: var(--text-2); cursor: pointer; list-style: none;
   display: flex; align-items: center; gap: 8px;
 }
-.install-details-wrap summary::before { content: '⚠️'; font-size: 14px; }
+.install-details-wrap summary::before { content: ''; }
 .install-details-wrap summary::-webkit-details-marker { display: none; }
 .install-details-wrap p { font-size: 13px; color: var(--text-3); line-height: 1.65; margin-top: 12px; }
 .install-details-wrap ol { padding-left: 18px; margin-top: 8px; }
@@ -710,7 +711,7 @@ footer {
     <div class="aha-scene">
       <div class="aha-row">
         <div class="aha-time">09:42</div>
-        <div class="aha-device phone">📱</div>
+        <div class="aha-device phone"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></div>
         <div class="aha-bubble sent">
           "Refactoriza el sistema de autenticación y ejecuta los tests cuando termines."
         </div>
@@ -718,7 +719,7 @@ footer {
       <div class="aha-connector"><div class="aha-connector-line"></div></div>
       <div class="aha-row right">
         <div class="aha-time">09:43</div>
-        <div class="aha-device mac">💻</div>
+        <div class="aha-device mac"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="4" rx="2"/><path d="M2 20h20"/></svg></div>
         <div class="aha-bubble">
           <strong style="color: var(--teal);">Claude Code</strong><br>
           Trabajando en tu Mac…
@@ -727,7 +728,7 @@ footer {
       <div class="aha-connector"><div class="aha-connector-line"></div></div>
       <div class="aha-row">
         <div class="aha-time">10:17</div>
-        <div class="aha-device phone">📱</div>
+        <div class="aha-device phone"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></div>
         <div class="aha-bubble" style="background: var(--ink-3); border-color: var(--border-warm);">
           "Encontré un problema con la validación de tokens. ¿Quieres que lo corrija?"
         </div>
@@ -735,7 +736,7 @@ footer {
       <div class="aha-connector"><div class="aha-connector-line"></div></div>
       <div class="aha-row">
         <div class="aha-time">10:17</div>
-        <div class="aha-device phone">📱</div>
+        <div class="aha-device phone"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></div>
         <div class="aha-bubble sent">sí</div>
       </div>
     </div>
@@ -756,7 +757,7 @@ footer {
       <div class="arch-flow">
         <div style="font-size: 11px; font-weight: 700; color: var(--text-3); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px;">Arquitectura</div>
         <div class="arch-node">
-          <div class="arch-node-icon phone-icon">📱</div>
+          <div class="arch-node-icon phone-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></div>
           <div>
             <div class="arch-node-label">Tu iPhone</div>
             <div class="arch-node-sub">CC Controller PWA</div>
@@ -769,7 +770,7 @@ footer {
           <div class="arch-label">Supabase Realtime</div>
         </div>
         <div class="arch-node">
-          <div class="arch-node-icon mac-icon">🖥️</div>
+          <div class="arch-node-icon mac-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="4" rx="2"/><path d="M2 20h20"/></svg></div>
           <div>
             <div class="arch-node-label">Tu Mac</div>
             <div class="arch-node-sub">CC Controller Desktop</div>
@@ -782,7 +783,7 @@ footer {
           <div class="arch-label">local</div>
         </div>
         <div class="arch-node">
-          <div class="arch-node-icon claude-icon">⚡</div>
+          <div class="arch-node-icon claude-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.914 4a1.5 1.5 0 0 0-2.474-1.561l-9 9A1.5 1.5 0 0 0 5.5 14h4.002a.5.5 0 0 1 .471.666L8.086 20a1.5 1.5 0 0 0 2.475 1.56l9-9A1.5 1.5 0 0 0 18.5 10h-3.997a.5.5 0 0 1-.472-.667z"/></svg></div>
           <div>
             <div class="arch-node-label">Claude Code</div>
             <div class="arch-node-sub">claude --print · tu entorno</div>
@@ -995,25 +996,25 @@ footer {
       <div style="font-size: 12px; color: var(--text-3); margin-bottom: 16px;">Tu código no se ejecuta en nuestros servidores.</div>
       <div class="how-arch-flow">
         <div class="arch-item">
-          <div class="arch-item-icon">📱</div>
+          <div class="arch-item-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></div>
           <div class="arch-item-label">iPhone</div>
           <div class="arch-item-sub">CC Controller</div>
         </div>
         <div class="arch-sep">→</div>
         <div class="arch-item">
-          <div class="arch-item-icon">☁️</div>
+          <div class="arch-item-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg></div>
           <div class="arch-item-label">Supabase</div>
           <div class="arch-item-sub">Realtime Broadcast</div>
         </div>
         <div class="arch-sep">→</div>
         <div class="arch-item">
-          <div class="arch-item-icon">🖥️</div>
+          <div class="arch-item-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="4" rx="2"/><path d="M2 20h20"/></svg></div>
           <div class="arch-item-label">Mac</div>
           <div class="arch-item-sub">Companion</div>
         </div>
         <div class="arch-sep">→</div>
         <div class="arch-item">
-          <div class="arch-item-icon">⚡</div>
+          <div class="arch-item-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.914 4a1.5 1.5 0 0 0-2.474-1.561l-9 9A1.5 1.5 0 0 0 5.5 14h4.002a.5.5 0 0 1 .471.666L8.086 20a1.5 1.5 0 0 0 2.475 1.56l9-9A1.5 1.5 0 0 0 18.5 10h-3.997a.5.5 0 0 1-.472-.667z"/></svg></div>
           <div class="arch-item-label">Claude Code</div>
           <div class="arch-item-sub">claude --print</div>
         </div>
@@ -1029,12 +1030,12 @@ footer {
     <span class="section-eyebrow">Tu código permanece en tu Mac</span>
     <h2 class="section-title">Seguridad por diseño.</h2>
     <div class="sec-badges">
-      <div class="sec-badge"><div class="sec-badge-icon">🔐</div><div><h4>Sin puertos abiertos</h4><p>El Mac no expone ningún servidor a Internet.</p></div></div>
-      <div class="sec-badge"><div class="sec-badge-icon">🔒</div><div><h4>Canales privados</h4><p>Supabase Realtime con autenticación JWT en cada conexión.</p></div></div>
-      <div class="sec-badge"><div class="sec-badge-icon">🪙</div><div><h4>Tokens de sesión</h4><p>Código de emparejamiento único por dispositivo, almacenado solo en tu móvil.</p></div></div>
-      <div class="sec-badge"><div class="sec-badge-icon">📁</div><div><h4>Validación de rutas</h4><p>Los archivos enviados se validan contra la ruta del proyecto activo.</p></div></div>
-      <div class="sec-badge"><div class="sec-badge-icon">🗑️</div><div><h4>Archivos temporales</h4><p>Los archivos subidos se eliminan del storage tras ser guardados localmente.</p></div></div>
-      <div class="sec-badge"><div class="sec-badge-icon">👁️</div><div><h4>Código auditable</h4><p>Todo el código fuente está disponible en GitHub. Nada que ocultar.</p></div></div>
+      <div class="sec-badge"><div class="sec-badge-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 2 20 20M5 5a1 1 0 0 0-1 1v7c0 5 3.5 7.5 7.67 8.94a1 1 0 0 0 .67.01c2.35-.82 4.48-1.97 5.9-3.71M9.309 3.652A12.3 12.3 0 0 0 11.24 2.28a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1v7a10 10 0 0 1-.08 1.264"/></svg></div><div><h4>Sin puertos abiertos</h4><p>El Mac no expone ningún servidor a Internet.</p></div></div>
+      <div class="sec-badge"><div class="sec-badge-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div><h4>Canales privados</h4><p>Supabase Realtime con autenticación JWT en cada conexión.</p></div></div>
+      <div class="sec-badge"><div class="sec-badge-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></svg></div><div><h4>Tokens de sesión</h4><p>Código de emparejamiento único por dispositivo, almacenado solo en tu móvil.</p></div></div>
+      <div class="sec-badge"><div class="sec-badge-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/><path d="m9 13 2 2 4-4"/></svg></div><div><h4>Validación de rutas</h4><p>Los archivos enviados se validan contra la ruta del proyecto activo.</p></div></div>
+      <div class="sec-badge"><div class="sec-badge-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6m4-6v6m5-11v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div><div><h4>Archivos temporales</h4><p>Los archivos subidos se eliminan del storage tras ser guardados localmente.</p></div></div>
+      <div class="sec-badge"><div class="sec-badge-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696a10.75 10.75 0 0 1 19.876 0a1 1 0 0 1 0 .696a10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg></div><div><h4>Código auditable</h4><p>Todo el código fuente está disponible en GitHub. Nada que ocultar.</p></div></div>
     </div>
     <div class="sec-oss">
       <p>¿Quieres comprobarlo tú mismo?</p>
@@ -1074,7 +1075,7 @@ footer {
 
     <div class="install-details-wrap">
       <details>
-        <summary>¿macOS bloqueó la aplicación?</summary>
+        <summary><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:-2px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01"/></svg>¿macOS bloqueó la aplicación?</summary>
         <p>CC Controller no está notarizado por Apple. Si macOS bloquea la apertura:</p>
         <ol>
           <li>Ve a <strong>Configuración del Sistema → Privacidad y Seguridad</strong></li>
@@ -1175,9 +1176,11 @@ footer {
   <div class="footer-inner">
     <div class="footer-left">
       <div class="footer-brand">
-        <svg width="24" height="24" viewBox="0 0 302.21 302.21" xmlns="http://www.w3.org/2000/svg" style="border-radius:6px">
+        <svg width="28" height="28" viewBox="0 0 302.21 302.21" xmlns="http://www.w3.org/2000/svg" style="border-radius:7px;flex-shrink:0">
           <rect width="302.21" height="302.21" rx="68" ry="68" fill="#f0f0f0"/>
           <path fill="#ff582a" d="M242.73,157.22h0c-7.37,0-13.92,4.45-16.91,11.19-2.08,4.69-5.07,8.99-8.99,12.9-8.11,8.11-17.83,12.29-29.14,12.57-.4,0-.79.03-1.19.03-11.82,0-21.91-4.18-30.26-12.53-.96-.96-1.86-1.94-2.7-2.95-6.55-7.75-9.83-16.85-9.83-27.32s3.29-19.6,9.87-27.36c-.84-1.01-1.74-2-2.7-2.96-8.39-8.31-18.5-12.47-30.31-12.47-.4,0-.8.02-1.2.03-8.22,12.57-12.35,26.82-12.35,42.77,0,15.96,4.13,30.21,12.35,42.77,3.08,4.71,6.71,9.18,10.94,13.42,7.07,7.07,14.81,12.51,23.2,16.36,10.05,4.61,21.04,6.93,32.99,6.93,21.93,0,40.68-7.78,56.25-23.36,7.34-7.34,12.94-15.42,16.8-24.22,5.33-12.16-3.55-25.8-16.83-25.8Z"/>
+          <path fill="#ff582a" d="M187.74,108.33c11.29.28,20.99,4.42,29.1,12.45,3.91,3.96,6.91,8.29,8.98,13,2.98,6.75,9.54,11.21,16.92,11.21h0c13.27,0,22.14-13.62,16.83-25.78-3.86-8.83-9.46-16.95-16.82-24.35-15.57-15.49-34.32-23.23-56.25-23.23-11.93,0-22.91,2.32-32.95,6.92,8.4,3.84,16.16,9.27,23.25,16.32,4.23,4.25,7.86,8.75,10.93,13.48Z"/>
+          <path fill="#ff9477" d="M176.78,157.22c-7.37,0-13.92,4.45-16.91,11.19-1.58,3.56-3.69,6.9-6.33,10.01.85,1,1.75,1.99,2.7,2.95,8.35,8.36,18.44,12.53,30.26,12.53.4,0,.79-.02,1.19-.03,2.28-3.49,4.26-7.1,5.91-10.86,5.33-12.16-3.55-25.8-16.83-25.8Z"/>
           <path fill="#ff9477" d="M119.38,193.88c-11.31-.27-21.01-4.43-29.08-12.51-8.36-8.35-12.53-18.44-12.53-30.26s4.18-21.91,12.53-30.26c7.74-7.74,18.17-12.2,29.08-12.51.4-.01.8-.03,1.2-.03,11.81,0,21.91,4.16,30.31,12.47.95.97,1.85,1.95,2.7,2.96,2.62,3.13,4.72,6.48,6.29,10.03,2.98,6.75,9.54,11.21,16.92,11.21h0c13.27,0,22.14-13.62,16.83-25.78-1.64-3.76-3.62-7.38-5.89-10.87-3.07-4.73-6.7-9.23-10.93-13.48-7.09-7.05-14.84-12.48-23.25-16.32-10.06-4.6-21.06-6.92-33-6.92-21.93,0-40.66,7.76-56.19,23.29-15.53,15.53-23.3,34.26-23.3,56.19s7.76,40.66,23.3,56.19c15.53,15.53,34.26,23.3,56.19,23.3,11.93,0,22.91-2.32,32.96-6.93-8.39-3.85-16.13-9.29-23.2-16.36-4.23-4.23-7.87-8.71-10.94-13.42Z"/>
         </svg>
         <span class="footer-name">CC Controller</span>
