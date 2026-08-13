@@ -43,6 +43,7 @@ function CCController() {
   const [showSettings, setShowSettings] = useState(false);
   const [reconnectKey, setReconnectKey] = useState(0);
   const [streamingMsg, setStreamingMsg] = useState(null); // {msgId, text} | null
+  const streamingMsgRef = useRef(null);
   const chatRef = useRef(null);
   const channelRef = useRef(null);
   const currentIdRef = useRef(null);
@@ -57,6 +58,7 @@ function CCController() {
   const audioChunksRef = useRef([]);
 
   useEffect(() => { currentIdRef.current = currentId; }, [currentId]);
+  useEffect(() => { streamingMsgRef.current = streamingMsg; }, [streamingMsg]);
   useEffect(() => { awaitingFolderIdRef.current = awaitingFolderId; }, [awaitingFolderId]);
   useEffect(() => { knownProjectIdsRef.current = new Set(projects.map(p => p.id)); }, [projects]);
 
@@ -118,17 +120,15 @@ function CCController() {
       clearTimeout(thinkingTimerRef.current);
       setThinking(false);
       if (done) {
-        setStreamingMsg(prev => {
-          if (prev?.msgId === msgId) {
-            const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
-            const targetId = pId ?? currentIdRef.current;
-            setProjects(ps => ps.map(p => p.id !== targetId ? p : {
-              ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: 'claude', text: prev.text, time }],
-            }));
-            return null;
-          }
-          return prev;
-        });
+        const prev = streamingMsgRef.current;
+        if (prev?.msgId === msgId) {
+          const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+          const targetId = pId ?? currentIdRef.current;
+          setProjects(ps => ps.map(p => p.id !== targetId ? p : {
+            ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: 'claude', text: prev.text, time }],
+          }));
+          setStreamingMsg(null);
+        }
       } else {
         setStreamingMsg(prev => prev?.msgId === msgId
           ? { msgId, text: prev.text + text }
