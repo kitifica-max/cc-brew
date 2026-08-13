@@ -39,28 +39,31 @@ let pendingFolderId = null; // set while PWA is waiting for user to pick a folde
 let trialDaysLeft = null; // null = paid/unknown, number = days remaining in trial
 
 function checkForUpdates() {
-  const req = net.request({
-    method: 'GET',
-    url: `https://${process.env.PWA_URL || 'ccc.kitifica.com'}/api/latest`,
-    headers: { 'User-Agent': 'CC-Controller-App' },
-  });
-  req.on('response', (res) => {
-    let body = '';
-    res.on('data', (chunk) => { body += chunk; });
-    res.on('end', () => {
-      try {
-        const { version: latest, releaseUrl } = JSON.parse(body);
-        const current = app.getVersion();
-        if (latest && latest !== current) {
-          updateAvailable = { version: latest, url: releaseUrl };
-          if (tray) setTrayMenu(pty?.running ? 'running' : 'stopped');
-          bridge?.sendPush('CC Controller', `Nueva versión v${latest} disponible — abre el menú del tray para instalar`).catch(() => {});
-        }
-      } catch (_) {}
+  return new Promise((resolve) => {
+    const req = net.request({
+      method: 'GET',
+      url: `https://${process.env.PWA_URL || 'ccc.kitifica.com'}/api/latest`,
+      headers: { 'User-Agent': 'CC-Controller-App' },
     });
+    req.on('response', (res) => {
+      let body = '';
+      res.on('data', (chunk) => { body += chunk; });
+      res.on('end', () => {
+        try {
+          const { version: latest, releaseUrl } = JSON.parse(body);
+          const current = app.getVersion();
+          if (latest && latest !== current) {
+            updateAvailable = { version: latest, url: releaseUrl };
+            if (tray) setTrayMenu(bridge !== null ? 'running' : 'stopped');
+            bridge?.sendPush('CC Controller', `Nueva versión v${latest} disponible — abre el menú del tray para instalar`).catch(() => {});
+          }
+        } catch (_) {}
+        resolve(updateAvailable);
+      });
+    });
+    req.on('error', () => resolve(null));
+    req.end();
   });
-  req.on('error', () => {});
-  req.end();
 }
 
 function downloadUpdate(version, url, redirects = 0) {
@@ -142,12 +145,17 @@ function buildMenu(status) {
     { type: 'separator' },
     {
       label: updateAvailable ? `Actualización disponible: v${updateAvailable.version}` : 'Buscar actualizaciones',
-      click: () => {
+      click: async () => {
         if (updateAvailable) {
           shell.openExternal(updateAvailable.url);
         } else {
-          checkForUpdates();
-          dialog.showMessageBox({ type: 'info', message: 'Revisando actualizaciones…', detail: 'Si hay una versión nueva aparecerá en el menú.' });
+          const result = await checkForUpdates();
+          if (result) {
+            setTrayMenu(bridge !== null ? 'running' : 'stopped');
+            dialog.showMessageBox({ type: 'info', message: `Nueva versión disponible: v${result.version}`, detail: 'Haz clic en "Actualización disponible" en el menú para descargar.' });
+          } else {
+            dialog.showMessageBox({ type: 'info', message: 'Ya tienes la última versión', detail: `v${app.getVersion()} está actualizado.` });
+          }
         }
       },
     },
