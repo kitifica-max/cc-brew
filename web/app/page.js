@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { supabase, getSessionId, getSessionToken } from './lib/supabase';
 import { loadProjects, saveProjects, makeProject } from './lib/storage';
 import { voiceFilter } from './utils/voiceFilter';
-import AuthGate from './components/AuthGate';
+import AuthGate, { useTrial } from './components/AuthGate';
 import ProjectsList from './components/ProjectsList';
 import SettingsSheet from './components/SettingsSheet';
 import FileUpload from './components/FileUpload';
@@ -27,6 +27,18 @@ export default function Page() {
     <AuthGate>
       <CCController />
     </AuthGate>
+  );
+}
+
+function TrialPill() {
+  const { daysLeft } = useTrial();
+  if (daysLeft === null) return null;
+  return (
+    <div style={{ background: 'rgba(251,191,36,0.18)', border: '1px solid rgba(251,191,36,0.35)', borderRadius: 20, padding: '3px 10px', display: 'flex', alignItems: 'center', gap: 4 }}>
+      <span style={{ fontSize: 9, fontWeight: 700, color: '#fbbf24', letterSpacing: '0.04em' }}>
+        {daysLeft === 0 ? 'TRIAL: hoy vence' : `TRIAL: ${daysLeft}d restantes`}
+      </span>
+    </div>
   );
 }
 
@@ -460,6 +472,7 @@ function CCController() {
         onOpenFolder={handleOpenFolder}
         onCancelFolder={handleCancelFolder}
         onBack={() => setView('chat')}
+        trialPill={<TrialPill />}
         onShowSettings={() => { setShowSettings(true); sendEvent('get-mcp-config', { projectId: currentId }); }}
       />
       {showSettings && currentProject && (
@@ -491,7 +504,8 @@ function CCController() {
       <div style={{ background: '#f04e23', padding: '52px 20px 14px', flexShrink: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
           <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Claude Code</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <TrialPill />
             <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
               <div style={{ width: 7, height: 7, borderRadius: '50%', background: desktopActive ? '#00b09b' : connected ? '#f0a040' : 'rgba(255,255,255,0.3)', boxShadow: desktopActive ? '0 0 6px #00b09b' : 'none' }} />
               {desktopActive ? 'Desktop activo' : connected ? 'Desktop detenido' : 'Sin conexión'}

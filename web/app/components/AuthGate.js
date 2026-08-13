@@ -1,6 +1,9 @@
 'use client';
-import { useCallback, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { supabase, getSessionToken, setSessionToken, setSessionId, CONFIGURED } from '../lib/supabase';
+
+export const TrialContext = createContext({ daysLeft: null });
+export function useTrial() { return useContext(TrialContext); }
 
 const F = "'Sora', -apple-system, BlinkMacSystemFont, sans-serif";
 
@@ -36,41 +39,44 @@ function Shell({ hero, card, footer }) {
 }
 
 async function checkAccess(session) {
-  // Check user_access table
   const { data } = await supabase
     .from('user_access')
     .select('trial_ends_at, paid_at')
     .eq('user_id', session.user.id)
     .single();
 
-  if (data?.paid_at) return 'paid';
+  if (data?.paid_at) return { status: 'paid', trialEnds: null };
 
   const trialEnds = data?.trial_ends_at
     ? new Date(data.trial_ends_at)
     : new Date(new Date(session.user.created_at).getTime() + 7 * 24 * 60 * 60 * 1000);
 
-  return new Date() < trialEnds ? 'trial' : 'expired';
+  const status = new Date() < trialEnds ? 'trial' : 'expired';
+  return { status, trialEnds };
 }
 
 export default function AuthGate({ children }) {
   const [status, setStatus] = useState('loading');
   const [hasToken, setHasToken] = useState(false);
-  const [access, setAccess] = useState(null); // null | 'paid' | 'trial' | 'expired'
+  const [access, setAccess] = useState(null);
+  const [trialEnds, setTrialEnds] = useState(null);
 
   useEffect(() => {
     if (!CONFIGURED) { setStatus('unconfigured'); return; }
     supabase.auth.getSession().then(async ({ data }) => {
       if (data.session) {
-        const acc = await checkAccess(data.session);
+        const { status: acc, trialEnds: te } = await checkAccess(data.session);
         setAccess(acc);
+        setTrialEnds(te);
       }
       setStatus(data.session ? 'ready' : 'anon');
       setHasToken(Boolean(getSessionToken()));
     });
     const { data: sub } = supabase.auth.onAuthStateChange(async (_e, session) => {
       if (session) {
-        const acc = await checkAccess(session);
+        const { status: acc, trialEnds: te } = await checkAccess(session);
         setAccess(acc);
+        setTrialEnds(te);
       }
       setStatus(session ? 'ready' : 'anon');
     });
@@ -88,7 +94,16 @@ export default function AuthGate({ children }) {
   if (status === 'anon') return <SignIn />;
   if (!hasToken) return <PairDevice onSubmit={handleToken} />;
   if (access === 'expired') return <PaywallScreen />;
-  return children;
+
+  const daysLeft = trialEnds && access === 'trial'
+    ? Math.max(0, Math.ceil((trialEnds - new Date()) / (1000 * 60 * 60 * 24)))
+    : null;
+
+  return (
+    <TrialContext.Provider value={{ daysLeft }}>
+      {children}
+    </TrialContext.Provider>
+  );
 }
 
 function SignIn() {

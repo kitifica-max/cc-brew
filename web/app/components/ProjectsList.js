@@ -10,7 +10,7 @@ const ICON_PENCIL = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height=
 const ICON_SETTINGS = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M14 17H5M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></g></svg>`;
 const ICON_LOGOUT = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14 5-5-5-5m5 5H9"/></svg>`;
 
-export default function ProjectsList({ projects, currentId, awaitingFolder, onSwitch, onDelete, onCreate, onRename, onOpenFolder, onCancelFolder, onBack, onShowSettings }) {
+export default function ProjectsList({ projects, currentId, awaitingFolder, onSwitch, onDelete, onCreate, onRename, onOpenFolder, onCancelFolder, onBack, onShowSettings, trialPill }) {
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
   const [confirmId, setConfirmId] = useState(null);
@@ -67,7 +67,8 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
       <div style={{ background: '#f04e23', padding: '52px 20px 16px', flexShrink: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
           <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Claude Code</span>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {trialPill}
             <button
               onClick={onShowSettings}
               style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}

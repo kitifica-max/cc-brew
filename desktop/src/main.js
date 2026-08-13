@@ -36,6 +36,7 @@ let updateAvailable = null; // { version, url } | null
 let downloadedDmgPath = null; // path to pre-downloaded DMG, null while downloading
 let downloadInProgress = false;
 let pendingFolderId = null; // set while PWA is waiting for user to pick a folder
+let trialDaysLeft = null; // null = paid/unknown, number = days remaining in trial
 
 function checkForUpdates() {
   const req = net.request({
@@ -111,7 +112,14 @@ function getUptime() {
 
 function buildMenu(status) {
   const active = getActive();
-  const items = [{ label: 'CC Controller', enabled: false }, { label: `Estado: ${status}`, enabled: false }];
+  const trialLabel = trialDaysLeft !== null
+    ? (trialDaysLeft === 0 ? 'Prueba: vence hoy' : `Prueba: ${trialDaysLeft} día${trialDaysLeft === 1 ? '' : 's'} restante${trialDaysLeft === 1 ? '' : 's'}`)
+    : null;
+  const items = [
+    { label: 'CC Controller', enabled: false },
+    { label: `Estado: ${status}`, enabled: false },
+    ...(trialLabel ? [{ label: trialLabel, enabled: false }] : []),
+  ];
 
   if (status === 'running') {
     items.push(...[
@@ -235,6 +243,9 @@ async function startSession() {
     const trialEnds = access?.trial_ends_at
       ? new Date(access.trial_ends_at)
       : new Date(new Date(authSession.user.created_at).getTime() + 7 * 24 * 60 * 60 * 1000);
+    if (!access?.paid_at) {
+      trialDaysLeft = Math.max(0, Math.ceil((trialEnds - new Date()) / (1000 * 60 * 60 * 24)));
+    }
     if (!access?.paid_at && new Date() >= trialEnds) {
       shell.openExternal('https://ccc.kitifica.com/pago');
       await dialog.showMessageBox({
