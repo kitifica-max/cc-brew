@@ -229,36 +229,28 @@ async function startSession() {
     }
   };
 
-  bridge.onOpenFolder = async (id) => {
-    // tray-only apps have no OS-level focus; show app in Dock momentarily so
-    // the standalone dialog (no sheet parent) appears in front of other windows
-    app.show();
-    app.focus({ steal: true });
-    let canceled = true;
-    let filePaths = [];
-    try {
-      ({ canceled, filePaths } = await dialog.showOpenDialog({
-        properties: ['openDirectory'],
-        title: 'Seleccionar carpeta del proyecto',
-        message: 'Elige el directorio raíz del proyecto',
-      }));
-    } finally {
-      app.hide();
-    }
-    if (canceled || !filePaths.length) {
-      bridge?.broadcastMessage('system', '⚠️ No se seleccionó ninguna carpeta.');
-      return;
-    }
-    const folderPath = filePaths[0];
-    const name = path.basename(folderPath);
-    try {
-      const project = addExistingProject(id, name, folderPath);
-      pty.spawn('claude', [], project.path);
-      setTrayMenu('running');
-      broadcastProjects();
-    } catch (e) {
-      bridge?.broadcastMessage('system', `Error abriendo carpeta: ${e.message}`);
-    }
+  bridge.onOpenFolder = (id) => {
+    // AppleScript choose folder is a native macOS dialog owned by osascript —
+    // it appears in front regardless of Electron's window/focus state
+    exec(
+      `osascript -e 'POSIX path of (choose folder with prompt "Selecciona la carpeta raíz del proyecto:")'`,
+      (err, stdout) => {
+        const folderPath = stdout?.trim();
+        if (err || !folderPath) {
+          bridge?.broadcastMessage('system', '⚠️ No se seleccionó ninguna carpeta.');
+          return;
+        }
+        const name = path.basename(folderPath);
+        try {
+          const project = addExistingProject(id, name, folderPath);
+          pty.spawn('claude', [], project.path);
+          setTrayMenu('running');
+          broadcastProjects();
+        } catch (e) {
+          bridge?.broadcastMessage('system', `Error abriendo carpeta: ${e.message}`);
+        }
+      }
+    );
   };
 
   bridge.onOpenClaudeDesktop = (projectId) => {
