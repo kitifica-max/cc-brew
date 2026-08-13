@@ -484,6 +484,15 @@ nav {
   margin-top: 40px; background: var(--ink-2); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 28px; text-align: center;
 }
+.mac-notice {
+  margin-top: 24px; background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.28);
+  border-radius: var(--radius); padding: 20px 24px; display: flex; gap: 16px; align-items: flex-start;
+}
+.mac-notice-icon { flex-shrink: 0; color: #f59e0b; margin-top: 1px; }
+.mac-notice-body { flex: 1; }
+.mac-notice-title { font-size: 14px; font-weight: 700; color: #fbbf24; margin: 0 0 6px; }
+.mac-notice-text { font-size: 13px; color: var(--text-2); line-height: 1.65; margin: 0 0 10px; }
+.mac-notice-tag { display: inline-flex; align-items: center; gap: 5px; background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.25); border-radius: 20px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: #f59e0b; }
 .how-arch-flow { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin-top: 12px; }
 .arch-item { text-align: center; padding: 0 16px; }
 .arch-item-label { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
@@ -992,11 +1001,17 @@ footer {
       </div>
     </div>
 
-    <div style="margin: 0 auto 32px; max-width: 640px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 14px; padding: 14px 18px; display: flex; gap: 10px; align-items: flex-start;">
-      <span style="font-size: 18px; flex-shrink: 0; line-height: 1.3;">⚠️</span>
-      <div>
-        <strong style="font-size: 13px; color: #92400e; display: block; margin-bottom: 4px;">Tu Mac debe estar encendida y con CC Controller abierto</strong>
-        <span style="font-size: 12px; color: #a16207; line-height: 1.5;">CC Controller no ejecuta código en la nube. Claude Code corre en tu Mac. Si tu Mac está apagada, suspendida o cerrada, CC Controller no puede procesar instrucciones ni devolver respuestas.</span>
+    <div class="mac-notice">
+      <div class="mac-notice-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+      </div>
+      <div class="mac-notice-body">
+        <p class="mac-notice-title">Tu Mac debe estar encendida y con CC Controller abierto</p>
+        <p class="mac-notice-text">CC Controller no ejecuta código en la nube. Claude Code corre localmente en tu Mac. Si tu Mac está apagada, suspendida o cerrada, CC Controller no puede procesar instrucciones ni devolver respuestas.</p>
+        <span class="mac-notice-tag">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+          CC Controller mantiene la pantalla encendida automáticamente mientras está abierta
+        </span>
       </div>
     </div>
 
