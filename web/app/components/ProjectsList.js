@@ -42,10 +42,10 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
         Selecciona una carpeta en tu Mac
       </div>
       <div style={{ fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 1.5, marginBottom: 8 }}>
-        El Finder ya está abierto en tu escritorio.
+        Haz clic en el ícono de CC Controller en la barra de menús de tu Mac.
       </div>
       <div style={{ fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 1.5, marginBottom: 36 }}>
-        Elige la carpeta del proyecto y vuelve aquí — la app navegará al chat automáticamente.
+        Selecciona <strong style={{ color: '#1a1a1a' }}>📁 Seleccionar carpeta del proyecto</strong> — la app navegará al chat automáticamente.
       </div>
       <div style={{ width: 40, height: 40, border: '3px solid #f04e23', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite', marginBottom: 40 }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
