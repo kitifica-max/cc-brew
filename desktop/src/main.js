@@ -41,7 +41,7 @@ let trialDaysLeft = null; // null = paid/unknown, number = days remaining in tri
 function checkForUpdates() {
   const req = net.request({
     method: 'GET',
-    url: 'https://api.github.com/repos/kitifica-max/cc-controller/releases/latest',
+    url: `https://${process.env.PWA_URL || 'ccc.kitifica.com'}/api/latest`,
     headers: { 'User-Agent': 'CC-Controller-App' },
   });
   req.on('response', (res) => {
@@ -49,20 +49,12 @@ function checkForUpdates() {
     res.on('data', (chunk) => { body += chunk; });
     res.on('end', () => {
       try {
-        const { tag_name, html_url, assets } = JSON.parse(body);
-        const latest = tag_name?.replace(/^v/, '');
+        const { version: latest, releaseUrl } = JSON.parse(body);
         const current = app.getVersion();
         if (latest && latest !== current) {
-          updateAvailable = { version: latest, url: html_url };
+          updateAvailable = { version: latest, url: releaseUrl };
           if (tray) setTrayMenu(pty?.running ? 'running' : 'stopped');
-          // Push A: notificar que hay update disponible
-          bridge?.sendPush('CC Controller', `Nueva versión v${latest} disponible — descargando en background…`).catch(() => {});
-          // Push B: descargar DMG en background
-          const isArm = process.arch === 'arm64';
-          const asset = assets?.find(a =>
-            a.name.endsWith('.dmg') && (isArm ? a.name.includes('arm64') : !a.name.includes('arm64'))
-          );
-          if (asset?.browser_download_url) downloadUpdate(latest, asset.browser_download_url);
+          bridge?.sendPush('CC Controller', `Nueva versión v${latest} disponible — abre el menú del tray para instalar`).catch(() => {});
         }
       } catch (_) {}
     });
@@ -415,6 +407,7 @@ app.whenReady().then(async () => {
   const iconPath = path.join(__dirname, '../assets/tray-icon.png');
   const icon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
   tray = new Tray(icon);
+  tray.on('mouse-enter', () => setTrayMenu(pty?.running ? 'running' : 'stopped'));
   setTrayMenu('stopped');
 
   if (needsSetup()) {
