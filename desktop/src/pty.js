@@ -28,6 +28,11 @@ export default class PtyManager {
     if (text === '\x03') return;
     const msg = text.replace(/\n+$/, '').trim();
     if (!msg) return;
+    // Proceso activo esperando input (permiso) → escribir directo a su stdin
+    if (this._currentProc && !this._currentProc.killed) {
+      this._currentProc.stdin.write(msg + '\n');
+      return;
+    }
     if (!MODEL_RE.test(model)) model = 'claude-sonnet-4-6';
     if (!EFFORTS.has(effort)) effort = 'medium';
     this._queue.push({ msg, continueConv, model, effort, projectId, skipPermissions: Boolean(skipPermissions) });
@@ -53,11 +58,10 @@ export default class PtyManager {
     });
 
     this._currentProc = proc;
-    // Si el proceso muere antes de leer stdin, el EPIPE tumbaría el proceso principal.
     proc.stdin.on('error', () => {});
     proc.on('error', (e) => stderrChunks.push(`[ERROR: ${e.message}]`));
     proc.stdin.write(msg + '\n');
-    proc.stdin.end();
+    // No cerrar stdin — Claude Code puede pedir permisos vía stdin
 
     const timeout = setTimeout(() => {
       proc.kill('SIGTERM');
