@@ -68,13 +68,6 @@ function buildMenu(status) {
   const active = getActive();
   const items = [{ label: 'CC Controller', enabled: false }, { label: `Estado: ${status}`, enabled: false }];
 
-  if (pendingFolderId) {
-    items.push(
-      { type: 'separator' },
-      { label: '📁 Seleccionar carpeta del proyecto ←', click: openFolderDialog },
-    );
-  }
-
   if (status === 'running') {
     items.push(...[
       { label: `Uptime: ${getUptime()}`, enabled: false },
@@ -82,6 +75,7 @@ function buildMenu(status) {
       active ? { label: active.path, enabled: false } : null,
       { type: 'separator' },
       { label: 'Abrir PWA', click: () => shell.openExternal(`https://${process.env.PWA_URL || 'localhost:3000'}`) },
+      { label: '📁 Abrir carpeta existente', click: openFolderDialog },
       { type: 'separator' },
       { label: 'Detener', click: stopSession },
       { label: 'Reiniciar', click: () => { stopSession(); startSession(); } },
@@ -123,10 +117,8 @@ function setTrayMenu(status) {
 }
 
 async function openFolderDialog() {
-  if (!pendingFolderId) return;
-  const id = pendingFolderId;
+  const id = pendingFolderId ?? (Math.random().toString(36).slice(2) + Date.now().toString(36));
   pendingFolderId = null;
-  setTrayMenu(pty?.running ? 'running' : 'stopped');
 
   const { canceled, filePaths } = await dialog.showOpenDialog({
     properties: ['openDirectory'],

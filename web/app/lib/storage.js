@@ -23,9 +23,9 @@ export function saveProjects(projects) {
   catch {}
 }
 
-export function makeProject(name = 'Nuevo proyecto') {
+export function makeProject(name = 'Nuevo proyecto', id = null) {
   return {
-    id: Math.random().toString(36).slice(2) + Date.now().toString(36),
+    id: id ?? (Math.random().toString(36).slice(2) + Date.now().toString(36)),
     name,
     path: null,
     model: 'claude-sonnet-4-6',
