@@ -31,6 +31,7 @@ let startTime = null;
 let uptimeInterval = null;
 let powerBlockId = null;
 let updateAvailable = null; // { version, url } | null
+let pendingFolderId = null; // set while PWA is waiting for user to pick a folder
 
 function checkForUpdates() {
   const req = net.request({
@@ -66,6 +67,13 @@ function getUptime() {
 function buildMenu(status) {
   const active = getActive();
   const items = [{ label: 'CC Controller', enabled: false }, { label: `Estado: ${status}`, enabled: false }];
+
+  if (pendingFolderId) {
+    items.push(
+      { type: 'separator' },
+      { label: '📁 Seleccionar carpeta del proyecto ←', click: openFolderDialog },
+    );
+  }
 
   if (status === 'running') {
     items.push(...[
@@ -112,6 +120,34 @@ function buildMenu(status) {
 function setTrayMenu(status) {
   tray.setContextMenu(buildMenu(status));
   tray.setToolTip(`CC Controller — ${status}`);
+}
+
+async function openFolderDialog() {
+  if (!pendingFolderId) return;
+  const id = pendingFolderId;
+  pendingFolderId = null;
+  setTrayMenu(pty?.running ? 'running' : 'stopped');
+
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+    title: 'Seleccionar carpeta del proyecto',
+    message: 'Elige el directorio raíz del proyecto',
+  });
+
+  if (canceled || !filePaths.length) {
+    bridge?.broadcastMessage('system', '⚠️ No se seleccionó ninguna carpeta.');
+    return;
+  }
+  const folderPath = filePaths[0];
+  const name = path.basename(folderPath);
+  try {
+    const project = addExistingProject(id, name, folderPath);
+    pty.spawn('claude', [], project.path);
+    setTrayMenu('running');
+    broadcastProjects();
+  } catch (e) {
+    bridge?.broadcastMessage('system', `Error abriendo carpeta: ${e.message}`);
+  }
 }
 
 function broadcastProjects() {
@@ -229,36 +265,12 @@ async function startSession() {
     }
   };
 
-  bridge.onOpenFolder = async (id) => {
-    // tray-only apps have no OS-level focus; show app in Dock momentarily so
-    // the standalone dialog (no sheet parent) appears in front of other windows
-    app.show();
-    app.focus({ steal: true });
-    let canceled = true;
-    let filePaths = [];
-    try {
-      ({ canceled, filePaths } = await dialog.showOpenDialog({
-        properties: ['openDirectory'],
-        title: 'Seleccionar carpeta del proyecto',
-        message: 'Elige el directorio raíz del proyecto',
-      }));
-    } finally {
-      app.hide();
-    }
-    if (canceled || !filePaths.length) {
-      bridge?.broadcastMessage('system', '⚠️ No se seleccionó ninguna carpeta.');
-      return;
-    }
-    const folderPath = filePaths[0];
-    const name = path.basename(folderPath);
-    try {
-      const project = addExistingProject(id, name, folderPath);
-      pty.spawn('claude', [], project.path);
-      setTrayMenu('running');
-      broadcastProjects();
-    } catch (e) {
-      bridge?.broadcastMessage('system', `Error abriendo carpeta: ${e.message}`);
-    }
+  bridge.onOpenFolder = (id) => {
+    // dialog.showOpenDialog only works when triggered by a real user click that
+    // gives Electron OS-level focus. Store the id and surface a tray menu item;
+    // when the user clicks it the OS grants focus and the dialog appears.
+    pendingFolderId = id;
+    setTrayMenu(pty?.running ? 'running' : 'stopped');
   };
 
   bridge.onOpenClaudeDesktop = (projectId) => {
