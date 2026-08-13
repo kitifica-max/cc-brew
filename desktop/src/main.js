@@ -141,6 +141,18 @@ function buildMenu(status) {
   items.push(
     { type: 'separator' },
     {
+      label: updateAvailable ? `Actualización disponible: v${updateAvailable.version}` : 'Buscar actualizaciones',
+      click: () => {
+        if (updateAvailable) {
+          shell.openExternal(updateAvailable.url);
+        } else {
+          checkForUpdates();
+          dialog.showMessageBox({ type: 'info', message: 'Revisando actualizaciones…', detail: 'Si hay una versión nueva aparecerá en el menú.' });
+        }
+      },
+    },
+    { type: 'separator' },
+    {
       label: 'Copiar SESSION_TOKEN',
       click: () => {
         const token = process.env.SESSION_TOKEN;
