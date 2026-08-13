@@ -407,7 +407,7 @@ app.whenReady().then(async () => {
   const iconPath = path.join(__dirname, '../assets/tray-icon.png');
   const icon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
   tray = new Tray(icon);
-  tray.on('mouse-enter', () => setTrayMenu(pty?.running ? 'running' : 'stopped'));
+  tray.on('mouse-enter', () => setTrayMenu(bridge !== null ? 'running' : 'stopped'));
   setTrayMenu('stopped');
 
   if (needsSetup()) {
