@@ -106,15 +106,20 @@ function CCController() {
   }, []);
 
   // Supabase — reconnectKey re-crea canal en iOS background o network recovery
+  // `active` guard: removeChannel es async, sin guard subscripciones stale
+  // siguen recibiendo eventos → respuestas duplicadas.
   useEffect(() => {
+    let active = true;
     const ch = supabase.channel(`session:${getSessionId()}`, { config: { private: true } });
     channelRef.current = ch;
 
     ch.on('broadcast', { event: 'heartbeat' }, () => {
+      if (!active) return;
       resetDesktopTimeout();
     });
 
     ch.on('broadcast', { event: 'chunk' }, ({ payload }) => {
+      if (!active) return;
       resetDesktopTimeout();
       const { msgId, text, done, projectId: pId } = payload;
       clearTimeout(thinkingTimerRef.current);
@@ -122,6 +127,7 @@ function CCController() {
       if (done) {
         const prev = streamingMsgRef.current;
         if (prev?.msgId === msgId) {
+          streamingMsgRef.current = null; // clear immediately — prevents duplicate commits if done fires >1x
           const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
           const targetId = pId ?? currentIdRef.current;
           setProjects(ps => ps.map(p => p.id !== targetId ? p : {
@@ -137,6 +143,7 @@ function CCController() {
     });
 
     ch.on('broadcast', { event: 'message' }, ({ payload }) => {
+      if (!active) return;
       resetDesktopTimeout();
       clearTimeout(thinkingTimerRef.current);
       setThinking(false);
@@ -156,6 +163,7 @@ function CCController() {
     });
 
     ch.on('broadcast', { event: 'history' }, ({ payload }) => {
+      if (!active) return;
       if (!payload.messages?.length) return;
       setProjects(prev => prev.map(p => {
         if (p.messages.length > 0) return p;
@@ -172,6 +180,7 @@ function CCController() {
     });
 
     ch.on('broadcast', { event: 'project-state' }, ({ payload }) => {
+      if (!active) return;
       resetDesktopTimeout();
       const pending = awaitingFolderIdRef.current;
 
@@ -204,8 +213,10 @@ function CCController() {
 
     (async () => {
       const { data } = await supabase.auth.getSession();
+      if (!active) return; // cleanup ran before subscribe — don't open stale channel
       await supabase.realtime.setAuth(data.session?.access_token ?? null);
       ch.subscribe(s => {
+        if (!active) return;
         const isNowConnected = s === 'SUBSCRIBED';
         setConnected(isNowConnected);
         if (isNowConnected) {
@@ -221,6 +232,7 @@ function CCController() {
     });
 
     return () => {
+      active = false;
       sub.subscription.unsubscribe();
       supabase.removeChannel(ch);
       clearTimeout(desktopTimeoutRef.current);
