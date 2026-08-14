@@ -931,7 +931,6 @@ function DonutRing({ pct, color, size = 26, title }) {
 
 function UsageRings({ usage, project }) {
   const [show, setShow] = useState(false);
-  if (!usage.cost && !usage.tokens) return null;
 
   const maxCtx = MODEL_CONTEXT[project?.model] ?? 200000;
   const ctxPct = usage.tokens / maxCtx;
