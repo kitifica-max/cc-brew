@@ -657,7 +657,7 @@ footer {
     <div class="hero-left">
       <div class="hero-badge">
         <div class="hero-badge-dot"><div class="hero-badge-pulse"></div></div>
-        Open Source · v1.4.3
+        Open Source · v1.4.4
       </div>
       <h1>Tu Claude Code.<br>Tu Mac.<br><span>Tu móvil.</span></h1>
       <p class="hero-tagline">Controla tus proyectos de Claude Code estés donde estés.</p>
@@ -1075,10 +1075,11 @@ footer {
     <div class="install-steps">
       <div class="install-step">
         <div class="install-num">1</div>
-        <h3>Descarga CC Controller</h3>
-        <p>Descarga el DMG para tu Mac y arrástralo a Aplicaciones. Apple Silicon e Intel.</p>
-        <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;">
-          <a href="https://github.com/kitifica-max/cc-controller/releases/latest" target="_blank" rel="noopener" class="btn-primary" style="font-size: 13px; padding: 10px 18px; border-radius: 100px; justify-content: center; text-decoration: none;">Descargar CC Controller</a>
+        <h3>Instala CC Controller</h3>
+        <p>Vía Homebrew (recomendado) o descargando el DMG. Apple Silicon e Intel.</p>
+        <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <code style="display:block; background: var(--surface-2, rgba(255,255,255,0.06)); border: 1px solid var(--border,rgba(255,255,255,0.1)); border-radius: 8px; padding: 8px 12px; font-size: 11px; color: var(--orange, #f97316); font-family: monospace; word-break: break-all;">brew install --cask kitifica-max/tap/cc-controller</code>
+          <a href="https://github.com/kitifica-max/cc-controller/releases/latest" target="_blank" rel="noopener" class="btn-ghost" style="font-size: 12px; padding: 8px 16px; text-align: center; text-decoration: none;">Descargar DMG →</a>
         </div>
       </div>
       <div class="install-step">
@@ -1098,8 +1099,8 @@ footer {
 
     <div class="install-details-wrap">
       <details>
-        <summary><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:-2px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01"/></svg>¿macOS bloqueó la aplicación?</summary>
-        <p>CC Controller no está notarizado por Apple. Si macOS bloquea la apertura:</p>
+        <summary><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:-2px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01"/></svg>¿macOS bloqueó la aplicación? (solo si usas el DMG)</summary>
+        <p>Si instalas con Homebrew, macOS no bloqueará la app. Si descargaste el DMG manualmente:</p>
         <ol>
           <li>Ve a <strong>Configuración del Sistema → Privacidad y Seguridad</strong></li>
           <li>Busca el mensaje sobre CC Controller y haz clic en <strong>"Abrir igualmente"</strong></li>
