@@ -56,6 +56,7 @@ function CCController() {
   const [mcpConfig, setMcpConfig] = useState({});
   const [reconnectKey, setReconnectKey] = useState(0);
   const [streamingMsg, setStreamingMsg] = useState(null); // {msgId, text} | null
+  const [pendingPermission, setPendingPermission] = useState(null); // {text, msgId, projectId} | null
   const streamingMsgRef = useRef(null);
   const chatRef = useRef(null);
   const channelRef = useRef(null);
@@ -246,6 +247,14 @@ function CCController() {
       }
     });
 
+    ch.on('broadcast', { event: 'permission' }, ({ payload }) => {
+      if (!active) return;
+      resetDesktopTimeout();
+      clearTimeout(thinkingTimerRef.current);
+      setThinking(false);
+      setPendingPermission({ text: payload.text, msgId: payload.msgId, projectId: payload.projectId });
+    });
+
     ch.on('broadcast', { event: 'mcp-config' }, ({ payload }) => {
       if (!active) return;
       setMcpConfig(payload.mcpServers ?? {});
@@ -356,6 +365,21 @@ function CCController() {
   function cancelThinking() {
     clearTimeout(thinkingTimerRef.current);
     setThinking(false);
+  }
+
+  function handlePermissionResponse(allow) {
+    sendRaw(allow ? 'y' : 'n', true);
+    const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+    setProjects(prev => prev.map(p => p.id !== currentId ? p : {
+      ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: 'system', text: allow ? '✓ Permiso concedido' : '✗ Permiso denegado', time }],
+    }));
+    setPendingPermission(null);
+    setThinking(true);
+    clearTimeout(thinkingTimerRef.current);
+    thinkingTimerRef.current = setTimeout(() => {
+      setThinking(false);
+      addSystemMsg('⚠️ Sin respuesta en 3 min — verifica que el desktop esté activo');
+    }, THINKING_TIMEOUT_MS);
   }
 
   // ── Voice recording ───────────────────────────────────────────────────────────
@@ -572,8 +596,15 @@ function CCController() {
           </div>
         )}
         {messages.map(msg => <MessageRow key={msg.id} msg={msg} />)}
+        {pendingPermission && !streamingMsg && (
+          <PermissionCard
+            permission={pendingPermission}
+            onAllow={() => handlePermissionResponse(true)}
+            onDeny={() => handlePermissionResponse(false)}
+          />
+        )}
         {streamingMsg && <StreamingRow text={streamingMsg.text} onCancel={cancelThinking} />}
-        {thinking && !streamingMsg && <TypingIndicator onCancel={cancelThinking} />}
+        {thinking && !streamingMsg && !pendingPermission && <TypingIndicator onCancel={cancelThinking} />}
       </div>
 
       {/* Waiting banner */}
@@ -804,6 +835,53 @@ function StreamingRow({ text, onCancel }) {
           title="Cancelar"
           style={{ background: 'rgba(0,0,0,0.08)', border: 'none', borderRadius: '50%', width: 26, height: 26, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: 16, lineHeight: 1, marginTop: 8, flexShrink: 0 }}
         >×</button>
+      </div>
+    </div>
+  );
+}
+
+function PermissionCard({ permission, onAllow, onDeny }) {
+  // Extrae la parte relevante: qué herramienta y qué archivo/comando
+  const lines = permission.text.split('\n').filter(l => l.trim());
+  const summary = lines.slice(0, 6).join('\n');
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+      <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#b45309', marginBottom: 4, paddingLeft: 4 }}>
+        ⚠️ Permiso requerido
+      </div>
+      <div style={{
+        maxWidth: '96%', background: '#fffbeb', border: '1.5px solid #fbbf24',
+        borderRadius: 18, borderBottomLeftRadius: 4, padding: '12px 14px',
+      }}>
+        <pre style={{
+          margin: '0 0 12px', fontSize: 11, color: '#44403c',
+          whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+          fontFamily: "'SF Mono','Fira Code',ui-monospace,monospace", lineHeight: 1.6,
+        }}>
+          {summary}
+        </pre>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={onAllow}
+            style={{
+              flex: 1, background: '#16a34a', color: '#fff', border: 'none',
+              borderRadius: 12, padding: '11px 0', fontSize: 14, fontWeight: 700,
+              cursor: 'pointer', fontFamily: 'Sora, sans-serif',
+            }}
+          >
+            Permitir
+          </button>
+          <button
+            onClick={onDeny}
+            style={{
+              flex: 1, background: '#dc2626', color: '#fff', border: 'none',
+              borderRadius: 12, padding: '11px 0', fontSize: 14, fontWeight: 700,
+              cursor: 'pointer', fontFamily: 'Sora, sans-serif',
+            }}
+          >
+            Denegar
+          </button>
+        </div>
       </div>
     </div>
   );

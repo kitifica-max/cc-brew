@@ -255,6 +255,17 @@ export default class Bridge {
     return Buffer.from(await data.arrayBuffer());
   }
 
+  broadcastPermission(text, msgId, projectId = null) {
+    const clean = text.replace(ANSI_RE, '').trim();
+    this._addToHistory({ role: 'permission', text: clean, msgId, projectId });
+    this.channel?.send({
+      type: 'broadcast',
+      event: 'permission',
+      payload: { text: clean, msgId, projectId, ts: Date.now() },
+    });
+    this.sendPush('CC Controller', '⚠️ Claude necesita un permiso — toca para responder').catch(() => {});
+  }
+
   broadcastMcpConfig(projectId, mcpServers) {
     this.channel?.send({
       type: 'broadcast', event: 'mcp-config',

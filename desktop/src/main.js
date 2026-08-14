@@ -286,6 +286,9 @@ async function startSession() {
     bridge?.broadcastChunk(msgId, text, done, projectId);
     if (done) bridge?.sendPush('CC Controller', 'Claude terminó — toca para ver la respuesta').catch(() => {});
   };
+  pty.onPermissionRequest = (text, msgId, projectId) => {
+    bridge?.broadcastPermission(text, msgId, projectId ?? getActive()?.id ?? null);
+  };
 
   bridge.onCreateProject = (id, name) => {
     try {
