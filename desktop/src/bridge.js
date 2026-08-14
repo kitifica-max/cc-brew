@@ -189,7 +189,7 @@ export default class Bridge {
       this.channel?.send({
         type: 'broadcast',
         event: 'chunk',
-        payload: { msgId, text: '', done: true, projectId: buf.projectId, ts: Date.now() },
+        payload: { msgId, text: fullText, done: true, projectId: buf.projectId, ts: Date.now() },
       });
     } else if (clean.trim()) {
       this.channel?.send({

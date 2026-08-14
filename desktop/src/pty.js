@@ -3,6 +3,7 @@ import pty from 'node-pty';
 const ANSI_RE = /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g;
 const MCP_WARN_RE = /Client\.\w+\(\) called but server does not advertise \w+ capability[^\n]*/g;
 const PERMISSION_RE = /Do you want to proceed\?|requires approval|Allow\?\s*\[y\/n/i;
+const DEFERRED_RE = /No deferred tool marker found in the resumed session/;
 const DEFAULT_TIMEOUT_MS = 10 * 60_000;
 
 export default class PtyManager {
@@ -17,6 +18,8 @@ export default class PtyManager {
     this._currentMsgId = null;
     this._currentProjectId = null;
     this._permissionPending = false;
+    this._deferredError = false;
+    this._skipContinue = false;
     this._hardTimer = null;
     this.onMessage = null;
     this.onChunk = null;
@@ -36,7 +39,6 @@ export default class PtyManager {
     if (!msg) return;
 
     if (this._permissionPending && this._proc) {
-      // y → opción 1 (Yes), n → opción 3 (No) para el menú de Claude Code
       const response = msg === 'n' ? '3' : '1';
       this._proc.write(response + '\r');
       this._permissionPending = false;
@@ -54,11 +56,14 @@ export default class PtyManager {
     this._currentMsgId = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
     this._currentProjectId = projectId;
     this._jsonBuf = '';
+    this._deferredError = false;
 
-    const proc = pty.spawn(this._command, [
-      '--print', '--output-format', 'stream-json', '--verbose', '--continue',
-      '--model', model, '--effort', effort,
-    ], {
+    const args = ['--print', '--output-format', 'stream-json', '--verbose'];
+    if (!this._skipContinue) args.push('--continue');
+    this._skipContinue = false;
+    args.push('--model', model, '--effort', effort, msg);
+
+    const proc = pty.spawn(this._command, args, {
       name: 'xterm-color', cols: 220, rows: 50,
       cwd: this._cwd,
       env: { ...process.env, NO_COLOR: '1' },
@@ -70,10 +75,22 @@ export default class PtyManager {
       this._onData(raw);
     });
 
-    proc.onExit(() => {
+    proc.onExit(({ exitCode }) => {
       if (this._proc !== proc) return;
       this._proc = null;
       clearTimeout(this._hardTimer);
+      this._permissionPending = false;
+
+      if (this._deferredError && exitCode === 1) {
+        this._deferredError = false;
+        this._skipContinue = true;
+        this._queue.unshift({ msg, projectId, model, effort });
+        this._currentMsgId = null;
+        this._busy = false;
+        this._flush();
+        return;
+      }
+
       if (this._currentMsgId) {
         this.onChunk?.(this._currentMsgId, '', true, this._currentProjectId);
         this._currentMsgId = null;
@@ -82,9 +99,8 @@ export default class PtyManager {
       this._flush();
     });
 
-    // Mensaje + EOF (Ctrl+D) — --print lee de stdin
-    proc.write(msg + '\n');
-    setTimeout(() => { if (this._proc === proc) proc.write('\x04'); }, 100);
+    // mensaje pasado como arg CLI — cerrar stdin inmediatamente
+    setTimeout(() => { if (this._proc === proc) proc.write('\x04'); }, 50);
 
     this._hardTimer = setTimeout(() => {
       if (this._currentMsgId) {
@@ -99,11 +115,7 @@ export default class PtyManager {
     const text = raw.replace(ANSI_RE, '').replace(MCP_WARN_RE, '')
       .replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
-    if (PERMISSION_RE.test(text)) {
-      this._permissionPending = true;
-      this.onPermissionRequest?.(text.trim(), this._currentMsgId, this._currentProjectId);
-      return;
-    }
+    if (DEFERRED_RE.test(text)) { this._deferredError = true; }
 
     this._jsonBuf += text;
     const lines = this._jsonBuf.split('\n');
@@ -113,7 +125,12 @@ export default class PtyManager {
       if (!line.trim()) continue;
       try {
         this._handleEvent(JSON.parse(line.trim()));
-      } catch { /* línea no-JSON: ignorar (spinners, headers de tool use, etc.) */ }
+      } catch {
+        if (PERMISSION_RE.test(line)) {
+          this._permissionPending = true;
+          this.onPermissionRequest?.(line.trim(), this._currentMsgId, this._currentProjectId);
+        }
+      }
     }
   }
 
@@ -141,7 +158,7 @@ export default class PtyManager {
   kill() {
     clearTimeout(this._hardTimer);
     this._queue = []; this._busy = false; this._jsonBuf = '';
-    this._permissionPending = false;
+    this._permissionPending = false; this._deferredError = false;
     if (this._currentMsgId) {
       this.onChunk?.(this._currentMsgId, '', true, this._currentProjectId);
       this._currentMsgId = null;

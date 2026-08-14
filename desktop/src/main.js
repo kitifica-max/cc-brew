@@ -235,7 +235,8 @@ async function startSession() {
   });
 
   // El canal es privado: sin JWT válido Realtime rechaza la suscripción.
-  if (!(await bridge.restoreSession())) {
+  const restored = await bridge.restoreSession();
+  if (!restored) {
     bridge = null;
     await dialog.showMessageBox({
       type: 'warning',
@@ -282,8 +283,8 @@ async function startSession() {
     pty.write(text, continueConv, model, effort, projectId, skipPermissions);
   };
   pty.onMessage = (role, text, projectId) => bridge?.broadcastMessage(role, text, projectId);
-  pty.onChunk = (msgId, text, done, projectId) => {
-    bridge?.broadcastChunk(msgId, text, done, projectId);
+  pty.onChunk = (msgId, text, done, _projectId) => {
+    bridge?.broadcastChunk(msgId, text, done, null); // null → PWA usa currentIdRef
     if (done) bridge?.sendPush('CC Controller', 'Claude terminó — toca para ver la respuesta').catch(() => {});
   };
   pty.onPermissionRequest = (text, msgId, projectId) => {
