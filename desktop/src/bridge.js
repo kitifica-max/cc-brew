@@ -266,6 +266,13 @@ export default class Bridge {
     this.sendPush('CC Controller', '⚠️ Claude necesita un permiso — toca para responder').catch(() => {});
   }
 
+  broadcastUsage(cost, tokens, projectId = null) {
+    this.channel?.send({
+      type: 'broadcast', event: 'usage',
+      payload: { cost, tokens, projectId, ts: Date.now() },
+    });
+  }
+
   broadcastMcpConfig(projectId, mcpServers) {
     this.channel?.send({
       type: 'broadcast', event: 'mcp-config',

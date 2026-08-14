@@ -16,7 +16,7 @@ const ENV_KEYS = ['GITHUB_TOKEN', 'NETLIFY_AUTH_TOKEN', 'SUPABASE_SERVICE_KEY'];
 const EMPTY_ENV = Object.fromEntries(ENV_KEYS.map(k => [k, '']));
 const EMPTY_SERVER = { name: '', command: '', args: '' };
 
-export default function SettingsSheet({ project, mcpConfig = {}, onClose, onModelChange, onEffortChange, onSkipPermissionsChange, onOpenDesktop, onSaveEnv, onSaveMcpConfig }) {
+export default function SettingsSheet({ project, mcpConfig = {}, onClose, onModelChange, onEffortChange, onSkipPermissionsChange, onSpendLimitChange, onOpenDesktop, onSaveEnv, onSaveMcpConfig }) {
   const [envData, setEnvData] = useState(EMPTY_ENV);
   const [newToken, setNewToken] = useState('');
   const [tokenSaved, setTokenSaved] = useState(false);
@@ -244,6 +244,21 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
               }} />
             </div>
           </button>
+          <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 12 }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#333' }}>Límite de gasto</div>
+              <div style={{ fontSize: 10, color: '#999', marginTop: 2 }}>Dona de costo en el chat</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ fontSize: 13, color: '#666' }}>$</span>
+              <input
+                type="number" min="0.1" step="0.5"
+                value={project?.spendLimit ?? 1}
+                onChange={e => onSpendLimitChange?.(parseFloat(e.target.value) || 1)}
+                style={{ width: 60, fontSize: 13, fontWeight: 600, color: '#333', border: '1.5px solid #e0e0e0', borderRadius: 8, padding: '6px 8px', textAlign: 'right', fontFamily: 'Sora, sans-serif' }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* MCP Servers */}

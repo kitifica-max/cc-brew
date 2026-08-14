@@ -57,6 +57,7 @@ function CCController() {
   const [reconnectKey, setReconnectKey] = useState(0);
   const [streamingMsg, setStreamingMsg] = useState(null); // {msgId, text} | null
   const [pendingPermission, setPendingPermission] = useState(null); // {text, msgId, projectId} | null
+  const [sessionUsage, setSessionUsage] = useState({ cost: 0, tokens: 0 });
   const streamingMsgRef = useRef(null);
   const chatRef = useRef(null);
   const channelRef = useRef(null);
@@ -253,6 +254,14 @@ function CCController() {
       clearTimeout(thinkingTimerRef.current);
       setThinking(false);
       setPendingPermission({ text: payload.text, msgId: payload.msgId, projectId: payload.projectId });
+    });
+
+    ch.on('broadcast', { event: 'usage' }, ({ payload }) => {
+      if (!active) return;
+      setSessionUsage(prev => ({
+        cost: prev.cost + (payload.cost ?? 0),
+        tokens: prev.tokens + (payload.tokens ?? 0),
+      }));
     });
 
     ch.on('broadcast', { event: 'mcp-config' }, ({ payload }) => {
@@ -454,6 +463,7 @@ function CCController() {
     setCurrentId(id);
     setView('chat');
     setThinking(false);
+    setSessionUsage({ cost: 0, tokens: 0 });
     clearTimeout(thinkingTimerRef.current);
     const target = projects.find(p => p.id === id);
     if (target?.path) {
@@ -522,6 +532,7 @@ function CCController() {
           onModelChange={v => updateProjectSettings('model', v)}
           onEffortChange={v => updateProjectSettings('effort', v)}
           onSkipPermissionsChange={v => updateProjectSettings('skipPermissions', v)}
+          onSpendLimitChange={v => updateProjectSettings('spendLimit', v)}
           onOpenDesktop={() => { sendEvent('open-claude-desktop', { projectId: currentId }); setShowSettings(false); }}
           onSaveEnv={(env) => { sendEvent('save-env', { projectId: currentId, env }); setShowSettings(false); }}
           onSaveMcpConfig={(cfg) => { sendEvent('save-mcp-config', { projectId: currentId, mcpServers: cfg }); }}
@@ -549,6 +560,7 @@ function CCController() {
               <div style={{ width: 7, height: 7, borderRadius: '50%', background: desktopActive ? '#00b09b' : connected ? '#f0a040' : 'rgba(255,255,255,0.3)', boxShadow: desktopActive ? '0 0 6px #00b09b' : 'none' }} />
               {desktopActive ? 'Desktop activo' : connected ? 'Desktop detenido' : 'Sin conexión'}
             </div>
+            <UsageRings usage={sessionUsage} project={currentProject} />
             <button
               onClick={() => {
                 setShowSettings(true);
@@ -693,6 +705,7 @@ function CCController() {
           onModelChange={v => updateProjectSettings('model', v)}
           onEffortChange={v => updateProjectSettings('effort', v)}
           onSkipPermissionsChange={v => updateProjectSettings('skipPermissions', v)}
+          onSpendLimitChange={v => updateProjectSettings('spendLimit', v)}
           onOpenDesktop={() => { sendEvent('open-claude-desktop', { projectId: currentId }); setShowSettings(false); }}
           onSaveEnv={(env) => { sendEvent('save-env', { projectId: currentId, env }); setShowSettings(false); }}
           onSaveMcpConfig={(cfg) => { sendEvent('save-mcp-config', { projectId: currentId, mcpServers: cfg }); }}
@@ -891,6 +904,74 @@ function PermissionCard({ permission, onAllow, onDeny }) {
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+const MODEL_CONTEXT = {
+  'claude-sonnet-4-6': 200000,
+  'claude-opus-4': 200000,
+  'claude-haiku-4-5': 200000,
+};
+
+function DonutRing({ pct, color, size = 26, title }) {
+  const r = (size - 5) / 2;
+  const circ = 2 * Math.PI * r;
+  const filled = Math.min(pct, 1);
+  return (
+    <svg width={size} height={size} title={title} style={{ transform: 'rotate(-90deg)', flexShrink: 0 }}>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={3.5} />
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={3.5}
+        strokeDasharray={circ} strokeDashoffset={circ * (1 - filled)}
+        strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+      />
+    </svg>
+  );
+}
+
+function UsageRings({ usage, project }) {
+  const [show, setShow] = useState(false);
+  if (!usage.cost && !usage.tokens) return null;
+
+  const maxCtx = MODEL_CONTEXT[project?.model] ?? 200000;
+  const ctxPct = usage.tokens / maxCtx;
+  const spendLimit = project?.spendLimit ?? 1;
+  const spendPct = spendLimit > 0 ? usage.cost / spendLimit : 0;
+
+  const ctxColor = ctxPct > 0.85 ? '#f87171' : ctxPct > 0.6 ? '#fbbf24' : '#86efac';
+  const spendColor = spendPct > 0.85 ? '#f87171' : spendPct > 0.6 ? '#fbbf24' : '#86efac';
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <button
+        onClick={() => setShow(s => !s)}
+        style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, padding: 2 }}
+        title="Ver consumo"
+      >
+        <DonutRing pct={ctxPct} color={ctxColor} title={`Context: ${Math.round(ctxPct*100)}%`} />
+        <DonutRing pct={spendPct} color={spendColor} title={`Gasto: $${usage.cost.toFixed(4)}`} />
+      </button>
+      {show && (
+        <div style={{
+          position: 'absolute', top: 36, right: 0, background: '#1a1a1a', borderRadius: 12,
+          padding: '10px 14px', zIndex: 100, minWidth: 160, boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+          border: '1px solid rgba(255,255,255,0.1)',
+        }}
+          onClick={() => setShow(false)}
+        >
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Consumo sesión</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
+              <span style={{ fontSize: 11, color: '#aaa' }}>Context</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: ctxColor }}>{usage.tokens.toLocaleString()} / {(maxCtx/1000).toFixed(0)}k</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
+              <span style={{ fontSize: 11, color: '#aaa' }}>Gasto</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: spendColor }}>${usage.cost.toFixed(4)} / ${spendLimit.toFixed(2)}</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

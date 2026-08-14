@@ -297,6 +297,9 @@ async function startSession() {
   pty.onPermissionRequest = (text, msgId, projectId) => {
     bridge?.broadcastPermission(text, msgId, projectId ?? getActive()?.id ?? null);
   };
+  pty.onUsage = (cost, tokens, projectId) => {
+    bridge?.broadcastUsage(cost, tokens, projectId ?? getActive()?.id ?? null);
+  };
 
   bridge.onCreateProject = (id, name) => {
     try {

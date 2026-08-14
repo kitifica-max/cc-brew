@@ -153,6 +153,14 @@ export default class PtyManager {
         this._currentProjectId,
       );
     }
+
+    if (event.type === 'result') {
+      const cost = event.cost_usd ?? 0;
+      const u = event.usage ?? {};
+      const tokens = (u.input_tokens ?? 0) + (u.output_tokens ?? 0)
+        + (u.cache_creation_input_tokens ?? 0) + (u.cache_read_input_tokens ?? 0);
+      if (cost || tokens) this.onUsage?.(cost, tokens, this._currentProjectId);
+    }
   }
 
   kill() {
