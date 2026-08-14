@@ -40,32 +40,36 @@ let trialDaysLeft = null; // null = paid/unknown, number = days remaining in tri
 
 function checkForUpdates() {
   return new Promise((resolve) => {
-    const req = net.request({
-      method: 'GET',
-      url: `https://${process.env.PWA_URL || 'ccc.kitifica.com'}/api/latest`,
-      headers: { 'User-Agent': 'CC-Controller-App' },
-    });
-    req.on('response', (res) => {
+    const url = `https://${process.env.PWA_URL || 'ccc.kitifica.com'}/api/latest`;
+    httpsGet(url, { headers: { 'User-Agent': 'CC-Controller-App' } }, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        httpsGet(res.headers.location, { headers: { 'User-Agent': 'CC-Controller-App' } }, (res2) => {
+          let body = '';
+          res2.on('data', (c) => { body += c; });
+          res2.on('end', () => processBody(body, resolve));
+        }).on('error', () => resolve(null));
+        return;
+      }
       let body = '';
-      res.on('data', (chunk) => { body += chunk; });
-      res.on('end', () => {
-        try {
-          const { version: latest, releaseUrl } = JSON.parse(body);
-          const current = app.getVersion();
-          const isNewer = latest && latest.split('.').map(Number)
-            .reduce((acc, n, i) => acc !== 0 ? acc : n - current.split('.').map(Number)[i], 0) > 0;
-          if (isNewer) {
-            updateAvailable = { version: latest, url: releaseUrl };
-            if (tray) setTrayMenu(bridge !== null ? 'running' : 'stopped');
-            bridge?.sendPush('CC Controller', `Nueva versión v${latest} disponible — abre el menú del tray para instalar`).catch(() => {});
-          }
-        } catch (_) {}
-        resolve(updateAvailable);
-      });
-    });
-    req.on('error', () => resolve(null));
-    req.end();
+      res.on('data', (c) => { body += c; });
+      res.on('end', () => processBody(body, resolve));
+    }).on('error', () => resolve(null));
   });
+}
+
+function processBody(body, resolve) {
+  try {
+    const { version: latest, releaseUrl } = JSON.parse(body);
+    const current = app.getVersion();
+    const isNewer = latest && latest.split('.').map(Number)
+      .reduce((acc, n, i) => acc !== 0 ? acc : n - current.split('.').map(Number)[i], 0) > 0;
+    if (isNewer) {
+      updateAvailable = { version: latest, url: releaseUrl };
+      if (tray) setTrayMenu(bridge !== null ? 'running' : 'stopped');
+      bridge?.sendPush('CC Controller', `Nueva versión v${latest} disponible — abre el menú del tray para instalar`).catch(() => {});
+    }
+  } catch (_) {}
+  resolve(updateAvailable);
 }
 
 function downloadUpdate(version, url, redirects = 0) {
