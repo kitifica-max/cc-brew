@@ -10,6 +10,9 @@ directories:
 # Firma ad-hoc del .app antes de empaquetar el DMG.
 afterPack: scripts/adhoc-sign.cjs
 
+asarUnpack:
+  - "**/node_modules/node-pty/**"
+
 files:
   - src/**/*
   - assets/tray-icon.png

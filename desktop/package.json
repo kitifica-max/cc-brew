@@ -1,6 +1,6 @@
 {
   "name": "cc-controller-desktop",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "type": "module",
   "main": "src/main.js",
   "scripts": {
@@ -11,6 +11,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
     "dotenv": "^16.4.0",
+    "node-pty": "^1.1.0",
     "web-push": "^3.6.7",
     "ws": "^8.21.3"
   },
@@ -19,6 +20,7 @@
     "electron-builder": "^25.0.0"
   },
   "allowScripts": {
-    "electron@30.5.1": true
+    "electron@30.5.1": true,
+    "node-pty@1.1.0": true
   }
 }

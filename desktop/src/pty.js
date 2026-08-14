@@ -1,16 +1,16 @@
-import { spawn } from 'child_process';
+import pty from 'node-pty';
 
 const ANSI_RE = /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g;
 const MCP_WARN_RE = /Client\.\w+\(\) called but server does not advertise \w+ capability[^\n]*/g;
 
-// Prompt que Claude Code muestra cuando espera input del usuario (modo interactivo)
+// Prompt de Claude Code en modo interactivo (después de strip ANSI)
 const PROMPT_RE = /(?:^|\n)>\s*$/;
 
-// Patrón de solicitud de permiso
+// Solicitud de permiso de Claude Code
 const PERMISSION_RE = /Allow\?\s*\[y\/n[^\]]*\]/i;
 
 const DEFAULT_TIMEOUT_MS = 10 * 60_000;
-const QUIET_MS = 1500; // 1.5s sin output = respuesta terminada
+const QUIET_MS = 1500;
 
 export default class PtyManager {
   constructor(timeoutMs = Number(process.env.CLAUDE_TIMEOUT_MS) || DEFAULT_TIMEOUT_MS) {
@@ -43,26 +43,22 @@ export default class PtyManager {
   }
 
   _startProcess(model = 'claude-sonnet-4-6', effort = 'medium') {
-    const args = ['--continue', '--model', model, '--effort', effort];
-    const proc = spawn(this._command, args, {
-      stdio: ['pipe', 'pipe', 'pipe'],
+    const proc = pty.spawn(this._command, ['--continue', '--model', model, '--effort', effort], {
+      name: 'xterm-color',
+      cols: 220,
+      rows: 50,
       cwd: this._cwd,
-      env: { ...process.env, NO_COLOR: '1', TERM: 'dumb' },
+      env: { ...process.env, NO_COLOR: '1' },
     });
     this._proc = proc;
 
-    proc.stdin.on('error', () => {});
-    proc.on('error', (e) => this.onMessage?.('system', `Error: ${e.message}`));
-
-    proc.stdout.on('data', (d) => {
-      if (proc !== this._proc) return;
-      this._onData(d.toString());
+    proc.onData((raw) => {
+      if (this._proc !== proc) return;
+      this._onData(raw);
     });
 
-    proc.stderr.on('data', () => {});
-
-    proc.on('close', () => {
-      if (proc !== this._proc) return;
+    proc.onExit(() => {
+      if (this._proc !== proc) return;
       this._proc = null;
       this._busy = false;
       this._buffer = '';
@@ -86,7 +82,7 @@ export default class PtyManager {
 
     // Stream al PWA (sin línea de prompt)
     if (this._currentMsgId) {
-      const displayable = text.replace(/\n?>\s*$/, '');
+      const displayable = text.replace(/\r/g, '').replace(/\n?>\s*$/, '');
       if (displayable.trim()) {
         this.onChunk?.(this._currentMsgId, displayable, false, this._currentProjectId);
       }
@@ -96,7 +92,7 @@ export default class PtyManager {
     if (PERMISSION_RE.test(this._buffer)) {
       clearTimeout(this._quietTimer);
       clearTimeout(this._hardTimer);
-      const permText = this._buffer.trim();
+      const permText = this._buffer.replace(/\r/g, '').trim();
       this._buffer = '';
       this._permissionPending = true;
       this.onPermissionRequest?.(permText, this._currentMsgId, this._currentProjectId);
@@ -104,7 +100,7 @@ export default class PtyManager {
     }
 
     // Prompt detectado → respuesta terminada
-    if (PROMPT_RE.test(this._buffer)) {
+    if (PROMPT_RE.test(this._buffer.replace(/\r/g, ''))) {
       this._onResponseDone();
       return;
     }
@@ -120,7 +116,6 @@ export default class PtyManager {
     this._buffer = '';
 
     if (!this._readyForInput) {
-      // Primer prompt → proceso listo
       this._readyForInput = true;
       this._flush();
       return;
@@ -139,9 +134,9 @@ export default class PtyManager {
     const msg = text.replace(/\n+$/, '').trim();
     if (!msg) return;
 
-    // Respuesta a permiso → directo a stdin del proceso activo
+    // Respuesta a permiso → directo al PTY
     if (this._permissionPending && this._proc) {
-      this._proc.stdin.write(msg + '\n');
+      this._proc.write(msg + '\r');
       this._permissionPending = false;
       this._quietTimer = setTimeout(() => this._onResponseDone(), QUIET_MS * 2);
       return;
@@ -162,7 +157,7 @@ export default class PtyManager {
     this._currentMsgId = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
     this._currentProjectId = projectId;
     this._buffer = '';
-    this._proc.stdin.write(msg + '\n');
+    this._proc.write(msg + '\r');
 
     this._hardTimer = setTimeout(() => {
       if (this._currentMsgId) {
@@ -187,11 +182,7 @@ export default class PtyManager {
       this._currentMsgId = null;
     }
     if (this._proc) {
-      this._proc.stdout.removeAllListeners();
-      this._proc.stderr.removeAllListeners();
-      this._proc.stdin.removeAllListeners();
-      this._proc.removeAllListeners();
-      this._proc.kill('SIGTERM');
+      try { this._proc.kill(); } catch (_) {}
       this._proc = null;
     }
   }
