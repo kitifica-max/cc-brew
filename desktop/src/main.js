@@ -2,9 +2,8 @@ import { app, Tray, Menu, nativeImage, shell, clipboard, dialog, powerSaveBlocke
 import { needsSetup, openSetupWindow } from './setup-window.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { writeFileSync, createWriteStream, unlink } from 'fs';
+import { writeFileSync } from 'fs';
 import { get as httpsGet } from 'https';
-import { tmpdir } from 'os';
 import dotenv from 'dotenv';
 import PtyManager from './pty.js';
 import Bridge from './bridge.js';
@@ -32,9 +31,8 @@ let bridge = null;
 let startTime = null;
 let uptimeInterval = null;
 let powerBlockId = null;
-let updateAvailable = null; // { version, url } | null
-let downloadedDmgPath = null; // path to pre-downloaded DMG, null while downloading
-let downloadInProgress = false;
+let updateAvailable = null; // { version } | null
+const BREW_UPDATE_CMD = 'brew upgrade --cask kitifica-max/tap/cc-controller';
 let pendingFolderId = null; // set while PWA is waiting for user to pick a folder
 let previewProc = null;
 let trialDaysLeft = null; // null = paid/unknown, number = days remaining in trial
@@ -61,50 +59,21 @@ function checkForUpdates() {
 
 function processBody(body, resolve) {
   try {
-    const { version: latest, releaseUrl } = JSON.parse(body);
+    const { version: latest } = JSON.parse(body);
     const current = app.getVersion();
     const isNewer = latest && latest.split('.').map(Number)
       .reduce((acc, n, i) => acc !== 0 ? acc : n - current.split('.').map(Number)[i], 0) > 0;
     if (isNewer) {
-      updateAvailable = { version: latest, url: releaseUrl };
+      updateAvailable = { version: latest };
       if (tray) setTrayMenu(bridge !== null ? 'running' : 'stopped');
-      bridge?.sendPush('CC Controller', `Nueva versión v${latest} disponible — abre el menú del tray para instalar`).catch(() => {});
+      bridge?.sendPush('CC Controller', `Nueva versión v${latest} disponible — abre el menú del tray para actualizar`).catch(() => {});
     }
   } catch (_) {}
   resolve(updateAvailable);
 }
 
-function downloadUpdate(version, url, redirects = 0) {
-  if (downloadInProgress || downloadedDmgPath || redirects > 5) return;
-  downloadInProgress = true;
-  const dest = path.join(tmpdir(), `CC.Controller-${version}.dmg`);
-  const file = createWriteStream(dest);
-  httpsGet(url, { headers: { 'User-Agent': 'CC-Controller-App' } }, (res) => {
-    if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-      file.destroy();
-      downloadInProgress = false;
-      return downloadUpdate(version, res.headers.location, redirects + 1);
-    }
-    if (res.statusCode !== 200) { file.destroy(); downloadInProgress = false; return; }
-    res.pipe(file);
-    file.on('finish', () => {
-      file.close(() => {
-        downloadInProgress = false;
-        downloadedDmgPath = dest;
-        if (tray) setTrayMenu(pty?.running ? 'running' : 'stopped');
-        // Push B: DMG listo
-        bridge?.sendPush('CC Controller', `v${version} lista — abre el menú del tray para instalar`).catch(() => {});
-      });
-    });
-    file.on('error', () => {
-      downloadInProgress = false;
-      unlink(dest, () => {});
-    });
-  }).on('error', () => {
-    downloadInProgress = false;
-    file.destroy();
-    unlink(dest, () => {});
-  });
+function openBrewUpdate() {
+  exec(`osascript -e 'tell application "Terminal" to do script "${BREW_UPDATE_CMD}"' -e 'tell application "Terminal" to activate'`);
 }
 
 function getUptime() {
@@ -144,9 +113,7 @@ function buildMenu(status) {
     items.push(
       { type: 'separator' },
       { label: `Nueva versión disponible: v${updateAvailable.version}`, enabled: false },
-      downloadedDmgPath
-        ? { label: '⬇ Instalar ahora', click: () => shell.openPath(downloadedDmgPath) }
-        : { label: downloadInProgress ? 'Descargando actualización…' : 'Descargar actualización →', enabled: !downloadInProgress, click: () => shell.openExternal(updateAvailable.url) }
+      { label: '⬆ Actualizar con Homebrew →', click: openBrewUpdate }
     );
   }
   items.push(
@@ -155,12 +122,18 @@ function buildMenu(status) {
       label: updateAvailable ? `Actualización disponible: v${updateAvailable.version}` : 'Buscar actualizaciones',
       click: async () => {
         if (updateAvailable) {
-          shell.openExternal(updateAvailable.url);
+          openBrewUpdate();
         } else {
           const result = await checkForUpdates();
           if (result) {
             setTrayMenu(bridge !== null ? 'running' : 'stopped');
-            dialog.showMessageBox({ type: 'info', message: `Nueva versión disponible: v${result.version}`, detail: 'Haz clic en "Actualización disponible" en el menú para descargar.' });
+            dialog.showMessageBox({
+              type: 'info',
+              message: `Nueva versión disponible: v${result.version}`,
+              detail: `Ejecuta en Terminal:\n\n${BREW_UPDATE_CMD}`,
+              buttons: ['Actualizar ahora', 'Cerrar'],
+              defaultId: 0,
+            }).then(({ response }) => { if (response === 0) openBrewUpdate(); });
           } else {
             dialog.showMessageBox({ type: 'info', message: 'Ya tienes la última versión', detail: `v${app.getVersion()} está actualizado.` });
           }
