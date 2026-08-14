@@ -100,8 +100,7 @@ export default class PtyManager {
       this._flush();
     });
 
-    // mensaje pasado como arg CLI — cerrar stdin inmediatamente
-    setTimeout(() => { if (this._proc === proc) proc.write('\x04'); }, 50);
+    // Mensaje pasado como arg CLI — stdin queda abierto para eventos permission_request
 
     this._hardTimer = setTimeout(() => {
       if (this._currentMsgId) {
