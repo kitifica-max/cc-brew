@@ -18,3 +18,9 @@ CCProjects/
 # macOS
 .DS_Store
 *.rtf
+*.ai
+
+# Tools output
+graphify-out/
+package-lock.json
+.claude/launch.json
