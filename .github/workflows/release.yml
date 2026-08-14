@@ -68,8 +68,29 @@ jobs:
           done
 
       - uses: softprops/action-gh-release@v2
+        id: release
         with:
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
           name: CC Controller ${{ github.event.inputs.tag || github.ref_name }}
           generate_release_notes: true
           files: desktop/dist/*.dmg
+
+      - name: Actualizar Homebrew Cask
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          VERSION="${{ github.event.inputs.tag || github.ref_name }}"
+          VERSION="${VERSION#v}"
+
+          SHA_ARM64=$(shasum -a 256 "desktop/dist/CC.Controller-${VERSION}-arm64.dmg" | awk '{print $1}')
+          SHA_INTEL=$(shasum -a 256 "desktop/dist/CC.Controller-${VERSION}.dmg" | awk '{print $1}')
+
+          git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/kitifica-max/homebrew-tap.git" /tmp/tap
+          python3 scripts/update-cask.py "$VERSION" "$SHA_ARM64" "$SHA_INTEL" /tmp/tap/Casks/cc-controller.rb
+
+          cd /tmp/tap
+          git config user.email "ci@kitifica.com"
+          git config user.name "CC Controller CI"
+          git add Casks/cc-controller.rb
+          git commit -m "chore: bump cc-controller to v${VERSION}"
+          git push
