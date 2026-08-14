@@ -164,13 +164,13 @@ export default class Bridge {
   }
 
   broadcastChunk(msgId, text, done, projectId = null) {
-    const clean = text ? text.replace(ANSI_RE, '').replace(MCP_WARN_RE, '').trim() : '';
+    const clean = text ? text.replace(ANSI_RE, '').replace(MCP_WARN_RE, '') : '';
 
     if (!this._streamBuffers.has(msgId)) {
       this._streamBuffers.set(msgId, { parts: [], projectId });
     }
     const buf = this._streamBuffers.get(msgId);
-    if (clean) buf.parts.push(clean);
+    if (clean.trim()) buf.parts.push(clean); // preserva \n internos, filtra chunks vacíos
 
     if (done) {
       const fullText = buf.parts.join('').trim();
@@ -191,7 +191,7 @@ export default class Bridge {
         event: 'chunk',
         payload: { msgId, text: '', done: true, projectId: buf.projectId, ts: Date.now() },
       });
-    } else if (clean) {
+    } else if (clean.trim()) {
       this.channel?.send({
         type: 'broadcast',
         event: 'chunk',

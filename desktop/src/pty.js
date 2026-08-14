@@ -77,12 +77,14 @@ export default class PtyManager {
   }
 
   _onData(raw) {
-    const text = raw.replace(ANSI_RE, '').replace(MCP_WARN_RE, '');
+    // \r\n → \n, lone \r → \n (simula carriage return: spinner frames se separan en vez de concatenarse)
+    const text = raw.replace(ANSI_RE, '').replace(MCP_WARN_RE, '')
+      .replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     this._buffer += text;
 
     // Stream al PWA (sin línea de prompt)
     if (this._currentMsgId) {
-      const displayable = text.replace(/\r/g, '').replace(/\n?>\s*$/, '');
+      const displayable = text.replace(/\n?>\s*$/, '');
       if (displayable.trim()) {
         this.onChunk?.(this._currentMsgId, displayable, false, this._currentProjectId);
       }
