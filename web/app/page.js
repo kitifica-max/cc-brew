@@ -914,64 +914,58 @@ const MODEL_CONTEXT = {
   'claude-haiku-4-5': 200000,
 };
 
+function DonutRing({ pct, color, size = 26 }) {
+  const r = (size - 5) / 2;
+  const circ = 2 * Math.PI * r;
+  return (
+    <svg width={size} height={size} style={{ transform: 'rotate(-90deg)', flexShrink: 0 }}>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={3.5} />
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={3.5}
+        strokeDasharray={circ} strokeDashoffset={circ * (1 - Math.min(pct, 1))}
+        strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+      />
+    </svg>
+  );
+}
+
 function UsageRings({ usage, project }) {
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(null); // null | 'ctx' | 'spend'
 
   const maxCtx = MODEL_CONTEXT[project?.model] ?? 200000;
-  const ctxPct = Math.min(usage.tokens / maxCtx, 1);
+  const ctxPct = usage.tokens / maxCtx;
   const spendLimit = project?.spendLimit ?? 1;
-  const spendPct = spendLimit > 0 ? Math.min(usage.cost / spendLimit, 1) : 0;
+  const spendPct = spendLimit > 0 ? usage.cost / spendLimit : 0;
 
   const ctxColor = ctxPct > 0.85 ? '#f87171' : ctxPct > 0.6 ? '#fbbf24' : '#86efac';
   const spendColor = spendPct > 0.85 ? '#f87171' : spendPct > 0.6 ? '#fbbf24' : '#86efac';
 
-  const size = 34;
-  const outerR = (size - 4) / 2;
-  const innerR = outerR - 6;
-  const outerCirc = 2 * Math.PI * outerR;
-  const innerCirc = 2 * Math.PI * innerR;
+  const tooltip = (key, label, value) => show === key && (
+    <div style={{
+      position: 'absolute', top: 34, right: 0, background: '#1a1a1a', borderRadius: 10,
+      padding: '8px 12px', zIndex: 100, whiteSpace: 'nowrap', boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+      border: '1px solid rgba(255,255,255,0.1)',
+    }} onClick={() => setShow(null)}>
+      <div style={{ fontSize: 10, fontWeight: 700, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{label}</div>
+      <div style={{ fontSize: 12, fontWeight: 700, color: key === 'ctx' ? ctxColor : spendColor }}>{value}</div>
+    </div>
+  );
 
   return (
-    <div style={{ position: 'relative' }}>
-      <button
-        onClick={() => setShow(s => !s)}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex', alignItems: 'center' }}
-        title="Ver consumo"
-      >
-        <svg width={size} height={size} style={{ transform: 'rotate(-90deg)', flexShrink: 0 }}>
-          <circle cx={size/2} cy={size/2} r={outerR} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth={3.5} />
-          <circle cx={size/2} cy={size/2} r={outerR} fill="none" stroke={ctxColor} strokeWidth={3.5}
-            strokeDasharray={outerCirc} strokeDashoffset={outerCirc * (1 - ctxPct)}
-            strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.6s ease' }}
-          />
-          <circle cx={size/2} cy={size/2} r={innerR} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth={3} />
-          <circle cx={size/2} cy={size/2} r={innerR} fill="none" stroke={spendColor} strokeWidth={3}
-            strokeDasharray={innerCirc} strokeDashoffset={innerCirc * (1 - spendPct)}
-            strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.6s ease' }}
-          />
-        </svg>
-      </button>
-      {show && (
-        <div style={{
-          position: 'absolute', top: 36, right: 0, background: '#1a1a1a', borderRadius: 12,
-          padding: '10px 14px', zIndex: 100, minWidth: 160, boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
-          border: '1px solid rgba(255,255,255,0.1)',
-        }}
-          onClick={() => setShow(false)}
-        >
-          <div style={{ fontSize: 10, fontWeight: 700, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Consumo sesión</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-              <span style={{ fontSize: 11, color: '#aaa' }}>Context</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: ctxColor }}>{usage.tokens.toLocaleString()} / {(maxCtx/1000).toFixed(0)}k</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-              <span style={{ fontSize: 11, color: '#aaa' }}>Gasto</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: spendColor }}>${usage.cost.toFixed(4)} / ${spendLimit.toFixed(2)}</span>
-            </div>
-          </div>
-        </div>
-      )}
+    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+      <div style={{ position: 'relative' }}>
+        <button onClick={() => setShow(s => s === 'ctx' ? null : 'ctx')}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex' }}>
+          <DonutRing pct={ctxPct} color={ctxColor} />
+        </button>
+        {tooltip('ctx', 'Contexto', `${usage.tokens.toLocaleString()} / ${(maxCtx/1000).toFixed(0)}k tokens`)}
+      </div>
+      <div style={{ position: 'relative' }}>
+        <button onClick={() => setShow(s => s === 'spend' ? null : 'spend')}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex' }}>
+          <DonutRing pct={spendPct} color={spendColor} />
+        </button>
+        {tooltip('spend', 'Gasto sesión', `$${usage.cost.toFixed(4)} / $${spendLimit.toFixed(2)}`)}
+      </div>
     </div>
   );
 }
