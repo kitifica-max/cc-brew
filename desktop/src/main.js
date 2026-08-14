@@ -40,7 +40,8 @@ let trialDaysLeft = null; // null = paid/unknown, number = days remaining in tri
 
 function checkForUpdates() {
   return new Promise((resolve) => {
-    const url = `https://${process.env.PWA_URL || 'ccc.kitifica.com'}/api/latest`;
+    const pwaHost = (process.env.PWA_URL || 'ccc.kitifica.com').replace(/^https?:\/\//, '');
+    const url = `https://${pwaHost}/api/latest`;
     httpsGet(url, { headers: { 'User-Agent': 'CC-Controller-App' } }, (res) => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         httpsGet(res.headers.location, { headers: { 'User-Agent': 'CC-Controller-App' } }, (res2) => {
@@ -128,7 +129,7 @@ function buildMenu(status) {
       { label: active ? `Proyecto: ${active.name}` : `Sesion: ${process.env.SESSION_ID}`, enabled: false },
       active ? { label: active.path, enabled: false } : null,
       { type: 'separator' },
-      { label: 'Abrir PWA', click: () => shell.openExternal(`https://${process.env.PWA_URL || 'localhost:3000'}`) },
+      { label: 'Abrir PWA', click: () => { const h = (process.env.PWA_URL || 'localhost:3000').replace(/^https?:\/\//, ''); shell.openExternal(`https://${h}`); } },
       { label: '📁 Abrir carpeta existente', click: openFolderDialog },
       { type: 'separator' },
       { label: 'Detener', click: stopSession },
