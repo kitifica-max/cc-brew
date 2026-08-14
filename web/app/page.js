@@ -608,11 +608,19 @@ function CCController() {
       </div>
 
       {/* Waiting banner */}
-      {(thinking || streamingMsg) && (
+      {thinking && !streamingMsg && (
+        <div style={{ background: '#f0fdf4', borderTop: '1px solid #86efac', padding: '6px 14px', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+          <span style={{ fontSize: 11 }}>✓</span>
+          <span style={{ fontSize: 11, fontWeight: 600, color: '#166534', lineHeight: 1.3 }}>
+            Claude trabaja en tu Mac — puedes apagar la pantalla o cambiar de app
+          </span>
+        </div>
+      )}
+      {streamingMsg && (
         <div style={{ background: '#fffbeb', borderTop: '1px solid #fde68a', padding: '6px 14px', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           <span style={{ fontSize: 11 }}>⚠️</span>
           <span style={{ fontSize: 11, fontWeight: 600, color: '#92400e', lineHeight: 1.3 }}>
-            No cierres este chat — Claude está trabajando en tu Mac
+            Recibiendo respuesta — quédate en la app para verla completa
           </span>
         </div>
       )}
