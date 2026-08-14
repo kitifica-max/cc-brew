@@ -14,7 +14,7 @@ import { getSupabaseConfig } from './supabase-config.js';
 import { createFileAuthStorage, AUTH_STORAGE_KEY } from './auth-store.js';
 import { extname, basename, resolve, sep } from 'path';
 import { homedir } from 'os';
-import { exec } from 'child_process';
+import { exec, spawn } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Production: ~/.config/cc-controller/.env (not bundled in DMG)
@@ -36,6 +36,7 @@ let updateAvailable = null; // { version, url } | null
 let downloadedDmgPath = null; // path to pre-downloaded DMG, null while downloading
 let downloadInProgress = false;
 let pendingFolderId = null; // set while PWA is waiting for user to pick a folder
+let previewProc = null;
 let trialDaysLeft = null; // null = paid/unknown, number = days remaining in trial
 
 function checkForUpdates() {
@@ -386,6 +387,27 @@ async function startSession() {
     }
   };
 
+  bridge.onOpenPreview = (port) => {
+    if (previewProc) { previewProc.kill(); previewProc = null; }
+    const proc = spawn('cloudflared', ['tunnel', '--url', `localhost:${port}`], { stdio: ['ignore', 'pipe', 'pipe'] });
+    previewProc = proc;
+    const URL_RE = /https:\/\/[a-z0-9-]+\.trycloudflare\.com/;
+    const onData = (data) => {
+      const match = data.toString().match(URL_RE);
+      if (match) {
+        bridge?.broadcastPreviewUrl(match[0], port);
+        proc.stdout.off('data', onData);
+        proc.stderr.off('data', onData);
+      }
+    };
+    proc.stdout.on('data', onData);
+    proc.stderr.on('data', onData);
+    proc.on('error', (e) => {
+      bridge?.broadcastPreviewUrl(null, port);
+    });
+    proc.on('close', () => { if (previewProc === proc) previewProc = null; });
+  };
+
   bridge.onOpenFolder = (id) => {
     // dialog.showOpenDialog only works when triggered by a real user click that
     // gives Electron OS-level focus. Store the id and surface a tray menu item;
@@ -425,6 +447,7 @@ function stopSession() {
   pty?.kill();
   bridge?.disconnect();
   if (powerBlockId !== null) { powerSaveBlocker.stop(powerBlockId); powerBlockId = null; }
+  if (previewProc) { previewProc.kill(); previewProc = null; }
   pty = null; bridge = null; startTime = null; uptimeInterval = null;
   setTrayMenu('stopped');
 }

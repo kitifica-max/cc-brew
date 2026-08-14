@@ -43,6 +43,7 @@ export default class Bridge {
     this.onOpenFolder = null;
     this.onGetMcpConfig = null;
     this.onSaveMcpConfig = null;
+    this.onOpenPreview = null;
     this._heartbeatTimer = null;
     this._history = [];
     this._streamBuffers = new Map(); // msgId → { parts: string[], projectId }
@@ -160,6 +161,10 @@ export default class Bridge {
         if (!this._validate(payload)) return;
         this.onSaveMcpConfig?.(payload.projectId, payload.mcpServers);
       })
+      .on('broadcast', { event: 'open-preview' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this.onOpenPreview?.(payload.port);
+      })
       .subscribe();
   }
 
@@ -264,6 +269,13 @@ export default class Bridge {
       payload: { text: clean, msgId, projectId, ts: Date.now() },
     });
     this.sendPush('CC Controller', '⚠️ Claude necesita un permiso — toca para responder').catch(() => {});
+  }
+
+  broadcastPreviewUrl(url, port) {
+    this.channel?.send({
+      type: 'broadcast', event: 'preview-url',
+      payload: { url, port, ts: Date.now() },
+    });
   }
 
   broadcastUsage(cost, tokens, projectId = null) {

@@ -13,6 +13,7 @@ const ICON_SEND = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1
 const ICON_MIC = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="10" height="14" x="7" y="1" rx="5"/><path d="M4 12a8 8 0 0 0 16 0M12 19v4M8 23h8"/></g></svg>`;
 const ICON_MIC_STOP = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></g></svg>`;
 const ICON_SPINNER = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></path></svg>`;
+const ICON_GLOBE = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>`;
 
 const QUICK = [
   { label: 'sí', text: 'sí\n' },
@@ -58,6 +59,7 @@ function CCController() {
   const [streamingMsg, setStreamingMsg] = useState(null); // {msgId, text} | null
   const [pendingPermission, setPendingPermission] = useState(null); // {text, msgId, projectId} | null
   const [sessionUsage, setSessionUsage] = useState({ cost: 0, tokens: 0 });
+  const [preview, setPreview] = useState({ show: false, port: '', loading: false, url: null, error: false });
   const streamingMsgRef = useRef(null);
   const chatRef = useRef(null);
   const channelRef = useRef(null);
@@ -262,6 +264,15 @@ function CCController() {
         cost: prev.cost + (payload.cost ?? 0),
         tokens: prev.tokens + (payload.tokens ?? 0),
       }));
+    });
+
+    ch.on('broadcast', { event: 'preview-url' }, ({ payload }) => {
+      if (!active) return;
+      if (payload.url) {
+        setPreview(p => ({ ...p, loading: false, url: payload.url, error: false }));
+      } else {
+        setPreview(p => ({ ...p, loading: false, url: null, error: true }));
+      }
     });
 
     ch.on('broadcast', { event: 'mcp-config' }, ({ payload }) => {
@@ -538,6 +549,7 @@ function CCController() {
           onSaveMcpConfig={(cfg) => { sendEvent('save-mcp-config', { projectId: currentId, mcpServers: cfg }); }}
         />
       )}
+      {preview.show && <PreviewSheet preview={preview} setPreview={setPreview} sendEvent={sendEvent} />}
     </>
   );
 
@@ -561,6 +573,11 @@ function CCController() {
               {desktopActive ? 'Desktop activo' : connected ? 'Desktop detenido' : 'Sin conexión'}
             </div>
             <UsageRings usage={sessionUsage} project={currentProject} />
+            <button
+              onClick={() => setPreview(p => ({ ...p, show: true, url: null, loading: false }))}
+              style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
+              dangerouslySetInnerHTML={{ __html: ICON_GLOBE }}
+            />
             <button
               onClick={() => {
                 setShowSettings(true);
@@ -913,6 +930,65 @@ const MODEL_CONTEXT = {
   'claude-opus-4': 200000,
   'claude-haiku-4-5': 200000,
 };
+
+function PreviewSheet({ preview, setPreview, sendEvent }) {
+  const close = () => setPreview(p => ({ ...p, show: false }));
+  const connect = () => {
+    if (!preview.port) return;
+    setPreview(p => ({ ...p, loading: true, url: null }));
+    sendEvent('open-preview', { port: Number(preview.port) });
+  };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }} onClick={close}>
+      <div style={{ background: '#1a1a1a', borderRadius: '20px 20px 0 0', padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}
+        onClick={e => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Web Preview</span>
+          <button onClick={close} style={{ background: 'none', border: 'none', color: '#888', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}>×</button>
+        </div>
+        <p style={{ margin: 0, fontSize: 12, color: '#888', lineHeight: 1.5 }}>
+          Genera una URL pública temporal para ver tu proyecto desde cualquier dispositivo.
+        </p>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <input
+            type="number"
+            placeholder="Puerto (ej: 3000)"
+            value={preview.port}
+            onChange={e => setPreview(p => ({ ...p, port: e.target.value }))}
+            onKeyDown={e => e.key === 'Enter' && connect()}
+            style={{ flex: 1, background: '#2a2a2a', border: '1px solid #333', borderRadius: 10, padding: '10px 14px', color: '#fff', fontSize: 14, outline: 'none' }}
+          />
+          <button
+            onClick={connect}
+            disabled={!preview.port || preview.loading}
+            style={{ background: '#e8490f', border: 'none', borderRadius: 10, padding: '10px 18px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: preview.port && !preview.loading ? 'pointer' : 'default', opacity: preview.port && !preview.loading ? 1 : 0.5 }}
+          >
+            {preview.loading ? '...' : 'Conectar'}
+          </button>
+        </div>
+        {preview.error && (
+          <p style={{ margin: 0, fontSize: 11, color: '#f87171' }}>
+            Error al conectar. ¿Está cloudflared instalado? <code style={{ background: '#2a2a2a', padding: '2px 6px', borderRadius: 4 }}>brew install cloudflared</code>
+          </p>
+        )}
+        {preview.url && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ background: '#2a2a2a', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 12, color: '#86efac', flex: 1, wordBreak: 'break-all' }}>{preview.url}</span>
+            </div>
+            <button
+              onClick={() => window.open(preview.url, '_blank')}
+              style={{ background: '#e8490f', border: 'none', borderRadius: 10, padding: '12px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
+            >
+              Abrir en Safari →
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function DonutRing({ pct, color, size = 26 }) {
   const r = (size - 5) / 2;
