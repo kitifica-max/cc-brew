@@ -52,7 +52,9 @@ function checkForUpdates() {
         try {
           const { version: latest, releaseUrl } = JSON.parse(body);
           const current = app.getVersion();
-          if (latest && latest !== current) {
+          const isNewer = latest && latest.split('.').map(Number)
+            .reduce((acc, n, i) => acc !== 0 ? acc : n - current.split('.').map(Number)[i], 0) > 0;
+          if (isNewer) {
             updateAvailable = { version: latest, url: releaseUrl };
             if (tray) setTrayMenu(bridge !== null ? 'running' : 'stopped');
             bridge?.sendPush('CC Controller', `Nueva versión v${latest} disponible — abre el menú del tray para instalar`).catch(() => {});

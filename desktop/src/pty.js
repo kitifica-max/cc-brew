@@ -33,7 +33,7 @@ export default class PtyManager {
     this._cwd = cwd;
   }
 
-  write(text, continueConv = true, model = 'claude-sonnet-4-6', effort = 'medium', projectId = null) {
+  write(text, continueConv = true, model = 'claude-sonnet-4-6', effort = 'medium', projectId = null, skipPermissions = false) {
     if (text === '\x03') { this.kill(); return; }
     const msg = text.replace(/\n+$/, '').trim();
     if (!msg) return;
@@ -45,20 +45,21 @@ export default class PtyManager {
       return;
     }
 
-    this._queue.push({ msg, projectId, model, effort });
+    this._queue.push({ msg, projectId, model, effort, skipPermissions });
     if (!this._busy) this._flush();
   }
 
   _flush() {
     if (this._busy || !this._queue.length) return;
     this._busy = true;
-    const { msg, projectId, model, effort } = this._queue.shift();
+    const { msg, projectId, model, effort, skipPermissions } = this._queue.shift();
     this._currentMsgId = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
     this._currentProjectId = projectId;
     this._jsonBuf = '';
     this._deferredError = false;
 
     const args = ['--print', '--output-format', 'stream-json', '--verbose'];
+    if (skipPermissions) args.push('--dangerously-skip-permissions');
     if (!this._skipContinue) args.push('--continue');
     this._skipContinue = false;
     args.push('--model', model, '--effort', effort, msg);
@@ -84,7 +85,7 @@ export default class PtyManager {
       if (this._deferredError && exitCode === 1) {
         this._deferredError = false;
         this._skipContinue = true;
-        this._queue.unshift({ msg, projectId, model, effort });
+        this._queue.unshift({ msg, projectId, model, effort, skipPermissions });
         this._currentMsgId = null;
         this._busy = false;
         this._flush();
