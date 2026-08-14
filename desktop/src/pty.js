@@ -56,7 +56,7 @@ export default class PtyManager {
     this._jsonBuf = '';
 
     const proc = pty.spawn(this._command, [
-      '--print', '--output-format', 'stream-json', '--continue',
+      '--print', '--output-format', 'stream-json', '--verbose', '--continue',
       '--model', model, '--effort', effort,
     ], {
       name: 'xterm-color', cols: 220, rows: 50,
