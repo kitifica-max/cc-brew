@@ -914,41 +914,42 @@ const MODEL_CONTEXT = {
   'claude-haiku-4-5': 200000,
 };
 
-function DonutRing({ pct, color, size = 26, title }) {
-  const r = (size - 5) / 2;
-  const circ = 2 * Math.PI * r;
-  const filled = Math.min(pct, 1);
-  return (
-    <svg width={size} height={size} title={title} style={{ transform: 'rotate(-90deg)', flexShrink: 0 }}>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={3.5} />
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={3.5}
-        strokeDasharray={circ} strokeDashoffset={circ * (1 - filled)}
-        strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.6s ease' }}
-      />
-    </svg>
-  );
-}
-
 function UsageRings({ usage, project }) {
   const [show, setShow] = useState(false);
 
   const maxCtx = MODEL_CONTEXT[project?.model] ?? 200000;
-  const ctxPct = usage.tokens / maxCtx;
+  const ctxPct = Math.min(usage.tokens / maxCtx, 1);
   const spendLimit = project?.spendLimit ?? 1;
-  const spendPct = spendLimit > 0 ? usage.cost / spendLimit : 0;
+  const spendPct = spendLimit > 0 ? Math.min(usage.cost / spendLimit, 1) : 0;
 
   const ctxColor = ctxPct > 0.85 ? '#f87171' : ctxPct > 0.6 ? '#fbbf24' : '#86efac';
   const spendColor = spendPct > 0.85 ? '#f87171' : spendPct > 0.6 ? '#fbbf24' : '#86efac';
+
+  const size = 34;
+  const outerR = (size - 4) / 2;
+  const innerR = outerR - 6;
+  const outerCirc = 2 * Math.PI * outerR;
+  const innerCirc = 2 * Math.PI * innerR;
 
   return (
     <div style={{ position: 'relative' }}>
       <button
         onClick={() => setShow(s => !s)}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, padding: 2 }}
+        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex', alignItems: 'center' }}
         title="Ver consumo"
       >
-        <DonutRing pct={ctxPct} color={ctxColor} title={`Context: ${Math.round(ctxPct*100)}%`} />
-        <DonutRing pct={spendPct} color={spendColor} title={`Gasto: $${usage.cost.toFixed(4)}`} />
+        <svg width={size} height={size} style={{ transform: 'rotate(-90deg)', flexShrink: 0 }}>
+          <circle cx={size/2} cy={size/2} r={outerR} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth={3.5} />
+          <circle cx={size/2} cy={size/2} r={outerR} fill="none" stroke={ctxColor} strokeWidth={3.5}
+            strokeDasharray={outerCirc} strokeDashoffset={outerCirc * (1 - ctxPct)}
+            strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+          />
+          <circle cx={size/2} cy={size/2} r={innerR} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth={3} />
+          <circle cx={size/2} cy={size/2} r={innerR} fill="none" stroke={spendColor} strokeWidth={3}
+            strokeDasharray={innerCirc} strokeDashoffset={innerCirc * (1 - spendPct)}
+            strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+          />
+        </svg>
       </button>
       {show && (
         <div style={{
