@@ -44,6 +44,7 @@ export default class Bridge {
     this.onGetMcpConfig = null;
     this.onSaveMcpConfig = null;
     this.onOpenPreview = null;
+    this.onPhaseChange = null;
     this._heartbeatTimer = null;
     this._history = [];
     this._streamBuffers = new Map(); // msgId → { parts: string[], projectId }
@@ -165,6 +166,10 @@ export default class Bridge {
         if (!this._validate(payload)) return;
         this.onOpenPreview?.(payload.port);
       })
+      .on('broadcast', { event: 'phase-change' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this.onPhaseChange?.(payload.projectId, payload.phase);
+      })
       .subscribe();
   }
 
@@ -282,6 +287,13 @@ export default class Bridge {
     this.channel?.send({
       type: 'broadcast', event: 'usage',
       payload: { cost, tokens, projectId, ts: Date.now() },
+    });
+  }
+
+  broadcastPhaseChange(projectId, phase) {
+    this.channel?.send({
+      type: 'broadcast', event: 'phase-changed',
+      payload: { projectId, phase, ts: Date.now() },
     });
   }
 

@@ -390,6 +390,11 @@ async function startSession() {
     setTrayMenu(pty?.running ? 'running' : 'stopped');
   };
 
+  bridge.onPhaseChange = (projectId, phase) => {
+    const updated = updateProjectPhase(projectId, phase);
+    if (updated) bridge?.broadcastPhaseChange(projectId, phase);
+  };
+
   bridge.onOpenClaudeDesktop = (projectId) => {
     const project = listProjects().find(p => p.id === projectId);
     if (!project) return;
