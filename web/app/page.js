@@ -81,6 +81,16 @@ function CCController() {
   useEffect(() => { awaitingFolderIdRef.current = awaitingFolderId; }, [awaitingFolderId]);
   useEffect(() => { knownProjectIdsRef.current = new Set(projects.map(p => p.id)); }, [projects]);
 
+  // Starter message automático para proyectos nuevos
+  useEffect(() => {
+    if (!currentProject?.isNew || !connected) return;
+    sendEvent('starter-message', { projectId: currentId });
+    setProjects(prev => prev.map(p =>
+      p.id === currentId ? { ...p, isNew: false } : p
+    ));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentId, connected]);
+
   const resetDesktopTimeout = useCallback(() => {
     setDesktopActive(true);
     clearTimeout(desktopTimeoutRef.current);

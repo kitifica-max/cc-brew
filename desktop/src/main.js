@@ -395,6 +395,14 @@ async function startSession() {
     if (updated) bridge?.broadcastPhaseChange(projectId, phase);
   };
 
+  bridge.onStarterMessage = (projectId) => {
+    const project = listProjects().find(p => p.id === projectId);
+    if (!project) return;
+    const msg = `Eres el asistente de CC Creator para el proyecto "${project.name}". Por favor:\n1. Saluda al usuario y preséntate\n2. Explica el proceso de 6 fases de CC Creator y la filosofía Kitifica Local First\n3. Pregunta qué quiere construir\nNo empieces a codear todavía.`;
+    bridge._addToHistory({ role: 'user', text: msg.trim(), projectId });
+    pty?.write(msg, false, project.model ?? 'claude-sonnet-4-6', project.effort ?? 'medium', projectId, true);
+  };
+
   bridge.onOpenClaudeDesktop = (projectId) => {
     const project = listProjects().find(p => p.id === projectId);
     if (!project) return;
