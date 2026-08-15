@@ -1,5 +1,6 @@
-import { app, Tray, Menu, nativeImage, shell, clipboard, dialog, powerSaveBlocker, net } from 'electron';
+import { app, Tray, Menu, nativeImage, shell, clipboard, dialog, powerSaveBlocker, net, ipcMain } from 'electron';
 import { needsSetup, openSetupWindow } from './setup-window.js';
+import { createPanel, togglePanel, sendToPanel, isFirstOpen, markSeen } from './panel-window.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { writeFileSync } from 'fs';
@@ -26,6 +27,7 @@ const extraPaths = [`${HOME}/.npm-global/bin`, `${HOME}/.local/bin`, '/opt/homeb
 process.env.PATH = `${extraPaths}:${process.env.PATH || ''}`;
 
 let tray = null;
+let panel = null;
 let pty = null;
 let bridge = null;
 let startTime = null;
@@ -88,6 +90,8 @@ function buildMenu(status) {
     ? (trialDaysLeft === 0 ? 'Prueba: vence hoy' : `Prueba: ${trialDaysLeft} día${trialDaysLeft === 1 ? '' : 's'} restante${trialDaysLeft === 1 ? '' : 's'}`)
     : null;
   const items = [
+    { label: '📊 Abrir panel', click: () => { if (panel) togglePanel(panel, tray); } },
+    { type: 'separator' },
     { label: 'CC Creator', enabled: false },
     { label: `Estado: ${status}`, enabled: false },
     ...(trialLabel ? [{ label: trialLabel, enabled: false }] : []),
@@ -192,7 +196,10 @@ async function openFolderDialog() {
 }
 
 function broadcastProjects() {
-  bridge?.broadcastProjectState(listProjects(), getActive()?.id ?? null);
+  const projects = listProjects();
+  const project  = getActive() ?? null;
+  bridge?.broadcastProjectState(projects, project?.id ?? null);
+  sendToPanel(panel, 'panel:state', { project, projects, running: bridge !== null, firstOpen: isFirstOpen() });
 }
 
 async function startSession() {
@@ -267,6 +274,7 @@ async function startSession() {
   pty.onMessage = (role, text, projectId) => bridge?.broadcastMessage(role, text, projectId);
   pty.onChunk = (msgId, text, done, _projectId) => {
     bridge?.broadcastChunk(msgId, text, done, null); // null → PWA usa currentIdRef
+    sendToPanel(panel, 'panel:chunk', { text, done });
     if (done) bridge?.sendPush('CC Creator', 'Claude terminó — toca para ver la respuesta').catch(() => {});
   };
   pty.onPermissionRequest = (text, msgId, projectId) => {
@@ -455,11 +463,39 @@ async function signOutAndSetup() {
   await openSetupWindow();
 }
 
+// ── Panel IPC handlers ────────────────────────────────────────────────────────
+ipcMain.handle('panel:advance-phase', (_, projectId, phase) => {
+  const updated = updateProjectPhase(projectId, phase);
+  if (updated) bridge?.broadcastPhaseChange(projectId, phase);
+  broadcastProjects();
+});
+
+ipcMain.handle('panel:open-terminal', (_, projectId) => {
+  const project = listProjects().find(p => p.id === projectId);
+  if (!project) return;
+  const escapedPath = project.path.replace(/"/g, '\\"');
+  exec(`osascript -e 'tell application "Terminal" to do script "cd \\"${escapedPath}\\" && claude --continue"' -e 'tell application "Terminal" to activate'`);
+});
+
+ipcMain.handle('panel:switch-project', (_, id) => {
+  const project = switchProject(id);
+  if (project && pty) pty.spawn('claude', [], project.path);
+  broadcastProjects();
+});
+
+ipcMain.handle('panel:open-menu', () => {
+  tray.popUpContextMenu(buildMenu(bridge !== null ? 'running' : 'stopped'));
+});
+
+ipcMain.handle('panel:mark-seen', () => { markSeen(); });
+ipcMain.handle('panel:close', () => { panel?.hide(); });
+
 app.whenReady().then(async () => {
   app.dock?.hide();
   const iconPath = path.join(__dirname, '../assets/tray-icon.png');
   const icon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
   tray = new Tray(icon);
+  panel = createPanel();
   tray.on('mouse-enter', () => setTrayMenu(bridge !== null ? 'running' : 'stopped'));
   setTrayMenu('stopped');
 
