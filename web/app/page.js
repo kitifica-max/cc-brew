@@ -334,7 +334,7 @@ function CCController() {
       setProjects(prev => {
         const updated = prev.map(local => {
           const remote = payload.projects?.find(r => r.id === local.id);
-          return remote ? { ...local, path: remote.path, name: remote.name } : local;
+          return remote ? { ...local, path: remote.path } : local;
         });
         if (resolvedNew) {
           // Remove temp project, add the real one from desktop
