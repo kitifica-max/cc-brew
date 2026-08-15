@@ -8,6 +8,7 @@ import ProjectsList from './components/ProjectsList';
 import SettingsSheet from './components/SettingsSheet';
 import FileUpload from './components/FileUpload';
 import PhasePanel from './components/PhasePanel';
+import SecretsSheet from './components/SecretsSheet';
 
 const ICON_SETTINGS = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M14 17H5M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></g></svg>`;
 const ICON_SEND = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11zm7.318-19.539l-10.94 10.939"/></svg>`;
@@ -55,6 +56,8 @@ function CCController() {
   const thinkingTimerRef = useRef(null);
   const [view, setView] = useState('list');
   const [showSettings, setShowSettings] = useState(false);
+  const [showSecrets, setShowSecrets] = useState(false);
+  const [currentEnv, setCurrentEnv] = useState({});
   const [mcpConfig, setMcpConfig] = useState({});
   const [reconnectKey, setReconnectKey] = useState(0);
   const [streamingMsg, setStreamingMsg] = useState(null); // {msgId, text} | null
@@ -565,6 +568,15 @@ function CCController() {
           onOpenDesktop={() => { sendEvent('open-claude-desktop', { projectId: currentId }); setShowSettings(false); }}
           onSaveEnv={(env) => { sendEvent('save-env', { projectId: currentId, env }); setShowSettings(false); }}
           onSaveMcpConfig={(cfg) => { sendEvent('save-mcp-config', { projectId: currentId, mcpServers: cfg }); }}
+          onOpenSecrets={() => { setShowSettings(false); setShowSecrets(true); }}
+        />
+      )}
+      {showSecrets && currentProject && (
+        <SecretsSheet
+          project={currentProject}
+          currentEnv={currentEnv}
+          onSave={(env) => { setCurrentEnv(env); sendEvent('save-env', { projectId: currentId, env }); }}
+          onClose={() => setShowSecrets(false)}
         />
       )}
       {preview.show && <PreviewSheet preview={preview} setPreview={setPreview} sendEvent={sendEvent} />}
@@ -754,6 +766,15 @@ function CCController() {
           onOpenDesktop={() => { sendEvent('open-claude-desktop', { projectId: currentId }); setShowSettings(false); }}
           onSaveEnv={(env) => { sendEvent('save-env', { projectId: currentId, env }); setShowSettings(false); }}
           onSaveMcpConfig={(cfg) => { sendEvent('save-mcp-config', { projectId: currentId, mcpServers: cfg }); }}
+          onOpenSecrets={() => { setShowSettings(false); setShowSecrets(true); }}
+        />
+      )}
+      {showSecrets && currentProject && (
+        <SecretsSheet
+          project={currentProject}
+          currentEnv={currentEnv}
+          onSave={(env) => { setCurrentEnv(env); sendEvent('save-env', { projectId: currentId, env }); }}
+          onClose={() => setShowSecrets(false)}
         />
       )}
       {preview.show && <PreviewSheet preview={preview} setPreview={setPreview} sendEvent={sendEvent} />}
