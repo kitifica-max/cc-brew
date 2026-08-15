@@ -71,6 +71,14 @@ export function switchProject(id) {
   return project;
 }
 
+export function renameProject(id, name) {
+  const data = load();
+  const project = data.projects.find(p => p.id === id);
+  if (!project) return;
+  project.name = name;
+  save(data);
+}
+
 export function deleteProject(id) {
   const data = load();
   data.projects = data.projects.filter(p => p.id !== id);

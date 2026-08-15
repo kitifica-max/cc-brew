@@ -548,6 +548,7 @@ function CCController() {
       saveProjects(next);
       return next;
     });
+    sendEvent('rename-project', { id, name });
   }
 
   function handleDeleteProject(id) {

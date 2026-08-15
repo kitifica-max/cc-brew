@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('cc', {
   onStatus:      (cb) => ipcRenderer.on('panel:status', (_, d) => cb(d)),
   advance:       (projectId, phase) => ipcRenderer.invoke('panel:advance-phase', projectId, phase),
   openTerminal:  (projectId)        => ipcRenderer.invoke('panel:open-terminal', projectId),
+  openFinder:    (projectId)        => ipcRenderer.invoke('panel:open-finder', projectId),
   switchProject: (id)               => ipcRenderer.invoke('panel:switch-project', id),
   openMenu:      ()                 => ipcRenderer.invoke('panel:open-menu'),
   markSeen:      ()                 => ipcRenderer.invoke('panel:mark-seen'),

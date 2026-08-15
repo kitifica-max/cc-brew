@@ -144,6 +144,10 @@ export default class Bridge {
         if (!this._validate(payload)) return;
         this.onSaveEnv?.(payload.projectId, payload.env);
       })
+      .on('broadcast', { event: 'rename-project' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this.onRenameProject?.(payload.id, payload.name);
+      })
       .on('broadcast', { event: 'delete-project' }, ({ payload }) => {
         if (!this._validate(payload)) return;
         this.onDeleteProject?.(payload.id);

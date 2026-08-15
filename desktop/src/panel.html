@@ -258,6 +258,37 @@
   }
   .btn-advance:hover:not(:disabled) { opacity: 0.88; }
   .btn-advance:disabled { opacity: 0.28; cursor: not-allowed; }
+  .btn-term, .btn-finder {
+    display: flex; align-items: center; gap: 5px;
+  }
+  .btn-finder {
+    height: 36px; padding: 0 12px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: transparent;
+    color: rgba(255,255,255,0.65);
+    border-radius: 8px;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+    font-family: inherit;
+  }
+  .btn-finder:hover:not(:disabled) { background: rgba(255,255,255,0.08); color: #fff; }
+  .btn-finder:disabled { opacity: 0.3; cursor: not-allowed; }
+  .finder-toast {
+    display: none;
+    align-items: center; gap: 6px;
+    margin: 0 12px 0;
+    padding: 7px 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 8px;
+    font-size: 11px; color: rgba(255,255,255,0.65);
+    line-height: 1.4;
+  }
+  .finder-toast.visible { display: flex; }
+  .finder-toast strong { color: rgba(255,255,255,0.9); }
+  .finder-toast svg { flex-shrink: 0; opacity: 0.5; }
 </style>
 </head>
 <body>
@@ -314,9 +345,22 @@
   <button class="hint-close" id="hint-close">×</button>
 </div>
 
+<!-- Finder toast -->
+<div class="finder-toast" id="finder-toast">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+  Carpeta abierta. Para ver archivos ocultos (.env, .claude) usa <strong>Cmd+Shift+.</strong>
+</div>
+
 <!-- Actions -->
 <div class="actions">
-  <button class="btn-term" id="btn-term" disabled>⌘ Terminal</button>
+  <button class="btn-term" id="btn-term" disabled>
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+    Terminal
+  </button>
+  <button class="btn-finder" id="btn-finder" disabled>
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+    Finder
+  </button>
   <button class="btn-advance" id="btn-advance" disabled>Avanzar fase →</button>
 </div>
 
@@ -348,6 +392,8 @@ const elLogEmpty     = $('log-empty');
 const elScrollBadge  = $('scroll-badge');
 const elBtnAdvance   = $('btn-advance');
 const elBtnTerm      = $('btn-term');
+const elBtnFinder    = $('btn-finder');
+const elFinderToast  = $('finder-toast');
 const elBtnMenu      = $('btn-menu');
 const elBtnClose     = $('btn-close');
 const elHint         = $('hint');
@@ -380,7 +426,8 @@ function renderState() {
     ? `Avanzar: ${nextPhase.name} →`
     : phase >= 6 ? 'Validación completa ✓' : 'Avanzar fase →';
 
-  elBtnTerm.disabled = !project;
+  elBtnTerm.disabled    = !project;
+  elBtnFinder.disabled  = !project?.path;
   elLogEmpty.style.display = logLines.length === 0 ? 'block' : 'none';
 }
 
@@ -489,6 +536,15 @@ elBtnAdvance.addEventListener('click', () => {
 
 elBtnTerm.addEventListener('click', () => {
   if (state.project) cc.openTerminal(state.project.id);
+});
+
+let finderToastTimer = null;
+elBtnFinder.addEventListener('click', () => {
+  if (!state.project?.path) return;
+  cc.openFinder(state.project.id);
+  elFinderToast.classList.add('visible');
+  clearTimeout(finderToastTimer);
+  finderToastTimer = setTimeout(() => elFinderToast.classList.remove('visible'), 5000);
 });
 
 elBtnMenu.addEventListener('click', () => cc.openMenu());

@@ -1,6 +1,7 @@
 import { app, Tray, Menu, nativeImage, shell, clipboard, dialog, powerSaveBlocker, net, ipcMain } from 'electron';
 import { needsSetup, openSetupWindow } from './setup-window.js';
 import { createPanel, togglePanel, sendToPanel, isFirstOpen, markSeen } from './panel-window.js';
+import { createMenuWindow, toggleMenuWindow, sendToMenu } from './menu-window.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { writeFileSync } from 'fs';
@@ -8,7 +9,7 @@ import { get as httpsGet } from 'https';
 import dotenv from 'dotenv';
 import PtyManager from './pty.js';
 import Bridge from './bridge.js';
-import { createProject, switchProject, getActive, listProjects, deleteProject, saveProjectEnv, readProjectEnv, addExistingProject, readMcpConfig, saveMcpConfig, writeClaude, updateProjectPhase } from './projects.js';
+import { createProject, switchProject, getActive, listProjects, deleteProject, renameProject, saveProjectEnv, readProjectEnv, addExistingProject, readMcpConfig, saveMcpConfig, writeClaude, updateProjectPhase } from './projects.js';
 import { ALLOWED_EXTENSIONS, MAX_FILE_BYTES } from './bridge.js';
 import { getSupabaseConfig } from './supabase-config.js';
 import { createFileAuthStorage, AUTH_STORAGE_KEY } from './auth-store.js';
@@ -26,8 +27,9 @@ const HOME = process.env.HOME || homedir();
 const extraPaths = [`${HOME}/.npm-global/bin`, `${HOME}/.local/bin`, '/opt/homebrew/bin', '/usr/local/bin'].join(':');
 process.env.PATH = `${extraPaths}:${process.env.PATH || ''}`;
 
-let tray = null;
-let panel = null;
+let tray    = null;
+let panel   = null;
+let menuWin = null;
 let pty = null;
 let bridge = null;
 let startTime = null;
@@ -192,11 +194,26 @@ async function openFolderDialog() {
   }
 }
 
+function buildMenuState() {
+  const active = getActive();
+  const status = bridge !== null ? 'running' : 'stopped';
+  return {
+    status,
+    project: active ? { name: active.name, path: active.path } : null,
+    uptime: status === 'running' ? getUptime() : null,
+    trialLabel: trialDaysLeft !== null
+      ? (trialDaysLeft === 0 ? 'Prueba: vence hoy' : `Prueba: ${trialDaysLeft} día${trialDaysLeft === 1 ? '' : 's'} restante${trialDaysLeft === 1 ? '' : 's'}`)
+      : null,
+    updateAvailable: updateAvailable ? { version: updateAvailable.version } : null,
+  };
+}
+
 function broadcastProjects() {
   const projects = listProjects();
   const project  = getActive() ?? null;
   bridge?.broadcastProjectState(projects, project?.id ?? null);
   sendToPanel(panel, 'panel:state', { project, projects, running: bridge !== null, firstOpen: isFirstOpen() });
+  sendToMenu(menuWin, 'menu:state', buildMenuState());
 }
 
 async function startSession() {
@@ -351,6 +368,11 @@ async function startSession() {
     }
   };
 
+  bridge.onRenameProject = (id, name) => {
+    renameProject(id, name);
+    broadcastProjects();
+  };
+
   bridge.onDeleteProject = (id) => {
     deleteProject(id);
     broadcastProjects();
@@ -480,12 +502,62 @@ ipcMain.handle('panel:switch-project', (_, id) => {
   broadcastProjects();
 });
 
+ipcMain.handle('panel:open-finder', (_, projectId) => {
+  const project = listProjects().find(p => p.id === projectId);
+  if (project?.path) shell.openPath(project.path);
+});
+
 ipcMain.handle('panel:open-menu', () => {
-  tray.popUpContextMenu(buildMenu(bridge !== null ? 'running' : 'stopped'));
+  if (!menuWin) return;
+  sendToMenu(menuWin, 'menu:state', buildMenuState());
+  toggleMenuWindow(menuWin, tray);
 });
 
 ipcMain.handle('panel:mark-seen', () => { markSeen(); });
 ipcMain.handle('panel:close', () => { panel?.hide(); });
+
+// ── Menu window IPC handlers ──────────────────────────────────────────────────
+ipcMain.handle('menu:close',   () => menuWin?.hide());
+ipcMain.handle('menu:quit',    () => app.quit());
+ipcMain.handle('menu:start',   () => { startSession(); menuWin?.hide(); });
+ipcMain.handle('menu:stop',    () => { stopSession();  menuWin?.hide(); });
+ipcMain.handle('menu:restart', () => { stopSession(); startSession(); menuWin?.hide(); });
+ipcMain.handle('menu:sign-out',() => { signOutAndSetup(); menuWin?.hide(); });
+ipcMain.handle('menu:open-pwa', () => {
+  const h = (process.env.PWA_URL || 'localhost:3000').replace(/^https?:\/\//, '');
+  shell.openExternal(`https://${h}`);
+  menuWin?.hide();
+});
+ipcMain.handle('menu:open-folder', async () => {
+  menuWin?.hide();
+  await openFolderDialog();
+});
+ipcMain.handle('menu:copy-token', () => {
+  const token = process.env.SESSION_TOKEN;
+  if (!token) {
+    dialog.showMessageBox({ type: 'warning', message: 'SESSION_TOKEN no configurado en ~/.config/cc-controller/.env' });
+    return;
+  }
+  clipboard.writeText(token);
+  dialog.showMessageBox({ type: 'info', message: 'SESSION_TOKEN copiado al portapapeles.' });
+  menuWin?.hide();
+});
+ipcMain.handle('menu:check-updates', async () => {
+  menuWin?.hide();
+  const result = await checkForUpdates();
+  if (result) {
+    dialog.showMessageBox({
+      type: 'info',
+      message: `Nueva versión: v${result.version}`,
+      detail: `Ejecuta:\n\n${BREW_UPDATE_CMD}`,
+      buttons: ['Actualizar ahora', 'Cerrar'],
+      defaultId: 0,
+    }).then(({ response }) => { if (response === 0) openBrewUpdate(); });
+  } else {
+    dialog.showMessageBox({ type: 'info', message: 'Ya tienes la última versión', detail: `v${app.getVersion()} está actualizado.` });
+  }
+});
+ipcMain.handle('menu:brew-update', () => { openBrewUpdate(); menuWin?.hide(); });
 
 app.whenReady().then(async () => {
   app.dock?.hide();
@@ -493,13 +565,15 @@ app.whenReady().then(async () => {
   const icon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
   tray = new Tray(icon);
   panel = createPanel();
+  menuWin = createMenuWindow();
   tray.on('click', () => {
     if (!panel) return;
     togglePanel(panel, tray);
     if (panel.isVisible()) broadcastProjects();
   });
   tray.on('right-click', () => {
-    tray.popUpContextMenu(buildMenu(bridge !== null ? 'running' : 'stopped'));
+    sendToMenu(menuWin, 'menu:state', buildMenuState());
+    toggleMenuWindow(menuWin, tray);
   });
   setTrayMenu('stopped');
 
