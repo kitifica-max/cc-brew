@@ -1,19 +1,34 @@
 <p align="center">
-  <img src="logos/logoccc2.svg" alt="CC Controller" width="160"/>
+  <img src="logos/logoccc2.svg" alt="CC Creator" width="160"/>
 </p>
 
-# CC Controller — Remote Claude Code Bridge
+# CC Creator — Studio de Apps Directas guiado por Claude
 
-Controla Claude Code desde tu iPhone usando una PWA como control remoto. El Mac ejecuta Claude Code localmente; el teléfono envía y recibe mensajes en tiempo real vía Supabase Realtime.
+De la idea a tu App Directa en 6 fases. CC Creator envuelve Claude Code en un proceso estructurado: guía a Claude fase a fase, escribe el `CLAUDE.md` automáticamente y te deja controlar todo desde tu iPhone.
 
 ```
-iPhone (PWA)  ──── Supabase Realtime ────  Mac (Electron tray)
-  Escribe prompt                              claude CLI
-  Ve streaming token a token   ◄──────       Transmite output
-  Sube archivos                ──────►       Guarda en ~/CCProjects/
+iPhone (App Directa)  ──── Supabase Realtime ────  Mac (Electron tray)
+  Escribe prompt                                      claude CLI
+  Avanza de fase          ──────►                    CLAUDE.md automático
+  Ve streaming            ◄──────                    Output token a token
 ```
 
-**Sin cuenta Supabase. Sin SSH. Sin túneles. Sin config de red.**
+**Sin cuenta Supabase propia. Sin SSH. Sin túneles. Sin config de red.**
+
+---
+
+## Sistema de 6 Fases
+
+| # | Fase | Objetivo |
+|---|------|----------|
+| 1 | **Ideación** | Definir el problema, usuarios, y alcance del MVP |
+| 2 | **POC Local** | Construir el prototipo funcional en local |
+| 3 | **Lanzamiento** | Deploy, dominio y pipeline de CI/CD |
+| 4 | **Backend** | Base de datos, auth, APIs y servicios externos |
+| 5 | **App Directa Completa** | PWA instalable con offline, push y UX nativa |
+| 6 | **Validación** | Métricas, feedback de usuarios y decisiones de producto |
+
+Cada avance de fase escribe un `CLAUDE.md` actualizado en el proyecto. Claude Code lo lee nativamente — sin copiar contexto, sin instrucciones manuales.
 
 ---
 
@@ -26,93 +41,92 @@ iPhone (PWA)  ──── Supabase Realtime ────  Mac (Electron tray)
 
 ---
 
-## Instalación en 3 pasos
+## Instalación
 
-### 1 — Descargar el DMG
+### Homebrew (recomendado)
+
+```bash
+brew install --cask kitifica-max/tap/cc-controller
+```
+
+macOS no bloqueará la app instalada vía Homebrew.
+
+### DMG manual
 
 Desde [GitHub Releases](https://github.com/kitifica-max/cc-controller/releases/latest):
 
 | Chip | Archivo |
 |---|---|
-| Apple Silicon (M1/M2/M3/M4) | `CC.Controller-*-arm64.dmg` |
-| Intel | `CC.Controller-*.dmg` |
+| Apple Silicon (M1/M2/M3/M4) | `CC.Creator-*-arm64.dmg` |
+| Intel | `CC.Creator-*.dmg` |
 
-> **DMG sin firmar:** macOS bloqueará la apertura por defecto. Clic derecho → *Abrir* → confirmar. Esto es un paso único. Ver sección [Seguridad](#seguridad) para más detalle.
+> **DMG sin firmar:** clic derecho → *Abrir* → confirmar. Solo una vez. Ver [Seguridad](#seguridad).
 
-Arrastra CC Controller a Applications. Al abrir, aparece en el tray (barra superior) sin ícono en el Dock.
-
-### 2 — Setup inicial
-
-La primera vez que CC Controller corre, abre una ventana de configuración automáticamente. El asistente:
-
-1. Pide tu correo y contraseña — la misma cuenta que usas en la PWA
-2. Genera un `SESSION_ID` único para tu instalación
-3. Genera un `SESSION_TOKEN` aleatorio (mín. 32 chars)
-4. Muestra el **código de emparejamiento** (`sessionId:token`)
-5. Guarda la config en `~/.config/cc-controller/.env` y la sesión en `~/.config/cc-controller/auth.json` (ambos `600`)
-
-Copia el código de emparejamiento — lo necesitas en el paso 3.
-
-### 3 — Emparejar con la PWA
-
-1. Abre [ccc.kitifica.com](https://ccc.kitifica.com) en tu iPhone
-2. Agrega a la pantalla de inicio (Share → Add to Home Screen) para usarla como app nativa
-3. Pega el código de emparejamiento cuando la PWA lo solicite
-4. En CC Controller (tray) → clic derecho → **Iniciar**
-
-Listo. Escribe desde el iPhone, Claude Code responde con streaming token a token.
+Arrastra CC Creator a Applications. Al abrir, aparece en el tray (barra superior) sin ícono en el Dock.
 
 ---
 
-## Uso Diario
+## Setup inicial
 
-### Flujo normal
+La primera vez, CC Creator abre el asistente de configuración:
 
-1. CC Controller debe estar corriendo en el tray (barra superior del Mac)
-2. Clic derecho → **Iniciar** para iniciar la sesión
-3. Abre la PWA en el iPhone → chat activo
+1. Ingresa tu correo y contraseña — la misma cuenta que usas en la App Directa
+2. Genera un `SESSION_ID` único para tu instalación
+3. Genera un `SESSION_TOKEN` aleatorio (mín. 32 chars)
+4. Muestra el **código de emparejamiento** (`sessionId:token`)
+5. Guarda la config en `~/.config/cc-controller/.env` y la sesión en `~/.config/cc-controller/auth.json`
 
-### Proyectos
+### Conectar tu iPhone
 
-- Toca el nombre del proyecto en el header de la PWA → lista de proyectos
-- **Nuevo proyecto:** CC Controller crea `~/CCProjects/<slug>/` en el Mac
+1. Abre [ccc.kitifica.com](https://ccc.kitifica.com) en Safari
+2. Agrega a la pantalla de inicio (Share → Add to Home Screen)
+3. Pega el código de emparejamiento cuando la App Directa lo solicite
+4. En el tray → clic derecho → **Iniciar**
+
+---
+
+## Uso diario
+
+### Proyectos y fases
+
+- Toca el nombre del proyecto en el header → lista de proyectos
+- **Nuevo proyecto:** CC Creator crea `~/CCProjects/<slug>/` en el Mac
+- **Avanzar de fase:** toca el indicador de fase → panel de fases → selecciona la siguiente
+- CC Creator escribe el `CLAUDE.md` del proyecto al cambiar de fase
 - **Abrir en Claude Code:** botón en el header → abre Terminal con `cd <proyecto> && claude`
-- Claude Code siempre corre dentro del directorio del proyecto activo
 
-### Subir archivos desde iPhone
+### Secrets por categoría
 
-Toca el ícono de clip en la barra de entrada. El archivo viaja a Supabase Storage temporalmente, Electron lo descarga al directorio del proyecto y lo elimina de Storage inmediatamente.
-
-Formatos permitidos: `.png .jpg .jpeg .gif .pdf .txt .md .json .csv .svg .zip` (máx. 10 MB)
-
-### Variables de entorno
-
-Settings (⚙️) → Entorno. Las claves se guardan exclusivamente en:
+Settings (⚙️) → Secrets. Las claves se organizan por categoría (API Keys, Database, Auth, etc.) y se guardan en:
 
 ```
 ~/CCProjects/<proyecto>/.env
 ```
 
-con permisos `600`. Nunca se almacenan en la PWA ni en Supabase.
+con permisos `600`. Nunca se almacenan en la App Directa ni en Supabase.
+
+### Subir archivos desde iPhone
+
+Toca el ícono de clip. El archivo viaja a Supabase Storage temporalmente, el desktop lo descarga al directorio del proyecto y lo elimina de Storage inmediatamente.
+
+Formatos: `.png .jpg .jpeg .gif .pdf .txt .md .json .csv .svg .zip` (máx. 10 MB)
 
 ---
 
 ## Seguridad
 
-El DMG no está notarizado (el certificado de Apple cuesta $99/año). Lo que sí existe es código completamente abierto: puedes leer `desktop/src/main.js`, `bridge.js` y `pty.js` antes de ejecutar.
-
 | Medida | Detalle |
 |---|---|
-| **Canal privado** | El canal `session:<id>` es privado: Supabase evalúa Row Level Security sobre `realtime.messages` con el JWT de tu cuenta (ver `scripts/setup-supabase.sql`). Sin sesión autorizada no hay suscripción — ni para enviar ni para leer. |
-| **Código de emparejamiento** | `SESSION_ID` único por instalación + `SESSION_TOKEN` ≥ 32 chars. Segunda capa: sin ese par exacto, cualquier evento llega y se descarta en silencio. |
-| **Sin puertos abiertos** | El Mac no escucha en ningún puerto. Todo viaja por Supabase WebSocket (WSS/TLS). Sin SSH, sin ngrok, sin IP expuesta. |
-| **Path traversal bloqueado** | Toda ruta de archivo se valida dentro de `~/CCProjects/`. Paths con `../` o rutas absolutas externas rechazadas. |
-| **Whitelist de archivos** | Solo extensiones permitidas, máx. 10 MB. Archivo eliminado de Supabase Storage inmediatamente tras descargarse. |
-| **Secretos con permisos 600** | `.env` de cada proyecto escrito con `mode 0o600` — solo el usuario del sistema puede leerlo. |
+| **Canal privado** | El canal `session:<id>` es privado: Supabase evalúa RLS sobre `realtime.messages` con el JWT de tu cuenta. Sin sesión autorizada no hay suscripción. |
+| **Código de emparejamiento** | `SESSION_ID` único por instalación + `SESSION_TOKEN` ≥ 32 chars. Segunda capa: sin ese par exacto, cualquier evento se descarta. |
+| **Sin puertos abiertos** | El Mac no escucha en ningún puerto. Todo viaja por Supabase WebSocket (WSS/TLS). Sin SSH, sin ngrok. |
+| **Path traversal bloqueado** | Toda ruta de archivo se valida dentro de `~/CCProjects/`. Paths con `../` rechazados. |
+| **Whitelist de archivos** | Solo extensiones permitidas, máx. 10 MB. Eliminado de Storage tras descargarse. |
+| **Secretos con permisos 600** | `.env` de cada proyecto escrito con `mode 0o600`. |
 | **Hardened Runtime** | `hardenedRuntime: true` en el build de Electron. |
-| **Open source** | Todo el código está en GitHub. Sin binarios opacos ni dependencias sin fuente. |
+| **Open source** | Todo el código está en GitHub. Sin binarios opacos. |
 
-> Si pierdes el iPhone: cambia `SESSION_TOKEN` en `~/.config/cc-controller/.env` y reinicia CC Controller. El dispositivo anterior no puede reconectar. Para cortar también el acceso de esa cuenta, pon `active = false` en `public.cc_allowed_users`.
+> Si pierdes el iPhone: cambia `SESSION_TOKEN` en `~/.config/cc-controller/.env` y reinicia CC Creator. El dispositivo anterior no puede reconectar.
 
 ---
 
@@ -124,21 +138,24 @@ desktop/src/
 ├── bridge.js        # Supabase Realtime bridge (broadcast + storage)
 ├── pty.js           # Claude CLI runner (child_process + streaming)
 ├── projects.js      # ProjectManager (~/.config + ~/CCProjects)
+├── claude-md.js     # Generador de CLAUDE.md por fase
 └── setup-window.js  # Wizard de primer setup
 
 web/app/
 ├── page.js                    # Chat UI principal con streaming
 └── components/
     ├── AuthGate.js            # Emparejamiento de código
-    ├── SettingsSheet.js       # Modelo, effort, secretos, proyectos
+    ├── PhasePanel.js          # Visualización y cambio de fase
+    ├── SecretsSheet.js        # Secrets por categoría
+    ├── SettingsSheet.js       # Modelo, effort, proyectos
     ├── ProjectsList.js        # Lista y gestión de proyectos
     └── FileUpload.js          # Subida de archivos
 ```
 
 | Componente | Tecnología | Rol |
 |---|---|---|
-| Desktop | Electron 30 + Node.js | Ejecuta `claude` CLI, gestiona proyectos |
-| PWA | Next.js 14 + Netlify | Control remoto desde el móvil |
+| Desktop | Electron 30 + Node.js | Ejecuta `claude` CLI, gestiona fases y CLAUDE.md |
+| App Directa | Next.js 14 + Netlify | Control remoto e interfaz de fases desde el móvil |
 | Bridge | Supabase Realtime (Broadcast) | Canal WebSocket cifrado entre ambos |
 | Storage | Supabase Storage (`uploads`) | Tránsito temporal de archivos |
 
@@ -146,13 +163,13 @@ Supabase está **bundled** — los devs no necesitan cuenta propia.
 
 ---
 
-## Desarrollo Local
+## Desarrollo local
 
 ```bash
 # Desktop
 cd desktop && npm install && npm run dev
 
-# PWA
+# App Directa
 cd web && npm install && npm run dev
 ```
 
@@ -163,7 +180,7 @@ cd desktop
 # Apple Silicon
 npm run build -- --mac --arm64
 
-# Intel (separado para evitar conflicto de volúmenes hdiutil)
+# Intel
 npm run build -- --mac --x64
 ```
 
@@ -171,25 +188,22 @@ Los DMGs quedan en `desktop/dist/`.
 
 ---
 
-## Solución de Problemas
+## Solución de problemas
 
-**"Desktop detenido" en la PWA aunque Electron corra**
-→ Electron envía heartbeat cada 20s. Si la PWA no recibe uno en 45s, marca el desktop como detenido. Verifica: clic derecho en tray → Iniciar.
+**"Desktop detenido" en la App Directa aunque Electron corra**
+→ Electron envía heartbeat cada 20s. Si la App Directa no recibe uno en 45s, marca el desktop como detenido. Clic derecho en tray → Iniciar.
 
 **"no se puede abrir porque proviene de un desarrollador no identificado"**
-→ Clic derecho → Abrir → confirmar. Solo ocurre la primera vez.
+→ Instala vía Homebrew (sin este problema) o clic derecho → Abrir → confirmar.
 
-**La PWA pide código de emparejamiento otra vez**
-→ El localStorage del navegador fue borrado. Abre CC Controller → clic derecho → Copiar código de emparejamiento (o revisa `~/.config/cc-controller/.env`).
+**La App Directa pide código de emparejamiento otra vez**
+→ El localStorage fue borrado. Abre CC Creator → clic derecho → Copiar código de emparejamiento.
 
 **La respuesta de Claude tiene caracteres extraños (`[0m`, `[31m`)**
-→ Caracteres ANSI. El bridge los filtra automáticamente. Si persisten, actualiza al DMG más reciente.
-
-**La subida de archivos falla**
-→ Verifica que la extensión del archivo esté en la whitelist y que el archivo sea menor a 10 MB.
+→ El bridge filtra ANSI automáticamente. Si persisten, actualiza a la versión más reciente.
 
 **El Mac se duerme y la sesión se cae**
-→ CC Controller activa `prevent-display-sleep` automáticamente mientras la sesión corre. Si el Mac igual se duerme, revisa System Settings → Battery → Prevent automatic sleeping.
+→ CC Creator activa `prevent-display-sleep` automáticamente mientras la sesión corre.
 
 ---
 
