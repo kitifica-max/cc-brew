@@ -66,7 +66,7 @@ function processBody(body, resolve) {
     if (isNewer) {
       updateAvailable = { version: latest };
       if (tray) setTrayMenu(bridge !== null ? 'running' : 'stopped');
-      bridge?.sendPush('CC Controller', `Nueva versión v${latest} disponible — abre el menú del tray para actualizar`).catch(() => {});
+      bridge?.sendPush('CC Creator', `Nueva versión v${latest} disponible — abre el menú del tray para actualizar`).catch(() => {});
     }
   } catch (_) {}
   resolve(updateAvailable);
@@ -88,7 +88,7 @@ function buildMenu(status) {
     ? (trialDaysLeft === 0 ? 'Prueba: vence hoy' : `Prueba: ${trialDaysLeft} día${trialDaysLeft === 1 ? '' : 's'} restante${trialDaysLeft === 1 ? '' : 's'}`)
     : null;
   const items = [
-    { label: 'CC Controller', enabled: false },
+    { label: 'CC Creator', enabled: false },
     { label: `Estado: ${status}`, enabled: false },
     ...(trialLabel ? [{ label: trialLabel, enabled: false }] : []),
   ];
@@ -161,7 +161,7 @@ function buildMenu(status) {
 
 function setTrayMenu(status) {
   tray.setContextMenu(buildMenu(status));
-  tray.setToolTip(`CC Controller — ${status}`);
+  tray.setToolTip(`CC Creator — ${status}`);
 }
 
 async function openFolderDialog() {
@@ -221,7 +221,7 @@ async function startSession() {
     bridge = null;
     await dialog.showMessageBox({
       type: 'warning',
-      message: 'Tu sesión de CC Controller expiró.',
+      message: 'Tu sesión de CC Creator expiró.',
       detail: 'Vuelve a iniciar sesión con el mismo correo que usas en la PWA.',
     });
     await openSetupWindow();
@@ -246,7 +246,7 @@ async function startSession() {
         type: 'info',
         title: 'Prueba finalizada',
         message: 'Tu prueba de 7 días ha terminado.',
-        detail: 'Completa el pago de $4.99 en el navegador para seguir usando CC Controller.',
+        detail: 'Completa el pago de $4.99 en el navegador para seguir usando CC Creator.',
         buttons: ['Abrir pago'],
       });
       bridge = null;
@@ -266,7 +266,7 @@ async function startSession() {
   pty.onMessage = (role, text, projectId) => bridge?.broadcastMessage(role, text, projectId);
   pty.onChunk = (msgId, text, done, _projectId) => {
     bridge?.broadcastChunk(msgId, text, done, null); // null → PWA usa currentIdRef
-    if (done) bridge?.sendPush('CC Controller', 'Claude terminó — toca para ver la respuesta').catch(() => {});
+    if (done) bridge?.sendPush('CC Creator', 'Claude terminó — toca para ver la respuesta').catch(() => {});
   };
   pty.onPermissionRequest = (text, msgId, projectId) => {
     bridge?.broadcastPermission(text, msgId, projectId ?? getActive()?.id ?? null);

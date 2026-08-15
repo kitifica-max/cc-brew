@@ -1,5 +1,5 @@
-appId: com.cccontroller.app
-productName: CC Controller
+appId: com.cccreator.app
+productName: CC Creator
 copyright: Copyright © 2026
 electronVersion: "30.5.1"
 
@@ -40,7 +40,7 @@ mac:
         - x64
 
 dmg:
-  title: CC Controller
+  title: CC Creator
   window:
     width: 540
     height: 380
