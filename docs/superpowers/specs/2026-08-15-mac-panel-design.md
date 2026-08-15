@@ -202,6 +202,46 @@ ipcMain.handle('panel:switch-project', (_, id) => switchProject(id));
 
 ---
 
+## Tray interaction (Opción C)
+
+El tray icon mantiene el mismo comportamiento de clic izquierdo y derecho — ambos siguen abriendo el menú de contexto existente (Iniciar/Detener, Copiar código, Actualizar, Salir). El panel se abre desde el **primer ítem del menú**: "📊 Abrir panel →".
+
+Adicionalmente, el panel incluye un botón `···` en el header que despliega `tray.popUpContextMenu(buildMenu(status))` — acceso al menú completo desde dentro del panel sin cerrarlo.
+
+Esto elimina la necesidad de recordar izquierdo vs derecho. Un solo flujo: clic en ícono → menú → "Abrir panel".
+
+---
+
+## Hint de primer uso
+
+La primera vez que el panel se abre, aparece un strip de onboarding animado sobre el action bar:
+
+```
+│──────────────────────────────────│
+│ 💡 Clic en ▣ CC Creator abre    │  ← strip #f04e23, texto blanco
+│    este panel · ··· para más    │    slide-up animado
+│    opciones                  [×] │
+│──────────────────────────────────│
+```
+
+### Comportamiento
+- Aparece con `slide-up` (200ms ease-out) al renderizar el panel por primera vez
+- Se cierra con `×` o automáticamente después de 8 segundos (fade-out 300ms)
+- Flag persistido en `~/.config/cc-controller/panel-seen` (archivo vacío — su existencia es el flag)
+- Si el archivo existe al abrir el panel → strip no se renderiza
+- Si no existe → strip visible, al cerrarlo se crea el archivo
+
+### Código de verificación en panel-window.js
+```js
+import { existsSync, writeFileSync } from 'fs';
+const flagPath = path.join(homedir(), '.config', 'cc-controller', 'panel-seen');
+const isFirstOpen = !existsSync(flagPath);
+// Enviado al panel como parte de panel:state: { ..., firstOpen: isFirstOpen }
+// Al cerrarse el hint, el panel invoca panel:mark-seen → main crea el archivo
+```
+
+---
+
 ## Constraints
 
 - Panel no aparece en el Dock ni en cmd+tab (`skipTaskbar: true` implícito por `frame: false` + `alwaysOnTop`).
