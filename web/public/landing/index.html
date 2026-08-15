@@ -161,6 +161,8 @@ nav {
   position: relative; z-index: 1; max-width: 1120px; margin: 0 auto;
   display: grid; grid-template-columns: 1fr 400px; gap: 60px; align-items: center; width: 100%;
 }
+.hero-right { display: flex; align-items: center; justify-content: center; perspective: 1000px; }
+#hero-phone { width: 100%; max-width: 320px; display: block; filter: drop-shadow(0 40px 80px rgba(0,0,0,0.4)); will-change: transform, opacity; }
 @media (max-width: 860px) { .hero-inner { grid-template-columns: 1fr; } .hero-right { display: none; } }
 .hero-badge {
   display: inline-flex; align-items: center; gap: 7px;
@@ -684,28 +686,7 @@ footer {
     </div>
 
     <div class="hero-right">
-      <div class="phone-frame">
-        <div class="phone-status">
-          <div class="phone-status-live"><div class="phone-status-dot"></div> EN VIVO</div>
-          <div class="phone-status-proj">mi-startup</div>
-        </div>
-        <div class="phone-msgs">
-          <div>
-            <div class="msg user">Refactoriza el sistema de autenticación y ejecuta los tests.</div>
-            <div class="msg-meta right">09:42 · tú</div>
-          </div>
-          <div class="typing"><span></span><span></span><span></span></div>
-          <div>
-            <div class="msg ai">✓ Refactorizando auth middleware…<br>→ Actualizando JWT handler<br>→ Añadiendo refresh tokens<br>→ Tests: 24/24 ✓</div>
-            <div class="msg-meta">10:17 · Claude</div>
-          </div>
-        </div>
-        <div class="quick-row">
-          <div class="qbtn">✓ sí</div>
-          <div class="qbtn">✕ no</div>
-          <div class="qbtn">→ continúa</div>
-        </div>
-      </div>
+      <img id="hero-phone" src="mu_1_ccc.png" alt="CC Controller en iPhone" />
     </div>
   </div>
 </section>
@@ -1194,6 +1175,22 @@ footer {
     </div>
   </div>
 </section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(function() {
+  var img = document.getElementById('hero-phone');
+  if (!img || typeof gsap === 'undefined') return;
+  gsap.set(img, { opacity: 0, y: 70, rotationY: 18, scale: 0.88, transformOrigin: 'center center' });
+  var tl = gsap.timeline({ delay: 0.25 });
+  tl.to(img, {
+    opacity: 1, y: 0, rotationY: 0, scale: 1,
+    duration: 1.1, ease: 'power3.out',
+  }).then(function() {
+    gsap.to(img, { y: -10, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+  });
+})();
+</script>
 
 <!-- ═══════════════════ FOOTER ═══════════════════ -->
 <footer>
