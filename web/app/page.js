@@ -728,6 +728,7 @@ function CCController() {
           onSaveMcpConfig={(cfg) => { sendEvent('save-mcp-config', { projectId: currentId, mcpServers: cfg }); }}
         />
       )}
+      {preview.show && <PreviewSheet preview={preview} setPreview={setPreview} sendEvent={sendEvent} />}
     </main>
   );
 }
