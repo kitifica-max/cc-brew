@@ -90,8 +90,6 @@ function buildMenu(status) {
     ? (trialDaysLeft === 0 ? 'Prueba: vence hoy' : `Prueba: ${trialDaysLeft} día${trialDaysLeft === 1 ? '' : 's'} restante${trialDaysLeft === 1 ? '' : 's'}`)
     : null;
   const items = [
-    { label: '📊 Abrir panel', click: () => { if (panel) togglePanel(panel, tray); } },
-    { type: 'separator' },
     { label: 'CC Creator', enabled: false },
     { label: `Estado: ${status}`, enabled: false },
     ...(trialLabel ? [{ label: trialLabel, enabled: false }] : []),
@@ -164,7 +162,6 @@ function buildMenu(status) {
 }
 
 function setTrayMenu(status) {
-  tray.setContextMenu(buildMenu(status));
   tray.setToolTip(`CC Creator — ${status}`);
 }
 
@@ -496,7 +493,14 @@ app.whenReady().then(async () => {
   const icon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
   tray = new Tray(icon);
   panel = createPanel();
-  tray.on('mouse-enter', () => setTrayMenu(bridge !== null ? 'running' : 'stopped'));
+  tray.on('click', () => {
+    if (!panel) return;
+    togglePanel(panel, tray);
+    if (panel.isVisible()) broadcastProjects();
+  });
+  tray.on('right-click', () => {
+    tray.popUpContextMenu(buildMenu(bridge !== null ? 'running' : 'stopped'));
+  });
   setTrayMenu('stopped');
 
   if (needsSetup()) {

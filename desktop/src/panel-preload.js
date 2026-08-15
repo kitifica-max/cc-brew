@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron';
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('cc', {
   onState:       (cb) => ipcRenderer.on('panel:state',  (_, d) => cb(d)),
