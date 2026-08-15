@@ -139,7 +139,6 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
               <path fill="#fff" d="M335.5,357.7c0,12.3-7.4,21.4-20.3,21.4s-20-9-20-21.2,7.6-21.5,20.5-21.5,19.8,8.5,19.8,21.2ZM306.7,357.8c0,7.8,3.4,12.5,8.8,12.5s8.6-4.6,8.6-12.4-3.1-12.6-8.7-12.6-8.7,3.9-8.7,12.5Z"/>
               <path fill="#fff" d="M343.3,348.5c0-4,0-7.6,0-11.1h11.1c.1.9.3,5,.3,7.2,1.8-4.7,6.1-8.1,13.1-8.1v10.8c-8.2-.2-13.1,2-13.1,13.2v17.8h-11.3v-29.7Z"/>
             </svg>
-            <span style={{ fontSize: 13, fontWeight: 800, color: 'rgba(255,255,255,0.92)', letterSpacing: '0.02em' }}>CC Creator</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
             {trialPill}
