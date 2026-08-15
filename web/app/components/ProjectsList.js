@@ -12,7 +12,7 @@ const ICON_SETTINGS = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 2
 const ICON_LOGOUT   = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M12 12h7m0 0l-3 3m3-3l-3-3m3-3V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1"/></svg>`;
 
 const PHASES = [
-  { n: 1, name: 'Ideación',          color: '#f97316' },
+  { n: 1, name: 'Ideación',          color: '#f04e23' },
   { n: 2, name: 'POC Local',         color: '#3b82f6' },
   { n: 3, name: 'Lanzamiento',       color: '#10b981' },
   { n: 4, name: 'Backend',           color: '#8b5cf6' },
@@ -46,7 +46,7 @@ function PhaseDots({ phase }) {
       {PHASES.map(p => {
         const done = p.n < cur;
         const active = p.n === cur;
-        const phaseColor = PHASES[cur - 1]?.color ?? '#f97316';
+        const phaseColor = PHASES[cur - 1]?.color ?? '#f04e23';
         return (
           <div key={p.n} style={{
             width: 7, height: 7, borderRadius: '50%',
@@ -103,7 +103,7 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
       <div style={{ fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 1.5, marginBottom: 36 }}>
         Selecciona <strong style={{ color: '#1a1a1a' }}>📁 Seleccionar carpeta del proyecto</strong> — la app navegará al chat automáticamente.
       </div>
-      <div style={{ width: 40, height: 40, border: '3px solid #f97316', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite', marginBottom: 40 }} />
+      <div style={{ width: 40, height: 40, border: '3px solid #f04e23', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite', marginBottom: 40 }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       <button
         onClick={onCancelFolder}
@@ -121,16 +121,24 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
     <main style={{ height: '100dvh', background: '#f0f0f2', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
       {/* Header */}
-      <div style={{ background: '#f97316', padding: '52px 18px 16px', flexShrink: 0 }}>
+      <div style={{ background: '#f04e23', padding: '52px 18px 16px', flexShrink: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          {/* CC Creator logo mark */}
+          {/* CC Creator logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            <div style={{ width: 30, height: 30, borderRadius: 9, background: 'rgba(255,255,255,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="20" height="20" viewBox="0 0 302 302" xmlns="http://www.w3.org/2000/svg">
-                <path fill="#fff" d="M242.73,157.22h0c-7.37,0-13.92,4.45-16.91,11.19-2.08,4.69-5.07,8.99-8.99,12.9-8.11,8.11-17.83,12.29-29.14,12.57-.4,0-.79.03-1.19.03-11.82,0-21.91-4.18-30.26-12.53-.96-.96-1.86-1.94-2.7-2.95-6.55-7.75-9.83-16.85-9.83-27.32s3.29-19.6,9.87-27.36c-.84-1.01-1.74-2-2.7-2.96-8.39-8.31-18.5-12.47-30.31-12.47-.4,0-.8.02-1.2.03-8.22,12.57-12.35,26.82-12.35,42.77,0,15.96,4.13,30.21,12.35,42.77,3.08,4.71,6.71,9.18,10.94,13.42,7.07,7.07,14.81,12.51,23.2,16.36,10.05,4.61,21.04,6.93,32.99,6.93,21.93,0,40.68-7.78,56.25-23.36,7.34-7.34,12.94-15.42,16.8-24.22,5.33-12.16-3.55-25.8-16.83-25.8Z"/>
-                <path fill="rgba(255,255,255,0.55)" d="M119.38,193.88c-11.31-.27-21.01-4.43-29.08-12.51-8.36-8.35-12.53-18.44-12.53-30.26s4.18-21.91,12.53-30.26c7.74-7.74,18.17-12.2,29.08-12.51,11.81,0,21.91,4.16,30.31,12.47.95.97,1.85,1.95,2.7,2.96,2.62,3.13,4.72,6.48,6.29,10.03,2.98,6.75,9.54,11.21,16.92,11.21h0c13.27,0,22.14-13.62,16.83-25.78-1.64-3.76-3.62-7.38-5.89-10.87-3.07-4.73-6.7-9.23-10.93-13.48-7.09-7.05-14.84-12.48-23.25-16.32-10.06-4.6-21.06-6.92-33-6.92-21.93,0-40.66,7.76-56.19,23.29-15.53,15.53-23.3,34.26-23.3,56.19s7.76,40.66,23.3,56.19c15.53,15.53,34.26,23.3,56.19,23.3,11.93,0,22.91-2.32,32.96-6.93-8.39-3.85-16.13-9.29-23.2-16.36-4.23-4.23-7.87-8.71-10.94-13.42Z"/>
-              </svg>
-            </div>
+            <svg width="34" height="34" viewBox="0 0 459.9 459.9" xmlns="http://www.w3.org/2000/svg">
+              <rect fill="#333" width="459.9" height="459.9" rx="60.8" ry="60.8"/>
+              <path fill="#ff582a" d="M350.7,202.2h0c-9.7,0-18.4,5.9-22.3,14.8-2.7,6.2-6.7,11.8-11.8,17-10.7,10.7-23.5,16.2-38.4,16.6-.5,0-1,0-1.6,0-15.6,0-28.9-5.5-39.9-16.5-1.3-1.3-2.4-2.6-3.6-3.9-8.6-10.2-13-22.2-13-36s4.3-25.8,13-36.1c-1.1-1.3-2.3-2.6-3.6-3.9-11.1-10.9-24.4-16.4-39.9-16.4s-1.1,0-1.6,0c-10.8,16.6-16.3,35.3-16.3,56.4s5.4,39.8,16.3,56.4c4.1,6.2,8.9,12.1,14.4,17.7,9.3,9.3,19.5,16.5,30.6,21.6,13.2,6.1,27.7,9.1,43.5,9.1,28.9,0,53.6-10.3,74.1-30.8s17.1-20.3,22.1-31.9c7-16-4.7-34-22.2-34h0Z"/>
+              <path fill="#ff582a" d="M278.2,137.7c14.9.4,27.7,5.8,38.4,16.4,5.2,5.2,9.1,10.9,11.8,17.1,3.9,8.9,12.6,14.8,22.3,14.8h0c17.5,0,29.2-18,22.2-34-5.1-11.6-12.5-22.3-22.2-32.1-20.5-20.4-45.2-30.6-74.1-30.6s-30.2,3.1-43.4,9.1c11.1,5.1,21.3,12.2,30.6,21.5,5.6,5.6,10.4,11.5,14.4,17.8h0Z"/>
+              <path fill="#ff9477" d="M263.8,202.2c-9.7,0-18.4,5.9-22.3,14.8-2.1,4.7-4.9,9.1-8.3,13.2,1.1,1.3,2.3,2.6,3.6,3.9,11,11,24.3,16.5,39.9,16.5s1,0,1.6,0c3-4.6,5.6-9.4,7.8-14.3,7-16-4.7-34-22.2-34h0Z"/>
+              <path fill="#ff9477" d="M188.1,250.5c-14.9-.4-27.7-5.8-38.3-16.5-11-11-16.5-24.3-16.5-39.9s5.5-28.9,16.5-39.9,23.9-16.1,38.3-16.5c.5,0,1.1,0,1.6,0,15.6,0,28.9,5.5,39.9,16.4,1.3,1.3,2.4,2.6,3.6,3.9,3.4,4.1,6.2,8.5,8.3,13.2,3.9,8.9,12.6,14.8,22.3,14.8h0c17.5,0,29.2-18,22.2-34-2.2-4.9-4.8-9.7-7.8-14.3-4-6.2-8.8-12.2-14.4-17.8-9.3-9.3-19.6-16.4-30.6-21.5-13.3-6.1-27.8-9.1-43.5-9.1-28.9,0-53.6,10.2-74.1,30.7-20.5,20.5-30.7,45.2-30.7,74.1s10.2,53.6,30.7,74.1c20.5,20.5,45.2,30.7,74.1,30.7s30.2-3.1,43.4-9.1c-11.1-5.1-21.3-12.2-30.6-21.6-5.6-5.6-10.4-11.5-14.4-17.7h0Z"/>
+              <path fill="#fff" d="M145.2,361.4c-2.2,10.1-9.8,17.5-23.4,17.5s-25.3-12.2-25.3-27.6,8.4-28.2,25.9-28.2,21.5,8.5,22.8,17.6h-11.7c-1.1-4.2-4-8.4-11.4-8.4s-13.4,8.7-13.4,18.6,3.2,18.8,13.7,18.8,10.1-5.1,11.1-8.3h11.8Z"/>
+              <path fill="#fff" d="M152.6,348.5c0-4,0-7.6,0-11.1h11.1c.1.9.3,5,.3,7.2,1.8-4.7,6.1-8.1,13.1-8.1v10.8c-8.2-.2-13.1,2-13.1,13.2v17.8h-11.3v-29.7Z"/>
+              <path fill="#fff" d="M191.9,360.2c0,5.1,2.6,10.1,8.2,10.1s6-1.9,7.1-4.3h11.3c-1.4,5-5.9,13.2-18.7,13.2s-19.2-10-19.2-20.7,6.6-21.9,19.6-21.9,18.7,10.1,18.7,20.3,0,2.3-.1,3.4h-26.9ZM207.6,353.3c0-4.7-2-8.7-7.5-8.7s-7.6,3.7-8,8.7h15.5Z"/>
+              <path fill="#fff" d="M260.4,367.6c0,3.9.3,9.5.6,10.5h-10.8c-.3-.8-.6-3-.6-4-1.5,2.3-4.2,4.9-11.5,4.9s-14-6.5-14-12.8c0-9.3,7.5-13.6,19.4-13.6h5.8v-2.5c0-2.9-1-5.7-6.3-5.7s-5.8,2-6.3,5h-10.7c.6-7.2,5.1-13.1,17.5-13,10.9,0,16.8,4.3,16.8,14v17.1ZM249.4,359.6h-4.6c-6.8,0-9.3,2.1-9.3,6s1.8,5.4,5.9,5.4c7.2,0,8-5,8-10.4v-1.1Z"/>
+              <path fill="#fff" d="M265.9,337.4h6.3v-11h11.3v11h8v8.5h-8v20.1c0,3.1.9,4.3,4.3,4.3s1.7,0,2.6-.1v7.8c-2.2.8-5.3.8-7.6.8-7.9,0-10.6-4.3-10.6-11.4v-21.4h-6.3v-8.5Z"/>
+              <path fill="#fff" d="M335.5,357.7c0,12.3-7.4,21.4-20.3,21.4s-20-9-20-21.2,7.6-21.5,20.5-21.5,19.8,8.5,19.8,21.2ZM306.7,357.8c0,7.8,3.4,12.5,8.8,12.5s8.6-4.6,8.6-12.4-3.1-12.6-8.7-12.6-8.7,3.9-8.7,12.5Z"/>
+              <path fill="#fff" d="M343.3,348.5c0-4,0-7.6,0-11.1h11.1c.1.9.3,5,.3,7.2,1.8-4.7,6.1-8.1,13.1-8.1v10.8c-8.2-.2-13.1,2-13.1,13.2v17.8h-11.3v-29.7Z"/>
+            </svg>
             <span style={{ fontSize: 13, fontWeight: 800, color: 'rgba(255,255,255,0.92)', letterSpacing: '0.02em' }}>CC Creator</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -173,8 +181,8 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
                   borderRadius: 18,
                   padding: '13px 13px 13px 15px',
                   cursor: isEditing ? 'default' : 'pointer',
-                  border: '1.5px solid rgba(249,115,22,0.32)',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 6px 20px rgba(0,0,0,0.07), 0 0 0 1px rgba(249,115,22,0.15)',
+                  border: '1.5px solid rgba(240,78,35,0.32)',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 6px 20px rgba(0,0,0,0.07), 0 0 0 1px rgba(240,78,35,0.15)',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 9 }}>
@@ -293,7 +301,7 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
             />
             <button
               onClick={handleCreate}
-              style={{ background: '#f97316', border: 'none', borderRadius: 14, padding: '12px 18px', fontSize: 13, fontWeight: 700, color: '#fff', cursor: 'pointer' }}
+              style={{ background: '#f04e23', border: 'none', borderRadius: 14, padding: '12px 18px', fontSize: 13, fontWeight: 700, color: '#fff', cursor: 'pointer' }}
             >
               Crear
             </button>
@@ -302,7 +310,7 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <button
               onClick={() => setCreating(true)}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#f97316', border: 'none', borderRadius: 16, padding: '15px 16px', fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', boxShadow: '0 2px 12px rgba(249,115,22,0.35)', letterSpacing: '-0.01em' }}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#f04e23', border: 'none', borderRadius: 16, padding: '15px 16px', fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', boxShadow: '0 2px 12px rgba(240,78,35,0.35)', letterSpacing: '-0.01em' }}
             >
               <span style={{ display: 'flex', width: 17, height: 17 }} dangerouslySetInnerHTML={{ __html: ICON_PLUS }} />
               Nuevo proyecto
