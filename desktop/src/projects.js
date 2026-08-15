@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, resolve } from 'path';
 import { EOL, homedir } from 'os';
 import { generateClaude } from './claude-md.js';
@@ -112,18 +112,47 @@ export function saveMcpConfig(id, mcpServers) {
 
 export function writeClaude(projectPath, project) {
   try {
-    writeFileSync(join(projectPath, 'CLAUDE.md'), generateClaude(project), 'utf8');
+    const target = join(projectPath, 'CLAUDE.md');
+    // Don't overwrite external CLAUDE.md (not written by CC Creator)
+    if (existsSync(target)) {
+      const existing = readFileSync(target, 'utf8');
+      if (!existing.startsWith('# CC Creator —')) return;
+    }
+    writeFileSync(target, generateClaude(project), 'utf8');
   } catch (_) {}
 }
 
 export function updateProjectPhase(id, phase) {
+  const p = Math.max(1, Math.min(6, parseInt(phase, 10)));
+  if (isNaN(p)) return null;
   const data = load();
-  const idx = data.projects.findIndex(p => p.id === id);
+  const idx = data.projects.findIndex(pr => pr.id === id);
   if (idx === -1) return null;
-  data.projects[idx] = { ...data.projects[idx], phase };
+  data.projects[idx] = { ...data.projects[idx], phase: p };
   save(data);
   writeClaude(data.projects[idx].path, data.projects[idx]);
   return data.projects[idx];
+}
+
+export function readProjectEnv(id) {
+  const data = load();
+  const project = data.projects.find(p => p.id === id);
+  if (!project) return {};
+  try {
+    const envPath = join(project.path, '.env');
+    if (!existsSync(envPath)) return {};
+    const result = {};
+    readFileSync(envPath, 'utf8').split(/\r?\n/).forEach(line => {
+      const idx = line.indexOf('=');
+      if (idx < 1) return;
+      const k = line.slice(0, idx).trim();
+      if (!k) return;
+      let v = line.slice(idx + 1).trim();
+      if (v.startsWith('"') && v.endsWith('"')) v = v.slice(1, -1).replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\r/g, '\r').replace(/\\\\/g, '\\');
+      result[k] = v;
+    });
+    return result;
+  } catch { return {}; }
 }
 
 export function saveProjectEnv(id, envObject) {
@@ -131,8 +160,12 @@ export function saveProjectEnv(id, envObject) {
   const project = data.projects.find(p => p.id === id);
   if (!project) throw new Error(`Project not found: ${id}`);
 
+  // Merge with existing .env so we never silently erase keys not present in envObject
+  const existing = readProjectEnv(id);
+  const merged = { ...existing, ...envObject };
+
   let envContent = '';
-  for (const [key, value] of Object.entries(envObject)) {
+  for (const [key, value] of Object.entries(merged)) {
     if (!key || value === undefined || value === null) continue;
     const safeKey = key.replace(/[^a-zA-Z0-9_]/g, '');
     if (!safeKey) continue;

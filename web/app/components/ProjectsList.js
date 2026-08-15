@@ -45,7 +45,7 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
         Selecciona una carpeta en tu Mac
       </div>
       <div style={{ fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 1.5, marginBottom: 8 }}>
-        Haz clic en el ícono de CC Controller en la barra de menús de tu Mac.
+        Haz clic en el ícono de CC Creator en la barra de menús de tu Mac.
       </div>
       <div style={{ fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 1.5, marginBottom: 36 }}>
         Selecciona <strong style={{ color: '#1a1a1a' }}>📁 Seleccionar carpeta del proyecto</strong> — la app navegará al chat automáticamente.

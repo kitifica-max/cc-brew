@@ -39,7 +39,7 @@ jobs:
         run: npm test
 
       # Un arch por invocación: en paralelo los dos DMG montan el mismo
-      # /Volumes/CC Controller y el `hdiutil detach` de uno tumba al otro.
+      # /Volumes/CC Creator y el `hdiutil detach` de uno tumba al otro.
       - name: Construir DMG arm64
         working-directory: desktop
         run: npx electron-builder --mac dmg --arm64 --publish never
@@ -47,7 +47,7 @@ jobs:
       - name: Construir DMG x64
         working-directory: desktop
         run: |
-          hdiutil detach '/Volumes/CC Controller' 2>/dev/null || true
+          hdiutil detach '/Volumes/CC Creator' 2>/dev/null || true
           npx electron-builder --mac dmg --x64 --publish never
 
       # Un .app sin firma real arranca como "la app está dañada" en Apple
@@ -57,7 +57,7 @@ jobs:
       - name: Verificar firma ad-hoc
         working-directory: desktop
         run: |
-          for app in 'dist/mac-arm64/CC Controller.app' 'dist/mac/CC Controller.app'; do
+          for app in 'dist/mac-arm64/CC Creator.app' 'dist/mac/CC Creator.app'; do
             codesign -dv --verbose=2 "$app" 2>&1 | tee /tmp/sig.txt
             grep -q 'Signature=adhoc' /tmp/sig.txt
             if grep -q 'linker-signed' /tmp/sig.txt; then
@@ -71,7 +71,7 @@ jobs:
         id: release
         with:
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
-          name: CC Controller ${{ github.event.inputs.tag || github.ref_name }}
+          name: CC Creator ${{ github.event.inputs.tag || github.ref_name }}
           generate_release_notes: true
           files: desktop/dist/*.dmg
 

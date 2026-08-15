@@ -10,20 +10,20 @@ content = f"""cask "cc-controller" do
   version "{version}"
 
   on_arm do
-    url "https://github.com/kitifica-max/cc-controller/releases/download/v{version}/CC.Controller-{version}-arm64.dmg"
+    url "https://github.com/kitifica-max/cc-controller/releases/download/v{version}/CC.Creator-{version}-arm64.dmg"
     sha256 "{sha_arm64}"
   end
 
   on_intel do
-    url "https://github.com/kitifica-max/cc-controller/releases/download/v{version}/CC.Controller-{version}.dmg"
+    url "https://github.com/kitifica-max/cc-controller/releases/download/v{version}/CC.Creator-{version}.dmg"
     sha256 "{sha_intel}"
   end
 
-  name "CC Controller"
+  name "CC Creator"
   desc "Control Claude Code desde tu iPhone via PWA"
   homepage "https://ccc.kitifica.com"
 
-  app "CC Controller.app"
+  app "CC Creator.app"
 end
 """
 

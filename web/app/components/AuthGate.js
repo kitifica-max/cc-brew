@@ -140,7 +140,7 @@ function SignIn() {
       <LogoMark size={80} />
       <div style={{ textAlign: 'center', marginTop: 4 }}>
         <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
-          CC Controller
+          CC Creator
         </h1>
         <p style={{ margin: '8px 0 0', fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.45)', letterSpacing: '-0.01em' }}>
           Controla Claude Code desde tu iPhone
@@ -206,7 +206,7 @@ function SignIn() {
 
   const footer = (
     <p style={{ margin: 0, fontSize: 11, fontWeight: 500, color: '#999999', letterSpacing: '0.03em' }}>
-      kitifica.com · CC Controller
+      kitifica.com · CC Creator
     </p>
   );
 
@@ -270,7 +270,7 @@ function PairDevice({ onSubmit }) {
 
   const footer = (
     <p style={{ margin: 0, fontSize: 11, fontWeight: 500, color: '#999999', letterSpacing: '0.03em' }}>
-      kitifica.com · CC Controller
+      kitifica.com · CC Creator
     </p>
   );
 
@@ -300,7 +300,7 @@ function PaywallScreen() {
       card={
         <>
           <p style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 500, color: '#666666', lineHeight: 1.55 }}>
-            Un solo pago. Sin suscripción. Acceso permanente a CC Controller.
+            Un solo pago. Sin suscripción. Acceso permanente a CC Creator.
           </p>
           <a
             href="/pago"
@@ -322,7 +322,7 @@ function PaywallScreen() {
           </button>
         </>
       }
-      footer={<p style={{ margin: 0, fontSize: 11, fontWeight: 500, color: '#999999', letterSpacing: '0.03em' }}>kitifica.com · CC Controller</p>}
+      footer={<p style={{ margin: 0, fontSize: 11, fontWeight: 500, color: '#999999', letterSpacing: '0.03em' }}>kitifica.com · CC Creator</p>}
     />
   );
 }
@@ -330,7 +330,7 @@ function PaywallScreen() {
 function Unconfigured() {
   return (
     <Shell
-      hero={<><LogoMark size={80} /><h1 style={{ margin: '4px 0 0', fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em' }}>CC Controller</h1></>}
+      hero={<><LogoMark size={80} /><h1 style={{ margin: '4px 0 0', fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em' }}>CC Creator</h1></>}
       card={
         <>
           <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#1a1a1a' }}>Falta configurar Supabase</p>

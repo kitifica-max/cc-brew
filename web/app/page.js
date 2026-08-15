@@ -89,9 +89,14 @@ function CCController() {
   useEffect(() => {
     if (!currentProject?.isNew || !connected) return;
     sendEvent('starter-message', { projectId: currentId });
-    setProjects(prev => prev.map(p =>
-      p.id === currentId ? { ...p, isNew: false } : p
-    ));
+    // Don't mark isNew:false optimistically — wait for desktop ack ('starter-sent').
+    // Fallback: mark false after 5s if no ack arrives (desktop may be old version).
+    const fallback = setTimeout(() => {
+      setProjects(prev => prev.map(p =>
+        p.id === currentId ? { ...p, isNew: false } : p
+      ));
+    }, 5000);
+    return () => clearTimeout(fallback);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentId, connected]);
 
@@ -301,6 +306,18 @@ function CCController() {
       ));
     });
 
+    ch.on('broadcast', { event: 'env-state' }, ({ payload }) => {
+      if (!active) return;
+      setCurrentEnv(payload.env ?? {});
+    });
+
+    ch.on('broadcast', { event: 'starter-sent' }, ({ payload }) => {
+      if (!active) return;
+      setProjects(prev => prev.map(p =>
+        p.id === payload.projectId ? { ...p, isNew: false } : p
+      ));
+    });
+
     ch.on('broadcast', { event: 'project-state' }, ({ payload }) => {
       if (!active) return;
       resetDesktopTimeout();
@@ -343,6 +360,7 @@ function CCController() {
         setConnected(isNowConnected);
         if (isNowConnected) {
           ch.send({ type: 'broadcast', event: 'get-project-state', payload: { token: getSessionToken() } });
+          if (currentIdRef.current) ch.send({ type: 'broadcast', event: 'get-env', payload: { projectId: currentIdRef.current, token: getSessionToken() } });
           if (wasConnectedRef.current) addSystemMsg('✓ Conexión recuperada');
           wasConnectedRef.current = true;
           registerPush();
@@ -749,7 +767,7 @@ function CCController() {
       {/* Mac disclaimer */}
       <div style={{ background: '#fff', padding: '0 14px max(20px, env(safe-area-inset-bottom, 20px))', flexShrink: 0 }}>
         <p style={{ margin: 0, fontSize: 10, fontWeight: 500, color: '#bbb', textAlign: 'center', lineHeight: 1.4 }}>
-          Tu Mac debe estar encendida y con CC Controller abierto
+          Tu Mac debe estar encendida y con CC Creator abierto
         </p>
       </div>
 
