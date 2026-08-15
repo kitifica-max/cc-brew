@@ -78,6 +78,7 @@ function processBody(body, resolve) {
 
 function openBrewUpdate() {
   exec(`osascript -e 'tell application "Terminal" to do script "${BREW_UPDATE_CMD}"' -e 'tell application "Terminal" to activate'`);
+  setTimeout(() => app.quit(), 1000);
 }
 
 function getUptime() {
