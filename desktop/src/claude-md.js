@@ -1,4 +1,4 @@
-const PHASE_NAMES = ['', 'Ideación', 'POC Local', 'Lanzamiento', 'Backend', 'App Directa', 'Validación'];
+const PHASE_NAMES = ['', 'Ideación', 'POC Local', 'Lanzamiento', 'Backend', 'App Directa Completa', 'Validación'];
 
 const PHASE_ROLES = {
   1: `- Saluda al usuario y preséntate como su asistente de desarrollo en CC Creator
@@ -97,7 +97,7 @@ ${context}
 2. POC Local — Construir y probar localmente con web previewer
 3. Lanzamiento — GitHub + Netlify deploy
 4. Backend — Supabase: datos, auth, storage
-5. App Directa — Manifest, service worker, optimización
+5. App Directa Completa — Manifest, service worker, optimización
 6. Validación — Certificar en kitifica.com/validador/
 `;
 }
