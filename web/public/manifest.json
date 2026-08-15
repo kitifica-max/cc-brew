@@ -1,7 +1,7 @@
 {
-  "name": "CC Controller",
-  "short_name": "CC Controller",
-  "description": "Control Claude Code desde tu móvil",
+  "name": "CC Creator",
+  "short_name": "CC Creator",
+  "description": "De la idea a tu App Directa en 6 fases, guiado por Claude.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fde8e4",
