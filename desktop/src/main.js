@@ -38,6 +38,7 @@ let uptimeInterval = null;
 let powerBlockId = null;
 let updateAvailable = null; // { version } | null
 const BREW_UPDATE_CMD = 'brew upgrade --cask kitifica-max/tap/cc-controller';
+const EXEC_WHITELIST = new Set(['npm','npx','node','git','yarn','pnpm','bun','ls','pwd','cat','mkdir','touch','echo','python3','pip3','cargo','go','make']);
 let pendingFolderId = null; // set while PWA is waiting for user to pick a folder
 let previewProc = null;
 let trialDaysLeft = null; // null = paid/unknown, number = days remaining in trial
@@ -346,6 +347,29 @@ async function startSession() {
     } finally {
       if (downloaded) await bridge.deleteFromStorage(storageKey).catch(() => {});
     }
+  };
+
+  bridge.onExecCommand = (cmd, projectId) => {
+    const parts = (cmd ?? '').trim().split(/\s+/).filter(Boolean);
+    const bin = parts[0];
+    if (!bin || !EXEC_WHITELIST.has(bin)) {
+      bridge?.broadcastExecOutput(`⛔ No permitido: "${bin}". Comandos válidos: ${[...EXEC_WHITELIST].join(', ')}`, true, 1);
+      return;
+    }
+    const project = (projectId ? listProjects().find(p => p.id === projectId) : null) ?? getActive();
+    if (!project?.path) { bridge?.broadcastExecOutput('⛔ Sin proyecto activo.', true, 1); return; }
+
+    const proc = spawn(bin, parts.slice(1), { cwd: project.path, env: { ...process.env } });
+    let killed = false;
+    const timer = setTimeout(() => { killed = true; proc.kill(); }, 30_000);
+
+    proc.stdout.on('data', d => bridge?.broadcastExecOutput(d.toString(), false));
+    proc.stderr.on('data', d => bridge?.broadcastExecOutput(d.toString(), false));
+    proc.on('close', code => {
+      clearTimeout(timer);
+      bridge?.broadcastExecOutput(killed ? '\n[Timeout 30s: proceso terminado]' : '', true, code ?? 0);
+    });
+    proc.on('error', e => { clearTimeout(timer); bridge?.broadcastExecOutput(`Error: ${e.message}`, true, 1); });
   };
 
   bridge.onGetProjectState = (pwaProjects) => {

@@ -80,6 +80,7 @@ function CCController() {
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const projectsRef = useRef([]);
+  const [terminal, setTerminal] = useState({ open: false, lines: [], running: false, cmd: '' });
 
   useEffect(() => { currentIdRef.current = currentId; }, [currentId]);
   useEffect(() => { projectsRef.current = projects; }, [projects]);
@@ -319,6 +320,15 @@ function CCController() {
       setProjects(prev => prev.map(p =>
         p.id === payload.projectId ? { ...p, isNew: false } : p
       ));
+    });
+
+    ch.on('broadcast', { event: 'exec-output' }, ({ payload }) => {
+      if (!active || !payload?.text) return;
+      setTerminal(t => ({
+        ...t,
+        lines: [...t.lines, payload.text].slice(-200),
+        running: !payload.done,
+      }));
     });
 
     ch.on('broadcast', { event: 'project-state' }, ({ payload }) => {
@@ -725,13 +735,57 @@ function CCController() {
         </div>
       )}
 
+      {/* Terminal collapsible */}
+      {terminal.open && (
+        <div style={{ background: '#0d1117', borderTop: '1px solid #30363d', flexShrink: 0, display: 'flex', flexDirection: 'column', maxHeight: '40vh' }}>
+          <div style={{ padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid #21262d' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#7d8590', fontFamily: 'monospace', flex: 1 }}>
+              Terminal — {currentProject?.path?.replace(/^\/Users\/[^/]+/, '~') ?? '~'}
+            </span>
+            {terminal.running && <span style={{ fontSize: 10, color: '#3fb950', fontWeight: 700 }}>● ejecutando</span>}
+            <button onClick={() => setTerminal(t => ({ ...t, lines: [] }))} style={{ background: 'none', border: 'none', color: '#7d8590', cursor: 'pointer', fontSize: 11 }}>limpiar</button>
+          </div>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '8px 12px', fontFamily: 'monospace', fontSize: 12, color: '#e6edf3', whiteSpace: 'pre-wrap', wordBreak: 'break-all', minHeight: 60 }}>
+            {terminal.lines.length === 0
+              ? <span style={{ color: '#7d8590' }}>Sin output aún. Escribe un comando abajo.</span>
+              : terminal.lines.join('')}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderTop: '1px solid #21262d' }}>
+            <span style={{ color: '#3fb950', fontFamily: 'monospace', fontSize: 13, flexShrink: 0 }}>$</span>
+            <input
+              value={terminal.cmd}
+              onChange={e => setTerminal(t => ({ ...t, cmd: e.target.value }))}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && terminal.cmd.trim() && !terminal.running) {
+                  setTerminal(t => ({ ...t, lines: [...t.lines, `$ ${t.cmd}\n`], running: true }));
+                  sendEvent('exec-command', { cmd: terminal.cmd.trim(), projectId: currentId });
+                  setTerminal(t => ({ ...t, cmd: '' }));
+                }
+              }}
+              placeholder="npm run dev"
+              disabled={terminal.running}
+              style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', fontFamily: 'monospace', fontSize: 13, color: '#e6edf3' }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Quick actions */}
-      <div style={{ background: '#f5f5f5', padding: '8px 14px 4px', display: 'flex', gap: 7, overflowX: 'auto', flexShrink: 0 }}>
+      <div style={{ background: '#f5f5f5', padding: '8px 14px 4px', display: 'flex', gap: 7, overflowX: 'auto', flexShrink: 0, alignItems: 'center' }}>
         {QUICK.map(({ label, text }) => (
           <button key={label} onClick={() => sendRaw(text)} style={{ flexShrink: 0, background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 20, padding: '7px 14px', fontSize: 11, fontWeight: 700, color: '#555', cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'Sora, sans-serif' }}>
             {label}
           </button>
         ))}
+        <div style={{ flex: 1 }} />
+        <button
+          onClick={() => setTerminal(t => ({ ...t, open: !t.open }))}
+          title="Terminal"
+          style={{ flexShrink: 0, background: terminal.open ? '#1a1a1a' : '#fff', border: '1.5px solid #e0e0e0', borderRadius: 20, padding: '7px 12px', fontSize: 11, fontWeight: 700, color: terminal.open ? '#fff' : '#555', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          Terminal
+        </button>
       </div>
 
       {/* Input */}

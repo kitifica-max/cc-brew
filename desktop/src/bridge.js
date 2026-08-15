@@ -47,6 +47,7 @@ export default class Bridge {
     this.onPhaseChange = null;
     this.onStarterMessage = null;
     this.onGetEnv = null;
+    this.onExecCommand = null;
     this._heartbeatTimer = null;
     this._history = [];
     this._streamBuffers = new Map(); // msgId → { parts: string[], projectId }
@@ -183,6 +184,10 @@ export default class Bridge {
       .on('broadcast', { event: 'get-env' }, ({ payload }) => {
         if (!this._validate(payload)) return;
         this.onGetEnv?.(payload.projectId);
+      })
+      .on('broadcast', { event: 'exec-command' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this.onExecCommand?.(payload.cmd, payload.projectId ?? null);
       })
       .subscribe();
   }
@@ -353,6 +358,10 @@ export default class Bridge {
     this._heartbeatTimer = setInterval(() => {
       this.channel?.send({ type: 'broadcast', event: 'heartbeat', payload: { ts: Date.now() } });
     }, intervalMs);
+  }
+
+  broadcastExecOutput(text, done, exitCode) {
+    this.channel?.send({ type: 'broadcast', event: 'exec-output', payload: { text, done, exitCode: exitCode ?? null } });
   }
 
   disconnect() {
