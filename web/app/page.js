@@ -7,6 +7,7 @@ import AuthGate, { useTrial } from './components/AuthGate';
 import ProjectsList from './components/ProjectsList';
 import SettingsSheet from './components/SettingsSheet';
 import FileUpload from './components/FileUpload';
+import PhasePanel from './components/PhasePanel';
 
 const ICON_SETTINGS = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M14 17H5M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></g></svg>`;
 const ICON_SEND = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11zm7.318-19.539l-10.94 10.939"/></svg>`;
@@ -288,6 +289,13 @@ function CCController() {
     ch.on('broadcast', { event: 'mcp-config' }, ({ payload }) => {
       if (!active) return;
       setMcpConfig(payload.mcpServers ?? {});
+    });
+
+    ch.on('broadcast', { event: 'phase-changed' }, ({ payload }) => {
+      if (!active) return;
+      setProjects(prev => prev.map(p =>
+        p.id === payload.projectId ? { ...p, phase: payload.phase } : p
+      ));
     });
 
     ch.on('broadcast', { event: 'project-state' }, ({ payload }) => {
@@ -583,6 +591,16 @@ function CCController() {
               {desktopActive ? 'Desktop activo' : connected ? 'Desktop detenido' : 'Sin conexión'}
             </div>
             <UsageRings usage={sessionUsage} project={currentProject} />
+            {currentProject && (
+              <PhasePanel
+                phase={currentProject.phase ?? 1}
+                projectId={currentId}
+                onPhaseChange={(projectId, phase) => {
+                  setProjects(prev => prev.map(p => p.id === projectId ? { ...p, phase } : p));
+                  sendEvent('phase-change', { projectId, phase });
+                }}
+              />
+            )}
             <button
               onClick={() => setPreview(p => ({ ...p, show: true, url: null, loading: false }))}
               style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
