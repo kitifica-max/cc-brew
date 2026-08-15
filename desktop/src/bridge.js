@@ -137,7 +137,7 @@ export default class Bridge {
       })
       .on('broadcast', { event: 'get-project-state' }, ({ payload }) => {
         if (!this._validate(payload)) return;
-        this.onGetProjectState?.();
+        this.onGetProjectState?.(payload.projects ?? null);
         this._sendHistory(payload.projectId ?? null);
       })
       .on('broadcast', { event: 'save-env' }, ({ payload }) => {

@@ -79,8 +79,10 @@ function CCController() {
   const knownProjectIdsRef = useRef(new Set());
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const projectsRef = useRef([]);
 
   useEffect(() => { currentIdRef.current = currentId; }, [currentId]);
+  useEffect(() => { projectsRef.current = projects; }, [projects]);
   // streamingMsgRef se actualiza síncronamente en el chunk handler (no vía useEffect)
   // para evitar race: done chunk llega antes del render → ref null → mensaje desaparece.
   useEffect(() => { awaitingFolderIdRef.current = awaitingFolderId; }, [awaitingFolderId]);
@@ -360,7 +362,7 @@ function CCController() {
         const isNowConnected = s === 'SUBSCRIBED';
         setConnected(isNowConnected);
         if (isNowConnected) {
-          ch.send({ type: 'broadcast', event: 'get-project-state', payload: { token: getSessionToken() } });
+          ch.send({ type: 'broadcast', event: 'get-project-state', payload: { token: getSessionToken(), projects: projectsRef.current.map(p => ({ id: p.id, name: p.name })) } });
           if (currentIdRef.current) ch.send({ type: 'broadcast', event: 'get-env', payload: { projectId: currentIdRef.current, token: getSessionToken() } });
           if (wasConnectedRef.current && !reconnectMsgShownRef.current) {
             addSystemMsg('✓ Conexión recuperada');

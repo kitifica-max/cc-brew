@@ -38,7 +38,16 @@ function save(data) {
   writeFileSync(getConfigFile(), JSON.stringify(data, null, 2));
 }
 
-export function listProjects() { return load().projects; }
+export function listProjects() {
+  const data = load();
+  const alive = data.projects.filter(p => !p.path || existsSync(p.path));
+  if (alive.length !== data.projects.length) {
+    data.projects = alive;
+    if (!alive.find(p => p.id === data.activeId)) data.activeId = alive[0]?.id ?? null;
+    save(data);
+  }
+  return alive;
+}
 
 export function getActive() {
   const { projects, activeId } = load();

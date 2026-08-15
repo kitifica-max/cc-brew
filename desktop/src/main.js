@@ -348,7 +348,16 @@ async function startSession() {
     }
   };
 
-  bridge.onGetProjectState = () => broadcastProjects();
+  bridge.onGetProjectState = (pwaProjects) => {
+    if (Array.isArray(pwaProjects)) {
+      const stored = listProjects();
+      pwaProjects.forEach(({ id, name }) => {
+        const local = stored.find(p => p.id === id);
+        if (local && name && local.name !== name) renameProject(id, name);
+      });
+    }
+    broadcastProjects();
+  };
 
   bridge.onGetMcpConfig = (projectId) => {
     try {
