@@ -566,7 +566,6 @@ function CCController() {
           onSkipPermissionsChange={v => updateProjectSettings('skipPermissions', v)}
           onSpendLimitChange={v => updateProjectSettings('spendLimit', v)}
           onOpenDesktop={() => { sendEvent('open-claude-desktop', { projectId: currentId }); setShowSettings(false); }}
-          onSaveEnv={(env) => { sendEvent('save-env', { projectId: currentId, env }); setShowSettings(false); }}
           onSaveMcpConfig={(cfg) => { sendEvent('save-mcp-config', { projectId: currentId, mcpServers: cfg }); }}
           onOpenSecrets={() => { setShowSettings(false); setShowSecrets(true); }}
         />
@@ -764,7 +763,6 @@ function CCController() {
           onSkipPermissionsChange={v => updateProjectSettings('skipPermissions', v)}
           onSpendLimitChange={v => updateProjectSettings('spendLimit', v)}
           onOpenDesktop={() => { sendEvent('open-claude-desktop', { projectId: currentId }); setShowSettings(false); }}
-          onSaveEnv={(env) => { sendEvent('save-env', { projectId: currentId, env }); setShowSettings(false); }}
           onSaveMcpConfig={(cfg) => { sendEvent('save-mcp-config', { projectId: currentId, mcpServers: cfg }); }}
           onOpenSecrets={() => { setShowSettings(false); setShowSecrets(true); }}
         />

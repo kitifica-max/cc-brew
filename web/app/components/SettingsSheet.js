@@ -14,7 +14,7 @@ const ICON_BOT = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1e
 
 const EMPTY_SERVER = { name: '', command: '', args: '' };
 
-export default function SettingsSheet({ project, mcpConfig = {}, onClose, onModelChange, onEffortChange, onSkipPermissionsChange, onSpendLimitChange, onOpenDesktop, onSaveEnv, onSaveMcpConfig, onOpenSecrets }) {
+export default function SettingsSheet({ project, mcpConfig = {}, onClose, onModelChange, onEffortChange, onSkipPermissionsChange, onSpendLimitChange, onOpenDesktop, onSaveMcpConfig, onOpenSecrets }) {
   const [newToken, setNewToken] = useState('');
   const [tokenSaved, setTokenSaved] = useState(false);
   const [mcpServers, setMcpServers] = useState(mcpConfig);
