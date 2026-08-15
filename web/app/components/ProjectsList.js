@@ -63,12 +63,45 @@ function PhaseDots({ phase }) {
   );
 }
 
+const ONBOARDING_STEPS = [
+  {
+    n: 1,
+    title: 'Instala CC Creator en tu Mac',
+    body: 'Abre Terminal y ejecuta:',
+    code: 'brew install --cask kitifica-max/tap/cc-controller',
+  },
+  {
+    n: 2,
+    title: 'Crea tu primer proyecto',
+    body: 'Toca "Nuevo proyecto" aquí. CC Creator crea la carpeta en tu Mac y escribe el CLAUDE.md de la Fase 1 automáticamente.',
+  },
+  {
+    n: 3,
+    title: 'Guía a Claude desde tu iPhone',
+    body: 'Envía prompts, sube archivos y avanza de Fase cuando estés listo. Claude ya sabe exactamente en qué etapa va tu proyecto.',
+  },
+];
+
+const CC_LOGO = (
+  <svg width="52" height="52" viewBox="0 0 459.9 459.9" xmlns="http://www.w3.org/2000/svg">
+    <rect fill="#333" width="459.9" height="459.9" rx="60.8" ry="60.8"/>
+    <path fill="#ff582a" d="M350.7,202.2h0c-9.7,0-18.4,5.9-22.3,14.8-2.7,6.2-6.7,11.8-11.8,17-10.7,10.7-23.5,16.2-38.4,16.6-.5,0-1,0-1.6,0-15.6,0-28.9-5.5-39.9-16.5-1.3-1.3-2.4-2.6-3.6-3.9-8.6-10.2-13-22.2-13-36s4.3-25.8,13-36.1c-1.1-1.3-2.3-2.6-3.6-3.9-11.1-10.9-24.4-16.4-39.9-16.4s-1.1,0-1.6,0c-10.8,16.6-16.3,35.3-16.3,56.4s5.4,39.8,16.3,56.4c4.1,6.2,8.9,12.1,14.4,17.7,9.3,9.3,19.5,16.5,30.6,21.6,13.2,6.1,27.7,9.1,43.5,9.1,28.9,0,53.6-10.3,74.1-30.8s17.1-20.3,22.1-31.9c7-16-4.7-34-22.2-34h0Z"/>
+    <path fill="#ff582a" d="M278.2,137.7c14.9.4,27.7,5.8,38.4,16.4,5.2,5.2,9.1,10.9,11.8,17.1,3.9,8.9,12.6,14.8,22.3,14.8h0c17.5,0,29.2-18,22.2-34-5.1-11.6-12.5-22.3-22.2-32.1-20.5-20.4-45.2-30.6-74.1-30.6s-30.2,3.1-43.4,9.1c11.1,5.1,21.3,12.2,30.6,21.5,5.6,5.6,10.4,11.5,14.4,17.8h0Z"/>
+    <path fill="#ff9477" d="M263.8,202.2c-9.7,0-18.4,5.9-22.3,14.8-2.1,4.7-4.9,9.1-8.3,13.2,1.1,1.3,2.3,2.6,3.6,3.9,11,11,24.3,16.5,39.9,16.5s1,0,1.6,0c3-4.6,5.6-9.4,7.8-14.3,7-16-4.7-34-22.2-34h0Z"/>
+    <path fill="#ff9477" d="M188.1,250.5c-14.9-.4-27.7-5.8-38.3-16.5-11-11-16.5-24.3-16.5-39.9s5.5-28.9,16.5-39.9,23.9-16.1,38.3-16.5c.5,0,1.1,0,1.6,0,15.6,0,28.9,5.5,39.9,16.4,1.3,1.3,2.4,2.6,3.6,3.9,3.4,4.1,6.2,8.5,8.3,13.2,3.9,8.9,12.6,14.8,22.3,14.8h0c17.5,0,29.2-18,22.2-34-2.2-4.9-4.8-9.7-7.8-14.3-4-6.2-8.8-12.2-14.4-17.8-9.3-9.3-19.6-16.4-30.6-21.5-13.3-6.1-27.8-9.1-43.5-9.1-28.9,0-53.6,10.2-74.1,30.7-20.5,20.5-30.7,45.2-30.7,74.1s10.2,53.6,30.7,74.1c20.5,20.5,45.2,30.7,74.1,30.7s30.2-3.1,43.4-9.1c-11.1-5.1-21.3-12.2-30.6-21.6-5.6-5.6-10.4-11.5-14.4-17.7h0Z"/>
+  </svg>
+);
+
 export default function ProjectsList({ projects, currentId, awaitingFolder, onSwitch, onDelete, onCreate, onRename, onOpenFolder, onCancelFolder, onBack, onShowSettings, trialPill }) {
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
   const [confirmId, setConfirmId] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState('');
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return !localStorage.getItem('cc-onboarding-done');
+  });
 
   function handleCreate() {
     const name = newName.trim();
@@ -90,6 +123,55 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
     if (trimmed) onRename(id, trimmed);
     setEditingId(null);
   }
+
+  function dismissOnboarding() {
+    localStorage.setItem('cc-onboarding-done', '1');
+    setShowOnboarding(false);
+  }
+
+  if (showOnboarding) return (
+    <main style={{ height: '100dvh', background: '#f0f0f2', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ background: '#f04e23', padding: '52px 24px 28px', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+        {CC_LOGO}
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1 }}>Bienvenido a CC Creator</div>
+          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 6, lineHeight: 1.4 }}>De la idea a tu App Directa en 6 fases,<br/>desde tu iPhone.</div>
+        </div>
+      </div>
+
+      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 14px 0' }}>
+        <div style={{ background: '#fff', borderRadius: 20, padding: '20px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 6px 20px rgba(0,0,0,0.07)', marginBottom: 12 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#aaa', marginBottom: 18 }}>Primeros pasos</div>
+          {ONBOARDING_STEPS.map((s, i) => (
+            <div key={s.n} style={{ display: 'flex', gap: 14, marginBottom: i < ONBOARDING_STEPS.length - 1 ? 24 : 0 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#f04e23', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: '#fff' }}>{s.n}</div>
+                {i < ONBOARDING_STEPS.length - 1 && <div style={{ width: 1.5, flex: 1, background: 'rgba(240,78,35,0.18)', marginTop: 6 }} />}
+              </div>
+              <div style={{ paddingBottom: i < ONBOARDING_STEPS.length - 1 ? 8 : 0 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#111', letterSpacing: '-0.01em', marginBottom: 4 }}>{s.title}</div>
+                <div style={{ fontSize: 12, color: '#777', lineHeight: 1.5, marginBottom: s.code ? 8 : 0 }}>{s.body}</div>
+                {s.code && (
+                  <div style={{ background: '#1a1a1a', borderRadius: 8, padding: '8px 12px', fontSize: 11, fontFamily: 'monospace', color: '#e8e8e8', wordBreak: 'break-all', lineHeight: 1.5 }}>
+                    {s.code}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ padding: '12px 14px 40px', flexShrink: 0 }}>
+        <button
+          onClick={dismissOnboarding}
+          style={{ width: '100%', background: '#f04e23', border: 'none', borderRadius: 16, padding: '16px', fontSize: 16, fontWeight: 700, color: '#fff', cursor: 'pointer', boxShadow: '0 2px 12px rgba(240,78,35,0.35)', letterSpacing: '-0.01em' }}
+        >
+          Empezar →
+        </button>
+      </div>
+    </main>
+  );
 
   if (awaitingFolder) return (
     <main style={{ height: '100dvh', background: '#f5f5f5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, gap: 0 }}>
@@ -229,6 +311,28 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
         {others.length > 0 && (
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#aaa', padding: '2px 2px 0', marginTop: activeProject ? 2 : 0 }}>Recientes</div>
         )}
+        {/* Empty state */}
+        {projects.length === 0 && (
+          <div style={{ background: '#fff', borderRadius: 18, padding: '20px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.05)', border: '1px solid rgba(0,0,0,0.06)' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#ccc', marginBottom: 16 }}>Cómo empezar</div>
+            {ONBOARDING_STEPS.map((s, i) => (
+              <div key={s.n} style={{ display: 'flex', gap: 12, marginBottom: i < ONBOARDING_STEPS.length - 1 ? 16 : 0 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(240,78,35,0.1)', border: '1.5px solid rgba(240,78,35,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: '#f04e23' }}>{s.n}</div>
+                  {i < ONBOARDING_STEPS.length - 1 && <div style={{ width: 1.5, flex: 1, background: 'rgba(240,78,35,0.12)', marginTop: 4 }} />}
+                </div>
+                <div style={{ paddingBottom: i < ONBOARDING_STEPS.length - 1 ? 4 : 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#222', marginBottom: 2 }}>{s.title}</div>
+                  <div style={{ fontSize: 11, color: '#999', lineHeight: 1.5, marginBottom: s.code ? 6 : 0 }}>{s.body}</div>
+                  {s.code && (
+                    <div style={{ background: '#1a1a1a', borderRadius: 7, padding: '6px 10px', fontSize: 10, fontFamily: 'monospace', color: '#e8e8e8', wordBreak: 'break-all', lineHeight: 1.5 }}>{s.code}</div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {others.map(p => {
           const modelLabel = MODELS.find(m => m.id === p.model)?.label ?? p.model;
           const isEditing = editingId === p.id;
