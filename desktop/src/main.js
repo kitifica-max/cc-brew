@@ -2,6 +2,7 @@ import { app, Tray, Menu, nativeImage, shell, clipboard, dialog, powerSaveBlocke
 import { needsSetup, openSetupWindow } from './setup-window.js';
 import { createPanel, togglePanel, sendToPanel, isFirstOpen, markSeen } from './panel-window.js';
 import { createMenuWindow, toggleMenuWindow, sendToMenu } from './menu-window.js';
+import { openUpdaterWindow } from './updater-window.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { writeFileSync } from 'fs';
@@ -77,8 +78,7 @@ function processBody(body, resolve) {
 }
 
 function openBrewUpdate() {
-  exec(`osascript -e 'tell application "Terminal" to do script "${BREW_UPDATE_CMD}"' -e 'tell application "Terminal" to activate'`);
-  setTimeout(() => app.quit(), 1000);
+  openUpdaterWindow(() => app.quit());
 }
 
 function getUptime() {
@@ -547,13 +547,7 @@ ipcMain.handle('menu:check-updates', async () => {
   menuWin?.hide();
   const result = await checkForUpdates();
   if (result) {
-    dialog.showMessageBox({
-      type: 'info',
-      message: `Nueva versión: v${result.version}`,
-      detail: `Ejecuta:\n\n${BREW_UPDATE_CMD}`,
-      buttons: ['Actualizar ahora', 'Cerrar'],
-      defaultId: 0,
-    }).then(({ response }) => { if (response === 0) openBrewUpdate(); });
+    openBrewUpdate();
   } else {
     dialog.showMessageBox({ type: 'info', message: 'Ya tienes la última versión', detail: `v${app.getVersion()} está actualizado.` });
   }

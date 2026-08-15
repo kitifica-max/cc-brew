@@ -11,6 +11,7 @@ export function createMenuWindow() {
     frame: false,
     resizable: false,
     alwaysOnTop: true,
+    transparent: true,
     vibrancy: 'hud',
     backgroundColor: '#00000000',
     show: false,

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 360px;
+  background: transparent;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  font-size: 13px;
+  color: #fff;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-app-region: no-drag;
+}
+.wrap {
+  background: rgba(22,22,24,0.96);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 14px;
+  overflow: hidden;
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  padding: 20px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  -webkit-app-region: drag;
+}
+.logo {
+  width: 32px; height: 32px;
+  background: #f04e23;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: #fff;
+  flex-shrink: 0; letter-spacing: -0.5px;
+}
+.header-text { flex: 1; -webkit-app-region: drag; }
+.header-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); }
+.header-sub   { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 1px; }
+
+/* Progress */
+.progress-wrap {
+  background: rgba(255,255,255,0.07);
+  border-radius: 6px;
+  height: 6px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #f04e23, #ff7a50);
+  border-radius: 6px;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+.progress-bar.indeterminate {
+  width: 40%;
+  animation: slide 1.4s ease-in-out infinite;
+}
+@keyframes slide {
+  0%   { transform: translateX(-150%); }
+  50%  { transform: translateX(150%); }
+  100% { transform: translateX(350%); }
+}
+
+/* Status */
+.status {
+  font-size: 11.5px;
+  color: rgba(255,255,255,0.5);
+  min-height: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.status.error { color: rgba(255,100,100,0.8); }
+.status.done  { color: #22c55e; }
+
+/* Footer */
+.footer {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.version-badge {
+  font-size: 10px;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 0.02em;
+}
+.btn-close {
+  display: none;
+  padding: 5px 14px;
+  background: rgba(255,255,255,0.08);
+  border: none; border-radius: 6px;
+  color: rgba(255,255,255,0.6);
+  font-size: 11.5px; cursor: pointer;
+  -webkit-app-region: no-drag;
+  transition: background 0.12s;
+}
+.btn-close:hover { background: rgba(255,255,255,0.14); color: #fff; }
+.btn-close.visible { display: block; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="logo">CC</div>
+    <div class="header-text">
+      <div class="header-title">Actualizando CC Creator</div>
+      <div class="header-sub" id="ver-sub">Preparando...</div>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar indeterminate" id="bar"></div>
+  </div>
+  <div class="status" id="status">Iniciando actualización…</div>
+
+  <div class="footer">
+    <span class="version-badge" id="ver-badge"></span>
+    <button class="btn-close" id="btn-close">Cerrar</button>
+  </div>
+</div>
+
+<script>
+const bar       = document.getElementById('bar');
+const statusEl  = document.getElementById('status');
+const verBadge  = document.getElementById('ver-badge');
+const verSub    = document.getElementById('ver-sub');
+const btnClose  = document.getElementById('btn-close');
+
+document.getElementById('btn-close').addEventListener('click', () => updater.close());
+
+updater.onProgress(({ phase, text, pct, from, to, error }) => {
+  if (from && to) {
+    verBadge.textContent = `${from} → ${to}`;
+    verSub.textContent   = `${from} → ${to}`;
+  }
+
+  if (phase === 'indeterminate') {
+    bar.className = 'progress-bar indeterminate';
+    statusEl.className = 'status';
+    statusEl.textContent = text || 'Descargando…';
+  } else if (phase === 'progress') {
+    bar.className = 'progress-bar';
+    bar.style.width = `${pct}%`;
+    statusEl.className = 'status';
+    statusEl.textContent = text || 'Instalando…';
+  } else if (phase === 'done') {
+    bar.className = 'progress-bar';
+    bar.style.width = '100%';
+    statusEl.className = 'status done';
+    statusEl.textContent = '¡Listo! CC Creator se reiniciará en segundos…';
+  } else if (phase === 'error') {
+    bar.className = 'progress-bar';
+    bar.style.width = '100%';
+    bar.style.background = 'rgba(239,68,68,0.7)';
+    statusEl.className = 'status error';
+    statusEl.textContent = error || 'Error en la actualización.';
+    btnClose.classList.add('visible');
+    verSub.textContent = 'Error';
+  } else if (phase === 'already') {
+    bar.className = 'progress-bar';
+    bar.style.width = '100%';
+    statusEl.className = 'status done';
+    statusEl.textContent = 'Ya tienes la última versión instalada.';
+    btnClose.classList.add('visible');
+  }
+});
+</script>
+</body>
+</html>
