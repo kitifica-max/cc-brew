@@ -1,24 +1,24 @@
 <meta charset="UTF-8">
-<title>CC Creator — Tu interfaz móvil para Claude Code</title>
+<title>CC Creator — De la idea a tu App Directa, guiado por Claude</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="description" content="Controla Claude Code desde tu iPhone. Inicia tareas, dicta instrucciones por voz, cambia de proyecto y sigue el trabajo de Claude en tiempo real. Sin SSH. Sin túneles. $4.99 pago único.">
+<meta name="description" content="Sistema de 6 fases que guía a Claude a construir tu App Directa desde el iPhone. Ideación → POC → Lanzamiento → Backend → App Directa Completa → Validación. Open Source · $4.99 pago único.">
 <meta name="robots" content="index, follow">
 <meta name="author" content="Kitifica">
 <link rel="canonical" href="https://ccc.kitifica.com/landing/">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="CC Creator">
-<meta property="og:title" content="CC Creator — Tu interfaz móvil para Claude Code">
-<meta property="og:description" content="Controla Claude Code desde tu iPhone. Sin SSH. Sin túneles. $4.99 pago único.">
+<meta property="og:title" content="CC Creator — De la idea a tu App Directa, guiado por Claude">
+<meta property="og:description" content="Sistema de 6 fases que guía a Claude a construir tu App Directa. Open Source · $4.99 pago único.">
 <meta property="og:url" content="https://ccc.kitifica.com/landing/">
 <meta property="og:image" content="https://ccc.kitifica.com/icon-512.png">
 <meta property="og:image:width" content="512">
 <meta property="og:image:height" content="512">
 <meta property="og:locale" content="es_ES">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="CC Creator — Tu interfaz móvil para Claude Code">
-<meta name="twitter:description" content="Controla Claude Code desde tu iPhone. Sin SSH. Sin túneles. $4.99 pago único.">
+<meta name="twitter:title" content="CC Creator — De la idea a tu App Directa, guiado por Claude">
+<meta name="twitter:description" content="Sistema de 6 fases que guía a Claude a construir tu App Directa. Open Source · $4.99 pago único.">
 <meta name="twitter:image" content="https://ccc.kitifica.com/icon-512.png">
 
 <script type="application/ld+json">
@@ -223,6 +223,46 @@ nav {
   cursor: pointer; transition: all var(--tr); min-height: 36px; display: flex; align-items: center;
 }
 .qbtn:hover { background: var(--orange-dim); border-color: var(--border-warm); color: var(--orange); }
+
+/* ─── 6 FASES ─────────────────────────────────── */
+.phases { padding: 80px 20px; }
+.phases-inner { max-width: 860px; margin: 0 auto; text-align: center; }
+.phases-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 12px; margin-top: 48px; text-align: left;
+}
+@media (max-width: 700px) { .phases-grid { grid-template-columns: 1fr; } }
+.phase-card {
+  background: var(--ink-2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px 22px;
+  transition: border-color var(--tr-md), transform var(--tr-md);
+  position: relative; overflow: hidden;
+}
+.phase-card:hover { border-color: var(--border-warm); transform: translateY(-2px); }
+.phase-card.active-phase { border-color: var(--orange); background: linear-gradient(135deg, rgba(240,78,35,0.07), var(--ink-2)); }
+.phase-card.active-phase::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(to right, var(--orange), rgba(240,78,35,0.3));
+}
+.phase-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 8px; font-size: 13px; font-weight: 800;
+  margin-bottom: 14px; flex-shrink: 0;
+  background: var(--orange-dim); border: 1px solid var(--border-warm); color: var(--orange);
+}
+.phase-card:not(.active-phase) .phase-num {
+  background: rgba(255,255,255,0.05); border-color: var(--border); color: var(--text-3);
+}
+.phase-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+.phase-desc { font-size: 12px; color: var(--text-3); line-height: 1.6; }
+.phase-tag {
+  margin-top: 12px; display: inline-block; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--orange);
+  background: var(--orange-dim); border: 1px solid var(--border-warm);
+  padding: 3px 8px; border-radius: 6px;
+}
+.phases-cta { margin-top: 48px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.phases-note { margin-top: 20px; font-size: 12px; color: var(--text-3); line-height: 1.6; }
 
 /* ─── AHA MOMENT ──────────────────────────────── */
 .aha { padding: 80px 20px; }
@@ -648,7 +688,7 @@ footer {
     <a class="nav-link" href="#price">Precio</a>
     <a class="nav-link" href="#faq">FAQ</a>
   </div>
-  <a class="nav-cta" href="#install">Instalar gratis</a>
+  <a class="nav-cta" href="#install">Empezar gratis →</a>
 </nav>
 
 <!-- ═══════════════════ HERO ═══════════════════ -->
@@ -659,83 +699,144 @@ footer {
     <div class="hero-left">
       <div class="hero-badge">
         <div class="hero-badge-dot"><div class="hero-badge-pulse"></div></div>
-        Open Source · v1.6.0
+        Nuevo · Sistema de 6 fases
       </div>
-      <h1>Tu Claude Code.<br>Tu Mac.<br><span>Tu móvil.</span></h1>
-      <p class="hero-tagline">Controla tus proyectos de Claude Code estés donde estés.</p>
+      <h1>De la idea a tu<br><span>App Directa.</span><br>Guiado por Claude.</h1>
+      <p class="hero-tagline">CC Creator guía a Claude a través de 6 fases: desde definir tu idea hasta lanzar y certificar tu App Directa. Desde tu iPhone.</p>
       <div class="hero-bullets">
-        <div class="hero-bullet">Inicia tareas y dicta instrucciones por voz</div>
-        <div class="hero-bullet">Cambia de proyecto y envía archivos</div>
-        <div class="hero-bullet">Sigue el trabajo de Claude en tiempo real</div>
-        <div class="hero-bullet">Sin SSH · Sin túneles · Sin abrir puertos</div>
+        <div class="hero-bullet">6 fases: Ideación → POC → Lanzamiento → Backend → App Directa → Validación</div>
+        <div class="hero-bullet">Claude tiene el contexto exacto de cada fase — sin repetirle nada</div>
+        <div class="hero-bullet">Controla el avance tú: avanza cuando estés listo</div>
+        <div class="hero-bullet">Sin SSH · Sin túneles · Tu código permanece en tu Mac</div>
       </div>
       <div class="hero-actions">
         <a class="btn-primary" href="#install">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          Instalar — 7 días gratis
+          Empieza tu primera App Directa →
         </a>
         <a class="btn-ghost" href="https://github.com/kitifica-max/cc-controller" target="_blank" rel="noopener">
-          Ver en GitHub →
+          Ver en GitHub · Open Source
         </a>
       </div>
-      <div class="hero-price-note">Prueba gratis 7 días · luego <strong>$4.99</strong> pago único</div>
+      <div class="hero-price-note">7 días gratis · luego <strong>$4.99</strong> pago único · sin suscripción</div>
       <div class="hero-reqs">
         Requiere macOS + Claude Code CLI · Apple Silicon / Intel<br>
-        <em>Open Source · Sin API propia · Tu código permanece en tu Mac</em>
+        <em>Open Source · MIT · Sin API propia · Tu código permanece en tu Mac</em>
       </div>
     </div>
 
     <div class="hero-right">
-      <img id="hero-phone" src="mu_1_ccc.png" alt="CC Creator en iPhone" />
+      <img id="hero-phone" src="mu_2_ccc.png" alt="CC Creator — Sistema de 6 fases en iPhone" />
     </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ 6 FASES ═══════════════════ -->
+<section class="phases" id="fases">
+  <div class="phases-inner">
+    <span class="section-eyebrow">El proceso que funciona</span>
+    <h2 class="section-title">6 fases. De la idea<br>a la App Directa.</h2>
+    <p class="section-sub" style="margin: 16px auto 0; text-align: center;">Claude recibe las instrucciones correctas en cada etapa — automáticamente, sin que tengas que explicarle nada.</p>
+    <div class="phases-grid">
+
+      <div class="phase-card active-phase">
+        <div class="phase-num">1</div>
+        <div class="phase-name">Ideación</div>
+        <div class="phase-desc">Claude presenta el proceso completo, escucha tu idea, elige el stack más adecuado y explica la filosofía Local First. Sin codear hasta tener claridad total.</div>
+        <span class="phase-tag">Empieza aquí</span>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num">2</div>
+        <div class="phase-name">POC Local</div>
+        <div class="phase-desc">Claude construye iterativamente. El web previewer de CC Creator te muestra el avance en tiempo real desde tu iPhone. Funcionalidad core primero.</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num">3</div>
+        <div class="phase-name">Lanzamiento</div>
+        <div class="phase-desc">Claude te guía para obtener GITHUB_TOKEN y NETLIFY_AUTH_TOKEN, crea el repositorio y hace el primer deploy. Tu app tiene URL pública.</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num">4</div>
+        <div class="phase-name">Backend</div>
+        <div class="phase-desc">Conecta Supabase: base de datos, autenticación y storage. Claude implementa el schema según las necesidades de tu POC y migra datos locales.</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num">5</div>
+        <div class="phase-name">App Directa Completa</div>
+        <div class="phase-desc">Manifest, service worker, secrets de producción, optimización de performance y accesibilidad. Tu app lista para instalarse desde el navegador.</div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num">6</div>
+        <div class="phase-name">Validación</div>
+        <div class="phase-desc">Claude abre kitifica.com/validador/ con la URL de tu proyecto. Revisa el checklist completo y corrige issues. Certificación Kitifica.</div>
+      </div>
+
+    </div>
+    <div class="phases-cta">
+      <a class="btn-primary" href="#install">Empieza tu primera App Directa →</a>
+    </div>
+    <p class="phases-note">Tú controlas el avance. Toca "Avanzar a Fase X" cuando estés listo — CC Creator reescribe el contexto de Claude automáticamente.</p>
   </div>
 </section>
 
 <!-- ═══════════════════ AHA MOMENT ═══════════════════ -->
 <section class="aha">
   <div class="aha-inner">
-    <span class="section-eyebrow">Por qué lo necesitas</span>
-    <h2 class="section-title">Claude puede seguir trabajando<br>aunque tú te vayas.</h2>
-    <p class="section-sub" style="margin: 16px auto 0; text-align: center;">Imagina esto:</p>
+    <span class="section-eyebrow">Así se ve en la práctica</span>
+    <h2 class="section-title">De "tengo una idea"<br>a "ya está en vivo".</h2>
+    <p class="section-sub" style="margin: 16px auto 0; text-align: center;">Una sesión real de CC Creator:</p>
 
     <div class="aha-scene">
       <div class="aha-row">
-        <div class="aha-time">09:42</div>
+        <div class="aha-time">09:02</div>
         <div class="aha-device phone"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></div>
-        <div class="aha-bubble sent">
-          "Refactoriza el sistema de autenticación y ejecuta los tests cuando termines."
+        <div class="aha-bubble sent">Nuevo proyecto: mi-tienda</div>
+      </div>
+      <div class="aha-connector"><div class="aha-connector-line"></div></div>
+      <div class="aha-row right">
+        <div class="aha-time">09:02</div>
+        <div class="aha-device mac"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="4" rx="2"/><path d="M2 20h20"/></svg></div>
+        <div class="aha-bubble">
+          <strong style="color: var(--teal);">Claude · Fase 1 · Ideación</strong><br>
+          Hola. Vamos a construir mi-tienda. Aquí están las 6 fases que seguiremos. Cuéntame: ¿qué quieres que haga tu tienda?
+        </div>
+      </div>
+      <div class="aha-connector"><div class="aha-connector-line"></div></div>
+      <div class="aha-row">
+        <div class="aha-time">09:15</div>
+        <div class="aha-device phone"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></div>
+        <div class="aha-bubble sent" style="display:flex;align-items:center;gap:8px;">
+          <span style="background:var(--orange);border-radius:8px;padding:2px 8px;font-size:10px;font-weight:800;">Fase 2 · POC Local ▸</span>
+          Avanzar a POC Local
         </div>
       </div>
       <div class="aha-connector"><div class="aha-connector-line"></div></div>
       <div class="aha-row right">
-        <div class="aha-time">09:43</div>
+        <div class="aha-time">10:41</div>
         <div class="aha-device mac"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="4" rx="2"/><path d="M2 20h20"/></svg></div>
         <div class="aha-bubble">
-          <strong style="color: var(--teal);">Claude Code</strong><br>
-          Trabajando en tu Mac…
+          <strong style="color: var(--teal);">Claude · Fase 2 · POC Local</strong><br>
+          POC listo. Tienes carrito, checkout y catálogo funcionando. Web previewer activo en tu iPhone. ¿Probamos antes de lanzar?
         </div>
       </div>
       <div class="aha-connector"><div class="aha-connector-line"></div></div>
       <div class="aha-row">
-        <div class="aha-time">10:17</div>
+        <div class="aha-time">10:43</div>
         <div class="aha-device phone"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></div>
-        <div class="aha-bubble" style="background: var(--ink-3); border-color: var(--border-warm);">
-          "Encontré un problema con la validación de tokens. ¿Quieres que lo corrija?"
-        </div>
-      </div>
-      <div class="aha-connector"><div class="aha-connector-line"></div></div>
-      <div class="aha-row">
-        <div class="aha-time">10:17</div>
-        <div class="aha-device phone"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></div>
-        <div class="aha-bubble sent">sí</div>
+        <div class="aha-bubble sent">Se ve bien. Lanzamos.</div>
       </div>
     </div>
 
     <div class="aha-punchline">
-      Respondes desde tu iPhone.<br>
-      Claude continúa.<br>
-      <em>Tú sigues con tu día.</em><br>
-      <span style="font-weight: 400; color: var(--text-2); font-size: 16px;">No tienes que estar frente a tu Mac para seguir trabajando.</span>
+      Claude sabe qué hacer en cada fase.<br>
+      Tú decides cuándo avanzar.<br>
+      <em>El proceso, siempre claro.</em><br>
+      <span style="font-weight: 400; color: var(--text-2); font-size: 16px;">Sin perderte. Sin repetirle nada a Claude. Sin saber por dónde empezar.</span>
     </div>
   </div>
 </section>
@@ -782,18 +883,17 @@ footer {
       </div>
 
       <div class="not-chatbot-copy">
-        <h2>No es otro chatbot.<br><em>Es tu Claude Code.</em></h2>
+        <h2>No le repites nada.<br><em>Claude ya sabe.</em></h2>
         <p>
-          CC Creator no reemplaza Claude Code ni ejecuta una versión simplificada de él.
-          <strong>Claude Code sigue ejecutándose en tu Mac</strong>, con acceso a tus proyectos,
-          archivos, herramientas y entorno local.
+          Cada vez que avanzas de fase, CC Creator escribe un <strong>CLAUDE.md automático</strong>
+          en tu proyecto. Claude Code lo lee nativamente antes de cada tarea.
         </p>
         <p>
-          Tu iPhone se convierte en el <strong>control remoto de ese entorno</strong>.
-          Mismo Claude, mismos proyectos, mismo contexto. Solo que ahora desde el bolsillo.
+          Sin copiar contexto. Sin instrucciones manuales. Claude sabe en qué fase está,
+          qué acordaste, y qué sigue. <strong>Cada sesión empieza donde dejaste.</strong>
         </p>
         <p style="color: var(--text-3); font-size: 13px;">
-          Tu código no pasa por nuestros servidores. Claude se ejecuta localmente.
+          Tu código no pasa por nuestros servidores. Claude se ejecuta localmente en tu Mac.
           La conexión es cifrada y privada por diseño.
         </p>
       </div>
@@ -934,7 +1034,7 @@ footer {
 <section class="comparison">
   <div class="comparison-inner">
     <span class="section-eyebrow">¿Por qué CC Creator?</span>
-    <h2 class="section-title">Diseñado para este workflow.</h2>
+    <h2 class="section-title">Solo Claude Code vs. CC Creator.</h2>
     <div class="compare-table">
       <div class="compare-header">
         <div class="col">Característica</div>
@@ -942,17 +1042,17 @@ footer {
         <div class="col highlight">CC Creator</div>
       </div>
       <div class="compare-row"><div class="feat-name">Claude Code en tu Mac</div><div class="val yes">✓</div><div class="val yes">✓</div></div>
-      <div class="compare-row"><div class="feat-name">Control desde móvil</div><div class="val no">—</div><div class="val yes">✓</div></div>
-      <div class="compare-row"><div class="feat-name">Interfaz propia para tu workflow</div><div class="val no">—</div><div class="val yes">✓</div></div>
-      <div class="compare-row"><div class="feat-name">Gestión visual de proyectos</div><div class="val no">—</div><div class="val yes">✓</div></div>
+      <div class="compare-row"><div class="feat-name">Sistema de 6 fases guiadas</div><div class="val no">—</div><div class="val yes">✓</div></div>
+      <div class="compare-row"><div class="feat-name">CLAUDE.md automático por fase</div><div class="val no">—</div><div class="val yes">✓</div></div>
+      <div class="compare-row"><div class="feat-name">Control desde iPhone</div><div class="val no">—</div><div class="val yes">✓</div></div>
+      <div class="compare-row"><div class="feat-name">App Directa (PWA) con web previewer</div><div class="val no">—</div><div class="val yes">✓</div></div>
+      <div class="compare-row"><div class="feat-name">Secrets por categoría</div><div class="val no">—</div><div class="val yes">✓</div></div>
       <div class="compare-row"><div class="feat-name">Instrucciones por voz</div><div class="val no">—</div><div class="val yes">✓</div></div>
-      <div class="compare-row"><div class="feat-name">Acciones rápidas</div><div class="val no">—</div><div class="val yes">✓</div></div>
       <div class="compare-row"><div class="feat-name">Selección de modelo y esfuerzo</div><div class="val yes">✓</div><div class="val yes">✓</div></div>
-      <div class="compare-row"><div class="feat-name">Envío de archivos</div><div class="val yes">✓</div><div class="val yes">✓</div></div>
       <div class="compare-row"><div class="feat-name">Open Source</div><div class="val no">—</div><div class="val yes">✓</div></div>
       <div class="compare-row"><div class="feat-name">Precio adicional</div><div class="val no" style="font-size:11px">Incluido en Claude</div><div class="val special">$4.99 una vez</div></div>
     </div>
-    <p style="font-size: 12px; color: var(--text-3); text-align: center; margin-top: 16px;">La ventaja no es que otros no puedan hacer X. Es que CC Creator está diseñado específicamente para este workflow.</p>
+    <p style="font-size: 12px; color: var(--text-3); text-align: center; margin-top: 16px;">CC Creator no reemplaza Claude Code. Lo envuelve en un proceso con estructura, contexto automático y una App Directa al final.</p>
   </div>
 </section>
 
@@ -976,8 +1076,8 @@ footer {
       </div>
       <div class="step-card">
         <div class="step-n">03</div>
-        <h3>Controla Claude Code</h3>
-        <p>Elige tu proyecto, envía instrucciones y recibe las respuestas de Claude en tiempo real desde cualquier lugar.</p>
+        <h3>Empieza tu primera App Directa</h3>
+        <p>Crea un proyecto, entra a Fase 1 y dile a Claude qué quieres construir. CC Creator guía todo el proceso hasta el lanzamiento.</p>
         <div class="step-note">Requiere Claude Code CLI instalado en tu Mac.</div>
       </div>
     </div>
@@ -1103,18 +1203,18 @@ footer {
       </div>
       <div class="price-period"><em>Pago único · Acceso de por vida</em></div>
       <div class="price-features">
-        <div class="price-feat">Control de Claude Code desde tu iPhone</div>
-        <div class="price-feat">Instrucciones por voz (voz → texto)</div>
-        <div class="price-feat">Gestión visual de proyectos</div>
-        <div class="price-feat">Acciones rápidas configurables</div>
-        <div class="price-feat">Streaming en tiempo real</div>
-        <div class="price-feat">Envío de archivos al proyecto</div>
+        <div class="price-feat">Sistema de 6 fases guiadas</div>
+        <div class="price-feat">CLAUDE.md automático por fase</div>
+        <div class="price-feat">App Directa con web previewer en iPhone</div>
+        <div class="price-feat">Secrets por categoría</div>
+        <div class="price-feat">Control desde iPhone · Instrucciones por voz</div>
         <div class="price-feat">Selección de modelo y esfuerzo</div>
+        <div class="price-feat">Streaming en tiempo real</div>
         <div class="price-feat">Prueba gratis de 7 días</div>
         <div class="price-feat">Open Source · Código auditable</div>
       </div>
       <div class="price-cta-wrap">
-        <a class="price-cta" href="#install">Instalar — 7 días gratis</a>
+        <a class="price-cta" href="#install">Empieza tu primera App Directa →</a>
         <div class="price-note-row">Luego $4.99 · Sin suscripción · Pago seguro con 3DS desde la app</div>
       </div>
     </div>
@@ -1130,6 +1230,12 @@ footer {
     <span class="section-eyebrow">Preguntas frecuentes</span>
     <h2 class="section-title">Todo lo que necesitas saber.</h2>
     <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.querySelector('.faq-a').style.display = this.parentElement.querySelector('.faq-a').style.display === 'none' ? 'block' : 'none'">
+          ¿Qué es una App Directa? <span class="faq-q-icon">+</span>
+        </button>
+        <div class="faq-a" style="display: none;">App Directa es el nombre de Kitifica para las Progressive Web Apps (PWA). Son apps que funcionan desde el navegador, se instalan en el iPhone sin App Store, y tienen acceso a notificaciones, cámara y modo offline. CC Creator guía a Claude para construir tu App Directa en la Fase 5 del sistema de 6 fases.</div>
+      </div>
       <div class="faq-item">
         <button class="faq-q" onclick="this.parentElement.querySelector('.faq-a').style.display = this.parentElement.querySelector('.faq-a').style.display === 'none' ? 'block' : 'none'">
           ¿Necesito Claude Code? <span class="faq-q-icon">+</span>
@@ -1206,7 +1312,7 @@ footer {
         </svg>
         <span class="footer-name">CC Creator</span>
       </div>
-      <div class="footer-tagline">Claude trabaja en tu Mac. Tú decides desde dónde.<br>Open Source · MIT License · $4.99 pago único</div>
+      <div class="footer-tagline">De la idea a tu App Directa, guiado por Claude.<br>Open Source · MIT License · $4.99 pago único</div>
     </div>
     <div class="footer-links">
       <a class="footer-link" href="https://github.com/kitifica-max/cc-controller" target="_blank" rel="noopener">GitHub</a>
