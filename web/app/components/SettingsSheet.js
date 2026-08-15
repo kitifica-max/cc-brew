@@ -12,17 +12,15 @@ const ICON_LINK = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1
 const ICON_PLUG = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M12 22v-5M9 8V2M15 8V2M18 8H6a1 1 0 0 0-1 1v3a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4V9a1 1 0 0 0-1-1Z"/></g></svg>`;
 const ICON_BOT = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M9 13v2M15 13v2"/></g></svg>`;
 
-const ENV_KEYS = ['GITHUB_TOKEN', 'NETLIFY_AUTH_TOKEN', 'SUPABASE_SERVICE_KEY'];
-const EMPTY_ENV = Object.fromEntries(ENV_KEYS.map(k => [k, '']));
 const EMPTY_SERVER = { name: '', command: '', args: '' };
 
-export default function SettingsSheet({ project, mcpConfig = {}, onClose, onModelChange, onEffortChange, onSkipPermissionsChange, onSpendLimitChange, onOpenDesktop, onSaveEnv, onSaveMcpConfig }) {
-  const [envData, setEnvData] = useState(EMPTY_ENV);
+export default function SettingsSheet({ project, mcpConfig = {}, onClose, onModelChange, onEffortChange, onSkipPermissionsChange, onSpendLimitChange, onOpenDesktop, onSaveMcpConfig, onOpenSecrets }) {
   const [newToken, setNewToken] = useState('');
   const [tokenSaved, setTokenSaved] = useState(false);
   const [mcpServers, setMcpServers] = useState(mcpConfig);
   const [newServer, setNewServer] = useState(EMPTY_SERVER);
   const [mcpSaved, setMcpSaved] = useState(false);
+  // envData / handleSaveEnv removed — replaced by SecretsSheet
 
   useEffect(() => { setMcpServers(mcpConfig); }, [mcpConfig]);
 
@@ -55,13 +53,6 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
     delete updated[name];
     setMcpServers(updated);
     onSaveMcpConfig?.(updated);
-  }
-
-  function handleSaveEnv() {
-    const filtered = Object.fromEntries(Object.entries(envData).filter(([, v]) => v.trim() !== ''));
-    if (Object.keys(filtered).length === 0) return;
-    onSaveEnv(filtered);
-    setEnvData(EMPTY_ENV);
   }
 
   return (
@@ -140,38 +131,19 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
         </div>
 
         {/* Env / Secrets */}
-        <div style={{ marginBottom: 24, padding: 16, background: '#f5f5f5', borderRadius: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
             <span style={{ display: 'flex', width: 14, height: 14, color: '#f04e23' }} dangerouslySetInnerHTML={{ __html: ICON_KEY }} />
             <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#999999' }}>
               Entorno / Secretos (.env)
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
-            {ENV_KEYS.map(key => (
-              <input
-                key={key}
-                type="password"
-                placeholder={key}
-                value={envData[key]}
-                onChange={e => setEnvData(prev => ({ ...prev, [key]: e.target.value }))}
-                style={{
-                  background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 10,
-                  padding: '10px 14px', fontSize: 12, fontFamily: 'Sora, sans-serif',
-                  outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box',
-                }}
-              />
-            ))}
-          </div>
           <button
-            onClick={handleSaveEnv}
-            style={{
-              width: '100%', background: '#f04e23', border: 'none', borderRadius: 10,
-              padding: '10px', fontSize: 12, fontWeight: 700, color: '#fff',
-              cursor: 'pointer', fontFamily: 'Sora, sans-serif',
-            }}
+            onClick={onOpenSecrets}
+            style={{ width: '100%', background: '#f5f5f5', border: '1.5px solid #e0e0e0', borderRadius: 12, padding: '12px 16px', color: '#1a1a1a', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, fontFamily: 'Sora, sans-serif' }}
           >
-            Guardar e Inyectar en Local
+            <span>Variables de entorno & Secrets</span>
+            <span style={{ color: '#999' }}>→</span>
           </button>
         </div>
 

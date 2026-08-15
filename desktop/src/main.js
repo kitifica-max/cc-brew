@@ -7,7 +7,7 @@ import { get as httpsGet } from 'https';
 import dotenv from 'dotenv';
 import PtyManager from './pty.js';
 import Bridge from './bridge.js';
-import { createProject, switchProject, getActive, listProjects, deleteProject, saveProjectEnv, addExistingProject, readMcpConfig, saveMcpConfig } from './projects.js';
+import { createProject, switchProject, getActive, listProjects, deleteProject, saveProjectEnv, readProjectEnv, addExistingProject, readMcpConfig, saveMcpConfig, writeClaude, updateProjectPhase } from './projects.js';
 import { ALLOWED_EXTENSIONS, MAX_FILE_BYTES } from './bridge.js';
 import { getSupabaseConfig } from './supabase-config.js';
 import { createFileAuthStorage, AUTH_STORAGE_KEY } from './auth-store.js';
@@ -66,7 +66,7 @@ function processBody(body, resolve) {
     if (isNewer) {
       updateAvailable = { version: latest };
       if (tray) setTrayMenu(bridge !== null ? 'running' : 'stopped');
-      bridge?.sendPush('CC Controller', `Nueva versión v${latest} disponible — abre el menú del tray para actualizar`).catch(() => {});
+      bridge?.sendPush('CC Creator', `Nueva versión v${latest} disponible — abre el menú del tray para actualizar`).catch(() => {});
     }
   } catch (_) {}
   resolve(updateAvailable);
@@ -88,7 +88,7 @@ function buildMenu(status) {
     ? (trialDaysLeft === 0 ? 'Prueba: vence hoy' : `Prueba: ${trialDaysLeft} día${trialDaysLeft === 1 ? '' : 's'} restante${trialDaysLeft === 1 ? '' : 's'}`)
     : null;
   const items = [
-    { label: 'CC Controller', enabled: false },
+    { label: 'CC Creator', enabled: false },
     { label: `Estado: ${status}`, enabled: false },
     ...(trialLabel ? [{ label: trialLabel, enabled: false }] : []),
   ];
@@ -161,7 +161,7 @@ function buildMenu(status) {
 
 function setTrayMenu(status) {
   tray.setContextMenu(buildMenu(status));
-  tray.setToolTip(`CC Controller — ${status}`);
+  tray.setToolTip(`CC Creator — ${status}`);
 }
 
 async function openFolderDialog() {
@@ -182,6 +182,7 @@ async function openFolderDialog() {
   const name = path.basename(folderPath);
   try {
     const project = addExistingProject(id, name, folderPath);
+    writeClaude(project.path, project);
     pty.spawn('claude', [], project.path);
     setTrayMenu('running');
     broadcastProjects();
@@ -221,7 +222,7 @@ async function startSession() {
     bridge = null;
     await dialog.showMessageBox({
       type: 'warning',
-      message: 'Tu sesión de CC Controller expiró.',
+      message: 'Tu sesión de CC Creator expiró.',
       detail: 'Vuelve a iniciar sesión con el mismo correo que usas en la PWA.',
     });
     await openSetupWindow();
@@ -246,7 +247,7 @@ async function startSession() {
         type: 'info',
         title: 'Prueba finalizada',
         message: 'Tu prueba de 7 días ha terminado.',
-        detail: 'Completa el pago de $4.99 en el navegador para seguir usando CC Controller.',
+        detail: 'Completa el pago de $4.99 en el navegador para seguir usando CC Creator.',
         buttons: ['Abrir pago'],
       });
       bridge = null;
@@ -266,7 +267,7 @@ async function startSession() {
   pty.onMessage = (role, text, projectId) => bridge?.broadcastMessage(role, text, projectId);
   pty.onChunk = (msgId, text, done, _projectId) => {
     bridge?.broadcastChunk(msgId, text, done, null); // null → PWA usa currentIdRef
-    if (done) bridge?.sendPush('CC Controller', 'Claude terminó — toca para ver la respuesta').catch(() => {});
+    if (done) bridge?.sendPush('CC Creator', 'Claude terminó — toca para ver la respuesta').catch(() => {});
   };
   pty.onPermissionRequest = (text, msgId, projectId) => {
     bridge?.broadcastPermission(text, msgId, projectId ?? getActive()?.id ?? null);
@@ -278,6 +279,7 @@ async function startSession() {
   bridge.onCreateProject = (id, name) => {
     try {
       const project = createProject(id, name);
+      if (project.path) writeClaude(project.path, project);
       pty.spawn('claude', [], project.path);
       setTrayMenu('running');
       broadcastProjects();
@@ -387,6 +389,27 @@ async function startSession() {
     // when the user clicks it the OS grants focus and the dialog appears.
     pendingFolderId = id;
     setTrayMenu(pty?.running ? 'running' : 'stopped');
+  };
+
+  bridge.onPhaseChange = (projectId, phase) => {
+    const updated = updateProjectPhase(projectId, phase);
+    if (updated) bridge?.broadcastPhaseChange(projectId, phase);
+  };
+
+  bridge.onGetEnv = (projectId) => {
+    try {
+      const env = readProjectEnv(projectId);
+      bridge.channel?.send({ type: 'broadcast', event: 'env-state', payload: { projectId, env, ts: Date.now() } });
+    } catch (_) {}
+  };
+
+  bridge.onStarterMessage = (projectId) => {
+    const project = listProjects().find(p => p.id === projectId);
+    if (!project) return;
+    const msg = `Eres el asistente de CC Creator para el proyecto "${project.name}". Por favor:\n1. Saluda al usuario y preséntate\n2. Explica el proceso de 6 fases de CC Creator y la filosofía Kitifica Local First\n3. Pregunta qué quiere construir\nNo empieces a codear todavía.`;
+    bridge._addToHistory({ role: 'user', text: msg.trim(), projectId });
+    pty?.write(msg, false, project.model ?? 'claude-sonnet-4-6', project.effort ?? 'medium', projectId, true);
+    bridge.channel?.send({ type: 'broadcast', event: 'starter-sent', payload: { projectId, ts: Date.now() } });
   };
 
   bridge.onOpenClaudeDesktop = (projectId) => {

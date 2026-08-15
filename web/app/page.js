@@ -7,6 +7,8 @@ import AuthGate, { useTrial } from './components/AuthGate';
 import ProjectsList from './components/ProjectsList';
 import SettingsSheet from './components/SettingsSheet';
 import FileUpload from './components/FileUpload';
+import PhasePanel from './components/PhasePanel';
+import SecretsSheet from './components/SecretsSheet';
 
 const ICON_SETTINGS = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M14 17H5M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></g></svg>`;
 const ICON_SEND = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11zm7.318-19.539l-10.94 10.939"/></svg>`;
@@ -54,6 +56,8 @@ function CCController() {
   const thinkingTimerRef = useRef(null);
   const [view, setView] = useState('list');
   const [showSettings, setShowSettings] = useState(false);
+  const [showSecrets, setShowSecrets] = useState(false);
+  const [currentEnv, setCurrentEnv] = useState({});
   const [mcpConfig, setMcpConfig] = useState({});
   const [reconnectKey, setReconnectKey] = useState(0);
   const [streamingMsg, setStreamingMsg] = useState(null); // {msgId, text} | null
@@ -80,6 +84,21 @@ function CCController() {
   // para evitar race: done chunk llega antes del render → ref null → mensaje desaparece.
   useEffect(() => { awaitingFolderIdRef.current = awaitingFolderId; }, [awaitingFolderId]);
   useEffect(() => { knownProjectIdsRef.current = new Set(projects.map(p => p.id)); }, [projects]);
+
+  // Starter message automático para proyectos nuevos
+  useEffect(() => {
+    if (!currentProject?.isNew || !connected) return;
+    sendEvent('starter-message', { projectId: currentId });
+    // Don't mark isNew:false optimistically — wait for desktop ack ('starter-sent').
+    // Fallback: mark false after 5s if no ack arrives (desktop may be old version).
+    const fallback = setTimeout(() => {
+      setProjects(prev => prev.map(p =>
+        p.id === currentId ? { ...p, isNew: false } : p
+      ));
+    }, 5000);
+    return () => clearTimeout(fallback);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentId, connected]);
 
   const resetDesktopTimeout = useCallback(() => {
     setDesktopActive(true);
@@ -280,6 +299,25 @@ function CCController() {
       setMcpConfig(payload.mcpServers ?? {});
     });
 
+    ch.on('broadcast', { event: 'phase-changed' }, ({ payload }) => {
+      if (!active) return;
+      setProjects(prev => prev.map(p =>
+        p.id === payload.projectId ? { ...p, phase: payload.phase } : p
+      ));
+    });
+
+    ch.on('broadcast', { event: 'env-state' }, ({ payload }) => {
+      if (!active) return;
+      setCurrentEnv(payload.env ?? {});
+    });
+
+    ch.on('broadcast', { event: 'starter-sent' }, ({ payload }) => {
+      if (!active) return;
+      setProjects(prev => prev.map(p =>
+        p.id === payload.projectId ? { ...p, isNew: false } : p
+      ));
+    });
+
     ch.on('broadcast', { event: 'project-state' }, ({ payload }) => {
       if (!active) return;
       resetDesktopTimeout();
@@ -322,6 +360,7 @@ function CCController() {
         setConnected(isNowConnected);
         if (isNowConnected) {
           ch.send({ type: 'broadcast', event: 'get-project-state', payload: { token: getSessionToken() } });
+          if (currentIdRef.current) ch.send({ type: 'broadcast', event: 'get-env', payload: { projectId: currentIdRef.current, token: getSessionToken() } });
           if (wasConnectedRef.current) addSystemMsg('✓ Conexión recuperada');
           wasConnectedRef.current = true;
           registerPush();
@@ -545,8 +584,16 @@ function CCController() {
           onSkipPermissionsChange={v => updateProjectSettings('skipPermissions', v)}
           onSpendLimitChange={v => updateProjectSettings('spendLimit', v)}
           onOpenDesktop={() => { sendEvent('open-claude-desktop', { projectId: currentId }); setShowSettings(false); }}
-          onSaveEnv={(env) => { sendEvent('save-env', { projectId: currentId, env }); setShowSettings(false); }}
           onSaveMcpConfig={(cfg) => { sendEvent('save-mcp-config', { projectId: currentId, mcpServers: cfg }); }}
+          onOpenSecrets={() => { setShowSettings(false); setShowSecrets(true); }}
+        />
+      )}
+      {showSecrets && currentProject && (
+        <SecretsSheet
+          project={currentProject}
+          currentEnv={currentEnv}
+          onSave={(env) => { setCurrentEnv(env); sendEvent('save-env', { projectId: currentId, env }); }}
+          onClose={() => setShowSecrets(false)}
         />
       )}
       {preview.show && <PreviewSheet preview={preview} setPreview={setPreview} sendEvent={sendEvent} />}
@@ -573,6 +620,16 @@ function CCController() {
               {desktopActive ? 'Desktop activo' : connected ? 'Desktop detenido' : 'Sin conexión'}
             </div>
             <UsageRings usage={sessionUsage} project={currentProject} />
+            {currentProject && (
+              <PhasePanel
+                phase={currentProject.phase ?? 1}
+                projectId={currentId}
+                onPhaseChange={(projectId, phase) => {
+                  setProjects(prev => prev.map(p => p.id === projectId ? { ...p, phase } : p));
+                  sendEvent('phase-change', { projectId, phase });
+                }}
+              />
+            )}
             <button
               onClick={() => setPreview(p => ({ ...p, show: true, url: null, loading: false }))}
               style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
@@ -710,7 +767,7 @@ function CCController() {
       {/* Mac disclaimer */}
       <div style={{ background: '#fff', padding: '0 14px max(20px, env(safe-area-inset-bottom, 20px))', flexShrink: 0 }}>
         <p style={{ margin: 0, fontSize: 10, fontWeight: 500, color: '#bbb', textAlign: 'center', lineHeight: 1.4 }}>
-          Tu Mac debe estar encendida y con CC Controller abierto
+          Tu Mac debe estar encendida y con CC Creator abierto
         </p>
       </div>
 
@@ -724,8 +781,16 @@ function CCController() {
           onSkipPermissionsChange={v => updateProjectSettings('skipPermissions', v)}
           onSpendLimitChange={v => updateProjectSettings('spendLimit', v)}
           onOpenDesktop={() => { sendEvent('open-claude-desktop', { projectId: currentId }); setShowSettings(false); }}
-          onSaveEnv={(env) => { sendEvent('save-env', { projectId: currentId, env }); setShowSettings(false); }}
           onSaveMcpConfig={(cfg) => { sendEvent('save-mcp-config', { projectId: currentId, mcpServers: cfg }); }}
+          onOpenSecrets={() => { setShowSettings(false); setShowSecrets(true); }}
+        />
+      )}
+      {showSecrets && currentProject && (
+        <SecretsSheet
+          project={currentProject}
+          currentEnv={currentEnv}
+          onSave={(env) => { setCurrentEnv(env); sendEvent('save-env', { projectId: currentId, env }); }}
+          onClose={() => setShowSecrets(false)}
         />
       )}
       {preview.show && <PreviewSheet preview={preview} setPreview={setPreview} sendEvent={sendEvent} />}

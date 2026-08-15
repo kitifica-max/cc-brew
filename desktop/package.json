@@ -1,5 +1,5 @@
 {
-  "name": "cc-controller-desktop",
+  "name": "cc-creator-desktop",
   "version": "1.5.1",
   "type": "module",
   "main": "src/main.js",

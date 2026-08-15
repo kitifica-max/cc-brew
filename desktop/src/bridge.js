@@ -44,6 +44,9 @@ export default class Bridge {
     this.onGetMcpConfig = null;
     this.onSaveMcpConfig = null;
     this.onOpenPreview = null;
+    this.onPhaseChange = null;
+    this.onStarterMessage = null;
+    this.onGetEnv = null;
     this._heartbeatTimer = null;
     this._history = [];
     this._streamBuffers = new Map(); // msgId → { parts: string[], projectId }
@@ -165,6 +168,18 @@ export default class Bridge {
         if (!this._validate(payload)) return;
         this.onOpenPreview?.(payload.port);
       })
+      .on('broadcast', { event: 'phase-change' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this.onPhaseChange?.(payload.projectId, payload.phase);
+      })
+      .on('broadcast', { event: 'starter-message' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this.onStarterMessage?.(payload.projectId);
+      })
+      .on('broadcast', { event: 'get-env' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this.onGetEnv?.(payload.projectId);
+      })
       .subscribe();
   }
 
@@ -268,7 +283,7 @@ export default class Bridge {
       event: 'permission',
       payload: { text: clean, msgId, projectId, ts: Date.now() },
     });
-    this.sendPush('CC Controller', '⚠️ Claude necesita un permiso — toca para responder').catch(() => {});
+    this.sendPush('CC Creator', '⚠️ Claude necesita un permiso — toca para responder').catch(() => {});
   }
 
   broadcastPreviewUrl(url, port) {
@@ -282,6 +297,13 @@ export default class Bridge {
     this.channel?.send({
       type: 'broadcast', event: 'usage',
       payload: { cost, tokens, projectId, ts: Date.now() },
+    });
+  }
+
+  broadcastPhaseChange(projectId, phase) {
+    this.channel?.send({
+      type: 'broadcast', event: 'phase-changed',
+      payload: { projectId, phase, ts: Date.now() },
     });
   }
 

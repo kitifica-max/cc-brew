@@ -41,7 +41,7 @@ export function openSetupWindow() {
       height: 560,
       resizable: false,
       minimizable: false,
-      title: 'CC Controller — Configuración',
+      title: 'CC Creator — Configuración',
       titleBarStyle: 'hiddenInset',
       webPreferences: {
         nodeIntegration: false,

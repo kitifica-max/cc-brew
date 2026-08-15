@@ -2,10 +2,10 @@ import './globals.css';
 import InstallPopup from './components/InstallPopup';
 
 export const metadata = {
-  title: 'CC Controller',
+  title: 'CC Creator',
   description: 'Control Claude Code desde tu móvil',
   manifest: '/manifest.json',
-  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'CC Controller' },
+  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'CC Creator' },
   icons: { icon: '/favicon.ico', apple: '/icon-192.png' },
 };
 
