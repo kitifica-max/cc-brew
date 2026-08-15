@@ -293,10 +293,10 @@ export default class Bridge {
     });
   }
 
-  broadcastUsage(cost, tokens, projectId = null) {
+  broadcastUsage(cost, inputTokens, projectId = null) {
     this.channel?.send({
       type: 'broadcast', event: 'usage',
-      payload: { cost, tokens, projectId, ts: Date.now() },
+      payload: { cost, inputTokens, projectId, ts: Date.now() },
     });
   }
 

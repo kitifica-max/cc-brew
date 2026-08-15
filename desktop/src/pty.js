@@ -157,9 +157,10 @@ export default class PtyManager {
     if (event.type === 'result') {
       const cost = event.cost_usd ?? 0;
       const u = event.usage ?? {};
-      const tokens = (u.input_tokens ?? 0) + (u.output_tokens ?? 0)
-        + (u.cache_creation_input_tokens ?? 0) + (u.cache_read_input_tokens ?? 0);
-      if (cost || tokens) this.onUsage?.(cost, tokens, this._currentProjectId);
+      // inputTokens = current context size (latest turn only, not accumulated)
+      const inputTokens = (u.input_tokens ?? 0) + (u.cache_creation_input_tokens ?? 0) + (u.cache_read_input_tokens ?? 0);
+      const totalTokens = inputTokens + (u.output_tokens ?? 0);
+      if (cost || totalTokens) this.onUsage?.(cost, inputTokens, this._currentProjectId);
     }
   }
 

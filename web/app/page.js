@@ -62,13 +62,14 @@ function CCController() {
   const [reconnectKey, setReconnectKey] = useState(0);
   const [streamingMsg, setStreamingMsg] = useState(null); // {msgId, text} | null
   const [pendingPermission, setPendingPermission] = useState(null); // {text, msgId, projectId} | null
-  const [sessionUsage, setSessionUsage] = useState({ cost: 0, tokens: 0 });
+  const [sessionUsage, setSessionUsage] = useState({ cost: 0, inputTokens: 0 });
   const [preview, setPreview] = useState({ show: false, port: '', loading: false, url: null, error: false });
   const streamingMsgRef = useRef(null);
   const chatRef = useRef(null);
   const channelRef = useRef(null);
   const currentIdRef = useRef(null);
   const wasConnectedRef = useRef(false);
+  const reconnectMsgShownRef = useRef(false); // dedup: one msg per disconnect cycle
   const unreadRef = useRef(0);
 
   // ── Voice state ──────────────────────────────────────────────────────────────
@@ -281,7 +282,7 @@ function CCController() {
       if (!active) return;
       setSessionUsage(prev => ({
         cost: prev.cost + (payload.cost ?? 0),
-        tokens: prev.tokens + (payload.tokens ?? 0),
+        inputTokens: payload.inputTokens ?? 0, // latest turn = current context size
       }));
     });
 
@@ -361,9 +362,14 @@ function CCController() {
         if (isNowConnected) {
           ch.send({ type: 'broadcast', event: 'get-project-state', payload: { token: getSessionToken() } });
           if (currentIdRef.current) ch.send({ type: 'broadcast', event: 'get-env', payload: { projectId: currentIdRef.current, token: getSessionToken() } });
-          if (wasConnectedRef.current) addSystemMsg('✓ Conexión recuperada');
+          if (wasConnectedRef.current && !reconnectMsgShownRef.current) {
+            addSystemMsg('✓ Conexión recuperada');
+            reconnectMsgShownRef.current = true;
+          }
           wasConnectedRef.current = true;
           registerPush();
+        } else {
+          reconnectMsgShownRef.current = false; // reset on disconnect so next reconnect shows once
         }
       });
     })();
@@ -513,7 +519,7 @@ function CCController() {
     setCurrentId(id);
     setView('chat');
     setThinking(false);
-    setSessionUsage({ cost: 0, tokens: 0 });
+    setSessionUsage({ cost: 0, inputTokens: 0 });
     clearTimeout(thinkingTimerRef.current);
     const target = projects.find(p => p.id === id);
     if (target?.path) {
@@ -610,42 +616,36 @@ function CCController() {
     <main style={{ height: '100dvh', background: '#f5f5f5', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
       {/* Header */}
-      <div style={{ background: '#f04e23', padding: '52px 20px 14px', flexShrink: 0 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-          <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Claude Code</span>
+      <div style={{ background: '#f04e23', padding: '52px 16px 12px', flexShrink: 0 }}>
+        {/* Row 1: logo + status | actions */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <TrialPill />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
-              <div style={{ width: 7, height: 7, borderRadius: '50%', background: desktopActive ? '#00b09b' : connected ? '#f0a040' : 'rgba(255,255,255,0.3)', boxShadow: desktopActive ? '0 0 6px #00b09b' : 'none' }} />
-              {desktopActive ? 'Desktop activo' : connected ? 'Desktop detenido' : 'Sin conexión'}
+            {/* CC Creator logo mark */}
+            <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.06em', lineHeight: 1, fontFamily: "'SF Pro Display', system-ui, sans-serif" }}>CC</div>
+            <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.25)' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <div style={{ width: 7, height: 7, borderRadius: '50%', background: desktopActive ? '#00b09b' : connected ? '#f0a040' : 'rgba(255,255,255,0.3)', boxShadow: desktopActive ? '0 0 6px #00b09b' : 'none', flexShrink: 0 }} />
+              <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+                {desktopActive ? 'Desktop activo' : connected ? 'Desktop detenido' : 'Sin conexión'}
+              </span>
             </div>
-            <UsageRings usage={sessionUsage} project={currentProject} />
-            {currentProject && (
-              <PhasePanel
-                phase={currentProject.phase ?? 1}
-                projectId={currentId}
-                onPhaseChange={(projectId, phase) => {
-                  setProjects(prev => prev.map(p => p.id === projectId ? { ...p, phase } : p));
-                  sendEvent('phase-change', { projectId, phase });
-                }}
-              />
-            )}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <TrialPill />
             <button
               onClick={() => setPreview(p => ({ ...p, show: true, url: null, loading: false }))}
               style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
               dangerouslySetInnerHTML={{ __html: ICON_GLOBE }}
             />
             <button
-              onClick={() => {
-                setShowSettings(true);
-                sendEvent('get-mcp-config', { projectId: currentId });
-              }}
+              onClick={() => { setShowSettings(true); sendEvent('get-mcp-config', { projectId: currentId }); }}
               style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
               dangerouslySetInnerHTML={{ __html: ICON_SETTINGS }}
             />
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* Row 2: nav + project name | donas + fase */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button
             onClick={() => setView('list')}
             style={{ background: 'rgba(255,255,255,0.18)', border: 'none', borderRadius: 20, padding: '6px 12px 6px 8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, color: '#fff', flexShrink: 0 }}
@@ -653,12 +653,23 @@ function CCController() {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.02em' }}>Proyectos</span>
           </button>
-          <div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1 }}>{currentProject?.name ?? 'Nuevo proyecto'}</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentProject?.name ?? 'Nuevo proyecto'}</div>
             <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
               {currentProject?.model?.split('-').slice(-2).join(' ')} · {currentProject?.effort}
             </div>
           </div>
+          <UsageRings usage={sessionUsage} project={currentProject} />
+          {currentProject && (
+            <PhasePanel
+              phase={currentProject.phase ?? 1}
+              projectId={currentId}
+              onPhaseChange={(projectId, phase) => {
+                setProjects(prev => prev.map(p => p.id === projectId ? { ...p, phase } : p));
+                sendEvent('phase-change', { projectId, phase });
+              }}
+            />
+          )}
         </div>
       </div>
 
@@ -1074,7 +1085,7 @@ function UsageRings({ usage, project }) {
   const [show, setShow] = useState(null); // null | 'ctx' | 'spend'
 
   const maxCtx = MODEL_CONTEXT[project?.model] ?? 200000;
-  const ctxPct = usage.tokens / maxCtx;
+  const ctxPct = usage.inputTokens / maxCtx;
   const spendLimit = project?.spendLimit ?? 1;
   const spendPct = spendLimit > 0 ? usage.cost / spendLimit : 0;
 
@@ -1099,7 +1110,7 @@ function UsageRings({ usage, project }) {
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex' }}>
           <DonutRing pct={ctxPct} color={ctxColor} />
         </button>
-        {tooltip('ctx', 'Contexto', `${usage.tokens.toLocaleString()} / ${(maxCtx/1000).toFixed(0)}k tokens`)}
+        {tooltip('ctx', 'Contexto', `${usage.inputTokens.toLocaleString()} / ${(maxCtx/1000).toFixed(0)}k tokens`)}
       </div>
       <div style={{ position: 'relative' }}>
         <button onClick={() => setShow(s => s === 'spend' ? null : 'spend')}
