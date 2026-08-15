@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, resolve } from 'path';
 import { EOL, homedir } from 'os';
+import { generateClaude } from './claude-md.js';
 
 function getHome() {
   return process.env.HOME || homedir();
@@ -107,6 +108,22 @@ export function saveMcpConfig(id, mcpServers) {
   let existing = {};
   try { existing = JSON.parse(readFileSync(settingsPath, 'utf8')); } catch {}
   writeFileSync(settingsPath, JSON.stringify({ ...existing, mcpServers }, null, 2));
+}
+
+export function writeClaude(projectPath, project) {
+  try {
+    writeFileSync(join(projectPath, 'CLAUDE.md'), generateClaude(project), 'utf8');
+  } catch (_) {}
+}
+
+export function updateProjectPhase(id, phase) {
+  const data = load();
+  const idx = data.projects.findIndex(p => p.id === id);
+  if (idx === -1) return null;
+  data.projects[idx] = { ...data.projects[idx], phase };
+  save(data);
+  writeClaude(data.projects[idx].path, data.projects[idx]);
+  return data.projects[idx];
 }
 
 export function saveProjectEnv(id, envObject) {

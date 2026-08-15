@@ -7,7 +7,7 @@ import { get as httpsGet } from 'https';
 import dotenv from 'dotenv';
 import PtyManager from './pty.js';
 import Bridge from './bridge.js';
-import { createProject, switchProject, getActive, listProjects, deleteProject, saveProjectEnv, addExistingProject, readMcpConfig, saveMcpConfig } from './projects.js';
+import { createProject, switchProject, getActive, listProjects, deleteProject, saveProjectEnv, addExistingProject, readMcpConfig, saveMcpConfig, writeClaude, updateProjectPhase } from './projects.js';
 import { ALLOWED_EXTENSIONS, MAX_FILE_BYTES } from './bridge.js';
 import { getSupabaseConfig } from './supabase-config.js';
 import { createFileAuthStorage, AUTH_STORAGE_KEY } from './auth-store.js';
@@ -182,6 +182,7 @@ async function openFolderDialog() {
   const name = path.basename(folderPath);
   try {
     const project = addExistingProject(id, name, folderPath);
+    writeClaude(project.path, project);
     pty.spawn('claude', [], project.path);
     setTrayMenu('running');
     broadcastProjects();
