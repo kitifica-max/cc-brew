@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=320">
+<title>CC Creator Panel</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    width: 320px; height: 480px;
+    background: rgba(20, 20, 20, 0.85);
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    font-size: 13px;
+    overflow: hidden;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    -webkit-app-region: no-drag;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    height: 44px;
+    -webkit-app-region: drag;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    -webkit-app-region: no-drag;
+  }
+  .header-logo-dot {
+    width: 20px; height: 20px;
+    background: #f04e23;
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 800; color: #fff;
+    flex-shrink: 0;
+    letter-spacing: -0.5px;
+  }
+  .header-spacer { flex: 1; }
+  .header-btn {
+    -webkit-app-region: no-drag;
+    width: 28px; height: 28px;
+    border: none;
+    background: rgba(255,255,255,0.08);
+    border-radius: 7px;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600;
+    transition: background 0.15s;
+    line-height: 1;
+  }
+  .header-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+  /* ── Project ── */
+  .project-row {
+    display: flex; align-items: center;
+    padding: 0 14px;
+    height: 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+    cursor: pointer;
+    position: relative;
+  }
+  .project-row:hover { background: rgba(255,255,255,0.04); }
+  .project-icon { margin-right: 8px; opacity: 0.6; font-size: 13px; }
+  .project-name { font-weight: 500; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .project-arrow { opacity: 0.4; font-size: 10px; margin-left: 6px; flex-shrink: 0; }
+  .project-dropdown {
+    display: none;
+    position: absolute;
+    top: 40px; left: 0; right: 0;
+    background: rgba(28,28,28,0.98);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    z-index: 100;
+    max-height: 160px;
+    overflow-y: auto;
+    backdrop-filter: blur(20px);
+  }
+  .project-dropdown.open { display: block; }
+  .dropdown-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex; align-items: center; gap: 8px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .dropdown-item:hover { background: rgba(255,255,255,0.06); }
+  .dropdown-item.active { color: #f04e23; font-weight: 600; }
+  .dropdown-empty { padding: 14px; color: rgba(255,255,255,0.3); font-size: 12px; text-align: center; }
+
+  /* ── Phases ── */
+  .phases-row {
+    padding: 11px 14px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+  .phases-dots {
+    display: flex; gap: 7px; align-items: center; margin-bottom: 7px;
+  }
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    transition: background 0.25s;
+    flex-shrink: 0;
+  }
+  .dot.done   { background: rgba(240,78,35,0.35); }
+  .dot.active { background: #f04e23; box-shadow: 0 0 6px rgba(240,78,35,0.5); }
+  .phase-label {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 12px;
+  }
+  .phase-name    { font-weight: 600; }
+  .phase-counter { color: rgba(255,255,255,0.35); font-size: 11px; }
+
+  /* ── Running indicator ── */
+  .running-badge {
+    display: none;
+    align-items: center; gap: 5px;
+    font-size: 11px; color: rgba(255,255,255,0.5);
+    margin-top: 5px;
+  }
+  .running-badge.visible { display: flex; }
+  .running-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #34d399;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+
+  /* ── Log ── */
+  .log-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 14px 6px;
+    position: relative;
+    min-height: 0;
+  }
+  .log-area::-webkit-scrollbar { width: 3px; }
+  .log-area::-webkit-scrollbar-track { background: transparent; }
+  .log-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+  .log-line {
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-size: 11px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .log-line.assistant { color: #f97b5a; }
+  .log-line.system    { color: rgba(255,255,255,0.3); }
+  .log-line.user      { color: rgba(255,255,255,0.65); }
+  .log-empty {
+    color: rgba(255,255,255,0.22);
+    font-size: 12px;
+    text-align: center;
+    margin-top: 28px;
+    line-height: 1.8;
+  }
+  .scroll-badge {
+    display: none;
+    position: sticky;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: fit-content;
+    background: rgba(240,78,35,0.92);
+    color: #fff;
+    font-size: 11px; font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    margin: 4px auto 0;
+  }
+  .scroll-badge.visible { display: block; }
+
+  /* ── Hint ── */
+  .hint {
+    display: none;
+    align-items: flex-start; gap: 8px;
+    background: #f04e23;
+    color: #fff;
+    font-size: 12px; line-height: 1.5;
+    padding: 10px 14px;
+    flex-shrink: 0;
+    animation: slideUp 0.2s ease-out;
+  }
+  .hint.visible { display: flex; }
+  .hint-text { flex: 1; }
+  .hint-text strong { font-weight: 700; }
+  .hint-close {
+    background: none; border: none;
+    color: rgba(255,255,255,0.75);
+    cursor: pointer; font-size: 18px; line-height: 1;
+    padding: 0; flex-shrink: 0; margin-top: -1px;
+  }
+  .hint-close:hover { color: #fff; }
+  @keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  /* ── Actions ── */
+  .actions {
+    display: flex; gap: 8px;
+    padding: 10px 12px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+  .btn-term {
+    height: 36px; padding: 0 12px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: transparent;
+    color: rgba(255,255,255,0.65);
+    border-radius: 8px;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+    font-family: inherit;
+  }
+  .btn-term:hover:not(:disabled) { background: rgba(255,255,255,0.08); color: #fff; }
+  .btn-term:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn-advance {
+    flex: 1; height: 36px;
+    background: #f04e23;
+    border: none;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 10px;
+    font-family: inherit;
+  }
+  .btn-advance:hover:not(:disabled) { opacity: 0.88; }
+  .btn-advance:disabled { opacity: 0.28; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-logo">
+    <div class="header-logo-dot">CC</div>
+    <span>CC Creator</span>
+  </div>
+  <div class="header-spacer"></div>
+  <button class="header-btn" id="btn-menu" title="Más opciones">···</button>
+  <button class="header-btn" id="btn-close" title="Cerrar">×</button>
+</div>
+
+<!-- Project -->
+<div class="project-row" id="project-row">
+  <span class="project-icon">📁</span>
+  <span class="project-name" id="project-name">—</span>
+  <span class="project-arrow">▾</span>
+  <div class="project-dropdown" id="project-dropdown"></div>
+</div>
+
+<!-- Phases -->
+<div class="phases-row">
+  <div class="phases-dots" id="phases-dots">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+  <div class="phase-label">
+    <span class="phase-name" id="phase-name">Sin proyecto</span>
+    <span class="phase-counter" id="phase-counter"></span>
+  </div>
+  <div class="running-badge" id="running-badge">
+    <div class="running-dot"></div>
+    <span>Claude ejecutando…</span>
+  </div>
+</div>
+
+<!-- Log -->
+<div class="log-area" id="log-area">
+  <div class="log-empty" id="log-empty">
+    Inicia CC Creator<br>para ver el output<br>de Claude aquí.
+  </div>
+  <div class="scroll-badge" id="scroll-badge">↓ nuevo output</div>
+</div>
+
+<!-- Hint (primer uso) -->
+<div class="hint" id="hint">
+  <span class="hint-text">
+    💡 Selecciona <strong>Abrir panel</strong> en el menú del ícono para abrir esto.
+    Usa <strong>···</strong> para Iniciar, Salir y más opciones.
+  </span>
+  <button class="hint-close" id="hint-close">×</button>
+</div>
+
+<!-- Actions -->
+<div class="actions">
+  <button class="btn-term" id="btn-term" disabled>⌘ Terminal</button>
+  <button class="btn-advance" id="btn-advance" disabled>Avanzar fase →</button>
+</div>
+
+<script>
+const PHASES = [
+  { n: 1, name: 'Ideación' },
+  { n: 2, name: 'POC Local' },
+  { n: 3, name: 'Lanzamiento' },
+  { n: 4, name: 'Backend' },
+  { n: 5, name: 'App Directa' },
+  { n: 6, name: 'Validación' },
+];
+
+const MAX_LINES = 500;
+let state      = { project: null, projects: [], running: false, firstOpen: false };
+let logLines   = [];  // [{ text, role }]
+let autoScroll = true;
+let hintTimer  = null;
+let dropOpen   = false;
+
+const $ = id => document.getElementById(id);
+const elProjectName  = $('project-name');
+const elPhasesDots   = $('phases-dots');
+const elPhaseName    = $('phase-name');
+const elPhaseCounter = $('phase-counter');
+const elRunningBadge = $('running-badge');
+const elLogArea      = $('log-area');
+const elLogEmpty     = $('log-empty');
+const elScrollBadge  = $('scroll-badge');
+const elBtnAdvance   = $('btn-advance');
+const elBtnTerm      = $('btn-term');
+const elBtnMenu      = $('btn-menu');
+const elBtnClose     = $('btn-close');
+const elHint         = $('hint');
+const elHintClose    = $('hint-close');
+const elProjectRow   = $('project-row');
+const elDropdown     = $('project-dropdown');
+
+// ─── Render ───────────────────────────────────────
+function renderState() {
+  const { project, running } = state;
+  const phase = project?.phase ?? 0;
+
+  elProjectName.textContent = project ? project.name : 'Sin proyecto activo';
+
+  const dots = elPhasesDots.querySelectorAll('.dot');
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('active', i + 1 === phase);
+    dot.classList.toggle('done',   i + 1 < phase);
+  });
+
+  const phaseInfo = PHASES[phase - 1];
+  elPhaseName.textContent    = phaseInfo ? phaseInfo.name : 'Sin proyecto';
+  elPhaseCounter.textContent = phase ? `Fase ${phase} de 6` : '';
+  elRunningBadge.classList.toggle('visible', running);
+
+  const nextPhase  = PHASES[phase];     // undefined if phase === 6
+  const canAdvance = !running && phase > 0 && phase < 6 && !!project;
+  elBtnAdvance.disabled = !canAdvance;
+  elBtnAdvance.textContent = nextPhase && canAdvance
+    ? `Avanzar: ${nextPhase.name} →`
+    : phase >= 6 ? 'Validación completa ✓' : 'Avanzar fase →';
+
+  elBtnTerm.disabled = !project;
+  elLogEmpty.style.display = logLines.length === 0 ? 'block' : 'none';
+}
+
+// ─── Dropdown ────────────────────────────────────
+function renderDropdown() {
+  elDropdown.innerHTML = '';
+  const { projects, project } = state;
+  if (!projects.length) {
+    const empty = document.createElement('div');
+    empty.className = 'dropdown-empty';
+    empty.textContent = 'Sin proyectos';
+    elDropdown.appendChild(empty);
+    return;
+  }
+  projects.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'dropdown-item' + (p.id === project?.id ? ' active' : '');
+    item.textContent = '📁 ' + p.name;
+    item.addEventListener('click', e => {
+      e.stopPropagation();
+      closeDropdown();
+      if (p.id !== state.project?.id) cc.switchProject(p.id);
+    });
+    elDropdown.appendChild(item);
+  });
+}
+
+function openDropdown()  { dropOpen = true;  elDropdown.classList.add('open');    renderDropdown(); }
+function closeDropdown() { dropOpen = false; elDropdown.classList.remove('open'); }
+
+elProjectRow.addEventListener('click', () => dropOpen ? closeDropdown() : openDropdown());
+document.addEventListener('click', e => {
+  if (dropOpen && !elProjectRow.contains(e.target)) closeDropdown();
+});
+
+// ─── Log ─────────────────────────────────────────
+function appendChunk(text) {
+  if (!text) return;
+  elLogEmpty.style.display = 'none';
+
+  // Split by newlines; first segment continues last line
+  const parts = text.split('\n');
+  parts.forEach((part, i) => {
+    if (i === 0 && logLines.length > 0) {
+      logLines[logLines.length - 1].text += part;
+    } else {
+      logLines.push({ text: part, role: 'assistant' });
+    }
+  });
+
+  // Ring buffer
+  if (logLines.length > MAX_LINES) logLines.splice(0, logLines.length - MAX_LINES);
+
+  rerenderLog();
+  if (autoScroll) scrollBottom();
+  else elScrollBadge.classList.add('visible');
+}
+
+function rerenderLog() {
+  elLogArea.querySelectorAll('.log-line').forEach(el => el.remove());
+  const frag = document.createDocumentFragment();
+  logLines.forEach(({ text, role }) => {
+    const div = document.createElement('div');
+    div.className = 'log-line ' + (role || 'assistant');
+    div.textContent = text;
+    frag.appendChild(div);
+  });
+  // Insert before scroll-badge
+  elLogArea.insertBefore(frag, elScrollBadge);
+}
+
+function scrollBottom() { elLogArea.scrollTop = elLogArea.scrollHeight; }
+
+elLogArea.addEventListener('scroll', () => {
+  const near = elLogArea.scrollTop + elLogArea.clientHeight >= elLogArea.scrollHeight - 40;
+  autoScroll = near;
+  if (near) elScrollBadge.classList.remove('visible');
+});
+
+elScrollBadge.addEventListener('click', () => {
+  autoScroll = true;
+  scrollBottom();
+  elScrollBadge.classList.remove('visible');
+});
+
+// ─── Hint ────────────────────────────────────────
+function showHint() {
+  elHint.classList.add('visible');
+  hintTimer = setTimeout(dismissHint, 8000);
+}
+
+function dismissHint() {
+  clearTimeout(hintTimer);
+  elHint.classList.remove('visible');
+  cc.markSeen();
+}
+
+elHintClose.addEventListener('click', dismissHint);
+
+// ─── Button actions ───────────────────────────────
+elBtnAdvance.addEventListener('click', () => {
+  const { project } = state;
+  if (!project || elBtnAdvance.disabled) return;
+  cc.advance(project.id, project.phase + 1);
+});
+
+elBtnTerm.addEventListener('click', () => {
+  if (state.project) cc.openTerminal(state.project.id);
+});
+
+elBtnMenu.addEventListener('click', () => cc.openMenu());
+elBtnClose.addEventListener('click', () => cc.close());
+
+// ─── IPC subscriptions ───────────────────────────
+cc.onState(({ project, projects, running, firstOpen }) => {
+  const changed = project?.id !== state.project?.id;
+  state = { project, projects, running, firstOpen };
+  if (changed) {
+    logLines = [];
+    rerenderLog();
+    autoScroll = true;
+    elScrollBadge.classList.remove('visible');
+  }
+  renderState();
+  if (firstOpen) showHint();
+});
+
+cc.onChunk(({ text }) => appendChunk(text));
+
+cc.onStatus(({ status }) => {
+  state.running = status === 'running';
+  renderState();
+});
+
+// Initial render
+renderState();
+</script>
+</body>
+</html>
