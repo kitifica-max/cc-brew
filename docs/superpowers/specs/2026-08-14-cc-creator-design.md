@@ -6,7 +6,7 @@
 
 ## Resumen ejecutivo
 
-CC Creator (renombre de CC Controller) es una PWA + app de escritorio que convierte a Claude Code en un asistente guiado para crear aplicaciones PWA completas desde el móvil. El producto adopta la filosofía **Kitifica Local First**: construir un POC funcional primero, validarlo, y escalar progresivamente con las herramientas correctas (GitHub, Netlify, Supabase).
+CC Creator (renombre de CC Controller) es una App Directa + app de escritorio que convierte a Claude Code en un asistente guiado para crear aplicaciones App Directa completas desde el móvil. El producto adopta la filosofía **Kitifica Local First**: construir un POC funcional primero, validarlo, y escalar progresivamente con las herramientas correctas (GitHub, Netlify, Supabase).
 
 Claude opera con skills inyectadas automáticamente (ui-ux-pro-max, superpowers) via `CLAUDE.md` por proyecto. El flujo es guiado por Claude en el chat de manera natural, no por wizards rígidos.
 
@@ -29,8 +29,8 @@ Cada proyecto avanza por 6 fases secuenciales. El usuario controla el avance man
 | 2 | **POC Local** | Construye la app localmente, usa web previewer para testear en tiempo real |
 | 3 | **Lanzamiento** | Guía creación de repo GitHub + deploy en Netlify usando los tokens del usuario |
 | 4 | **Backend** | Conecta Supabase: base de datos, auth, storage |
-| 5 | **PWA Completa** | Secrets avanzados, APIs, manifest, service worker, optimización |
-| 6 | **Validación** | Abre `kitifica.com/validador/` con la URL del proyecto para certificar la PWA |
+| 5 | **App Directa Completa** | Secrets avanzados, APIs, manifest, service worker, optimización |
+| 6 | **Validación** | Abre `kitifica.com/validador/` con la URL del proyecto para certificar la App Directa |
 
 ### Reglas de avance
 - Solo avance secuencial (1→2→3…)
@@ -93,14 +93,14 @@ reales, escalar progresivamente. No sobre-ingenierizar antes de validar.
 - Conectar auth si el proyecto lo requiere
 - Migrar datos locales del POC al backend
 
-**Fase 5 — PWA Completa:**
+**Fase 5 — App Directa Completa:**
 - Implementar manifest.json y service worker correctamente
 - Configurar secrets de producción
 - Optimizar performance y accesibilidad
 - Preparar para validación Kitifica
 
 **Fase 6 — Validación:**
-- Revisar checklist PWA completo
+- Revisar checklist App Directa completo
 - Abrir kitifica.com/validador/ con la URL del proyecto
 - Corregir issues encontrados por el validador
 - Celebrar el lanzamiento
@@ -121,7 +121,7 @@ No empieces a codear todavía.
 
 ---
 
-## Indicador de fases en la PWA
+## Indicador de fases en la App Directa
 
 **Header del chat:** pill no intrusivo junto a las donas de consumo:
 ```
@@ -186,7 +186,7 @@ Claude guía la obtención de cada token en el chat. La interfaz de secrets en C
 
 ### ui-ux-pro-max (condensado por fase)
 - Fase 1-2: reglas de touch targets, contraste, tipografía, layout responsive
-- Fase 5: checklist completo de accesibilidad, performance, PWA
+- Fase 5: checklist completo de accesibilidad, performance, App Directa
 
 ### superpowers (condensado por fase)
 - Todas las fases: systematic-debugging, no fixes sin root cause
@@ -222,7 +222,7 @@ Archivos a actualizar:
 
 ## Lo que NO cambia
 
-- Arquitectura Supabase Realtime (canal privado PWA ↔ desktop)
+- Arquitectura Supabase Realtime (canal privado App Directa ↔ desktop)
 - node-pty para spawn de Claude CLI
 - Sistema de donas de consumo
 - Sistema de permisos / skipPermissions

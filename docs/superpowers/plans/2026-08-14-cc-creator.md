@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Convertir CC Controller en CC Creator — una herramienta guiada para crear PWAs con un sistema de fases, skills inyectadas automáticamente via CLAUDE.md, y UI mejorada de secrets.
+**Goal:** Convertir CC Controller en CC Creator — una herramienta guiada para crear Apps Directas con un sistema de fases, skills inyectadas automáticamente via CLAUDE.md, y UI mejorada de secrets.
 
-**Architecture:** Enfoque A+C: CC Creator escribe `CLAUDE.md` en la carpeta del proyecto al asignar carpeta y al cambiar de fase (desktop), y envía un mensaje de arranque automático en proyectos nuevos (PWA → desktop via Supabase broadcast). La PWA muestra el indicador de fase en el header y un panel de fases lateral.
+**Architecture:** Enfoque A+C: CC Creator escribe `CLAUDE.md` en la carpeta del proyecto al asignar carpeta y al cambiar de fase (desktop), y envía un mensaje de arranque automático en proyectos nuevos (App Directa → desktop via Supabase broadcast). La app muestra el indicador de fase en el header y un panel de fases lateral.
 
-**Tech Stack:** Electron + Node.js (desktop), Next.js React (PWA), Supabase Realtime, node-pty
+**Tech Stack:** Electron + Node.js (desktop), Next.js React (App Directa), Supabase Realtime, node-pty
 
 **Spec:** `docs/superpowers/specs/2026-08-14-cc-creator-design.md`
 
@@ -183,7 +183,7 @@ git commit -m "feat(storage): agregar campos de fase y stack a proyecto"
 - [ ] **Step 1: Crear desktop/src/claude-md.js**
 
 ```js
-const PHASE_NAMES = ['', 'Ideación', 'POC Local', 'Lanzamiento', 'Backend', 'PWA Completa', 'Validación'];
+const PHASE_NAMES = ['', 'Ideación', 'POC Local', 'Lanzamiento', 'Backend', 'App Directa', 'Validación'];
 
 const PHASE_ROLES = {
   1: `- Saluda al usuario y preséntate como su asistente de desarrollo en CC Creator
@@ -212,15 +212,15 @@ const PHASE_ROLES = {
 - Agrega autenticación si el proyecto la requiere
 - Prueba que los datos persisten correctamente`,
 
-  5: `- Implementa manifest.json correcto para PWA (name, icons, start_url, display: standalone, theme_color)
+  5: `- Implementa manifest.json correcto para App Directa (name, icons, start_url, display: standalone, theme_color)
 - Implementa service worker para funcionamiento offline básico
 - Configura todas las variables de entorno de producción
 - Optimiza: lazy loading de imágenes, code splitting, Lighthouse score ≥ 80
 - Implementa accesibilidad completa: aria-labels, keyboard nav, focus states
 - Prepara el proyecto para la validación de Kitifica`,
 
-  6: `- Revisa el checklist completo de PWA con el usuario
-- Indica al usuario que puede validar su PWA en kitifica.com/validador/ con la URL del proyecto
+  6: `- Revisa el checklist completo de App Directa con el usuario
+- Indica al usuario que puede validar su App Directa en kitifica.com/validador/ con la URL del proyecto
 - Corrige los issues que el validador encuentre
 - Celebra el lanzamiento con el usuario`,
 };
@@ -245,7 +245,7 @@ const SKILLS_BY_PHASE = {
 
   5: `### Skills activos — Fase 5
 **Verification before completion:** No declares terminado sin verificar en un dispositivo real o emulador.
-**PWA checklist:** manifest.json válido, service worker registrado, HTTPS, responsive, offline básico.
+**App Directa checklist:** manifest.json válido, service worker registrado, HTTPS, responsive, offline básico.
 **Performance:** Web Vitals — LCP < 2.5s, CLS < 0.1, FID < 100ms.`,
 
   6: `### Skills activos — Fase 6
@@ -267,7 +267,7 @@ export function generateClaude(project) {
 **Stack:** ${project.stack ?? 'Por definir en fase 1'}
 
 ### Filosofía Kitifica Local First
-Construir primero un POC funcional local. Validar la idea con usuarios reales antes de invertir en infraestructura. Escalar progresivamente: local → GitHub/Netlify → Backend → PWA completa.
+Construir primero un POC funcional local. Validar la idea con usuarios reales antes de invertir en infraestructura. Escalar progresivamente: local → GitHub/Netlify → Backend → App Directa completa.
 
 ### Tu rol en esta fase
 ${PHASE_ROLES[phase] ?? ''}
@@ -282,7 +282,7 @@ ${context}
 2. POC Local — Construir y probar localmente con web previewer
 3. Lanzamiento — GitHub + Netlify deploy
 4. Backend — Supabase: datos, auth, storage
-5. PWA Completa — Manifest, service worker, optimización
+5. App Directa — Manifest, service worker, optimización
 6. Validación — Certificar en kitifica.com/validador/
 `;
 }
@@ -393,7 +393,7 @@ broadcastPhaseChange(projectId, phase) {
 }
 ```
 
-Nota: el evento que el desktop envía a la PWA se llama `phase-changed` (pasado), el que la PWA envía al desktop se llama `phase-change` (imperativo).
+Nota: el evento que el desktop envía a la app se llama `phase-changed` (pasado), el que la app envía al desktop se llama `phase-change` (imperativo).
 
 - [ ] **Step 4: Wiring en main.js**
 
@@ -422,9 +422,9 @@ git commit -m "feat(bridge): eventos phase-change ↔ phase-changed"
 
 **Interfaces:**
 - Consumes: `project.isNew === true`
-- Produces: cuando la PWA se conecta con `isNew: true`, el desktop auto-envía un mensaje a Claude para iniciar la conversación guiada
+- Produces: cuando la App Directa se conecta con `isNew: true`, el desktop auto-envía un mensaje a Claude para iniciar la conversación guiada
 
-**Estrategia:** La PWA detecta `isNew` al cambiar de proyecto. Si es true, envía evento `starter-message` al desktop. El desktop lo convierte en input a Claude. Al completar, broadcast `starter-sent` y la PWA pone `isNew: false`.
+**Estrategia:** La app detecta `isNew` al cambiar de proyecto. Si es true, envía evento `starter-message` al desktop. El desktop lo convierte en input a Claude. Al completar, broadcast `starter-sent` y la App Directa pone `isNew: false`.
 
 - [ ] **Step 1: Agregar onStarterMessage en bridge.js — constructor**
 
@@ -483,7 +483,7 @@ git commit -m "feat: starter message automático en proyectos nuevos"
 
 ---
 
-## Task 6: Phase indicator + PhasePanel (PWA)
+## Task 6: Phase indicator + PhasePanel (App Directa)
 
 **Files:**
 - Create: `web/app/components/PhasePanel.js`
@@ -504,7 +504,7 @@ const PHASES = [
   { n: 2, name: 'POC Local', desc: 'Construir y probar localmente' },
   { n: 3, name: 'Lanzamiento', desc: 'GitHub + Netlify deploy' },
   { n: 4, name: 'Backend', desc: 'Supabase: datos, auth, storage' },
-  { n: 5, name: 'PWA Completa', desc: 'Manifest, service worker, optimización' },
+  { n: 5, name: 'App Directa', desc: 'Manifest, service worker, optimización' },
   { n: 6, name: 'Validación', desc: 'Certificar en kitifica.com/validador/' },
 ];
 
@@ -634,7 +634,7 @@ ch.on('broadcast', { event: 'phase-changed' }, ({ payload }) => {
 
 - [ ] **Step 4: Test manual**
 
-1. Abrir CC Creator PWA en un proyecto
+1. Abrir CC Creator App Directa en un proyecto
 2. Verificar que aparece el pill "Fase 1 · Ideación ▸" en el header
 3. Tocarlo → panel abre con las 6 fases
 4. Tocar "Avanzar a Fase 2" → confirmar → pill cambia a "Fase 2 · POC Local ▸"
