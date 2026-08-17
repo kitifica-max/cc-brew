@@ -323,11 +323,11 @@ function CCController() {
     });
 
     ch.on('broadcast', { event: 'exec-output' }, ({ payload }) => {
-      if (!active || !payload?.text) return;
+      if (!active) return;
       setTerminal(t => ({
         ...t,
-        lines: [...t.lines, payload.text].slice(-200),
-        running: !payload.done,
+        lines: payload.text ? [...t.lines, payload.text].slice(-200) : t.lines,
+        running: payload.done ? false : t.running,
       }));
     });
 
@@ -737,7 +737,7 @@ function CCController() {
 
       {/* Terminal collapsible */}
       {terminal.open && (
-        <div style={{ background: '#0d1117', borderTop: '1px solid #30363d', flexShrink: 0, display: 'flex', flexDirection: 'column', maxHeight: '40vh' }}>
+        <div style={{ background: '#0d1117', borderTop: '1px solid #30363d', flexShrink: 0, display: 'flex', flexDirection: 'column', height: '55vh' }}>
           <div style={{ padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid #21262d' }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: '#7d8590', fontFamily: 'monospace', flex: 1 }}>
               Terminal — {currentProject?.path?.replace(/^\/Users\/[^/]+/, '~') ?? '~'}
