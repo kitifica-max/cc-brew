@@ -92,7 +92,7 @@ const CC_LOGO = (
   </svg>
 );
 
-export default function ProjectsList({ projects, currentId, awaitingFolder, onSwitch, onDelete, onCreate, onRename, onOpenFolder, onCancelFolder, onBack, onShowSettings, trialPill }) {
+export default function ProjectsList({ projects, currentId, awaitingFolder, onSwitch, onDelete, onCreate, onRename, onOpenFolder, onCancelFolder, onBack, onShowSettings }) {
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
   const [confirmId, setConfirmId] = useState(null);
@@ -223,7 +223,6 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
             </svg>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            {trialPill}
             <button
               onClick={onShowSettings}
               style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 34, height: 34, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}

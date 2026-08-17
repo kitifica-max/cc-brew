@@ -1,9 +1,6 @@
 'use client';
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createCallback, useCallback, useContext, useEffect, useState } from 'react';
 import { supabase, getSessionToken, setSessionToken, setSessionId, CONFIGURED } from '../lib/supabase';
-
-export const TrialContext = createContext({ daysLeft: null });
-export function useTrial() { return useContext(TrialContext); }
 
 const F = "'Sora', -apple-system, BlinkMacSystemFont, sans-serif";
 
@@ -38,46 +35,17 @@ function Shell({ hero, card, footer }) {
   );
 }
 
-async function checkAccess(session) {
-  const { data } = await supabase
-    .from('user_access')
-    .select('trial_ends_at, paid_at')
-    .eq('user_id', session.user.id)
-    .single();
-
-  if (data?.paid_at) return { status: 'paid', trialEnds: null };
-
-  const trialEnds = data?.trial_ends_at
-    ? new Date(data.trial_ends_at)
-    : new Date(new Date(session.user.created_at).getTime() + 7 * 24 * 60 * 60 * 1000);
-
-  const status = new Date() < trialEnds ? 'trial' : 'expired';
-  return { status, trialEnds };
-}
-
 export default function AuthGate({ children }) {
   const [status, setStatus] = useState('loading');
   const [hasToken, setHasToken] = useState(false);
-  const [access, setAccess] = useState(null);
-  const [trialEnds, setTrialEnds] = useState(null);
 
   useEffect(() => {
     if (!CONFIGURED) { setStatus('unconfigured'); return; }
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (data.session) {
-        const { status: acc, trialEnds: te } = await checkAccess(data.session);
-        setAccess(acc);
-        setTrialEnds(te);
-      }
+    supabase.auth.getSession().then(({ data }) => {
       setStatus(data.session ? 'ready' : 'anon');
       setHasToken(Boolean(getSessionToken()));
     });
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_e, session) => {
-      if (session) {
-        const { status: acc, trialEnds: te } = await checkAccess(session);
-        setAccess(acc);
-        setTrialEnds(te);
-      }
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       setStatus(session ? 'ready' : 'anon');
     });
     return () => sub.subscription.unsubscribe();
@@ -93,21 +61,12 @@ export default function AuthGate({ children }) {
   if (status === 'unconfigured') return <Unconfigured />;
   if (status === 'anon') return <SignIn />;
   if (!hasToken) return <PairDevice onSubmit={handleToken} />;
-  if (access === 'expired') return <PaywallScreen />;
 
-  const daysLeft = trialEnds && access === 'trial'
-    ? Math.max(0, Math.ceil((trialEnds - new Date()) / (1000 * 60 * 60 * 24)))
-    : null;
-
-  return (
-    <TrialContext.Provider value={{ daysLeft }}>
-      {children}
-    </TrialContext.Provider>
-  );
+  return children;
 }
 
 function SignIn() {
-  const [mode, setMode] = useState('login'); // 'login' | 'signup' | 'confirm'
+  const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -204,13 +163,7 @@ function SignIn() {
     </>
   );
 
-  const footer = (
-    <p style={{ margin: 0, fontSize: 11, fontWeight: 500, color: '#999999', letterSpacing: '0.03em' }}>
-      kitifica.com · CC Creator
-    </p>
-  );
-
-  return <Shell hero={hero} card={card} footer={footer} />;
+  return <Shell hero={hero} card={card} footer={<p style={{ margin: 0, fontSize: 11, fontWeight: 500, color: '#999999', letterSpacing: '0.03em' }}>kitifica.com · CC Creator</p>} />;
 }
 
 function PairDevice({ onSubmit }) {
@@ -219,7 +172,6 @@ function PairDevice({ onSubmit }) {
   function handleSubmit() {
     const val = code.trim();
     if (!val) return;
-    // Pairing code format: "sessionId:token" or just "token" (legacy)
     const idx = val.indexOf(':');
     if (idx > 0 && idx < val.length - 1) {
       onSubmit(val.slice(idx + 1), val.slice(0, idx));
@@ -251,11 +203,8 @@ function PairDevice({ onSubmit }) {
         Código de emparejamiento
       </label>
       <input
-        type="password"
-        autoComplete="off"
-        placeholder="••••••••••••••••"
-        value={code}
-        onChange={e => setCode(e.target.value)}
+        type="password" autoComplete="off" placeholder="••••••••••••••••"
+        value={code} onChange={e => setCode(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter') handleSubmit(); }}
         style={{ width: '100%', boxSizing: 'border-box', background: '#f5f5f5', border: '1.5px solid #e0e0e0', borderRadius: 14, padding: '14px 16px', fontSize: 16, fontWeight: 500, color: '#1a1a1a', fontFamily: F, outline: 'none', minHeight: 52, touchAction: 'manipulation' }}
       />
@@ -268,63 +217,7 @@ function PairDevice({ onSubmit }) {
     </>
   );
 
-  const footer = (
-    <p style={{ margin: 0, fontSize: 11, fontWeight: 500, color: '#999999', letterSpacing: '0.03em' }}>
-      kitifica.com · CC Creator
-    </p>
-  );
-
-  return <Shell hero={hero} card={card} footer={footer} />;
-}
-
-function PaywallScreen() {
-  return (
-    <Shell
-      hero={
-        <>
-          <LogoMark size={80} />
-          <div style={{ textAlign: 'center', marginTop: 4 }}>
-            <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
-              Prueba finalizada
-            </h1>
-            <p style={{ margin: '8px 0 0', fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.45)', letterSpacing: '-0.01em' }}>
-              Tu período de 7 días ha terminado
-            </p>
-          </div>
-          <div style={{ background: 'rgba(240,78,35,0.15)', border: '1px solid rgba(240,78,35,0.3)', borderRadius: 20, padding: '8px 20px' }}>
-            <span style={{ fontSize: 26, fontWeight: 900, color: '#ff582a', letterSpacing: '-0.04em' }}>$4.99</span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(240,78,35,0.7)', marginLeft: 6 }}>acceso de por vida</span>
-          </div>
-        </>
-      }
-      card={
-        <>
-          <p style={{ margin: '0 0 16px', fontSize: 13, fontWeight: 500, color: '#666666', lineHeight: 1.55 }}>
-            Un solo pago. Sin suscripción. Acceso permanente a CC Creator.
-          </p>
-          <a
-            href="/pago"
-            style={{
-              display: 'block', width: '100%', boxSizing: 'border-box',
-              background: '#f04e23', border: 'none', borderRadius: 14,
-              padding: '15px 20px', fontSize: 15, fontWeight: 700,
-              color: '#fff', textAlign: 'center', textDecoration: 'none',
-              fontFamily: F, touchAction: 'manipulation',
-            }}
-          >
-            Pagar $4.99 →
-          </a>
-          <button
-            onClick={() => supabase.auth.signOut()}
-            style={{ width: '100%', marginTop: 10, background: 'none', border: 'none', padding: '10px', fontSize: 13, fontWeight: 600, color: '#999999', cursor: 'pointer', fontFamily: F }}
-          >
-            Cerrar sesión
-          </button>
-        </>
-      }
-      footer={<p style={{ margin: 0, fontSize: 11, fontWeight: 500, color: '#999999', letterSpacing: '0.03em' }}>kitifica.com · CC Creator</p>}
-    />
-  );
+  return <Shell hero={hero} card={card} footer={<p style={{ margin: 0, fontSize: 11, fontWeight: 500, color: '#999999', letterSpacing: '0.03em' }}>kitifica.com · CC Creator</p>} />;
 }
 
 function Unconfigured() {

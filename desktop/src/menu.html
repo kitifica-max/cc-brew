@@ -75,7 +75,6 @@ html, body {
 .info-label { font-size: 10.5px; color: rgba(255,255,255,0.35); min-width: 50px; }
 .info-val   { font-size: 10.5px; color: rgba(255,255,255,0.75); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .info-path  { font-size: 9.5px; color: rgba(255,255,255,0.25); padding-left: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.trial-row  { font-size: 10px; color: #fbbf24; padding-top: 1px; }
 
 /* ── Menu items ── */
 .section { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
@@ -167,10 +166,10 @@ html, body {
 
 </div>
 <script>
-let state = { status: 'stopped', project: null, uptime: null, trialLabel: null, updateAvailable: null };
+let state = { status: 'stopped', project: null, uptime: null, updateAvailable: null };
 
 function renderInfo() {
-  const { status, project, uptime, trialLabel } = state;
+  const { status, project, uptime } = state;
   const running = status === 'running';
   let html = `<div class="info-row">
     <div class="status-dot ${running ? 'on' : 'off'}"></div>
@@ -190,7 +189,6 @@ function renderInfo() {
     </div>`;
     if (project.path) html += `<div class="info-path">${project.path}</div>`;
   }
-  if (trialLabel) html += `<div class="trial-row">${trialLabel}</div>`;
   document.getElementById('info').innerHTML = html;
 }
 

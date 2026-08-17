@@ -41,7 +41,6 @@ const BREW_UPDATE_CMD = 'brew upgrade --cask kitifica-max/tap/cc-controller';
 const EXEC_WHITELIST = new Set(['npm','npx','node','git','yarn','pnpm','bun','ls','pwd','cat','mkdir','touch','echo','python3','pip3','cargo','go','make']);
 let pendingFolderId = null; // set while PWA is waiting for user to pick a folder
 let previewProc = null;
-let trialDaysLeft = null; // null = paid/unknown, number = days remaining in trial
 
 function checkForUpdates() {
   return new Promise((resolve) => {
@@ -90,13 +89,9 @@ function getUptime() {
 
 function buildMenu(status) {
   const active = getActive();
-  const trialLabel = trialDaysLeft !== null
-    ? (trialDaysLeft === 0 ? 'Prueba: vence hoy' : `Prueba: ${trialDaysLeft} día${trialDaysLeft === 1 ? '' : 's'} restante${trialDaysLeft === 1 ? '' : 's'}`)
-    : null;
   const items = [
     { label: 'CC Creator', enabled: false },
     { label: `Estado: ${status}`, enabled: false },
-    ...(trialLabel ? [{ label: trialLabel, enabled: false }] : []),
   ];
 
   if (status === 'running') {
@@ -250,32 +245,6 @@ async function startSession() {
     });
     await openSetupWindow();
     return;
-  }
-
-  // Access check: trial / paid
-  const { data: { session: authSession } } = await bridge.client.auth.getSession();
-  if (authSession?.user) {
-    const uid = authSession.user.id;
-    const { data: access } = await bridge.client
-      .from('user_access').select('trial_ends_at, paid_at').eq('user_id', uid).single();
-    const trialEnds = access?.trial_ends_at
-      ? new Date(access.trial_ends_at)
-      : new Date(new Date(authSession.user.created_at).getTime() + 7 * 24 * 60 * 60 * 1000);
-    if (!access?.paid_at) {
-      trialDaysLeft = Math.max(0, Math.ceil((trialEnds - new Date()) / (1000 * 60 * 60 * 24)));
-    }
-    if (!access?.paid_at && new Date() >= trialEnds) {
-      shell.openExternal('https://ccc.kitifica.com/pago');
-      await dialog.showMessageBox({
-        type: 'info',
-        title: 'Prueba finalizada',
-        message: 'Tu prueba de 7 días ha terminado.',
-        detail: 'Completa el pago de $4.99 en el navegador para seguir usando CC Creator.',
-        buttons: ['Abrir pago'],
-      });
-      bridge = null;
-      return;
-    }
   }
 
   const active = getActive();

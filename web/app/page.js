@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { supabase, getSessionId, getSessionToken } from './lib/supabase';
 import { loadProjects, saveProjects, makeProject } from './lib/storage';
 import { voiceFilter } from './utils/voiceFilter';
-import AuthGate, { useTrial } from './components/AuthGate';
+import AuthGate from './components/AuthGate';
 import ProjectsList from './components/ProjectsList';
 import SettingsSheet from './components/SettingsSheet';
 import FileUpload from './components/FileUpload';
@@ -30,18 +30,6 @@ export default function Page() {
     <AuthGate>
       <CCController />
     </AuthGate>
-  );
-}
-
-function TrialPill() {
-  const { daysLeft } = useTrial();
-  if (daysLeft === null) return null;
-  return (
-    <div style={{ background: 'rgba(251,191,36,0.18)', border: '1px solid rgba(251,191,36,0.35)', borderRadius: 20, padding: '3px 10px', display: 'flex', alignItems: 'center', gap: 4 }}>
-      <span style={{ fontSize: 9, fontWeight: 700, color: '#fbbf24', letterSpacing: '0.04em' }}>
-        {daysLeft === 0 ? 'TRIAL: hoy vence' : `TRIAL: ${daysLeft}d restantes`}
-      </span>
-    </div>
   );
 }
 
@@ -590,7 +578,6 @@ function CCController() {
         onOpenFolder={handleOpenFolder}
         onCancelFolder={handleCancelFolder}
         onBack={() => setView('chat')}
-        trialPill={<TrialPill />}
         onShowSettings={() => { setShowSettings(true); sendEvent('get-mcp-config', { projectId: currentId }); }}
       />
       {showSettings && currentProject && (
@@ -644,7 +631,6 @@ function CCController() {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <TrialPill />
             <button
               onClick={() => setPreview(p => ({ ...p, show: true, url: null, loading: false }))}
               style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
