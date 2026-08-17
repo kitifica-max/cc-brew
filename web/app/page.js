@@ -750,22 +750,27 @@ function CCController() {
               ? <span style={{ color: '#7d8590' }}>Sin output aún. Escribe un comando abajo.</span>
               : terminal.lines.join('')}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderTop: '1px solid #21262d' }}>
-            <span style={{ color: '#3fb950', fontFamily: 'monospace', fontSize: 13, flexShrink: 0 }}>$</span>
-            <input
-              value={terminal.cmd}
-              onChange={e => setTerminal(t => ({ ...t, cmd: e.target.value }))}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && terminal.cmd.trim() && !terminal.running) {
-                  setTerminal(t => ({ ...t, lines: [...t.lines, `$ ${t.cmd}\n`], running: true }));
-                  sendEvent('exec-command', { cmd: terminal.cmd.trim(), projectId: currentId });
-                  setTerminal(t => ({ ...t, cmd: '' }));
-                }
-              }}
-              placeholder="npm run dev"
-              disabled={terminal.running}
-              style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', fontFamily: 'monospace', fontSize: 13, color: '#e6edf3' }}
-            />
+          <div style={{ borderTop: '1px solid #21262d', background: '#161b22' }}>
+            <div style={{ padding: '4px 10px 2px', fontSize: 9, color: '#484f58', fontFamily: 'monospace', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              {terminal.running ? '● ejecutando…' : 'Escribe un comando y presiona Enter'}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px 10px' }}>
+              <span style={{ color: '#3fb950', fontFamily: 'monospace', fontSize: 14, flexShrink: 0 }}>$</span>
+              <input
+                value={terminal.cmd}
+                onChange={e => setTerminal(t => ({ ...t, cmd: e.target.value }))}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && terminal.cmd.trim() && !terminal.running) {
+                    setTerminal(t => ({ ...t, lines: [...t.lines, `$ ${t.cmd}\n`], running: true }));
+                    sendEvent('exec-command', { cmd: terminal.cmd.trim(), projectId: currentId });
+                    setTerminal(t => ({ ...t, cmd: '' }));
+                  }
+                }}
+                placeholder="npm run dev"
+                disabled={terminal.running}
+                style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', fontFamily: 'monospace', fontSize: 14, color: terminal.running ? '#484f58' : '#e6edf3', caretColor: '#3fb950' }}
+              />
+            </div>
           </div>
         </div>
       )}
