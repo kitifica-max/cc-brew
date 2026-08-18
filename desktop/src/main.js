@@ -217,9 +217,6 @@ function buildMenuState() {
     status,
     project: active ? { name: active.name, path: active.path } : null,
     uptime: status === 'running' ? getUptime() : null,
-    trialLabel: trialDaysLeft !== null
-      ? (trialDaysLeft === 0 ? 'Prueba: vence hoy' : `Prueba: ${trialDaysLeft} día${trialDaysLeft === 1 ? '' : 's'} restante${trialDaysLeft === 1 ? '' : 's'}`)
-      : null,
     updateAvailable: updateAvailable ? { version: updateAvailable.version } : null,
   };
 }
