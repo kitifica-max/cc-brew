@@ -17,6 +17,7 @@ import { createFileAuthStorage, AUTH_STORAGE_KEY } from './auth-store.js';
 import { extname, basename, resolve, sep } from 'path';
 import { homedir } from 'os';
 import { exec, spawn } from 'child_process';
+import { createConnection as createTcpConn } from 'net';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Production: ~/.config/cc-controller/.env (not bundled in DMG)
@@ -41,6 +42,24 @@ const BREW_UPDATE_CMD = 'brew upgrade --cask kitifica-max/tap/cc-controller';
 const EXEC_WHITELIST = new Set(['npm','npx','node','git','yarn','pnpm','bun','ls','pwd','cat','mkdir','touch','echo','python3','pip3','cargo','go','make']);
 let pendingFolderId = null; // set while PWA is waiting for user to pick a folder
 let previewProc = null;
+
+const DEV_PORTS = [3000, 3001, 4173, 5173, 5174, 8000, 8080, 8888, 4000, 4321, 6006];
+
+function probePort(port) {
+  return new Promise(resolve => {
+    const sock = createTcpConn({ host: '127.0.0.1', port, timeout: 400 });
+    sock.once('connect', () => { sock.destroy(); resolve(true); });
+    sock.once('error', () => resolve(false));
+    sock.once('timeout', () => { sock.destroy(); resolve(false); });
+  });
+}
+
+async function findDevPort() {
+  for (const p of DEV_PORTS) {
+    if (await probePort(p)) return p;
+  }
+  return null;
+}
 
 function checkForUpdates() {
   return new Promise((resolve) => {
@@ -330,10 +349,28 @@ async function startSession() {
 
     const proc = spawn(bin, parts.slice(1), { cwd: project.path, env: { ...process.env } });
     let killed = false;
+    let previewTriggered = false;
     const timer = setTimeout(() => { killed = true; proc.kill(); }, 30_000);
+    const PORT_RE = /(?:localhost|127\.0\.0\.1|0\.0\.0\.0):(\d{4,5})/i;
 
-    proc.stdout.on('data', d => bridge?.broadcastExecOutput(d.toString(), false));
-    proc.stderr.on('data', d => bridge?.broadcastExecOutput(d.toString(), false));
+    const onData = (d) => {
+      const text = d.toString();
+      bridge?.broadcastExecOutput(text, false);
+      if (!previewTriggered) {
+        const match = text.match(PORT_RE);
+        if (match) {
+          const port = parseInt(match[1], 10);
+          if (port >= 1000 && port <= 65535) {
+            previewTriggered = true;
+            clearTimeout(timer); // dev server: no timeout
+            bridge?.onOpenPreview(port);
+          }
+        }
+      }
+    };
+
+    proc.stdout.on('data', onData);
+    proc.stderr.on('data', onData);
     proc.on('close', code => {
       clearTimeout(timer);
       bridge?.broadcastExecOutput(killed ? '\n[Timeout 30s: proceso terminado]' : '', true, code ?? 0);
@@ -392,15 +429,20 @@ async function startSession() {
     }
   };
 
-  bridge.onOpenPreview = (port) => {
+  bridge.onOpenPreview = async (port) => {
     if (previewProc) { previewProc.kill(); previewProc = null; }
-    const proc = spawn('cloudflared', ['tunnel', '--url', `localhost:${port}`], { stdio: ['ignore', 'pipe', 'pipe'] });
+    let actualPort = port;
+    if (!actualPort) {
+      actualPort = await findDevPort();
+      if (!actualPort) { bridge?.broadcastPreviewUrl(null, 0); return; }
+    }
+    const proc = spawn('cloudflared', ['tunnel', '--url', `localhost:${actualPort}`], { stdio: ['ignore', 'pipe', 'pipe'] });
     previewProc = proc;
     const URL_RE = /https:\/\/[a-z0-9-]+\.trycloudflare\.com/;
     const onData = (data) => {
       const match = data.toString().match(URL_RE);
       if (match) {
-        bridge?.broadcastPreviewUrl(match[0], port);
+        bridge?.broadcastPreviewUrl(match[0], actualPort);
         proc.stdout.off('data', onData);
         proc.stderr.off('data', onData);
       }
@@ -408,7 +450,7 @@ async function startSession() {
     proc.stdout.on('data', onData);
     proc.stderr.on('data', onData);
     proc.on('error', (e) => {
-      bridge?.broadcastPreviewUrl(null, port);
+      bridge?.broadcastPreviewUrl(null, actualPort);
     });
     proc.on('close', () => { if (previewProc === proc) previewProc = null; });
   };

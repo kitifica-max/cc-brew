@@ -9,10 +9,12 @@ const PHASE_ROLES = {
 - NO empieces a codear hasta tener claridad total de la idea y aprobación explícita del usuario`,
 
   2: `- Construye la app iterativamente con el stack elegido en fase 1
-- Usa el web previewer de CC Creator (botón globo en el header) para mostrar avance en tiempo real
 - Prioriza la funcionalidad core sobre diseño perfecto en esta fase
 - Aplica las reglas de UI/UX: touch targets ≥ 44px, contraste ≥ 4.5:1, tipografía ≥ 16px en móvil
 - Haz commits frecuentes con mensajes descriptivos
+- **Al terminar la primera versión funcional del POC, arranca el servidor de desarrollo INMEDIATAMENTE** sin esperar instrucción del usuario (npm run dev, python -m http.server, uvicorn, etc.)
+- **CRÍTICO:** Después de arrancar el servidor, incluye SIEMPRE en tu respuesta la línea exacta: "Servidor corriendo en http://localhost:PORT" (con el puerto real). CC Creator la detecta automáticamente y abre el web preview en la app del usuario sin que él haga nada
+- NO le pidas al usuario que abra el previewer, que escriba comandos ni que abra Finder — todo es automático
 - Cuando el usuario esté satisfecho con el POC, dile que puede avanzar a Fase 3 desde el panel de fases`,
 
   3: `- Guía al usuario para configurar GitHub: explica cómo obtener GITHUB_TOKEN en github.com/settings/tokens (scope: repo)
@@ -47,8 +49,9 @@ const SKILLS_BY_PHASE = {
 
   2: `### Skills activos — Fase 2
 **UI/UX:** Touch targets ≥ 44px. Contraste ≥ 4.5:1. Fuente body ≥ 16px en móvil. Usa cursor-pointer en elementos clickeables.
-**TDD básico:** Escribe la función, pruébala manualmente en el previewer antes de continuar.
-**Commits frecuentes:** Un commit por feature funcional.`,
+**TDD básico:** Escribe la función, pruébala en el previewer antes de continuar.
+**Commits frecuentes:** Un commit por feature funcional.
+**Dev server auto-start:** Al terminar el POC inicial, arranca el servidor. Incluye en tu respuesta "Servidor corriendo en http://localhost:PORT" — CC Creator lo detecta y abre el preview automáticamente. Nunca le pidas al usuario que lo haga.`,
 
   3: `### Skills activos — Fase 3
 **Instrucciones paso a paso:** Guía cada acción en el chat. El usuario no sabe dónde buscar los tokens — sé específico con URLs y pasos.

@@ -178,6 +178,18 @@ function CCController() {
       resetDesktopTimeout();
     });
 
+    const PORT_RE = /localhost:(\d{4,5})/i;
+    const autoPreviewedPorts = new Set();
+
+    const tryAutoPreview = (text) => {
+      const match = text?.match(PORT_RE);
+      if (!match) return;
+      const port = parseInt(match[1], 10);
+      if (port < 1000 || port > 65535 || autoPreviewedPorts.has(port)) return;
+      autoPreviewedPorts.add(port);
+      ch.send({ type: 'broadcast', event: 'open-preview', payload: { port, token: getSessionToken() } });
+    };
+
     ch.on('broadcast', { event: 'chunk' }, ({ payload }) => {
       if (!active) return;
       resetDesktopTimeout();
@@ -194,6 +206,7 @@ function CCController() {
             ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: 'claude', text: prev.text, time }],
           }));
           setStreamingMsg(null);
+          tryAutoPreview(prev.text);
           if (document.visibilityState !== 'visible') {
             unreadRef.current += 1;
             navigator.setAppBadge?.(unreadRef.current).catch(() => {});
@@ -227,6 +240,7 @@ function CCController() {
         if (p.id !== targetId) return p;
         return { ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: payload.role, text: payload.text, time }] };
       }));
+      if (payload.role === 'claude') tryAutoPreview(payload.text);
     });
 
     ch.on('broadcast', { event: 'history' }, ({ payload }) => {
@@ -280,7 +294,7 @@ function CCController() {
     ch.on('broadcast', { event: 'preview-url' }, ({ payload }) => {
       if (!active) return;
       if (payload.url) {
-        setPreview(p => ({ ...p, loading: false, url: payload.url, error: false }));
+        setPreview(p => ({ ...p, show: true, loading: false, url: payload.url, error: false }));
       } else {
         setPreview(p => ({ ...p, loading: false, url: null, error: true }));
       }
@@ -632,7 +646,10 @@ function CCController() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <button
-              onClick={() => setPreview(p => ({ ...p, show: true, url: null, loading: false }))}
+              onClick={() => {
+                setPreview(p => ({ ...p, show: true, loading: true, url: null, error: false }));
+                sendEvent('open-preview', { port: 0 });
+              }}
               style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
               dangerouslySetInnerHTML={{ __html: ICON_GLOBE }}
             />
@@ -737,7 +754,17 @@ function CCController() {
               : terminal.lines.join('')}
           </div>
           <div style={{ borderTop: '1px solid #21262d', background: '#161b22' }}>
-            <div style={{ padding: '4px 10px 2px', fontSize: 9, color: '#484f58', fontFamily: 'monospace', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            <div style={{ padding: '6px 10px 4px', display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+              {['npm install', 'npm run dev', 'npm run build', 'git status'].map(cmd => (
+                <button key={cmd} disabled={terminal.running} onClick={() => {
+                  setTerminal(t => ({ ...t, lines: [...t.lines, `$ ${cmd}\n`], running: true, cmd: '' }));
+                  sendEvent('exec-command', { cmd, projectId: currentId });
+                }} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, padding: '3px 8px', fontSize: 10, fontFamily: 'monospace', color: terminal.running ? '#484f58' : '#7d8590', cursor: terminal.running ? 'default' : 'pointer', whiteSpace: 'nowrap' }}>
+                  {cmd}
+                </button>
+              ))}
+            </div>
+            <div style={{ padding: '2px 10px 1px', fontSize: 9, color: '#484f58', fontFamily: 'monospace', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               {terminal.running ? '● ejecutando…' : 'Escribe un comando y presiona Enter'}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px 10px' }}>
@@ -1057,11 +1084,12 @@ const MODEL_CONTEXT = {
 };
 
 function PreviewSheet({ preview, setPreview, sendEvent }) {
+  const [manualPort, setManualPort] = useState('');
   const close = () => setPreview(p => ({ ...p, show: false }));
-  const connect = () => {
-    if (!preview.port) return;
-    setPreview(p => ({ ...p, loading: true, url: null }));
-    sendEvent('open-preview', { port: Number(preview.port) });
+  const retry = () => {
+    setPreview(p => ({ ...p, loading: true, url: null, error: false }));
+    const port = manualPort ? Number(manualPort) : 0;
+    sendEvent('open-preview', { port });
   };
 
   return (
@@ -1072,35 +1100,19 @@ function PreviewSheet({ preview, setPreview, sendEvent }) {
           <span style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Web Preview</span>
           <button onClick={close} style={{ background: 'none', border: 'none', color: '#888', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}>×</button>
         </div>
-        <p style={{ margin: 0, fontSize: 12, color: '#888', lineHeight: 1.5 }}>
-          Genera una URL pública temporal para ver tu proyecto desde cualquier dispositivo.
-        </p>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <input
-            type="number"
-            placeholder="Puerto (ej: 3000)"
-            value={preview.port}
-            onChange={e => setPreview(p => ({ ...p, port: e.target.value }))}
-            onKeyDown={e => e.key === 'Enter' && connect()}
-            style={{ flex: 1, background: '#2a2a2a', border: '1px solid #333', borderRadius: 10, padding: '10px 14px', color: '#fff', fontSize: 14, outline: 'none' }}
-          />
-          <button
-            onClick={connect}
-            disabled={!preview.port || preview.loading}
-            style={{ background: '#e8490f', border: 'none', borderRadius: 10, padding: '10px 18px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: preview.port && !preview.loading ? 'pointer' : 'default', opacity: preview.port && !preview.loading ? 1 : 0.5 }}
-          >
-            {preview.loading ? '...' : 'Conectar'}
-          </button>
-        </div>
-        {preview.error && (
-          <p style={{ margin: 0, fontSize: 11, color: '#f87171' }}>
-            Error al conectar. ¿Está cloudflared instalado? <code style={{ background: '#2a2a2a', padding: '2px 6px', borderRadius: 4 }}>brew install cloudflared</code>
-          </p>
+
+        {preview.loading && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '12px 0' }}>
+            <div style={{ width: 32, height: 32, border: '3px solid rgba(255,255,255,0.1)', borderTop: '3px solid #e8490f', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+            <span style={{ fontSize: 13, color: '#888' }}>Buscando servidor local…</span>
+          </div>
         )}
+
         {preview.url && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div style={{ background: '#2a2a2a', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 12, color: '#86efac', flex: 1, wordBreak: 'break-all' }}>{preview.url}</span>
+            <p style={{ margin: 0, fontSize: 11, color: '#888' }}>URL pública temporal · se cierra al cerrar CC Creator</p>
+            <div style={{ background: '#2a2a2a', borderRadius: 10, padding: '10px 14px' }}>
+              <span style={{ fontSize: 12, color: '#86efac', wordBreak: 'break-all' }}>{preview.url}</span>
             </div>
             <button
               onClick={() => window.open(preview.url, '_blank')}
@@ -1110,7 +1122,32 @@ function PreviewSheet({ preview, setPreview, sendEvent }) {
             </button>
           </div>
         )}
+
+        {preview.error && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <p style={{ margin: 0, fontSize: 12, color: '#f87171' }}>
+              No se encontró servidor. ¿Está corriendo la app?
+            </p>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input
+                type="number"
+                placeholder="Puerto manual (ej: 3000)"
+                value={manualPort}
+                onChange={e => setManualPort(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && retry()}
+                style={{ flex: 1, background: '#2a2a2a', border: '1px solid #444', borderRadius: 10, padding: '10px 12px', color: '#fff', fontSize: 13, outline: 'none' }}
+              />
+              <button onClick={retry} style={{ background: '#e8490f', border: 'none', borderRadius: 10, padding: '10px 16px', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                Reintentar
+              </button>
+            </div>
+            <p style={{ margin: 0, fontSize: 10, color: '#555' }}>
+              ¿Falta cloudflared? <code style={{ background: '#2a2a2a', padding: '2px 5px', borderRadius: 4 }}>brew install cloudflared</code>
+            </p>
+          </div>
+        )}
       </div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
