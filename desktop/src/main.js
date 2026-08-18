@@ -330,10 +330,28 @@ async function startSession() {
 
     const proc = spawn(bin, parts.slice(1), { cwd: project.path, env: { ...process.env } });
     let killed = false;
+    let previewTriggered = false;
     const timer = setTimeout(() => { killed = true; proc.kill(); }, 30_000);
+    const PORT_RE = /(?:localhost|127\.0\.0\.1|0\.0\.0\.0):(\d{4,5})/i;
 
-    proc.stdout.on('data', d => bridge?.broadcastExecOutput(d.toString(), false));
-    proc.stderr.on('data', d => bridge?.broadcastExecOutput(d.toString(), false));
+    const onData = (d) => {
+      const text = d.toString();
+      bridge?.broadcastExecOutput(text, false);
+      if (!previewTriggered) {
+        const match = text.match(PORT_RE);
+        if (match) {
+          const port = parseInt(match[1], 10);
+          if (port >= 1000 && port <= 65535) {
+            previewTriggered = true;
+            clearTimeout(timer); // dev server: no timeout
+            bridge?.onOpenPreview(port);
+          }
+        }
+      }
+    };
+
+    proc.stdout.on('data', onData);
+    proc.stderr.on('data', onData);
     proc.on('close', code => {
       clearTimeout(timer);
       bridge?.broadcastExecOutput(killed ? '\n[Timeout 30s: proceso terminado]' : '', true, code ?? 0);

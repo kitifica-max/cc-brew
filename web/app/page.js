@@ -280,7 +280,7 @@ function CCController() {
     ch.on('broadcast', { event: 'preview-url' }, ({ payload }) => {
       if (!active) return;
       if (payload.url) {
-        setPreview(p => ({ ...p, loading: false, url: payload.url, error: false }));
+        setPreview(p => ({ ...p, show: true, loading: false, url: payload.url, error: false }));
       } else {
         setPreview(p => ({ ...p, loading: false, url: null, error: true }));
       }
@@ -737,7 +737,17 @@ function CCController() {
               : terminal.lines.join('')}
           </div>
           <div style={{ borderTop: '1px solid #21262d', background: '#161b22' }}>
-            <div style={{ padding: '4px 10px 2px', fontSize: 9, color: '#484f58', fontFamily: 'monospace', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            <div style={{ padding: '6px 10px 4px', display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+              {['npm install', 'npm run dev', 'npm run build', 'git status'].map(cmd => (
+                <button key={cmd} disabled={terminal.running} onClick={() => {
+                  setTerminal(t => ({ ...t, lines: [...t.lines, `$ ${cmd}\n`], running: true, cmd: '' }));
+                  sendEvent('exec-command', { cmd, projectId: currentId });
+                }} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, padding: '3px 8px', fontSize: 10, fontFamily: 'monospace', color: terminal.running ? '#484f58' : '#7d8590', cursor: terminal.running ? 'default' : 'pointer', whiteSpace: 'nowrap' }}>
+                  {cmd}
+                </button>
+              ))}
+            </div>
+            <div style={{ padding: '2px 10px 1px', fontSize: 9, color: '#484f58', fontFamily: 'monospace', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               {terminal.running ? '● ejecutando…' : 'Escribe un comando y presiona Enter'}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px 10px' }}>
