@@ -24,6 +24,7 @@ const QUICK = [
 ];
 
 const THINKING_TIMEOUT_MS = 3 * 60 * 1000;
+const PORT_RE = /(?:localhost|127\.0\.0\.1|0\.0\.0\.0):(\d{4,5})/i;
 
 export default function Page() {
   return (
@@ -51,7 +52,7 @@ function CCController() {
   const [streamingMsg, setStreamingMsg] = useState(null); // {msgId, text} | null
   const [pendingPermission, setPendingPermission] = useState(null); // {text, msgId, projectId} | null
   const [sessionUsage, setSessionUsage] = useState({ cost: 0, inputTokens: 0 });
-  const [preview, setPreview] = useState({ show: false, port: '', loading: false, url: null, error: false });
+  const [preview, setPreview] = useState({ show: false, loading: false, url: null, error: false, errorMsg: null });
   const streamingMsgRef = useRef(null);
   const chatRef = useRef(null);
   const channelRef = useRef(null);
@@ -59,6 +60,7 @@ function CCController() {
   const wasConnectedRef = useRef(false);
   const reconnectMsgShownRef = useRef(false); // dedup: one msg per disconnect cycle
   const unreadRef = useRef(0);
+  const autoPreviewedPortsRef = useRef(new Set());
 
   // ── Voice state ──────────────────────────────────────────────────────────────
   const [voiceState, setVoiceState] = useState('idle'); // 'idle' | 'listening' | 'processing'
@@ -178,15 +180,12 @@ function CCController() {
       resetDesktopTimeout();
     });
 
-    const PORT_RE = /localhost:(\d{4,5})/i;
-    const autoPreviewedPorts = new Set();
-
     const tryAutoPreview = (text) => {
       const match = text?.match(PORT_RE);
       if (!match) return;
       const port = parseInt(match[1], 10);
-      if (port < 1000 || port > 65535 || autoPreviewedPorts.has(port)) return;
-      autoPreviewedPorts.add(port);
+      if (port < 1000 || port > 65535 || autoPreviewedPortsRef.current.has(port)) return;
+      autoPreviewedPortsRef.current.add(port);
       ch.send({ type: 'broadcast', event: 'open-preview', payload: { port, token: getSessionToken() } });
     };
 
@@ -294,9 +293,9 @@ function CCController() {
     ch.on('broadcast', { event: 'preview-url' }, ({ payload }) => {
       if (!active) return;
       if (payload.url) {
-        setPreview(p => ({ ...p, show: true, loading: false, url: payload.url, error: false }));
+        setPreview(p => ({ ...p, show: true, loading: false, url: payload.url, error: false, errorMsg: null }));
       } else {
-        setPreview(p => ({ ...p, loading: false, url: null, error: true }));
+        setPreview(p => ({ ...p, loading: false, url: null, error: true, errorMsg: payload.errorMsg ?? null }));
       }
     });
 
@@ -616,7 +615,6 @@ function CCController() {
           onClose={() => setShowSecrets(false)}
         />
       )}
-      {preview.show && <PreviewSheet preview={preview} setPreview={setPreview} sendEvent={sendEvent} />}
     </>
   );
 
@@ -1126,7 +1124,7 @@ function PreviewSheet({ preview, setPreview, sendEvent }) {
         {preview.error && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <p style={{ margin: 0, fontSize: 12, color: '#f87171' }}>
-              No se encontró servidor. ¿Está corriendo la app?
+              {preview.errorMsg ?? 'No se encontró servidor. ¿Está corriendo la app?'}
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
               <input

@@ -171,7 +171,7 @@ export default class Bridge {
       })
       .on('broadcast', { event: 'open-preview' }, ({ payload }) => {
         if (!this._validate(payload)) return;
-        this.onOpenPreview?.(payload.port);
+        this.onOpenPreview?.(payload.port)?.catch?.(() => {});
       })
       .on('broadcast', { event: 'phase-change' }, ({ payload }) => {
         if (!this._validate(payload)) return;
@@ -295,10 +295,10 @@ export default class Bridge {
     this.sendPush('CC Creator', '⚠️ Claude necesita un permiso — toca para responder').catch(() => {});
   }
 
-  broadcastPreviewUrl(url, port) {
+  broadcastPreviewUrl(url, port, errorMsg = null) {
     this.channel?.send({
       type: 'broadcast', event: 'preview-url',
-      payload: { url, port, ts: Date.now() },
+      payload: { url, port, ts: Date.now(), ...(errorMsg ? { errorMsg } : {}) },
     });
   }
 
