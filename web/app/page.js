@@ -178,6 +178,18 @@ function CCController() {
       resetDesktopTimeout();
     });
 
+    const PORT_RE = /localhost:(\d{4,5})/i;
+    const autoPreviewedPorts = new Set();
+
+    const tryAutoPreview = (text) => {
+      const match = text?.match(PORT_RE);
+      if (!match) return;
+      const port = parseInt(match[1], 10);
+      if (port < 1000 || port > 65535 || autoPreviewedPorts.has(port)) return;
+      autoPreviewedPorts.add(port);
+      ch.send({ type: 'broadcast', event: 'open-preview', payload: { port, token: getSessionToken() } });
+    };
+
     ch.on('broadcast', { event: 'chunk' }, ({ payload }) => {
       if (!active) return;
       resetDesktopTimeout();
@@ -194,6 +206,7 @@ function CCController() {
             ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: 'claude', text: prev.text, time }],
           }));
           setStreamingMsg(null);
+          tryAutoPreview(prev.text);
           if (document.visibilityState !== 'visible') {
             unreadRef.current += 1;
             navigator.setAppBadge?.(unreadRef.current).catch(() => {});
@@ -227,6 +240,7 @@ function CCController() {
         if (p.id !== targetId) return p;
         return { ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: payload.role, text: payload.text, time }] };
       }));
+      if (payload.role === 'claude') tryAutoPreview(payload.text);
     });
 
     ch.on('broadcast', { event: 'history' }, ({ payload }) => {

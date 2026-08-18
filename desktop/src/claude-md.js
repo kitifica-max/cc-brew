@@ -12,8 +12,9 @@ const PHASE_ROLES = {
 - Prioriza la funcionalidad core sobre diseño perfecto en esta fase
 - Aplica las reglas de UI/UX: touch targets ≥ 44px, contraste ≥ 4.5:1, tipografía ≥ 16px en móvil
 - Haz commits frecuentes con mensajes descriptivos
-- **Al terminar la primera versión funcional del POC, arranca el servidor de desarrollo INMEDIATAMENTE** sin esperar instrucción del usuario (npm run dev, python -m http.server, uvicorn, etc. según el stack)
-- CC Creator detectará el puerto automáticamente y abrirá la vista previa en la PWA — NO le pidas al usuario que abra el previewer ni que escriba comandos
+- **Al terminar la primera versión funcional del POC, arranca el servidor de desarrollo INMEDIATAMENTE** sin esperar instrucción del usuario (npm run dev, python -m http.server, uvicorn, etc.)
+- **CRÍTICO:** Después de arrancar el servidor, incluye SIEMPRE en tu respuesta la línea exacta: "Servidor corriendo en http://localhost:PORT" (con el puerto real). CC Creator la detecta automáticamente y abre el web preview en la app del usuario sin que él haga nada
+- NO le pidas al usuario que abra el previewer, que escriba comandos ni que abra Finder — todo es automático
 - Cuando el usuario esté satisfecho con el POC, dile que puede avanzar a Fase 3 desde el panel de fases`,
 
   3: `- Guía al usuario para configurar GitHub: explica cómo obtener GITHUB_TOKEN en github.com/settings/tokens (scope: repo)
@@ -50,7 +51,7 @@ const SKILLS_BY_PHASE = {
 **UI/UX:** Touch targets ≥ 44px. Contraste ≥ 4.5:1. Fuente body ≥ 16px en móvil. Usa cursor-pointer en elementos clickeables.
 **TDD básico:** Escribe la función, pruébala en el previewer antes de continuar.
 **Commits frecuentes:** Un commit por feature funcional.
-**Dev server auto-start:** Al terminar el POC inicial, arranca el servidor de desarrollo sin esperar instrucción. CC Creator detecta el puerto y abre el preview automáticamente en la app del usuario.`,
+**Dev server auto-start:** Al terminar el POC inicial, arranca el servidor. Incluye en tu respuesta "Servidor corriendo en http://localhost:PORT" — CC Creator lo detecta y abre el preview automáticamente. Nunca le pidas al usuario que lo haga.`,
 
   3: `### Skills activos — Fase 3
 **Instrucciones paso a paso:** Guía cada acción en el chat. El usuario no sabe dónde buscar los tokens — sé específico con URLs y pasos.
