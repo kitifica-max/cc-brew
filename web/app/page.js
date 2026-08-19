@@ -145,7 +145,7 @@ function CCController() {
     // Phase nudge
     if (phase < 6) {
       const DONE_WORDS = ['siguiente fase', 'puedes avanzar', 'has completado', 'terminaste la fase', 'listo para la siguiente', 'puedes pasar a la fase', 'fase completada', 'completado exitosamente', 'todo listo para avanzar'];
-      if (DONE_WORDS.some(w => text.includes(w)) || claudeMsgCountRef.current % 5 === 0) {
+      if (DONE_WORDS.some(w => text.includes(w)) || (claudeMsgCountRef.current > 0 && claudeMsgCountRef.current % 5 === 0)) {
         setPhaseNudge(true);
       }
     }
@@ -781,11 +781,11 @@ function CCController() {
           </div>
         )}
         {messages.map(msg => <MessageRow key={msg.id} msg={msg} />)}
-        {phaseNudge && !thinking && !streamingMsg && (currentProject?.phase ?? 1) < 6 && (
+        {phaseNudge && !thinking && !streamingMsg && currentProject && (currentProject.phase ?? 1) < 6 && (
           <PhaseAdvanceCard
             phase={currentProject.phase ?? 1}
             onAdvance={() => {
-              const newPhase = (currentProject.phase ?? 1) + 1;
+              const newPhase = (currentProject?.phase ?? 1) + 1;
               setProjects(prev => prev.map(p => p.id === currentId ? { ...p, phase: newPhase } : p));
               sendEvent('phase-change', { projectId: currentId, phase: newPhase });
               setPhaseNudge(false);
