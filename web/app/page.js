@@ -79,7 +79,7 @@ function CCController() {
   const channelRef = useRef(null);
   const currentIdRef = useRef(null);
   const wasConnectedRef = useRef(false);
-  const reconnectMsgShownRef = useRef(false); // dedup: one msg per disconnect cycle
+
   const unreadRef = useRef(0);
   const autoPreviewedPortsRef = useRef(new Set());
 
@@ -453,15 +453,9 @@ function CCController() {
         if (isNowConnected) {
           ch.send({ type: 'broadcast', event: 'get-project-state', payload: { token: getSessionToken(), projects: projectsRef.current.map(p => ({ id: p.id, name: p.name })) } });
           if (currentIdRef.current) ch.send({ type: 'broadcast', event: 'get-env', payload: { projectId: currentIdRef.current, token: getSessionToken() } });
-          if (wasConnectedRef.current && !reconnectMsgShownRef.current) {
-            addSystemMsg('✓ Conexión recuperada');
-            reconnectMsgShownRef.current = true;
-          }
           wasConnectedRef.current = true;
           registerPush();
         } else {
-          reconnectMsgShownRef.current = false; // reset on disconnect so next reconnect shows once
-        }
       });
     })();
 
