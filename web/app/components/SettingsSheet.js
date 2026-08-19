@@ -66,27 +66,27 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
       {/* Sheet */}
       <div style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 11,
-        background: '#fff', borderRadius: '24px 24px 0 0',
+        background: 'var(--bg-card)', borderRadius: '24px 24px 0 0',
         padding: '20px 20px 40px', maxHeight: '80dvh', overflowY: 'auto',
       }}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: '#1a1a1a' }}>{project.name}</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>{project.name}</div>
             <div style={{ fontSize: 10, fontWeight: 500, color: '#999999', marginTop: 2 }}>
               {project.path ?? 'Creando directorio...'}
             </div>
           </div>
           <button
             onClick={onClose}
-            style={{ background: '#f5f0ee', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            style={{ background: 'var(--bg-surface)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             dangerouslySetInnerHTML={{ __html: ICON_X }}
           />
         </div>
 
         {/* Model */}
         <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#999999', marginBottom: 10 }}>Modelo</div>
+          <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', marginBottom: 10 }}>Modelo</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {MODELS.map(m => (
               <button
@@ -94,12 +94,12 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
                 onClick={() => onModelChange(m.id)}
                 style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  background: project.model === m.id ? '#f0f0f0' : '#f5f5f5',
+                  background: project.model === m.id ? 'var(--bg-surface)' : 'var(--bg-surface)',
                   border: project.model === m.id ? '1.5px solid #f04e23' : '1.5px solid transparent',
                   borderRadius: 12, padding: '10px 14px', cursor: 'pointer', textAlign: 'left',
                 }}
               >
-                <span style={{ fontSize: 13, fontWeight: 600, color: project.model === m.id ? '#f04e23' : '#333' }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: project.model === m.id ? '#f04e23' : 'var(--text-secondary)' }}>
                   {m.label}
                 </span>
                 {project.model === m.id && (
@@ -112,7 +112,7 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
 
         {/* Effort */}
         <div style={{ marginBottom: 24 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#999999', marginBottom: 10 }}>Effort</div>
+          <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', marginBottom: 10 }}>Effort</div>
           <div style={{ display: 'flex', gap: 8 }}>
             {EFFORTS.map(e => (
               <button
@@ -120,8 +120,8 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
                 onClick={() => onEffortChange(e)}
                 style={{
                   flex: 1, padding: '10px 0', borderRadius: 12, border: 'none', cursor: 'pointer',
-                  background: project.effort === e ? '#f04e23' : '#f5f5f5',
-                  color: project.effort === e ? '#fff' : '#555',
+                  background: project.effort === e ? '#f04e23' : 'var(--bg-surface)',
+                  color: project.effort === e ? '#fff' : 'var(--text-secondary)',
                   fontSize: 12, fontWeight: 700, fontFamily: 'Sora, sans-serif',
                 }}
               >
@@ -141,7 +141,7 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
           </div>
           <button
             onClick={onOpenSecrets}
-            style={{ width: '100%', background: '#f5f5f5', border: '1.5px solid #e0e0e0', borderRadius: 12, padding: '12px 16px', color: '#1a1a1a', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, fontFamily: 'Sora, sans-serif' }}
+            style={{ width: '100%', background: 'var(--bg-surface)', border: '1.5px solid var(--border)', borderRadius: 12, padding: '12px 16px', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, fontFamily: 'Sora, sans-serif' }}
           >
             <span>Variables de entorno & Secrets</span>
             <span style={{ color: '#999' }}>→</span>
@@ -149,10 +149,10 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
         </div>
 
         {/* Subagentes / Modo autónomo */}
-        <div style={{ marginBottom: 24, padding: 16, background: '#f5f5f5', borderRadius: 16 }}>
+        <div style={{ marginBottom: 24, padding: 16, background: 'var(--bg-surface)', borderRadius: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
             <span style={{ display: 'flex', width: 14, height: 14, color: '#f04e23' }} dangerouslySetInnerHTML={{ __html: ICON_BOT }} />
-            <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#999999' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)' }}>
               Subagentes / Workflows
             </div>
           </div>
@@ -160,12 +160,12 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
             onClick={() => onSkipPermissionsChange?.(!project.skipPermissions)}
             style={{
               width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              background: '#fff', border: `1.5px solid ${project.skipPermissions ? '#f04e23' : '#e0e0e0'}`,
+              background: 'var(--bg-card)', border: `1.5px solid ${project.skipPermissions ? '#f04e23' : 'var(--border)'}`,
               borderRadius: 12, padding: '12px 14px', cursor: 'pointer', textAlign: 'left',
             }}
           >
             <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: project.skipPermissions ? '#f04e23' : '#333' }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: project.skipPermissions ? '#f04e23' : 'var(--text-secondary)' }}>
                 Modo autónomo
               </div>
               <div style={{ fontSize: 10, color: '#999', marginTop: 2 }}>
@@ -184,18 +184,18 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
               }} />
             </div>
           </button>
-          <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 12 }}>
+          <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--bg-card)', border: '1.5px solid var(--border)', borderRadius: 12 }}>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#333' }}>Límite de gasto</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>Límite de gasto</div>
               <div style={{ fontSize: 10, color: '#999', marginTop: 2 }}>Controla el gasto visible en el chat</div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ fontSize: 13, color: '#666' }}>$</span>
+              <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>$</span>
               <input
                 type="number" min="0.1" step="0.5"
                 value={project?.spendLimit ?? 1}
                 onChange={e => onSpendLimitChange?.(parseFloat(e.target.value) || 1)}
-                style={{ width: 60, fontSize: 13, fontWeight: 600, color: '#333', border: '1.5px solid #e0e0e0', borderRadius: 8, padding: '6px 8px', textAlign: 'right', fontFamily: 'Sora, sans-serif' }}
+                style={{ width: 60, fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', border: '1.5px solid var(--border)', borderRadius: 8, padding: '6px 8px', textAlign: 'right', fontFamily: 'Sora, sans-serif', background: 'transparent' }}
               />
             </div>
           </div>
@@ -205,19 +205,19 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
         <div style={{ marginBottom: 24 }}>
           <button
             onClick={() => setShowAdvanced(v => !v)}
-            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f5f5f5', border: '1.5px solid #e8e8e8', borderRadius: 12, padding: '12px 14px', cursor: 'pointer', fontFamily: 'Sora, sans-serif' }}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-surface)', border: '1.5px solid var(--border)', borderRadius: 12, padding: '12px 14px', cursor: 'pointer', fontFamily: 'Sora, sans-serif' }}
           >
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#555' }}>Avanzado</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)' }}>Avanzado</span>
             <span style={{ fontSize: 12, color: '#999', transform: showAdvanced ? 'rotate(180deg)' : 'none', transition: 'transform 200ms', display: 'inline-block' }}>▾</span>
           </button>
           {showAdvanced && (
             <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 10 }}>
 
               {/* Session Token */}
-              <div style={{ padding: 16, background: '#f5f5f5', borderRadius: 16 }}>
+              <div style={{ padding: 16, background: 'var(--bg-surface)', borderRadius: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
                   <span style={{ display: 'flex', width: 14, height: 14, color: '#f04e23' }} dangerouslySetInnerHTML={{ __html: ICON_LINK }} />
-                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#999999' }}>Session Token</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)' }}>Session Token</div>
                 </div>
                 <input
                   type="password"
@@ -226,7 +226,7 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
                   value={newToken}
                   onChange={e => setNewToken(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') handleSaveToken(); }}
-                  style={{ background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '10px 14px', fontSize: 12, fontFamily: 'Sora, sans-serif', outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box', marginBottom: 8 }}
+                  style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)', borderRadius: 10, padding: '10px 14px', fontSize: 12, fontFamily: 'Sora, sans-serif', outline: 'none', color: 'var(--text-primary)', width: '100%', boxSizing: 'border-box', marginBottom: 8 }}
                 />
                 <button
                   onClick={handleSaveToken}
@@ -237,17 +237,17 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
               </div>
 
               {/* MCP Servers */}
-              <div style={{ padding: 16, background: '#f5f5f5', borderRadius: 16 }}>
+              <div style={{ padding: 16, background: 'var(--bg-surface)', borderRadius: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
                   <span style={{ display: 'flex', width: 14, height: 14, color: '#f04e23' }} dangerouslySetInnerHTML={{ __html: ICON_PLUG }} />
-                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#999999' }}>MCP Servers</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)' }}>MCP Servers</div>
                 </div>
                 {Object.entries(mcpServers).length > 0 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
                     {Object.entries(mcpServers).map(([name, cfg]) => (
-                      <div key={name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 10, padding: '8px 12px', border: '1.5px solid #e0e0e0' }}>
+                      <div key={name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-card)', borderRadius: 10, padding: '8px 12px', border: '1.5px solid var(--border)' }}>
                         <div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: '#1a1a1a' }}>{name}</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>{name}</div>
                           <div style={{ fontSize: 10, color: '#888', marginTop: 1 }}>{cfg.command}{cfg.args?.length ? ' ' + cfg.args.join(' ') : ''}</div>
                         </div>
                         <button onClick={() => handleRemoveServer(name)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontSize: 18, lineHeight: 1, padding: '0 4px' }}>×</button>
@@ -256,9 +256,9 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
                   </div>
                 )}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <input placeholder="Nombre (ej: filesystem)" value={newServer.name} onChange={e => setNewServer(s => ({ ...s, name: e.target.value }))} style={{ background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontFamily: 'Sora, sans-serif', outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box' }} />
-                  <input placeholder="Comando (ej: npx)" value={newServer.command} onChange={e => setNewServer(s => ({ ...s, command: e.target.value }))} style={{ background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontFamily: 'Sora, sans-serif', outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box' }} />
-                  <input placeholder="Args (ej: -y @modelcontextprotocol/server-filesystem /ruta)" value={newServer.args} onChange={e => setNewServer(s => ({ ...s, args: e.target.value }))} style={{ background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontFamily: 'Sora, sans-serif', outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box' }} />
+                  <input placeholder="Nombre (ej: filesystem)" value={newServer.name} onChange={e => setNewServer(s => ({ ...s, name: e.target.value }))} style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontFamily: 'Sora, sans-serif', outline: 'none', color: 'var(--text-primary)', width: '100%', boxSizing: 'border-box' }} />
+                  <input placeholder="Comando (ej: npx)" value={newServer.command} onChange={e => setNewServer(s => ({ ...s, command: e.target.value }))} style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontFamily: 'Sora, sans-serif', outline: 'none', color: 'var(--text-primary)', width: '100%', boxSizing: 'border-box' }} />
+                  <input placeholder="Args (ej: -y @modelcontextprotocol/server-filesystem /ruta)" value={newServer.args} onChange={e => setNewServer(s => ({ ...s, args: e.target.value }))} style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontFamily: 'Sora, sans-serif', outline: 'none', color: 'var(--text-primary)', width: '100%', boxSizing: 'border-box' }} />
                   <button onClick={handleAddServer} style={{ width: '100%', background: mcpSaved ? '#00b09b' : '#f04e23', border: 'none', borderRadius: 10, padding: '10px', fontSize: 12, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: 'Sora, sans-serif', transition: 'background 200ms' }}>
                     {mcpSaved ? '✓ Guardado' : 'Agregar MCP server'}
                   </button>

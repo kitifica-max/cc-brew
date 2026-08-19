@@ -129,7 +129,7 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
   }
 
   if (showOnboarding) return (
-    <main style={{ height: '100dvh', background: '#f0f0f2', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <main style={{ height: '100dvh', background: 'var(--bg-page)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div style={{ background: '#f04e23', padding: '52px 24px 28px', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
         {CC_LOGO}
         <div style={{ textAlign: 'center' }}>
@@ -139,8 +139,8 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px 14px 0' }}>
-        <div style={{ background: '#fff', borderRadius: 20, padding: '20px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 6px 20px rgba(0,0,0,0.07)', marginBottom: 12 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#aaa', marginBottom: 18 }}>Primeros pasos</div>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: '20px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 6px 20px rgba(0,0,0,0.07)', marginBottom: 12 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 18 }}>Primeros pasos</div>
           {ONBOARDING_STEPS.map((s, i) => (
             <div key={s.n} style={{ display: 'flex', gap: 14, marginBottom: i < ONBOARDING_STEPS.length - 1 ? 24 : 0 }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
@@ -148,8 +148,8 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
                 {i < ONBOARDING_STEPS.length - 1 && <div style={{ width: 1.5, flex: 1, background: 'rgba(240,78,35,0.18)', marginTop: 6 }} />}
               </div>
               <div style={{ paddingBottom: i < ONBOARDING_STEPS.length - 1 ? 8 : 0 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#111', letterSpacing: '-0.01em', marginBottom: 4 }}>{s.title}</div>
-                <div style={{ fontSize: 12, color: '#777', lineHeight: 1.5, marginBottom: s.code ? 8 : 0 }}>{s.body}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.01em', marginBottom: 4 }}>{s.title}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: s.code ? 8 : 0 }}>{s.body}</div>
                 {s.code && (
                   <div style={{ background: '#1a1a1a', borderRadius: 8, padding: '8px 12px', fontSize: 11, fontFamily: 'monospace', color: '#e8e8e8', wordBreak: 'break-all', lineHeight: 1.5 }}>
                     {s.code}
@@ -173,16 +173,16 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
   );
 
   if (awaitingFolder) return (
-    <main style={{ height: '100dvh', background: '#f5f5f5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, gap: 0 }}>
+    <main style={{ height: '100dvh', background: 'var(--bg-page)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, gap: 0 }}>
       <div style={{ fontSize: 52, marginBottom: 24 }}>🖥️</div>
-      <div style={{ fontSize: 20, fontWeight: 800, color: '#1a1a1a', textAlign: 'center', letterSpacing: '-0.02em', marginBottom: 12 }}>
+      <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', textAlign: 'center', letterSpacing: '-0.02em', marginBottom: 12 }}>
         Selecciona una carpeta en tu Mac
       </div>
-      <div style={{ fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 1.5, marginBottom: 8 }}>
+      <div style={{ fontSize: 14, color: 'var(--text-secondary)', textAlign: 'center', lineHeight: 1.5, marginBottom: 8 }}>
         Haz clic en el ícono de CC Creator en la barra de menús de tu Mac.
       </div>
-      <div style={{ fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 1.5, marginBottom: 36 }}>
-        Selecciona <strong style={{ color: '#1a1a1a' }}>📁 Seleccionar carpeta del proyecto</strong> — la app navegará al chat automáticamente.
+      <div style={{ fontSize: 14, color: 'var(--text-secondary)', textAlign: 'center', lineHeight: 1.5, marginBottom: 36 }}>
+        Selecciona <strong style={{ color: 'var(--text-primary)' }}>📁 Seleccionar carpeta del proyecto</strong> — la app navegará al chat automáticamente.
       </div>
       <div style={{ width: 40, height: 40, border: '3px solid #f04e23', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite', marginBottom: 40 }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -199,7 +199,7 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
   const others = projects.filter(p => p.id !== currentId);
 
   return (
-    <main style={{ height: '100dvh', background: '#f0f0f2', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <main style={{ height: '100dvh', background: 'var(--bg-page)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
       {/* Header */}
       <div style={{ background: '#f04e23', padding: '52px 18px 16px', flexShrink: 0 }}>
@@ -242,12 +242,12 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
           const isEditing = editingId === p.id;
           return (
             <>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#aaa', padding: '0 2px' }}>Activo</div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', padding: '0 2px' }}>Activo</div>
               <div
                 key={p.id}
                 onClick={() => { if (!isEditing) onSwitch(p.id); }}
                 style={{
-                  background: '#fff',
+                  background: 'var(--bg-card)',
                   borderRadius: 18,
                   padding: '13px 13px 13px 15px',
                   cursor: isEditing ? 'default' : 'pointer',
@@ -267,10 +267,10 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
                       }}
                       onBlur={() => commitEdit(p.id)}
                       onClick={e => e.stopPropagation()}
-                      style={{ flex: 1, background: '#f5f5f5', border: '1.5px solid #e0e0e0', borderRadius: 8, padding: '4px 10px', fontSize: 14, fontWeight: 700, color: '#1a1a1a', outline: 'none' }}
+                      style={{ flex: 1, background: 'var(--bg-surface)', border: '1.5px solid var(--border)', borderRadius: 8, padding: '4px 10px', fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', outline: 'none' }}
                     />
                   ) : (
-                    <span style={{ flex: 1, fontSize: 15, fontWeight: 700, color: '#111', letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
+                    <span style={{ flex: 1, fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
                   )}
                   {!isEditing && (
                     <>
@@ -288,7 +288,7 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
                 </div>
                 <PhaseTag phase={p.phase} />
                 <PhaseDots phase={p.phase} />
-                <div style={{ fontSize: 11, color: '#bbb', fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>
                   {modelLabel} · {p.effort}
                 </div>
               </div>
@@ -298,12 +298,12 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
 
         {/* Other projects */}
         {others.length > 0 && (
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#aaa', padding: '2px 2px 0', marginTop: activeProject ? 2 : 0 }}>Recientes</div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', padding: '2px 2px 0', marginTop: activeProject ? 2 : 0 }}>Recientes</div>
         )}
         {/* Empty state */}
         {projects.length === 0 && (
-          <div style={{ background: '#fff', borderRadius: 18, padding: '20px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.05)', border: '1px solid rgba(0,0,0,0.06)' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#ccc', marginBottom: 16 }}>Cómo empezar</div>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 18, padding: '20px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.05)', border: '1px solid var(--divider)' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 16 }}>Cómo empezar</div>
             {ONBOARDING_STEPS.map((s, i) => (
               <div key={s.n} style={{ display: 'flex', gap: 12, marginBottom: i < ONBOARDING_STEPS.length - 1 ? 16 : 0 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
@@ -311,8 +311,8 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
                   {i < ONBOARDING_STEPS.length - 1 && <div style={{ width: 1.5, flex: 1, background: 'rgba(240,78,35,0.12)', marginTop: 4 }} />}
                 </div>
                 <div style={{ paddingBottom: i < ONBOARDING_STEPS.length - 1 ? 4 : 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#222', marginBottom: 2 }}>{s.title}</div>
-                  <div style={{ fontSize: 11, color: '#999', lineHeight: 1.5, marginBottom: s.code ? 6 : 0 }}>{s.body}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>{s.title}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: s.code ? 6 : 0 }}>{s.body}</div>
                   {s.code && (
                     <div style={{ background: '#1a1a1a', borderRadius: 7, padding: '6px 10px', fontSize: 10, fontFamily: 'monospace', color: '#e8e8e8', wordBreak: 'break-all', lineHeight: 1.5 }}>{s.code}</div>
                   )}
@@ -330,11 +330,11 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
               key={p.id}
               onClick={() => { if (!isEditing) onSwitch(p.id); }}
               style={{
-                background: '#fff',
+                background: 'var(--bg-card)',
                 borderRadius: 18,
                 padding: '13px 13px 13px 15px',
                 cursor: isEditing ? 'default' : 'pointer',
-                border: '1px solid rgba(0,0,0,0.07)',
+                border: '1px solid var(--divider)',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.05)',
               }}
             >
@@ -371,7 +371,7 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
               </div>
               <PhaseTag phase={p.phase} />
               <PhaseDots phase={p.phase} />
-              <div style={{ fontSize: 11, color: '#bbb', fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>
                 {modelLabel} · {p.effort} · {p.messages.length} msgs · {new Date(p.createdAt).toLocaleDateString('es', { day: 'numeric', month: 'short' })}
               </div>
             </div>
@@ -380,7 +380,7 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
       </div>
 
       {/* Bottom actions */}
-      <div style={{ padding: '12px 14px 36px', flexShrink: 0, borderTop: '1px solid rgba(0,0,0,0.06)', background: '#f0f0f2' }}>
+      <div style={{ padding: '12px 14px 36px', flexShrink: 0, borderTop: '1px solid var(--divider)', background: 'var(--bg-page)' }}>
         {creating ? (
           <div style={{ display: 'flex', gap: 8 }}>
             <input
@@ -389,7 +389,7 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
               onChange={e => setNewName(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleCreate(); if (e.key === 'Escape') setCreating(false); }}
               placeholder="Nombre del proyecto..."
-              style={{ flex: 1, background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 14, padding: '12px 16px', fontSize: 15, fontWeight: 500, color: '#1a1a1a', outline: 'none' }}
+              style={{ flex: 1, background: 'var(--bg-card)', border: '1.5px solid var(--border)', borderRadius: 14, padding: '12px 16px', fontSize: 15, fontWeight: 500, color: 'var(--text-primary)', outline: 'none' }}
             />
             <button
               onClick={handleCreate}
@@ -409,7 +409,7 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
             </button>
             <button
               onClick={onOpenFolder}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'none', border: '1px solid rgba(0,0,0,0.13)', borderRadius: 16, padding: '13px 16px', fontSize: 14, fontWeight: 600, color: '#666', cursor: 'pointer' }}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'none', border: '1px solid var(--border)', borderRadius: 16, padding: '13px 16px', fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer' }}
             >
               <span style={{ display: 'flex', width: 16, height: 16 }} dangerouslySetInnerHTML={{ __html: ICON_FOLDER }} />
               Abrir carpeta existente

@@ -625,7 +625,7 @@ function CCController() {
       : null;
 
   return (
-    <main style={{ height: '100dvh', background: '#f5f5f5', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <main style={{ height: '100dvh', background: 'var(--bg-page)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
       {/* Header */}
       <div style={{ background: '#f04e23', padding: '52px 16px 12px', flexShrink: 0 }}>
@@ -704,7 +704,7 @@ function CCController() {
       {/* Chat */}
       <div ref={chatRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 14px 8px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {messages.length === 0 && (
-          <div style={{ textAlign: 'center', color: '#999999', fontSize: 12, fontWeight: 600, marginTop: 40 }}>
+          <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 12, fontWeight: 600, marginTop: 40 }}>
             {currentProject?.path ? currentProject.path.replace(/^\/Users\/[^/]+/, '~') : 'Creando directorio...'}
           </div>
         )}
@@ -789,9 +789,9 @@ function CCController() {
       )}
 
       {/* Quick actions */}
-      <div style={{ background: '#f5f5f5', padding: '8px 14px 4px', display: 'flex', gap: 7, overflowX: 'auto', flexShrink: 0, alignItems: 'center' }}>
-        {QUICK.map(({ label, text }) => (
-          <button key={label} onClick={() => sendRaw(text)} style={{ flexShrink: 0, background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 20, padding: '7px 14px', fontSize: 11, fontWeight: 700, color: '#555', cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'Sora, sans-serif' }}>
+      <div style={{ background: 'var(--bg-page)', padding: '8px 14px 4px', display: 'flex', gap: 7, overflowX: 'auto', flexShrink: 0, alignItems: 'center' }}>
+        {!thinking && !streamingMsg && QUICK.map(({ label, text }) => (
+          <button key={label} onClick={() => sendRaw(text)} style={{ flexShrink: 0, background: 'var(--bg-card)', border: '1.5px solid var(--border)', borderRadius: 20, padding: '7px 14px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'Sora, sans-serif' }}>
             {label}
           </button>
         ))}
@@ -800,7 +800,7 @@ function CCController() {
           <button
             onClick={() => setTerminal(t => ({ ...t, open: !t.open }))}
             title="Terminal"
-            style={{ flexShrink: 0, background: terminal.open ? '#1a1a1a' : '#fff', border: '1.5px solid #e0e0e0', borderRadius: 20, padding: '7px 12px', fontSize: 11, fontWeight: 700, color: terminal.open ? '#fff' : '#555', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}
+            style={{ flexShrink: 0, background: terminal.open ? '#1a1a1a' : 'var(--bg-card)', border: '1.5px solid var(--border)', borderRadius: 20, padding: '7px 12px', fontSize: 11, fontWeight: 700, color: terminal.open ? '#fff' : 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Terminal
@@ -809,7 +809,7 @@ function CCController() {
       </div>
 
       {/* Input */}
-      <div style={{ background: '#fff', borderTop: '1px solid #e0e0e0', padding: '10px 14px 6px', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+      <div style={{ background: 'var(--bg-card)', borderTop: '1px solid var(--border)', padding: '10px 14px 6px', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
         <FileUpload
           currentProject={currentProject}
           sendEvent={sendEvent}
@@ -823,28 +823,33 @@ function CCController() {
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
           placeholder="Escribe un mensaje..."
-          style={{ flex: 1, background: '#f5f5f5', border: '1.5px solid #e0e0e0', borderRadius: 22, padding: '10px 16px', fontSize: 16, fontWeight: 500, color: '#1a1a1a', fontFamily: 'Sora, sans-serif', outline: 'none' }}
+          style={{ flex: 1, background: 'var(--bg-surface)', border: '1.5px solid var(--border)', borderRadius: 22, padding: '10px 16px', fontSize: 16, fontWeight: 500, color: 'var(--text-primary)', fontFamily: 'Sora, sans-serif', outline: 'none' }}
         />
         {/* Mic button — mantener presionado para grabar */}
-        <button
-          onPointerDown={handleMicDown}
-          onPointerUp={handleMicUp}
-          onPointerCancel={handleMicUp}
-          onPointerLeave={handleMicUp}
-          disabled={voiceState === 'processing'}
-          title="Mantén presionado para grabar"
-          style={{
-            width: 44, height: 44, borderRadius: '50%', border: 'none',
-            background: voiceState === 'listening' ? '#f04e23' : voiceState === 'processing' ? '#e0e0e0' : '#1a1a1a',
-            color: '#fff',
-            cursor: voiceState === 'processing' ? 'default' : 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            opacity: voiceState === 'processing' ? 0.5 : 1,
-            animation: voiceState === 'listening' ? 'micPulse 1s ease-in-out infinite' : 'none',
-            touchAction: 'none', userSelect: 'none',
-          }}
-          dangerouslySetInnerHTML={{ __html: voiceState === 'processing' ? ICON_SPINNER : ICON_MIC }}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+          <button
+            onPointerDown={handleMicDown}
+            onPointerUp={handleMicUp}
+            onPointerCancel={handleMicUp}
+            onPointerLeave={handleMicUp}
+            disabled={voiceState === 'processing'}
+            title="Mantén presionado para grabar"
+            style={{
+              width: 44, height: 44, borderRadius: '50%', border: 'none',
+              background: voiceState === 'listening' ? '#f04e23' : voiceState === 'processing' ? '#e0e0e0' : '#1a1a1a',
+              color: '#fff',
+              cursor: voiceState === 'processing' ? 'default' : 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              opacity: voiceState === 'processing' ? 0.5 : 1,
+              animation: voiceState === 'listening' ? 'micPulse 1s ease-in-out infinite' : 'none',
+              touchAction: 'none', userSelect: 'none',
+            }}
+            dangerouslySetInnerHTML={{ __html: voiceState === 'processing' ? ICON_SPINNER : ICON_MIC }}
+          />
+          {voiceState === 'idle' && (
+            <span style={{ fontSize: 7, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.04em', whiteSpace: 'nowrap', lineHeight: 1 }}>mantén</span>
+          )}
+        </div>
         <button
           onClick={handleSend}
           style={{ width: 40, height: 40, borderRadius: '50%', background: '#f04e23', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
@@ -854,8 +859,8 @@ function CCController() {
 
       {/* Mac disclaimer — solo cuando desktop no está activo */}
       {!desktopActive && (
-        <div style={{ background: '#fff', padding: '0 14px max(20px, env(safe-area-inset-bottom, 20px))', flexShrink: 0 }}>
-          <p style={{ margin: 0, fontSize: 10, fontWeight: 500, color: '#bbb', textAlign: 'center', lineHeight: 1.4 }}>
+        <div style={{ background: 'var(--bg-card)', padding: '0 14px max(20px, env(safe-area-inset-bottom, 20px))', flexShrink: 0 }}>
+          <p style={{ margin: 0, fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.4 }}>
             Tu Mac debe estar encendida y con CC Creator abierto
           </p>
         </div>
