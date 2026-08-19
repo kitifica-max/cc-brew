@@ -16,7 +16,7 @@ test('makeProject includes all required base fields', () => {
   assert.ok(p.id, 'should have id');
   assert.equal(p.path, null);
   assert.equal(p.skipPermissions, true);
-  assert.equal(p.spendLimit, 1.00);
+  assert.equal(p.spendLimit, 5.00);
   assert.ok(Array.isArray(p.messages));
   assert.equal(p.isNewStart, true);
   assert.ok(p.createdAt > 0, 'createdAt should be a timestamp');
