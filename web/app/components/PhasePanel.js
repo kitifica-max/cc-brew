@@ -32,7 +32,7 @@ export default function PhasePanel({ phase, projectId, onPhaseChange }) {
         onClick={() => setOpen(true)}
         style={{
           background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 20,
-          padding: '4px 10px', cursor: 'pointer', color: '#fff', fontSize: 11,
+          padding: '8px 14px', cursor: 'pointer', color: '#fff', fontSize: 11,
           fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4,
         }}
       >
@@ -80,10 +80,18 @@ export default function PhasePanel({ phase, projectId, onPhaseChange }) {
               ))}
             </div>
 
+            {!confirming && phase > 1 && (
+              <button
+                onClick={() => { onPhaseChange(projectId, phase - 1); setOpen(false); }}
+                style={{ width: '100%', marginTop: 16, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '12px', color: '#aaa', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+              >
+                ← Retroceder a Fase {phase - 1}
+              </button>
+            )}
             {!confirming && phase < 6 && (
               <button
                 onClick={advance}
-                style={{ width: '100%', marginTop: 16, background: '#e8490f', border: 'none', borderRadius: 12, padding: '14px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
+                style={{ width: '100%', marginTop: phase > 1 ? 8 : 16, background: '#e8490f', border: 'none', borderRadius: 12, padding: '14px', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
               >
                 Avanzar a Fase {phase + 1} · {PHASES[phase]?.name} →
               </button>

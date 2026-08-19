@@ -31,7 +31,7 @@ export function makeProject(name = 'Nuevo proyecto', id = null) {
     model: 'claude-sonnet-4-6',
     effort: 'medium',
     skipPermissions: true,
-    spendLimit: 1.00,
+    spendLimit: 5.00,
     phase: 1,
     stack: null,
     isNew: true,

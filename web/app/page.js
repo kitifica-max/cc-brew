@@ -648,9 +648,11 @@ function CCController() {
                 setPreview(p => ({ ...p, show: true, loading: true, url: null, error: false }));
                 sendEvent('open-preview', { port: 0 });
               }}
-              style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
-              dangerouslySetInnerHTML={{ __html: ICON_GLOBE }}
-            />
+              style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: 20, padding: '6px 12px 6px 8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, color: '#fff' }}
+            >
+              <span style={{ display: 'flex', width: 16, height: 16 }} dangerouslySetInnerHTML={{ __html: ICON_GLOBE }} />
+              <span style={{ fontSize: 11, fontWeight: 700 }}>Vista</span>
+            </button>
             <button
               onClick={() => { setShowSettings(true); sendEvent('get-mcp-config', { projectId: currentId }); }}
               style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
@@ -794,14 +796,16 @@ function CCController() {
           </button>
         ))}
         <div style={{ flex: 1 }} />
-        <button
-          onClick={() => setTerminal(t => ({ ...t, open: !t.open }))}
-          title="Terminal"
-          style={{ flexShrink: 0, background: terminal.open ? '#1a1a1a' : '#fff', border: '1.5px solid #e0e0e0', borderRadius: 20, padding: '7px 12px', fontSize: 11, fontWeight: 700, color: terminal.open ? '#fff' : '#555', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-          Terminal
-        </button>
+        {(currentProject?.phase ?? 1) >= 2 && (
+          <button
+            onClick={() => setTerminal(t => ({ ...t, open: !t.open }))}
+            title="Terminal"
+            style={{ flexShrink: 0, background: terminal.open ? '#1a1a1a' : '#fff', border: '1.5px solid #e0e0e0', borderRadius: 20, padding: '7px 12px', fontSize: 11, fontWeight: 700, color: terminal.open ? '#fff' : '#555', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            Terminal
+          </button>
+        )}
       </div>
 
       {/* Input */}
@@ -848,12 +852,14 @@ function CCController() {
         />
       </div>
 
-      {/* Mac disclaimer */}
-      <div style={{ background: '#fff', padding: '0 14px max(20px, env(safe-area-inset-bottom, 20px))', flexShrink: 0 }}>
-        <p style={{ margin: 0, fontSize: 10, fontWeight: 500, color: '#bbb', textAlign: 'center', lineHeight: 1.4 }}>
-          Tu Mac debe estar encendida y con CC Creator abierto
-        </p>
-      </div>
+      {/* Mac disclaimer — solo cuando desktop no está activo */}
+      {!desktopActive && (
+        <div style={{ background: '#fff', padding: '0 14px max(20px, env(safe-area-inset-bottom, 20px))', flexShrink: 0 }}>
+          <p style={{ margin: 0, fontSize: 10, fontWeight: 500, color: '#bbb', textAlign: 'center', lineHeight: 1.4 }}>
+            Tu Mac debe estar encendida y con CC Creator abierto
+          </p>
+        </div>
+      )}
 
       {showSettings && currentProject && (
         <SettingsSheet
@@ -1197,8 +1203,9 @@ function UsageRings({ usage, project }) {
       </div>
       <div style={{ position: 'relative' }}>
         <button onClick={() => setShow(s => s === 'spend' ? null : 'spend')}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex' }}>
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
           <DonutRing pct={spendPct} color={spendColor} />
+          <span style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.65)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>${usage.cost.toFixed(2)}</span>
         </button>
         {tooltip('spend', 'Gasto sesión', `$${usage.cost.toFixed(4)} / $${spendLimit.toFixed(2)}`)}
       </div>

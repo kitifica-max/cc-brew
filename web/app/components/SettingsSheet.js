@@ -20,6 +20,7 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
   const [mcpServers, setMcpServers] = useState(mcpConfig);
   const [newServer, setNewServer] = useState(EMPTY_SERVER);
   const [mcpSaved, setMcpSaved] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   // envData / handleSaveEnv removed — replaced by SecretsSheet
 
   useEffect(() => { setMcpServers(mcpConfig); }, [mcpConfig]);
@@ -147,39 +148,6 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
           </button>
         </div>
 
-        {/* Session Token */}
-        <div style={{ marginBottom: 24, padding: 16, background: '#f5f5f5', borderRadius: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-            <span style={{ display: 'flex', width: 14, height: 14, color: '#f04e23' }} dangerouslySetInnerHTML={{ __html: ICON_LINK }} />
-            <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#999999' }}>
-              Session Token
-            </div>
-          </div>
-          <input
-            type="password"
-            autoComplete="off"
-            placeholder="Nuevo SESSION_TOKEN..."
-            value={newToken}
-            onChange={e => setNewToken(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter') handleSaveToken(); }}
-            style={{
-              background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 10,
-              padding: '10px 14px', fontSize: 12, fontFamily: 'Sora, sans-serif',
-              outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box', marginBottom: 8,
-            }}
-          />
-          <button
-            onClick={handleSaveToken}
-            style={{
-              width: '100%', background: tokenSaved ? '#00b09b' : '#f04e23', border: 'none', borderRadius: 10,
-              padding: '10px', fontSize: 12, fontWeight: 700, color: '#fff',
-              cursor: 'pointer', fontFamily: 'Sora, sans-serif', transition: 'background 200ms',
-            }}
-          >
-            {tokenSaved ? 'Token guardado' : 'Cambiar token'}
-          </button>
-        </div>
-
         {/* Subagentes / Modo autónomo */}
         <div style={{ marginBottom: 24, padding: 16, background: '#f5f5f5', borderRadius: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
@@ -219,7 +187,7 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
           <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 12 }}>
             <div>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#333' }}>Límite de gasto</div>
-              <div style={{ fontSize: 10, color: '#999', marginTop: 2 }}>Dona de costo en el chat</div>
+              <div style={{ fontSize: 10, color: '#999', marginTop: 2 }}>Controla el gasto visible en el chat</div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <span style={{ fontSize: 13, color: '#666' }}>$</span>
@@ -233,62 +201,72 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
           </div>
         </div>
 
-        {/* MCP Servers */}
-        <div style={{ marginBottom: 24, padding: 16, background: '#f5f5f5', borderRadius: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-            <span style={{ display: 'flex', width: 14, height: 14, color: '#f04e23' }} dangerouslySetInnerHTML={{ __html: ICON_PLUG }} />
-            <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#999999' }}>
-              MCP Servers
-            </div>
-          </div>
+        {/* Avanzado */}
+        <div style={{ marginBottom: 24 }}>
+          <button
+            onClick={() => setShowAdvanced(v => !v)}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f5f5f5', border: '1.5px solid #e8e8e8', borderRadius: 12, padding: '12px 14px', cursor: 'pointer', fontFamily: 'Sora, sans-serif' }}
+          >
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#555' }}>Avanzado</span>
+            <span style={{ fontSize: 12, color: '#999', transform: showAdvanced ? 'rotate(180deg)' : 'none', transition: 'transform 200ms', display: 'inline-block' }}>▾</span>
+          </button>
+          {showAdvanced && (
+            <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 10 }}>
 
-          {/* Lista de servers existentes */}
-          {Object.entries(mcpServers).length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
-              {Object.entries(mcpServers).map(([name, cfg]) => (
-                <div key={name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 10, padding: '8px 12px', border: '1.5px solid #e0e0e0' }}>
-                  <div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: '#1a1a1a' }}>{name}</div>
-                    <div style={{ fontSize: 10, color: '#888', marginTop: 1 }}>
-                      {cfg.command}{cfg.args?.length ? ' ' + cfg.args.join(' ') : ''}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleRemoveServer(name)}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontSize: 18, lineHeight: 1, padding: '0 4px' }}
-                  >×</button>
+              {/* Session Token */}
+              <div style={{ padding: 16, background: '#f5f5f5', borderRadius: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                  <span style={{ display: 'flex', width: 14, height: 14, color: '#f04e23' }} dangerouslySetInnerHTML={{ __html: ICON_LINK }} />
+                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#999999' }}>Session Token</div>
                 </div>
-              ))}
+                <input
+                  type="password"
+                  autoComplete="off"
+                  placeholder="Nuevo SESSION_TOKEN..."
+                  value={newToken}
+                  onChange={e => setNewToken(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleSaveToken(); }}
+                  style={{ background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '10px 14px', fontSize: 12, fontFamily: 'Sora, sans-serif', outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box', marginBottom: 8 }}
+                />
+                <button
+                  onClick={handleSaveToken}
+                  style={{ width: '100%', background: tokenSaved ? '#00b09b' : '#f04e23', border: 'none', borderRadius: 10, padding: '10px', fontSize: 12, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: 'Sora, sans-serif', transition: 'background 200ms' }}
+                >
+                  {tokenSaved ? 'Token guardado' : 'Cambiar token'}
+                </button>
+              </div>
+
+              {/* MCP Servers */}
+              <div style={{ padding: 16, background: '#f5f5f5', borderRadius: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                  <span style={{ display: 'flex', width: 14, height: 14, color: '#f04e23' }} dangerouslySetInnerHTML={{ __html: ICON_PLUG }} />
+                  <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#999999' }}>MCP Servers</div>
+                </div>
+                {Object.entries(mcpServers).length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
+                    {Object.entries(mcpServers).map(([name, cfg]) => (
+                      <div key={name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', borderRadius: 10, padding: '8px 12px', border: '1.5px solid #e0e0e0' }}>
+                        <div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: '#1a1a1a' }}>{name}</div>
+                          <div style={{ fontSize: 10, color: '#888', marginTop: 1 }}>{cfg.command}{cfg.args?.length ? ' ' + cfg.args.join(' ') : ''}</div>
+                        </div>
+                        <button onClick={() => handleRemoveServer(name)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontSize: 18, lineHeight: 1, padding: '0 4px' }}>×</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <input placeholder="Nombre (ej: filesystem)" value={newServer.name} onChange={e => setNewServer(s => ({ ...s, name: e.target.value }))} style={{ background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontFamily: 'Sora, sans-serif', outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box' }} />
+                  <input placeholder="Comando (ej: npx)" value={newServer.command} onChange={e => setNewServer(s => ({ ...s, command: e.target.value }))} style={{ background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontFamily: 'Sora, sans-serif', outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box' }} />
+                  <input placeholder="Args (ej: -y @modelcontextprotocol/server-filesystem /ruta)" value={newServer.args} onChange={e => setNewServer(s => ({ ...s, args: e.target.value }))} style={{ background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontFamily: 'Sora, sans-serif', outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box' }} />
+                  <button onClick={handleAddServer} style={{ width: '100%', background: mcpSaved ? '#00b09b' : '#f04e23', border: 'none', borderRadius: 10, padding: '10px', fontSize: 12, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: 'Sora, sans-serif', transition: 'background 200ms' }}>
+                    {mcpSaved ? '✓ Guardado' : 'Agregar MCP server'}
+                  </button>
+                </div>
+              </div>
+
             </div>
           )}
-
-          {/* Agregar nuevo server */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <input
-              placeholder="Nombre (ej: filesystem)"
-              value={newServer.name}
-              onChange={e => setNewServer(s => ({ ...s, name: e.target.value }))}
-              style={{ background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontFamily: 'Sora, sans-serif', outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box' }}
-            />
-            <input
-              placeholder="Comando (ej: npx)"
-              value={newServer.command}
-              onChange={e => setNewServer(s => ({ ...s, command: e.target.value }))}
-              style={{ background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontFamily: 'Sora, sans-serif', outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box' }}
-            />
-            <input
-              placeholder="Args (ej: -y @modelcontextprotocol/server-filesystem /ruta)"
-              value={newServer.args}
-              onChange={e => setNewServer(s => ({ ...s, args: e.target.value }))}
-              style={{ background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 10, padding: '8px 12px', fontSize: 12, fontFamily: 'Sora, sans-serif', outline: 'none', color: '#1a1a1a', width: '100%', boxSizing: 'border-box' }}
-            />
-            <button
-              onClick={handleAddServer}
-              style={{ width: '100%', background: mcpSaved ? '#00b09b' : '#f04e23', border: 'none', borderRadius: 10, padding: '10px', fontSize: 12, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: 'Sora, sans-serif', transition: 'background 200ms' }}
-            >
-              {mcpSaved ? '✓ Guardado' : 'Agregar MCP server'}
-            </button>
-          </div>
         </div>
 
         {/* Open in Claude Desktop */}
@@ -307,6 +285,7 @@ export default function SettingsSheet({ project, mcpConfig = {}, onClose, onMode
         {/* Cerrar sesión */}
         <button
           onClick={async () => {
+            if (!window.confirm('¿Cerrar sesión?')) return;
             clearSessionToken();
             localStorage.removeItem('cc-session-id');
             await supabase.auth.signOut();
