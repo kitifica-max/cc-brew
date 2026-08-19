@@ -23,6 +23,27 @@ const QUICK = [
   { label: 'continúa', text: 'continúa\n' },
 ];
 
+const PHASE_NAMES = ['Ideación', 'POC Local', 'Lanzamiento', 'Backend', 'App Directa', 'Validación'];
+
+const HINT_CONTENT = {
+  supabase: {
+    icon: '🗄️', title: 'Variables de Supabase necesarias',
+    body: 'Ve a ⚙️ → Variables de entorno. Agrega SUPABASE_URL y SUPABASE_ANON_KEY — CC Creator las pasará al proyecto automáticamente.',
+  },
+  netlify: {
+    icon: '🚀', title: 'Deploy a Netlify',
+    body: 'Agrega NETLIFY_AUTH_TOKEN y NETLIFY_SITE_ID en ⚙️ → Variables de entorno para que Claude haga deploy automáticamente desde tu Mac.',
+  },
+  apikey: {
+    icon: '🔑', title: 'API Keys detectadas',
+    body: 'Nunca escribas API keys en el código. Agrégalas en ⚙️ → Variables de entorno para que sean secrets seguros y no se expongan en el chat.',
+  },
+  env: {
+    icon: '🔐', title: 'Variables de entorno requeridas',
+    body: 'Ve a ⚙️ → Variables de entorno para agregar los secrets que necesita el proyecto. CC Creator los pasa automáticamente sin exponerlos en el chat.',
+  },
+};
+
 const THINKING_TIMEOUT_MS = 3 * 60 * 1000;
 const PORT_RE = /(?:localhost|127\.0\.0\.1|0\.0\.0\.0):(\d{4,5})/i;
 
@@ -71,6 +92,9 @@ function CCController() {
   const audioChunksRef = useRef([]);
   const projectsRef = useRef([]);
   const [terminal, setTerminal] = useState({ open: false, lines: [], running: false, cmd: '' });
+  const [phaseNudge, setPhaseNudge] = useState(false);
+  const lastProcessedMsgIdRef = useRef(null);
+  const claudeMsgCountRef = useRef(0);
 
   useEffect(() => { currentIdRef.current = currentId; }, [currentId]);
   useEffect(() => { projectsRef.current = projects; }, [projects]);
@@ -93,6 +117,60 @@ function CCController() {
     return () => clearTimeout(fallback);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentId, connected]);
+
+  // Reset nudge when switching project
+  useEffect(() => {
+    lastProcessedMsgIdRef.current = null;
+    claudeMsgCountRef.current = 0;
+    setPhaseNudge(false);
+  }, [currentId]);
+
+  // Reset nudge when phase advances
+  useEffect(() => {
+    setPhaseNudge(false);
+  }, [currentProject?.phase]);
+
+  // Auto-detect phase completion + contextual env hints
+  useEffect(() => {
+    if (!currentProject || thinking || streamingMsg) return;
+    const claudeMsgs = (currentProject.messages ?? []).filter(m => m.role === 'claude');
+    if (!claudeMsgs.length) return;
+    const last = claudeMsgs[claudeMsgs.length - 1];
+    if (last.id === lastProcessedMsgIdRef.current) return;
+    lastProcessedMsgIdRef.current = last.id;
+    claudeMsgCountRef.current = claudeMsgs.length;
+    const text = (last.text ?? '').toLowerCase();
+    const phase = currentProject.phase ?? 1;
+
+    // Phase nudge
+    if (phase < 6) {
+      const DONE_WORDS = ['siguiente fase', 'puedes avanzar', 'has completado', 'terminaste la fase', 'listo para la siguiente', 'puedes pasar a la fase', 'fase completada', 'completado exitosamente', 'todo listo para avanzar'];
+      if (DONE_WORDS.some(w => text.includes(w)) || claudeMsgCountRef.current % 5 === 0) {
+        setPhaseNudge(true);
+      }
+    }
+
+    // Contextual env var hints
+    const ENV_RULES = [
+      { key: 'supabase', words: ['supabase_url', 'supabase_anon_key', 'supabase url'] },
+      { key: 'netlify', words: ['netlify_auth_token', 'netlify_site_id', 'netlify deploy'] },
+      { key: 'apikey', words: ['openai_api_key', 'anthropic_api_key', 'stripe_secret', '_api_key='] },
+      { key: 'env', words: ['.env file', 'archivo .env', 'variable de entorno', 'variables de entorno'] },
+    ];
+    for (const rule of ENV_RULES) {
+      if (rule.words.some(w => text.includes(w))) {
+        const recentHints = (currentProject.messages ?? []).slice(-20);
+        if (!recentHints.some(m => m.role === 'hint' && m.hintKey === rule.key)) {
+          const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+          setProjects(prev => prev.map(p => p.id !== currentProject.id ? p : {
+            ...p, messages: [...p.messages, { id: Math.random().toString(36).slice(2), role: 'hint', hintKey: rule.key, time }],
+          }));
+        }
+        break;
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentProject?.messages?.length, thinking, streamingMsg]);
 
   const resetDesktopTimeout = useCallback(() => {
     setDesktopActive(true);
@@ -702,13 +780,25 @@ function CCController() {
       )}
 
       {/* Chat */}
-      <div ref={chatRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 14px 8px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div ref={chatRef} style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '16px 14px 8px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {messages.length === 0 && (
           <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 12, fontWeight: 600, marginTop: 40 }}>
             {currentProject?.path ? currentProject.path.replace(/^\/Users\/[^/]+/, '~') : 'Creando directorio...'}
           </div>
         )}
         {messages.map(msg => <MessageRow key={msg.id} msg={msg} />)}
+        {phaseNudge && !thinking && !streamingMsg && (currentProject?.phase ?? 1) < 6 && (
+          <PhaseAdvanceCard
+            phase={currentProject.phase ?? 1}
+            onAdvance={() => {
+              const newPhase = (currentProject.phase ?? 1) + 1;
+              setProjects(prev => prev.map(p => p.id === currentId ? { ...p, phase: newPhase } : p));
+              sendEvent('phase-change', { projectId: currentId, phase: newPhase });
+              setPhaseNudge(false);
+            }}
+            onDismiss={() => setPhaseNudge(false)}
+          />
+        )}
         {pendingPermission && !streamingMsg && (
           <PermissionCard
             permission={pendingPermission}
@@ -971,6 +1061,8 @@ function MessageRow({ msg }) {
     <div style={{ textAlign: 'center', fontSize: 10, fontWeight: 600, color: '#999999', padding: '4px 0' }}>{msg.text}</div>
   );
 
+  if (msg.role === 'hint') return <HintCard hintKey={msg.hintKey} time={msg.time} />;
+
   if (msg.imageUrl) return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
       <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#999999', marginBottom: 4, paddingLeft: 4 }}>Claude Code</div>
@@ -995,7 +1087,7 @@ function MessageRow({ msg }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUser ? 'flex-end' : 'flex-start' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: isUser ? 'flex-end' : 'flex-start', minWidth: 0, width: '100%' }}>
       {!isUser && <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#999999', marginBottom: 4, paddingLeft: 4 }}>Claude Code</div>}
       <div style={{
         maxWidth: '92%', borderRadius: 18, padding: '10px 14px',
@@ -1231,6 +1323,70 @@ function TypingIndicator({ onCancel }) {
           title="Cancelar"
           style={{ background: 'rgba(0,0,0,0.08)', border: 'none', borderRadius: '50%', width: 26, height: 26, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: 16, lineHeight: 1 }}
         >×</button>
+      </div>
+    </div>
+  );
+}
+
+function PhaseAdvanceCard({ phase, onAdvance, onDismiss }) {
+  const nextPhase = phase + 1;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
+      <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#059669', marginBottom: 4, paddingLeft: 4 }}>
+        ✅ Fase {phase} completada
+      </div>
+      <div style={{
+        width: '96%', background: '#f0fdf4', border: '1.5px solid #86efac',
+        borderRadius: 18, borderBottomLeftRadius: 4, padding: '12px 14px',
+      }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#065f46', marginBottom: 6 }}>
+          ¿Listo para avanzar a la Fase {nextPhase}: {PHASE_NAMES[nextPhase - 1]}?
+        </div>
+        <div style={{ fontSize: 12, color: '#166534', marginBottom: 12, lineHeight: 1.5 }}>
+          Claude detectó que completaste esta fase. Puedes avanzar cuando quieras.
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={onAdvance}
+            style={{
+              flex: 1, background: '#059669', color: '#fff', border: 'none',
+              borderRadius: 12, padding: '10px 0', fontSize: 13, fontWeight: 700,
+              cursor: 'pointer', fontFamily: 'Sora, sans-serif',
+            }}
+          >
+            Avanzar a Fase {nextPhase}
+          </button>
+          <button
+            onClick={onDismiss}
+            style={{
+              background: 'rgba(0,0,0,0.06)', color: '#555', border: 'none',
+              borderRadius: 12, padding: '10px 14px', fontSize: 13, fontWeight: 600,
+              cursor: 'pointer', fontFamily: 'Sora, sans-serif',
+            }}
+          >
+            Después
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HintCard({ hintKey, time }) {
+  const hint = HINT_CONTENT[hintKey];
+  if (!hint) return null;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
+      <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#b45309', marginBottom: 4, paddingLeft: 4 }}>
+        {hint.icon} Ayuda contextual
+      </div>
+      <div style={{
+        width: '96%', background: '#fffbeb', border: '1.5px solid #fbbf24',
+        borderRadius: 18, borderBottomLeftRadius: 4, padding: '12px 14px',
+      }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#92400e', marginBottom: 5 }}>{hint.title}</div>
+        <div style={{ fontSize: 12, color: '#78350f', lineHeight: 1.6 }}>{hint.body}</div>
+        <div style={{ fontSize: 9, color: '#b45309', marginTop: 8 }}>{time}</div>
       </div>
     </div>
   );
