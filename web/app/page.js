@@ -96,6 +96,10 @@ function CCController() {
   const lastProcessedMsgIdRef = useRef(null);
   const claudeMsgCountRef = useRef(0);
 
+  // Derivadas sincrónicamente — declaradas antes de cualquier useEffect para evitar TDZ
+  const currentProject = projects.find(p => p.id === currentId);
+  const messages = currentProject?.messages ?? [];
+
   useEffect(() => { currentIdRef.current = currentId; }, [currentId]);
   useEffect(() => { projectsRef.current = projects; }, [projects]);
   // streamingMsgRef se actualiza síncronamente en el chunk handler (no vía useEffect)
@@ -485,11 +489,8 @@ function CCController() {
     });
   }, [projects, sendEvent]);
 
-  const currentProject = projects.find(p => p.id === currentId);
-  const messages = currentProject?.messages ?? [];
-
   // ── Shared submit logic ───────────────────────────────────────────────────────
-  function submitMessage(text) {
+  const submitMessage = (text) => {
     const isNewStart = currentProject?.isNewStart ?? false;
     const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
     setProjects(prev => prev.map(p => {
@@ -503,21 +504,21 @@ function CCController() {
       setThinking(false);
       addSystemMsg('⚠️ Sin respuesta en 3 min — verifica que el desktop esté activo');
     }, THINKING_TIMEOUT_MS);
-  }
+  };
 
-  function handleSend() {
+  const handleSend = () => {
     const text = input.trim();
     if (!text) return;
     submitMessage(text);
     setInput('');
-  }
+  };
 
-  function cancelThinking() {
+  const cancelThinking = () => {
     clearTimeout(thinkingTimerRef.current);
     setThinking(false);
-  }
+  };
 
-  function handlePermissionResponse(allow) {
+  const handlePermissionResponse = (allow) => {
     sendRaw(allow ? 'y' : 'n', true);
     const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
     setProjects(prev => prev.map(p => p.id !== currentId ? p : {
@@ -530,7 +531,7 @@ function CCController() {
       setThinking(false);
       addSystemMsg('⚠️ Sin respuesta en 3 min — verifica que el desktop esté activo');
     }, THINKING_TIMEOUT_MS);
-  }
+  };
 
   // ── Voice recording ───────────────────────────────────────────────────────────
   async function startRecording() {
