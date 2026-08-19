@@ -455,7 +455,7 @@ function CCController() {
           if (currentIdRef.current) ch.send({ type: 'broadcast', event: 'get-env', payload: { projectId: currentIdRef.current, token: getSessionToken() } });
           wasConnectedRef.current = true;
           registerPush();
-        } else {
+        }
       });
     })();
 
