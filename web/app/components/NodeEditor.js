@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 const TYPE_OPTIONS = ['conversation', 'reference', 'definition', 'process'];
 const TYPE_LABELS  = { conversation: 'Conversación', reference: 'Referencia', definition: 'Definición', process: 'Proceso' };
 
-export default function NodeEditor({ node, onClose, onSend, onTypeChange }) {
+export default function NodeEditor({ node, onClose, onSend, onTypeChange, onConnectStart }) {
   const [draft, setDraft] = useState(node?.content ?? '');
   const [keyboardOffset, setKeyboardOffset] = useState(0);
 
@@ -37,6 +37,14 @@ export default function NodeEditor({ node, onClose, onSend, onTypeChange }) {
             {TYPE_LABELS[t]}
           </button>
         ))}
+        {onConnectStart && (
+          <button onClick={onConnectStart} aria-label="Conectar con otro nodo"
+            style={{ padding: '6px 14px', minHeight: 36, borderRadius: 20, cursor: 'pointer',
+                     background: 'transparent', border: '1.5px solid #334155',
+                     color: '#94A3B8', fontSize: 12, fontWeight: 600 }}>
+            Conectar →
+          </button>
+        )}
         <button onClick={onClose} aria-label="Cerrar editor"
           style={{
             marginLeft: 'auto', background: 'none', border: 'none',

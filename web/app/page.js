@@ -9,6 +9,14 @@ import BuildPanel from './components/BuildPanel';
 import SettingsPanel from './components/SettingsPanel';
 import { loadProjects, saveProjects, makeProject, makeNode, makeVector } from './lib/storage';
 
+const MODEL_LABEL = {
+  'claude-opus-5':      'Opus 5',
+  'claude-opus-4-6':    'Opus 4.6',
+  'claude-sonnet-5':    'Sonnet 5',
+  'claude-sonnet-4-6':  'Sonnet 4.6',
+  'claude-haiku-4-5':   'Haiku 4.5',
+};
+
 export default function Home() {
   const [projects, setProjects]     = useState([]);
   const [currentId, setCurrentId]   = useState(null);
@@ -20,11 +28,16 @@ export default function Home() {
   const [buildStatus, setBuildStatus]     = useState('idle');
   const [buildLog, setBuildLog]           = useState('');
   const [buildShareUrl, setBuildShareUrl] = useState('');
-  const [settingsOpen, setSettingsOpen]   = useState(false);
-  const [defaultModel, setDefaultModel]   = useState('claude-sonnet-4-6');
-  const [defaultEffort, setDefaultEffort] = useState('medium');
-  const channelRef  = useRef(null);
-  const currentIdRef = useRef(null);
+  const [settingsOpen, setSettingsOpen]       = useState(false);
+  const [defaultModel, setDefaultModel]       = useState('claude-sonnet-4-6');
+  const [defaultEffort, setDefaultEffort]     = useState('medium');
+  const [connectingFromId, setConnectingFromId] = useState(null);
+  const [renamingProject, setRenamingProject] = useState(false);
+  const [renameValue, setRenameValue]         = useState('');
+  const channelRef     = useRef(null);
+  const currentIdRef   = useRef(null);
+  const connectingRef  = useRef(null);
+  const mapRef         = useRef(null);
 
   // Cargar proyectos y defaults al inicio
   useEffect(() => {
@@ -174,6 +187,40 @@ export default function Home() {
     setDrawerOpen(false);
   };
 
+  const handleDeleteNode = useCallback((nodeId) => {
+    setProjects(prev => prev.map(p =>
+      p.id !== currentIdRef.current ? p : {
+        ...p,
+        nodes:   p.nodes.filter(n => n.id !== nodeId),
+        vectors: p.vectors.filter(v => v.fromId !== nodeId && v.toId !== nodeId),
+      }
+    ));
+    setSelectedNodeId(null);
+    setEditingNodeId(null);
+  }, []);
+
+  const handleConnect = useCallback((toId) => {
+    const fromId = connectingRef.current;
+    if (toId && fromId) addVector(fromId, toId);
+    connectingRef.current = null;
+    setConnectingFromId(null);
+  }, [addVector]);
+
+  const handleAddNodeFAB = useCallback(() => {
+    const existing = projects.find(p => p.id === currentIdRef.current)?.nodes ?? [];
+    const col = existing.length % 3;
+    const row = Math.floor(existing.length / 3);
+    const node = addNode('conversation', 150 + col * 220, 150 + row * 130);
+    setEditingNodeId(node.id);
+  }, [addNode, projects]);
+
+  const handleRenameCommit = () => {
+    if (renameValue.trim() && currentId) {
+      setProjects(prev => prev.map(p => p.id === currentId ? { ...p, name: renameValue.trim() } : p));
+    }
+    setRenamingProject(false);
+  };
+
   const handleSaveDefaults = (model, effort) => {
     setDefaultModel(model);
     setDefaultEffort(effort);
@@ -201,6 +248,7 @@ export default function Home() {
 
         {currentProject ? (
           <ConceptMap
+            ref={mapRef}
             nodes={currentProject.nodes}
             vectors={currentProject.vectors}
             selectedId={selectedNodeId}
@@ -208,7 +256,9 @@ export default function Home() {
             onCanvasTap={handleCanvasTap}
             onCanvasDeselect={() => { setSelectedNodeId(null); setEditingNodeId(null); }}
             onNodeMove={moveNode}
-            onAddVector={addVector}
+            onDelete={handleDeleteNode}
+            connectingFromId={connectingFromId}
+            onConnect={handleConnect}
           />
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -244,12 +294,44 @@ export default function Home() {
               <path d="M3 6h18M3 12h18M3 18h18"/>
             </svg>
           </button>
-          <span style={{
-            flex: 1, fontSize: 15, fontWeight: 700, color: '#E2E8F0',
-            letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}>
-            {currentProject?.name ?? 'Sin proyecto'}
-          </span>
+          <div style={{ flex: 1, minWidth: 0, pointerEvents: 'auto' }}>
+            {renamingProject ? (
+              <input
+                value={renameValue}
+                onChange={e => setRenameValue(e.target.value)}
+                onBlur={handleRenameCommit}
+                onKeyDown={e => { if (e.key === 'Enter') handleRenameCommit(); if (e.key === 'Escape') setRenamingProject(false); }}
+                autoFocus
+                style={{ background: 'transparent', border: 'none', borderBottom: '1px solid #f04e23',
+                         color: '#E2E8F0', fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em',
+                         padding: '2px 0', outline: 'none', width: '100%' }}
+              />
+            ) : (
+              <div
+                onClick={currentProject ? () => { setRenameValue(currentProject.name); setRenamingProject(true); } : undefined}
+                style={{ fontSize: 15, fontWeight: 700, color: '#E2E8F0', letterSpacing: '-0.02em',
+                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                         cursor: currentProject ? 'text' : 'default' }}>
+                {currentProject?.name ?? 'Sin proyecto'}
+              </div>
+            )}
+            {currentProject && (
+              <div style={{ fontSize: 11, color: '#475569', marginTop: 1 }}>
+                {currentProject.nodes.length} nodo{currentProject.nodes.length !== 1 ? 's' : ''}
+                {currentProject.model ? ` · ${MODEL_LABEL[currentProject.model] ?? currentProject.model}` : ''}
+              </div>
+            )}
+          </div>
+          {currentProject && (
+            <button onClick={() => mapRef.current?.fitAll()} aria-label="Centrar vista"
+              style={{ pointerEvents: 'auto', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                       borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center',
+                       justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2" strokeLinecap="round">
+                <path d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4"/>
+              </svg>
+            </button>
+          )}
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: connected ? '#10B981' : '#EF4444', flexShrink: 0 }} />
         </div>
 
@@ -294,7 +376,37 @@ export default function Home() {
               setEditingNodeId(null);
             }}
             onTypeChange={type => updateNode(editingNodeId, { type })}
+            onConnectStart={() => {
+              connectingRef.current = editingNodeId;
+              setConnectingFromId(editingNodeId);
+              setEditingNodeId(null);
+            }}
           />
+        )}
+
+        {/* FAB añadir nodo */}
+        {currentProject && !editingNodeId && !connectingFromId && (
+          <button onClick={handleAddNodeFAB} aria-label="Añadir nodo"
+            style={{ position: 'absolute', bottom: 'calc(28px + env(safe-area-inset-bottom, 0px))', left: 20,
+                     width: 52, height: 52, borderRadius: '50%',
+                     background: '#1E293B', border: '1px solid #334155',
+                     color: '#E2E8F0', fontSize: 30, cursor: 'pointer',
+                     display: 'flex', alignItems: 'center', justifyContent: 'center',
+                     boxShadow: '0 4px 16px rgba(0,0,0,0.4)' }}>
+            +
+          </button>
+        )}
+
+        {/* Banner modo conexión */}
+        {connectingFromId && (
+          <div style={{ position: 'absolute', bottom: 'calc(100px + env(safe-area-inset-bottom, 0px))',
+                        left: '50%', transform: 'translateX(-50%)',
+                        background: 'rgba(15,23,42,0.9)', border: '1px solid rgba(240,78,35,0.4)',
+                        borderRadius: 12, padding: '10px 20px',
+                        color: '#f04e23', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap',
+                        pointerEvents: 'none' }}>
+            Toca un nodo para conectar · Canvas para cancelar
+          </div>
         )}
 
         {/* Botón build */}
