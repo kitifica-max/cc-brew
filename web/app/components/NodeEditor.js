@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const TYPE_OPTIONS = ['conversation', 'reference', 'definition', 'process'];
 const TYPE_LABELS  = { conversation: 'Conversación', reference: 'Referencia', definition: 'Definición', process: 'Proceso' };
@@ -7,6 +7,21 @@ const TYPE_LABELS  = { conversation: 'Conversación', reference: 'Referencia', d
 export default function NodeEditor({ node, onClose, onSend, onTypeChange, onConnectStart }) {
   const [draft, setDraft] = useState(node?.content ?? '');
   const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const [fileName, setFileName] = useState(null);
+  const fileRef = useRef(null);
+
+  const handleFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target.result;
+      setDraft(`[${file.name}]\n\n${text.slice(0, 4000)}`);
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
 
   useEffect(() => {
     const vv = window.visualViewport;
@@ -63,11 +78,28 @@ export default function NodeEditor({ node, onClose, onSend, onTypeChange, onConn
         </div>
       )}
 
+      {node.type === 'reference' && (
+        <>
+          <input ref={fileRef} type="file" onChange={handleFile}
+            style={{ display: 'none' }} accept=".txt,.md,.js,.ts,.py,.json,.yaml,.yml,.csv,.html,.css,.pdf" />
+          <button onClick={() => fileRef.current?.click()}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8,
+                     padding: '7px 14px', borderRadius: 8, cursor: 'pointer',
+                     background: 'transparent', border: '1.5px solid #2A2A2A', color: '#888888',
+                     fontSize: 12, fontWeight: 600 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
+            </svg>
+            {fileName ?? 'Adjuntar archivo'}
+          </button>
+        </>
+      )}
+
       <div style={{ display: 'flex', gap: 8 }}>
         <textarea
           value={draft}
           onChange={e => setDraft(e.target.value)}
-          placeholder={node.type === 'conversation' ? 'Responde a la IA...' : 'Agregar contenido...'}
+          placeholder={node.type === 'reference' ? 'URL o descripción de la referencia...' : node.type === 'conversation' ? 'Responde a la IA...' : 'Agregar contenido...'}
           rows={3}
           style={{
             flex: 1, background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: 8,

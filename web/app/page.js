@@ -7,6 +7,7 @@ import ConceptMap from './components/ConceptMap';
 import NodeEditor from './components/NodeEditor';
 import BuildPanel from './components/BuildPanel';
 import SettingsPanel from './components/SettingsPanel';
+import OnboardingStepper from './components/OnboardingStepper';
 import { loadProjects, saveProjects, makeProject, makeNode, makeVector } from './lib/storage';
 
 const MODEL_LABEL = {
@@ -232,12 +233,11 @@ export default function Home() {
     const p = makeProject(name);
     p.model = defaultModel;
     p.effort = defaultEffort;
-    const guideNode = makeNode('definition', 80, 160);
+    const guideNode = makeNode('definition', 100, 180);
     guideNode.aiContent = 'Toca nodo → editar\nDoble tap canvas → crear\nConectar → para enlazar';
-    const convNode = makeNode('conversation', 320, 160);
-    const v = makeVector(guideNode.id, convNode.id, '');
+    const convNode = makeNode('conversation', 340, 180);
     p.nodes = [guideNode, convNode];
-    p.vectors = [v];
+    p.vectors = [];
     setProjects(prev => [p, ...prev]);
     setCurrentId(p.id);
     sendEvent('create-project', { id: p.id, name: p.name });
@@ -450,6 +450,11 @@ export default function Home() {
             }}
           />
         )}
+        {/* Stepper de onboarding */}
+        {currentProject && !editingNodeId && !buildOpen && !connectingFromId && (
+          <OnboardingStepper project={currentProject} />
+        )}
+
         {settingsOpen && (
           <SettingsPanel
             defaultModel={defaultModel}
