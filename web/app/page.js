@@ -100,8 +100,8 @@ export default function Home() {
       const channelName = `session:${getSessionId()}`;
       const ch = supabase.channel(channelName, { config: { private: true } });
 
-      ch.on('broadcast', { event: 'output' }, ({ payload }) => {
-        handleBridgeOutput(payload);
+      ch.on('broadcast', { event: 'chunk' }, ({ payload }) => {
+        handleBridgeOutput({ chunk: payload.text });
       });
       ch.on('broadcast', { event: 'build-progress' }, ({ payload }) => {
         setBuildLog(prev => prev + (payload.chunk ?? ''));
@@ -139,9 +139,16 @@ export default function Home() {
   }, []);
 
   const sendNodeContent = useCallback((nodeId, content) => {
-    sendEvent('user-message', { text: content });
+    const project = projects.find(p => p.id === currentIdRef.current);
+    sendEvent('input', {
+      text: content,
+      continue: true,
+      model: project?.model ?? 'claude-sonnet-4-6',
+      effort: project?.effort ?? 'medium',
+      skipPermissions: true,
+    });
     updateNode(nodeId, { content });
-  }, [sendEvent, updateNode]);
+  }, [sendEvent, updateNode, projects]);
 
   const handleCanvasTap = useCallback((x, y) => {
     setSelectedNodeId(null);
@@ -161,19 +168,30 @@ export default function Home() {
         <ProjectsList
           projects={projects}
           currentId={currentId}
-          onSelect={setCurrentId}
-          onAdd={() => {
-            const p = makeProject();
+          awaitingFolder={null}
+          onSwitch={id => {
+            setCurrentId(id);
+            sendEvent('switch-project', { id });
+          }}
+          onCreate={name => {
+            const p = makeProject(name);
             const firstNode = makeNode('conversation', 200, 200);
             p.nodes = [firstNode];
             setProjects(prev => [p, ...prev]);
             setCurrentId(p.id);
+            sendEvent('create-project', { id: p.id, name: p.name });
             setTimeout(() => sendEvent('new-project', { projectId: p.id, projectName: p.name }), 500);
           }}
           onDelete={id => {
             setProjects(prev => prev.filter(p => p.id !== id));
             setCurrentId(prev => prev === id ? projects.find(p => p.id !== id)?.id ?? null : prev);
           }}
+          onRename={(id, name) => {
+            setProjects(prev => prev.map(p => p.id === id ? { ...p, name } : p));
+          }}
+          onOpenFolder={() => {}}
+          onCancelFolder={() => {}}
+          onShowSettings={() => {}}
         />
 
         {/* Canvas principal */}

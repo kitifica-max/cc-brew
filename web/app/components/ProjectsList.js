@@ -369,10 +369,10 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
                   </>
                 )}
               </div>
-              <PhaseTag phase={p.phase} />
-              <PhaseDots phase={p.phase} />
+              <PhaseTag phase={p.phase ?? 1} />
+              <PhaseDots phase={p.phase ?? 1} />
               <div style={{ fontSize: 11, color: 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>
-                {modelLabel} · {p.effort} · {p.messages.length} msgs · {new Date(p.createdAt).toLocaleDateString('es', { day: 'numeric', month: 'short' })}
+                {modelLabel} · {p.effort} · {p.nodes?.length ?? 0} nodos · {new Date(p.createdAt).toLocaleDateString('es', { day: 'numeric', month: 'short' })}
               </div>
             </div>
           );

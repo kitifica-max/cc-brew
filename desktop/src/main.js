@@ -577,6 +577,8 @@ async function signOutAndSetup() {
 }
 
 // ── Panel IPC handlers ────────────────────────────────────────────────────────
+ipcMain.handle('panel:advance-phase', () => {});
+ipcMain.handle('panel:open-finder',   () => {});
 ipcMain.handle('panel:open-terminal', (_, projectId) => {
   const project = listProjects().find(p => p.id === projectId);
   if (!project) return;
