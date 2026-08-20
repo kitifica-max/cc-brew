@@ -13,8 +13,19 @@ export const EFFORTS = ['high', 'medium', 'low'];
 
 export function loadProjects() {
   if (typeof window === 'undefined') return [];
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
-  catch { return []; }
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    return raw.map(p => ({
+      id: p.id,
+      name: p.name,
+      path: p.path ?? null,
+      model: p.model ?? 'claude-sonnet-4-6',
+      effort: p.effort ?? 'medium',
+      createdAt: p.createdAt ?? Date.now(),
+      nodes: p.nodes ?? [],
+      vectors: p.vectors ?? [],
+    }));
+  } catch { return []; }
 }
 
 export function saveProjects(projects) {
@@ -23,6 +34,8 @@ export function saveProjects(projects) {
   catch {}
 }
 
+export const NODE_TYPES = ['conversation', 'reference', 'definition', 'process'];
+
 export function makeProject(name = 'Nuevo proyecto', id = null) {
   return {
     id: id ?? (Math.random().toString(36).slice(2) + Date.now().toString(36)),
@@ -30,16 +43,29 @@ export function makeProject(name = 'Nuevo proyecto', id = null) {
     path: null,
     model: 'claude-sonnet-4-6',
     effort: 'medium',
-    skipPermissions: true,
-    spendLimit: 5.00,
-    phase: 1,
-    stack: null,
-    isNew: true,
-    githubRepo: null,
-    netlifyUrl: null,
-    supabaseProject: null,
     createdAt: Date.now(),
-    messages: [],
-    isNewStart: true,
+    nodes: [],
+    vectors: [],
+  };
+}
+
+export function makeNode(type = 'conversation', x = 0, y = 0) {
+  return {
+    id: Math.random().toString(36).slice(2) + Date.now().toString(36),
+    type,
+    x,
+    y,
+    content: '',
+    aiContent: '',
+    createdAt: Date.now(),
+  };
+}
+
+export function makeVector(fromId, toId, label = '') {
+  return {
+    id: Math.random().toString(36).slice(2) + Date.now().toString(36),
+    fromId,
+    toId,
+    label,
   };
 }
