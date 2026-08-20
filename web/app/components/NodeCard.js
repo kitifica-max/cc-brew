@@ -22,7 +22,6 @@ export default function NodeCard({ node, selected, onTap }) {
   return (
     <g
       transform={`translate(${node.x}, ${node.y})`}
-      onClick={() => onTap(node.id)}
       style={{ cursor: 'pointer' }}
     >
       <rect
