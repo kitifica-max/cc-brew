@@ -232,19 +232,24 @@ export default function Home() {
     const p = makeProject(name);
     p.model = defaultModel;
     p.effort = defaultEffort;
-    const firstNode = makeNode('conversation', 200, 200);
-    p.nodes = [firstNode];
+    const guideNode = makeNode('definition', 80, 160);
+    guideNode.aiContent = 'Toca nodo → editar\nDoble tap canvas → crear\nConectar → para enlazar';
+    const convNode = makeNode('conversation', 320, 160);
+    const v = makeVector(guideNode.id, convNode.id, '');
+    p.nodes = [guideNode, convNode];
+    p.vectors = [v];
     setProjects(prev => [p, ...prev]);
     setCurrentId(p.id);
     sendEvent('create-project', { id: p.id, name: p.name });
     setTimeout(() => sendEvent('new-project', { projectId: p.id, projectName: p.name }), 500);
+    setTimeout(() => mapRef.current?.fitAll(), 200);
     setDrawerOpen(false);
   };
 
   return (
     <AuthGate>
       {/* Canvas pantalla completa */}
-      <div style={{ position: 'relative', width: '100%', height: '100dvh', background: '#0F172A', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', width: '100%', height: '100dvh', background: '#0A0A0A', overflow: 'hidden' }}>
 
         {currentProject ? (
           <ConceptMap
@@ -264,12 +269,12 @@ export default function Home() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center',
                         height: '100%', flexDirection: 'column', gap: 16, padding: '0 32px', textAlign: 'center' }}>
             <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{ opacity: 0.35 }}>
-              <rect x="4" y="4" width="40" height="40" rx="10" stroke="#475569" strokeWidth="2" strokeDasharray="4 3"/>
-              <rect x="14" y="17" width="20" height="14" rx="4" stroke="#475569" strokeWidth="1.5"/>
-              <line x1="14" y1="22" x2="34" y2="22" stroke="#475569" strokeWidth="1"/>
+              <rect x="4" y="4" width="40" height="40" rx="10" stroke="#525252" strokeWidth="2" strokeDasharray="4 3"/>
+              <rect x="14" y="17" width="20" height="14" rx="4" stroke="#525252" strokeWidth="1.5"/>
+              <line x1="14" y1="22" x2="34" y2="22" stroke="#525252" strokeWidth="1"/>
             </svg>
-            <span style={{ fontSize: 15, color: '#64748B' }}>Abre el menú ≡ para crear un proyecto</span>
-            <span style={{ fontSize: 13, color: '#475569' }}>Doble toque en el canvas para añadir nodos</span>
+            <span style={{ fontSize: 15, color: '#737373' }}>Abre el menú ≡ para crear un proyecto</span>
+            <span style={{ fontSize: 13, color: '#525252' }}>Doble toque en el canvas para añadir nodos</span>
           </div>
         )}
 
@@ -278,7 +283,7 @@ export default function Home() {
           position: 'absolute', top: 0, left: 0, right: 0,
           padding: 'calc(env(safe-area-inset-top, 20px) + 16px) 16px 16px',
           display: 'flex', alignItems: 'center', gap: 12,
-          background: 'linear-gradient(to bottom, rgba(15,23,42,0.85) 0%, transparent 100%)',
+          background: 'linear-gradient(to bottom, rgba(10,10,10,0.88) 0%, transparent 100%)',
           pointerEvents: 'none',
         }}>
           <button
@@ -290,7 +295,7 @@ export default function Home() {
               borderRadius: 10, width: 36, height: 36, display: 'flex', alignItems: 'center',
               justifyContent: 'center', cursor: 'pointer', flexShrink: 0,
             }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E2E8F0" strokeWidth="1.5" strokeLinecap="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" strokeWidth="1.5" strokeLinecap="round">
               <path d="M3 6h18M3 12h18M3 18h18"/>
             </svg>
           </button>
@@ -303,20 +308,20 @@ export default function Home() {
                 onKeyDown={e => { if (e.key === 'Enter') handleRenameCommit(); if (e.key === 'Escape') setRenamingProject(false); }}
                 autoFocus
                 style={{ background: 'transparent', border: 'none', borderBottom: '1px solid #f04e23',
-                         color: '#E2E8F0', fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em',
+                         color: '#E0E0E0', fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em',
                          padding: '2px 0', outline: 'none', width: '100%' }}
               />
             ) : (
               <div
                 onClick={currentProject ? () => { setRenameValue(currentProject.name); setRenamingProject(true); } : undefined}
-                style={{ fontSize: 15, fontWeight: 700, color: '#E2E8F0', letterSpacing: '-0.02em',
+                style={{ fontSize: 15, fontWeight: 700, color: '#E0E0E0', letterSpacing: '-0.02em',
                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                          cursor: currentProject ? 'text' : 'default' }}>
                 {currentProject?.name ?? 'Sin proyecto'}
               </div>
             )}
             {currentProject && (
-              <div style={{ fontSize: 11, color: '#475569', marginTop: 1 }}>
+              <div style={{ fontSize: 11, color: '#525252', marginTop: 1 }}>
                 {currentProject.nodes.length} nodo{currentProject.nodes.length !== 1 ? 's' : ''}
                 {currentProject.model ? ` · ${MODEL_LABEL[currentProject.model] ?? currentProject.model}` : ''}
               </div>
@@ -327,7 +332,7 @@ export default function Home() {
               style={{ pointerEvents: 'auto', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
                        borderRadius: 8, width: 36, height: 36, display: 'flex', alignItems: 'center',
                        justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2" strokeLinecap="round">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#737373" strokeWidth="2" strokeLinecap="round">
                 <path d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4"/>
               </svg>
             </button>
@@ -389,8 +394,8 @@ export default function Home() {
           <button onClick={handleAddNodeFAB} aria-label="Añadir nodo"
             style={{ position: 'absolute', bottom: 'calc(28px + env(safe-area-inset-bottom, 0px))', left: 20,
                      width: 52, height: 52, borderRadius: '50%',
-                     background: '#1E293B', border: '1px solid #334155',
-                     color: '#E2E8F0', fontSize: 30, cursor: 'pointer',
+                     background: '#141414', border: '1px solid #2A2A2A',
+                     color: '#E0E0E0', fontSize: 30, cursor: 'pointer',
                      display: 'flex', alignItems: 'center', justifyContent: 'center',
                      boxShadow: '0 4px 16px rgba(0,0,0,0.4)' }}>
             +
@@ -401,7 +406,7 @@ export default function Home() {
         {connectingFromId && (
           <div style={{ position: 'absolute', bottom: 'calc(100px + env(safe-area-inset-bottom, 0px))',
                         left: '50%', transform: 'translateX(-50%)',
-                        background: 'rgba(15,23,42,0.9)', border: '1px solid rgba(240,78,35,0.4)',
+                        background: 'rgba(10,10,10,0.9)', border: '1px solid rgba(240,78,35,0.4)',
                         borderRadius: 12, padding: '10px 20px',
                         color: '#f04e23', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap',
                         pointerEvents: 'none' }}>

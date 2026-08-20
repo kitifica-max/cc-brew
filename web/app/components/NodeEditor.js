@@ -22,7 +22,7 @@ export default function NodeEditor({ node, onClose, onSend, onTypeChange, onConn
   return (
     <div style={{
       position: 'fixed', bottom: keyboardOffset, left: 0, right: 0,
-      background: '#1E293B', borderTop: '1px solid #334155',
+      background: '#141414', borderTop: '1px solid #2A2A2A',
       padding: 16, zIndex: 10,
       transition: 'bottom 150ms ease-out',
     }}>
@@ -31,8 +31,8 @@ export default function NodeEditor({ node, onClose, onSend, onTypeChange, onConn
           <button key={t} onClick={() => onTypeChange(t)} aria-pressed={node.type === t}
             style={{
               padding: '6px 14px', minHeight: 36, borderRadius: 20, border: 'none', cursor: 'pointer',
-              background: node.type === t ? '#f04e23' : '#334155',
-              color: '#E2E8F0', fontSize: 12, fontWeight: 600,
+              background: node.type === t ? '#f04e23' : '#2A2A2A',
+              color: '#E0E0E0', fontSize: 12, fontWeight: 600,
             }}>
             {TYPE_LABELS[t]}
           </button>
@@ -40,15 +40,15 @@ export default function NodeEditor({ node, onClose, onSend, onTypeChange, onConn
         {onConnectStart && (
           <button onClick={onConnectStart} aria-label="Conectar con otro nodo"
             style={{ padding: '6px 14px', minHeight: 36, borderRadius: 20, cursor: 'pointer',
-                     background: 'transparent', border: '1.5px solid #334155',
-                     color: '#94A3B8', fontSize: 12, fontWeight: 600 }}>
+                     background: 'transparent', border: '1.5px solid #2A2A2A',
+                     color: '#888888', fontSize: 12, fontWeight: 600 }}>
             Conectar →
           </button>
         )}
         <button onClick={onClose} aria-label="Cerrar editor"
           style={{
             marginLeft: 'auto', background: 'none', border: 'none',
-            color: '#94A3B8', cursor: 'pointer', fontSize: 20,
+            color: '#888888', cursor: 'pointer', fontSize: 20,
             width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
             borderRadius: 8, flexShrink: 0,
           }}>×</button>
@@ -56,8 +56,8 @@ export default function NodeEditor({ node, onClose, onSend, onTypeChange, onConn
 
       {node.aiContent && (
         <div style={{
-          background: '#0F172A', borderRadius: 8, padding: 10, marginBottom: 10,
-          fontSize: 13, color: '#94A3B8', maxHeight: 120, overflowY: 'auto',
+          background: '#0A0A0A', borderRadius: 8, padding: 10, marginBottom: 10,
+          fontSize: 13, color: '#888888', maxHeight: 120, overflowY: 'auto',
         }}>
           {node.aiContent}
         </div>
@@ -70,8 +70,8 @@ export default function NodeEditor({ node, onClose, onSend, onTypeChange, onConn
           placeholder={node.type === 'conversation' ? 'Responde a la IA...' : 'Agregar contenido...'}
           rows={3}
           style={{
-            flex: 1, background: '#0F172A', border: '1px solid #334155', borderRadius: 8,
-            color: '#E2E8F0', padding: '8px 12px', fontSize: 14, resize: 'none',
+            flex: 1, background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: 8,
+            color: '#E0E0E0', padding: '8px 12px', fontSize: 14, resize: 'none',
           }}
         />
         <button onClick={() => onSend(draft)}

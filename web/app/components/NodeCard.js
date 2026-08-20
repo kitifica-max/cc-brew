@@ -16,7 +16,7 @@ export default function NodeCard({ node, selected, onDelete, isConnectMode, isCo
       transform={`translate(${node.x}, ${node.y})`}
       style={{
         cursor: isConnectMode && !isConnectSource ? 'crosshair' : 'pointer',
-        filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))',
+        filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.6))',
       }}
     >
       {/* Connect target ring */}
@@ -32,24 +32,25 @@ export default function NodeCard({ node, selected, onDelete, isConnectMode, isCo
 
       <rect
         width={NODE_W} height={NODE_H} rx={12}
-        fill={selected ? 'rgba(240,78,35,0.18)' : '#243147'}
-        stroke={selected ? '#f04e23' : '#334155'}
-        strokeWidth={selected ? 3 : 2}
+        fill={selected ? 'rgba(240,78,35,0.18)' : '#1C1C1C'}
+        stroke={selected ? '#f04e23' : '#2A2A2A'}
+        strokeWidth={selected ? 3 : 1.5}
       />
-      <text x={10} y={18} fill="#94A3B8" fontSize={11} fontWeight="700"
+      <text x={10} y={18} fill="#888888" fontSize={11} fontWeight="700"
         fontFamily="system-ui, -apple-system, sans-serif">
         {TYPE_LABELS[node.type] ?? node.type}
       </text>
       <foreignObject x={10} y={24} width={NODE_W - 20} height={NODE_H - 30}>
         <div xmlns="http://www.w3.org/1999/xhtml"
-          style={{ fontSize: 13, color: '#E2E8F0', fontFamily: 'system-ui, -apple-system, sans-serif',
+          style={{ fontSize: 12, color: '#E0E0E0', fontFamily: 'system-ui, -apple-system, sans-serif',
                    overflow: 'hidden', display: '-webkit-box',
-                   WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+                   WebkitLineClamp: 3, WebkitBoxOrient: 'vertical',
+                   whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
           {node.aiContent || node.content || '...'}
         </div>
       </foreignObject>
 
-      {/* Delete ×  (visible when selected + not in connect mode) */}
+      {/* Delete × (visible when selected + not in connect mode) */}
       {selected && !isConnectMode && onDelete && (
         <g
           transform={`translate(${NODE_W - 14}, 14)`}
@@ -57,9 +58,9 @@ export default function NodeCard({ node, selected, onDelete, isConnectMode, isCo
           onPointerUp={e => { e.stopPropagation(); onDelete(); }}
           style={{ cursor: 'pointer' }}
         >
-          <circle r={11} fill="#0F172A" stroke="#475569" strokeWidth={1.5}/>
+          <circle r={11} fill="#0A0A0A" stroke="#2A2A2A" strokeWidth={1.5}/>
           <text textAnchor="middle" dominantBaseline="central"
-            fill="#94A3B8" fontSize={14} fontWeight="700">×</text>
+            fill="#888888" fontSize={14} fontWeight="700">×</text>
         </g>
       )}
     </g>
