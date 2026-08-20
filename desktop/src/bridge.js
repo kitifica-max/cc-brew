@@ -45,6 +45,7 @@ export default class Bridge {
     this.onStarterMessage = null;
     this.onGetEnv = null;
     this.onExecCommand = null;
+    this.onNewProject = null;
     this._heartbeatTimer = null;
     this._history = [];
     this._streamBuffers = new Map(); // msgId → { parts: string[], projectId }
@@ -173,6 +174,10 @@ export default class Bridge {
       .on('broadcast', { event: 'exec-command' }, ({ payload }) => {
         if (!this._validate(payload)) return;
         this.onExecCommand?.(payload.cmd, payload.projectId ?? null);
+      })
+      .on('broadcast', { event: 'new-project' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this.onNewProject?.(payload.projectId, payload.projectName);
       })
       .subscribe();
   }

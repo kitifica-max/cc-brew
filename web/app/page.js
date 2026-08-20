@@ -151,8 +151,11 @@ export default function Home() {
           onSelect={setCurrentId}
           onAdd={() => {
             const p = makeProject();
+            const firstNode = makeNode('conversation', 200, 200);
+            p.nodes = [firstNode];
             setProjects(prev => [p, ...prev]);
             setCurrentId(p.id);
+            setTimeout(() => sendEvent('new-project', { projectId: p.id, projectName: p.name }), 500);
           }}
           onDelete={id => {
             setProjects(prev => prev.filter(p => p.id !== id));
