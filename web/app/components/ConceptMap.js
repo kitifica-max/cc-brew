@@ -89,7 +89,7 @@ export default function ConceptMap({ nodes, vectors, selectedId, onNodeTap, onCa
         <g
           key={node.id}
           onPointerDown={e => onPointerDown(e, node.id)}
-          onPointerUp={e => onPointerUp(e, node.id)}
+          onPointerUp={e => { e.stopPropagation(); onPointerUp(e, node.id); }}
           onClick={e => e.stopPropagation()}
         >
           <NodeCard node={node} selected={selectedId === node.id} onTap={onNodeTap} />
