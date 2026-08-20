@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase, getSessionId, getSessionToken } from './lib/supabase';
 import AuthGate from './components/AuthGate';
 import ProjectsList from './components/ProjectsList';
 import ConceptMap from './components/ConceptMap';
@@ -87,28 +87,42 @@ export default function Home() {
 
   // Setup canal Supabase
   useEffect(() => {
-    const supabaseUrl  = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey  = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!supabaseUrl || !supabaseKey || !currentId) return;
+    if (!currentId) return;
+    let active = true;
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    const channelName = `cc-bridge-${currentId}`;
-    const ch = supabase.channel(channelName);
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!active || !data?.session) return;
 
-    ch.on('broadcast', { event: 'output' }, ({ payload }) => {
-      handleBridgeOutput(payload);
-    });
+      const channelName = `session:${getSessionId()}`;
+      const ch = supabase.channel(channelName, { config: { private: true } });
 
-    ch.subscribe(status => {
-      setConnected(status === 'SUBSCRIBED');
-    });
+      ch.on('broadcast', { event: 'output' }, ({ payload }) => {
+        handleBridgeOutput(payload);
+      });
 
-    channelRef.current = ch;
-    return () => { supabase.removeChannel(ch); };
+      ch.subscribe(status => {
+        setConnected(status === 'SUBSCRIBED');
+      });
+
+      channelRef.current = ch;
+    })();
+
+    return () => {
+      active = false;
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+    };
   }, [currentId, handleBridgeOutput]);
 
   const sendEvent = useCallback((type, payload) => {
-    channelRef.current?.send({ type: 'broadcast', event: type, payload });
+    channelRef.current?.send({
+      type: 'broadcast',
+      event: type,
+      payload: { ...payload, token: getSessionToken() },
+    });
   }, []);
 
   const sendNodeContent = useCallback((nodeId, content) => {
@@ -184,6 +198,7 @@ export default function Home() {
         {/* Editor de nodo */}
         {editingNodeId && currentProject && (
           <NodeEditor
+            key={editingNodeId}
             node={currentProject.nodes.find(n => n.id === editingNodeId)}
             onClose={() => setEditingNodeId(null)}
             onSend={content => {
