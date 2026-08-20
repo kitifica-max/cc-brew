@@ -1,12 +1,5 @@
 'use client';
 
-const TYPE_COLORS = {
-  conversation: '#3B82F6',
-  reference:    '#10B981',
-  definition:   '#F59E0B',
-  process:      '#8B5CF6',
-};
-
 const TYPE_LABELS = {
   conversation: 'Conversación',
   reference:    'Referencia',
@@ -18,7 +11,6 @@ const NODE_W = 180;
 const NODE_H = 90;
 
 export default function NodeCard({ node, selected, onTap }) {
-  const color = TYPE_COLORS[node.type] ?? '#6B7280';
   return (
     <g
       transform={`translate(${node.x}, ${node.y})`}
@@ -26,11 +18,12 @@ export default function NodeCard({ node, selected, onTap }) {
     >
       <rect
         width={NODE_W} height={NODE_H} rx={12}
-        fill={selected ? color : '#243147'}
-        stroke={color} strokeWidth={selected ? 3 : 2}
+        fill={selected ? 'rgba(240,78,35,0.18)' : '#243147'}
+        stroke={selected ? '#f04e23' : '#334155'}
+        strokeWidth={selected ? 3 : 2}
       />
-      <text x={10} y={18} fill={color} fontSize={11} fontWeight="700" fontFamily="system-ui, -apple-system, sans-serif">
-        {TYPE_LABELS[node.type]}
+      <text x={10} y={18} fill="#94A3B8" fontSize={11} fontWeight="700" fontFamily="system-ui, -apple-system, sans-serif">
+        {TYPE_LABELS[node.type] ?? node.type}
       </text>
       <foreignObject x={10} y={24} width={NODE_W - 20} height={NODE_H - 30}>
         <div xmlns="http://www.w3.org/1999/xhtml"

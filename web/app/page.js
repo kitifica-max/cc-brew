@@ -6,6 +6,7 @@ import ProjectsList from './components/ProjectsList';
 import ConceptMap from './components/ConceptMap';
 import NodeEditor from './components/NodeEditor';
 import BuildPanel from './components/BuildPanel';
+import SettingsPanel from './components/SettingsPanel';
 import { loadProjects, saveProjects, makeProject, makeNode, makeVector } from './lib/storage';
 
 export default function Home() {
@@ -19,14 +20,19 @@ export default function Home() {
   const [buildStatus, setBuildStatus]     = useState('idle');
   const [buildLog, setBuildLog]           = useState('');
   const [buildShareUrl, setBuildShareUrl] = useState('');
+  const [settingsOpen, setSettingsOpen]   = useState(false);
+  const [defaultModel, setDefaultModel]   = useState('claude-sonnet-4-6');
+  const [defaultEffort, setDefaultEffort] = useState('medium');
   const channelRef  = useRef(null);
   const currentIdRef = useRef(null);
 
-  // Cargar proyectos al inicio
+  // Cargar proyectos y defaults al inicio
   useEffect(() => {
     const ps = loadProjects();
     setProjects(ps);
     if (ps.length > 0) setCurrentId(ps[0].id);
+    setDefaultModel(localStorage.getItem('cc_default_model') ?? 'claude-sonnet-4-6');
+    setDefaultEffort(localStorage.getItem('cc_default_effort') ?? 'medium');
   }, []);
 
   // Guardar proyectos cuando cambian
@@ -168,8 +174,17 @@ export default function Home() {
     setDrawerOpen(false);
   };
 
+  const handleSaveDefaults = (model, effort) => {
+    setDefaultModel(model);
+    setDefaultEffort(effort);
+    localStorage.setItem('cc_default_model', model);
+    localStorage.setItem('cc_default_effort', effort);
+  };
+
   const handleDrawerCreate = (name) => {
     const p = makeProject(name);
+    p.model = defaultModel;
+    p.effort = defaultEffort;
     const firstNode = makeNode('conversation', 200, 200);
     p.nodes = [firstNode];
     setProjects(prev => [p, ...prev]);
@@ -262,7 +277,7 @@ export default function Home() {
                 }}
                 onOpenFolder={() => {}}
                 onCancelFolder={() => {}}
-                onShowSettings={() => {}}
+                onShowSettings={() => setSettingsOpen(true)}
               />
             </div>
           </div>
@@ -316,6 +331,14 @@ export default function Home() {
               setBuildShareUrl('');
               sendEvent('build-poc', { projectId: currentId, projectName: currentProject.name });
             }}
+          />
+        )}
+        {settingsOpen && (
+          <SettingsPanel
+            defaultModel={defaultModel}
+            defaultEffort={defaultEffort}
+            onSave={handleSaveDefaults}
+            onClose={() => setSettingsOpen(false)}
           />
         )}
       </div>
