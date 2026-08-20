@@ -1,148 +1,78 @@
-# Copy Analysis: Landing CC Creator
-**Fecha:** 2026-08-14
-**Tipo de página:** Landing page (conversión única)
-**Copy Score:** 52/100
+# Copy Analysis & Suggestions: CC Creator Landing
+**Date:** 2026-08-20
+**Page Type:** Product Landing Page
+**Copy Score:** 48/100
 
----
+## Executive Summary
 
-## Resumen ejecutivo
+La landing comunica el mecanismo (nodos, canvas, mapa conceptual) antes que el beneficio. El ángulo más diferenciado — poder estructurar y lanzar una idea desde el celular, con Claude Code ejecutando en tu Mac — está enterrado en bullets y secciones secundarias. El copy trata a CC Creator como herramienta técnica cuando en realidad es la única app que conecta una idea en el iPhone con código generado automáticamente en la Mac.
 
-La landing comunica **qué hace** CC Creator con precisión técnica, pero no comunica **quién puede lograrlo** ni **cómo se va a sentir** cuando lo haga. El texto habla desde la herramienta ("CC Creator guía a Claude...") cuando debería hablar desde el sueño del usuario ("Construye tu primera app — real, publicada — desde tu iPhone").
+Cambio central: poner el celular en el hero. Toda la narrativa gira en torno a "la idea llega donde estés — CC Creator la construye."
 
-Los puntos fuertes ya existen: el H1 funciona, el AHA moment ("De 'tengo una idea' a 'ya está en vivo'") y el not-chatbot headline ("No le repites nada. Claude ya sabe.") son excelentes. El problema está concentrado en **tagline + 4 bullets**.
+## Score Breakdown
 
----
-
-## Voice & Tone Profile
-
-| Dimensión | Actual | Objetivo |
-|-----------|--------|----------|
-| Formalidad | 3/5 (técnico-formal) | 2/5 (conversacional) |
-| Emoción | 1/5 (muy neutral) | 4/5 (aspiracional) |
-| Complejidad | 4/5 (dev-heavy) | 2/5 (accesible) |
-| Autoridad | 3/5 (feature list) | 4/5 (proceso probado) |
-
----
-
-## Score por dimensión
-
-| Dimensión | Score | Justificación |
-|-----------|-------|---------------|
-| Clarity | 7/10 | Claro para devs, opaco para no-técnicos |
-| Persuasion | 4/10 | Lista features, no maneja objeciones emocionales |
-| Specificity | 7/10 | 6 fases, $4.99, SSH-free son concretos |
-| Emotion | 2/10 | Cero aspiración, cero imagen de éxito |
-| Action | 6/10 | CTAs decentes, precio visible |
-
-**Total: 26/50 = 52/100**
-
----
+| Dimensión | Score | Nota |
+|---|---|---|
+| Claridad | 5/10 | "Del mapa de ideas" es poético pero no inmediato |
+| Persuasión | 4/10 | No responde "¿por qué esto vs notas del iPhone?" |
+| Especificidad | 5/10 | "POC", "nodos" requieren contexto técnico previo |
+| Emoción | 4/10 | No captura el momento de inspiración en movimiento |
+| Acción | 6/10 | CTAs claros pero el "Requiere macOS + Claude Code CLI" frena |
 
 ## Value Proposition Canvas
 
-```
-CLIENTE OBJETIVO: Emprendedor o creador que tiene una idea de app,
-                  usa iPhone, sabe que Claude Code existe, y no quiere
-                  aprender a programar desde cero.
+- **Target:** Developers/makers que tienen ideas todo el tiempo pero las pierden antes de llegar al escritorio
+- **Problema:** Las ideas mueren entre la inspiración y el setup del entorno de desarrollo
+- **Solución:** Estructura tu idea desde el iPhone en minutos → Claude Code la convierte en código en tu Mac
+- **Mecanismo único:** Mapa conceptual tipado (4 tipos de nodo) como prompt estructurado para Claude Code, con skills de diseño e iconos ya incluidos
+- **Beneficio clave:** De idea a proyecto funcionando en una sesión, desde el celular
+- **Prueba:** Open source, gratis, auditable
 
-PROBLEMA: "Quiero crear mi propia app pero no sé por dónde empezar,
-           cómo estructurar el proceso, ni cómo mantener a Claude
-           enfocado sesión tras sesión."
+## Before/After Examples
 
-SOLUCIÓN: Un proceso de 6 fases diseñado por Kitifica que le dice
-          a Claude exactamente qué hacer en cada etapa, controlado
-          desde el iPhone.
+### 1. Headline
+**BEFORE:** "Del mapa de ideas al código."
+**AFTER:** "Idea en el celu. Código en tu Mac."
+**POR QUÉ:** El before es poético pero abstracto. El after es específico (celu → Mac), crea contraste visual y dice exactamente qué pasa.
 
-MECANISMO ÚNICO: CLAUDE.md automático por fase = Claude arranca cada
-                  sesión con el contexto completo, sin repetición.
-
-BENEFICIO CLAVE: Llegas al lanzamiento sin perderte. Tu app es real,
-                  funcional y publicada.
-
-PRUEBA: Proceso diseñado por Kitifica (autoridad), open source (confianza),
-         $4.99 pago único (sin riesgo).
-```
-
-**GAP detectado:** El mecanismo único (CLAUDE.md automático) se menciona después del fold, en la sección "Not Chatbot". El hero lo entierra en "Claude tiene el contexto exacto" — una frase técnica que no aterriza el beneficio emocional.
-
----
-
-## Before/After
-
-### 1. Tagline (IMPACTO MÁS ALTO)
-
-**BEFORE:**
-> "CC Creator guía a Claude a través de 6 fases: desde definir tu idea hasta lanzar y certificar tu App Directa. Desde tu iPhone."
-
-Problema: sujeto = CC Creator guiando a Claude. El usuario no quiere guiar a Claude, quiere **tener su app**.
-
-**AFTER:**
-> "Construye tu propia app — real, funcional, publicada — siguiendo el proceso de Kitifica. Claude sabe exactamente qué hacer en cada fase. Tú solo decides cuándo avanzar."
-
-Por qué: sujeto = "tú". Introduce el proceso de Kitifica como autoridad. Reencuadra Claude como el asistente que ya sabe, no como el objeto que hay que guiar.
-
----
-
-### 2. Bullets (IMPACTO ALTO)
-
-**BEFORE:**
-- `6 fases: Ideación → POC → Lanzamiento → Backend → App Directa → Validación`
-- `Claude tiene el contexto exacto de cada fase — sin repetirle nada`
-- `Controla el avance tú: avanza cuando estés listo`
-- `Sin SSH · Sin túneles · Tu código permanece en tu Mac`
-
-Problema: bullet 1 = jargon dump. bullet 2 = feature técnica. bullet 4 = pure objection-handling para devs. Cero imagen de éxito.
-
-**AFTER:**
-- `De "tengo una idea" a "ya está en línea" — 6 fases diseñadas por Kitifica`
-- `Claude arranca cada sesión con el contexto completo — como si nunca lo hubieras interrumpido`
-- `Tú controlas el ritmo: avanza cuando estés listo, desde tu iPhone`
-- `Tu Mac hace el trabajo · Tu iPhone lo dirige · Tu código nunca sale de casa`
-
-Por qué: bullet 1 = narrative arc (antes → después). bullet 2 = el superpoder de CLAUDE.md explicado en términos humanos. bullet 4 = mismo dato técnico, enmarcado en control y privacidad.
-
----
+### 2. Subheadline
+**BEFORE:** "Estructura tu POC en un canvas visual. Describe, define, referencia y mapea el flujo. Luego CC Creator envía todo el contexto a Claude Code — que genera el proyecto."
+**AFTER:** "Abre CC Creator desde tu iPhone, estructura tu idea en minutos — sin setup, sin terminal. Toca 'Construir POC' y Claude Code genera el proyecto en tu Mac con todo el contexto."
+**POR QUÉ:** El before explica el mecanismo. El after describe la experiencia del usuario, con "sin setup" respondiendo la objeción principal.
 
 ### 3. Hero badge
+**BEFORE:** "Studio de concepto · Claude Code"
+**AFTER:** "Para iPhone · Mac ejecuta · Todo incluido"
+**POR QUÉ:** El after comunica inmediatamente la propuesta de valor en 3 fragmentos escaneables.
 
-**BEFORE:** `Nuevo · Sistema de 6 fases`
+### 4. Hero note
+**BEFORE:** "Gratis · Open Source · MIT · Requiere macOS + Claude Code CLI"
+**AFTER:** "Gratis · Open Source · Todo lo necesario viene incluido"
+**POR QUÉ:** "Requiere macOS + Claude Code CLI" al inicio frena. Los requisitos van en FAQ. El after refuerza el ángulo "todo incluido".
 
-**AFTER:** `Proceso Kitifica · 6 fases probadas`
+### 5. Features headline
+**BEFORE:** "Diseñado para pensar en movimiento."
+**AFTER:** "Todo lo que necesitas, listo para usar."
+**POR QUÉ:** El after refuerza el ángulo "todo incluido" y elimina la ambigüedad de "en movimiento".
 
-Por qué: "Proceso Kitifica" establece autoridad metodológica. "Nuevo" es neutro, "probadas" implica validación.
+## Swipe File
 
----
+### Headline alternativas
+1. "Idea en el celu. Código en tu Mac." ← RECOMENDADO
+2. "Tu próxima app empieza en el iPhone."
+3. "Piensa desde el celu. Claude Code construye."
+4. "La idea te llega donde estés. CC Creator la estructura."
+5. "Del celu al código. Sin perder la idea en el camino."
 
-### 4. Phases section sub
+### Subheadline alternativas
+1. "Abre CC Creator desde tu iPhone, estructura tu idea en minutos. Toca 'Construir POC' y Claude Code genera el proyecto en tu Mac." ← RECOMENDADO
+2. "Captura tu idea desde el celular. Claude Code la convierte en código en tu Mac. Sin setup, todo incluido."
 
-**BEFORE:** `Claude recibe las instrucciones correctas en cada etapa — automáticamente, sin que tengas que explicarle nada.`
+### CTA alternativas
+1. "Descargar para Mac →" ← OK, mantener
+2. "Empezar gratis →"
+3. "Descargar CC Creator →"
 
-**AFTER:** `Cada fase tiene un rol claro. Claude lo sabe desde el inicio — tú solo guías la dirección.`
-
----
-
-### 5. CTA principal
-
-**BEFORE:** `Empieza tu primera App Directa →`
-**AFTER:** Mantener — ya está bien. Específico, accionable, primera persona implícita.
-
----
-
-## Swipe file — Headlines alternativos
-
-1. "Tu idea merece una app real. Con CC Creator, la tienes." *(aspiración + resultado)*
-2. "Por primera vez, puedes crear una app desde tu iPhone — de verdad." *(posibilidad)*
-3. "El proceso que convierte ideas en apps. Diseñado por Kitifica, ejecutado por Claude." *(autoridad + mecanismo)*
-4. "De la idea a tu App Directa. Paso a paso. Desde tu iPhone." *(journey + device)*
-5. "Claude construye. Kitifica guía. Tú decides." *(roles claros, brevísimo)*
-
----
-
-## Priority de implementación
-
-| Prioridad | Elemento | Impacto esperado |
-|-----------|----------|-----------------|
-| 1 | Tagline | Más alto — primer texto que se lee |
-| 2 | Bullets | Alto — refuerza o mata el tagline |
-| 3 | Badge | Medio |
-| 4 | Phases sub | Bajo |
+### Meta description alternativas
+1. "Estructura tu idea desde el iPhone en minutos. CC Creator envía todo el contexto a Claude Code y genera el proyecto en tu Mac. Gratis, open source, todo incluido."
+2. "Tu idea en el celu → código en tu Mac. CC Creator conecta tu iPhone con Claude Code en tiempo real. Gratis y open source."
