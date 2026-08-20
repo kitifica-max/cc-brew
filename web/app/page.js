@@ -6,6 +6,7 @@ import ProjectsList from './components/ProjectsList';
 import ConceptMap from './components/ConceptMap';
 import NodeEditor from './components/NodeEditor';
 import BuildPanel from './components/BuildPanel';
+import BriefingModal from './components/BriefingModal';
 import SettingsPanel from './components/SettingsPanel';
 import OnboardingStepper from './components/OnboardingStepper';
 import { loadProjects, saveProjects, makeProject, makeNode, makeVector } from './lib/storage';
@@ -25,6 +26,7 @@ export default function Home() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [editingNodeId, setEditingNodeId]   = useState(null);
+  const [briefingOpen, setBriefingOpen] = useState(false);
   const [buildOpen, setBuildOpen]   = useState(false);
   const [buildStatus, setBuildStatus]     = useState('idle');
   const [buildLog, setBuildLog]           = useState('');
@@ -417,7 +419,7 @@ export default function Home() {
         {/* Botón build */}
         {currentProject && !editingNodeId && (
           <button
-            onClick={() => setBuildOpen(true)}
+            onClick={() => setBriefingOpen(true)}
             style={{
               position: 'absolute', bottom: 'calc(28px + env(safe-area-inset-bottom, 0px))', right: 20,
               padding: '12px 22px', background: '#f04e23', color: '#fff',
@@ -427,6 +429,21 @@ export default function Home() {
             }}>
             Construir POC
           </button>
+        )}
+
+        {/* Briefing modal */}
+        {briefingOpen && currentProject && (
+          <BriefingModal
+            project={currentProject}
+            nodes={currentProject.nodes ?? []}
+            vectors={currentProject.vectors ?? []}
+            onClose={() => setBriefingOpen(false)}
+            onConfirm={(content) => {
+              sendEvent('write-brief', { projectId: currentId, content });
+              setBriefingOpen(false);
+              setBuildOpen(true);
+            }}
+          />
         )}
 
         {/* Panel build */}

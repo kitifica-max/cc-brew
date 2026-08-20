@@ -10,7 +10,7 @@ import { get as httpsGet } from 'https';
 import dotenv from 'dotenv';
 import PtyManager from './pty.js';
 import Bridge from './bridge.js';
-import { createProject, switchProject, getActive, listProjects, deleteProject, renameProject, saveProjectEnv, readProjectEnv, addExistingProject, writeClaude } from './projects.js';
+import { createProject, switchProject, getActive, listProjects, deleteProject, renameProject, saveProjectEnv, readProjectEnv, addExistingProject, writeClaude, writeSkills } from './projects.js';
 import { ALLOWED_EXTENSIONS, MAX_FILE_BYTES } from './bridge.js';
 import { getSupabaseConfig } from './supabase-config.js';
 import { createFileAuthStorage, AUTH_STORAGE_KEY } from './auth-store.js';
@@ -202,6 +202,7 @@ async function openFolderDialog() {
   try {
     const project = addExistingProject(id, name, folderPath);
     writeClaude(project.path, project);
+    writeSkills(project.path);
     pty.spawn('claude', [], project.path);
     setTrayMenu('running');
     broadcastProjects();
@@ -288,7 +289,7 @@ async function startSession() {
   bridge.onCreateProject = (id, name) => {
     try {
       const project = createProject(id, name);
-      if (project.path) writeClaude(project.path, project);
+      if (project.path) { writeClaude(project.path, project); writeSkills(project.path); }
       pty.spawn('claude', [], project.path);
       setTrayMenu('running');
       broadcastProjects();
@@ -474,6 +475,14 @@ async function startSession() {
     const prompt = `Nuevo mapa conceptual: "${projectName}". Eres un facilitador de diseño de producto. Haz UNA pregunta clave para entender la necesidad que resuelve este producto. Responde solo con la pregunta, sin explicación.`;
     bridge._addToHistory({ role: 'user', text: prompt.trim(), projectId });
     pty?.write(prompt, false, project?.model ?? 'claude-sonnet-4-6', project?.effort ?? 'medium', projectId, true);
+  };
+
+  bridge.onWriteBrief = (projectId, content) => {
+    const project = listProjects().find(p => p.id === projectId);
+    if (!project?.path) return;
+    try {
+      writeFileSync(path.join(project.path, 'BRIEF.md'), content, 'utf8');
+    } catch (_) {}
   };
 
   bridge.onBuildPoc = async (projectId, projectName) => {

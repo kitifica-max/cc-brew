@@ -1,6 +1,7 @@
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
-import { join, resolve } from 'path';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, copyFileSync } from 'fs';
+import { join, resolve, dirname } from 'path';
 import { EOL, homedir } from 'os';
+import { fileURLToPath } from 'url';
 import { generateClaude } from './claude-md.js';
 
 function getHome() {
@@ -125,6 +126,25 @@ export function saveMcpConfig(id, mcpServers) {
   let existing = {};
   try { existing = JSON.parse(readFileSync(settingsPath, 'utf8')); } catch {}
   writeFileSync(settingsPath, JSON.stringify({ ...existing, mcpServers }, null, 2));
+}
+
+function getSkillsSource() {
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  return join(__dirname, '..', 'assets', 'skills');
+}
+
+export function writeSkills(projectPath) {
+  try {
+    const src = getSkillsSource();
+    if (!existsSync(src)) return;
+    for (const skillName of readdirSync(src)) {
+      const skillSrc = join(src, skillName, 'SKILL.md');
+      if (!existsSync(skillSrc)) continue;
+      const skillDest = join(projectPath, '.claude', 'skills', skillName);
+      mkdirSync(skillDest, { recursive: true });
+      copyFileSync(skillSrc, join(skillDest, 'SKILL.md'));
+    }
+  } catch (_) {}
 }
 
 export function writeClaude(projectPath, project) {
