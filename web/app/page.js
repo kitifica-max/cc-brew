@@ -106,6 +106,9 @@ export default function Home() {
       ch.on('broadcast', { event: 'build-progress' }, ({ payload }) => {
         setBuildLog(prev => prev + (payload.chunk ?? ''));
       });
+      ch.on('broadcast', { event: 'build-uploading' }, () => {
+        setBuildStatus('uploading');
+      });
       ch.on('broadcast', { event: 'build-done' }, ({ payload }) => {
         setBuildStatus(payload.success ? 'done' : 'error');
         setBuildShareUrl(payload.url ?? '');

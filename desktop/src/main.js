@@ -514,6 +514,7 @@ async function startSession() {
 
     // POST al endpoint de kitifica
     bridge?.broadcastRaw(projectId, 'build-progress', { chunk: 'Subiendo a ccc.kitifica.com...\n' });
+    bridge.channel?.send({ type: 'broadcast', event: 'build-uploading', payload: { projectId } });
     try {
       const form = new FormData();
       form.append('slug', slug);
