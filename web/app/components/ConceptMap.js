@@ -1,9 +1,9 @@
 'use client';
-import { useRef, useState, forwardRef, useImperativeHandle, useCallback } from 'react';
+import { useRef, useState, useEffect, forwardRef, useImperativeHandle, useCallback } from 'react';
 import NodeCard, { NODE_W, NODE_H } from './NodeCard';
 
-const MIN_VB_W = 200;
-const MAX_VB_W = 6000;
+const MIN_SCALE = 0.1; // viewBox can be at most 10x initial size
+const MAX_SCALE = 10;  // viewBox can be at most 1/10 initial size
 
 const ConceptMap = forwardRef(function ConceptMap({
   nodes, vectors, selectedId,
@@ -24,15 +24,41 @@ const ConceptMap = forwardRef(function ConceptMap({
     _setVB(vb);
   }, []);
 
+  // Initialize viewBox to actual SVG dimensions so 1 SVG unit = 1 CSS px.
+  // This makes preserveAspectRatio="none" coordinate math exact.
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const sync = () => {
+      const { width, height } = svg.getBoundingClientRect();
+      if (width > 0 && height > 0) setViewBox({ x: 0, y: 0, w: width, h: height });
+    };
+    sync();
+    window.addEventListener('resize', sync);
+    return () => window.removeEventListener('resize', sync);
+  }, [setViewBox]);
+
   useImperativeHandle(ref, () => ({
     fitAll() {
       if (!nodes?.length) return;
+      const svg = svgRef.current;
+      if (!svg) return;
       const pad = 80;
       const minX = Math.min(...nodes.map(n => n.x)) - pad;
       const minY = Math.min(...nodes.map(n => n.y)) - pad;
       const maxX = Math.max(...nodes.map(n => n.x + NODE_W)) + pad;
       const maxY = Math.max(...nodes.map(n => n.y + NODE_H)) + pad;
-      setViewBox({ x: minX, y: minY, w: maxX - minX, h: maxY - minY });
+      const contentW = maxX - minX;
+      const contentH = maxY - minY;
+      // Expand to fill the SVG element's aspect ratio so preserveAspectRatio="none" doesn't distort
+      const { width: svgW, height: svgH } = svg.getBoundingClientRect();
+      if (svgW === 0 || svgH === 0) return;
+      const scale = Math.max(contentW / svgW, contentH / svgH);
+      const w = svgW * scale;
+      const h = svgH * scale;
+      const cx = (minX + maxX) / 2;
+      const cy = (minY + maxY) / 2;
+      setViewBox({ x: cx - w / 2, y: cy - h / 2, w, h });
     },
   }), [nodes, setViewBox]);
 
@@ -113,8 +139,11 @@ const ConceptMap = forwardRef(function ConceptMap({
       const svgMidY = startVB.y + (midY - rect.top)  * (startVB.h / rect.height);
 
       const aspect = startVB.h / startVB.w;
-      const newW   = Math.max(MIN_VB_W, Math.min(MAX_VB_W, startVB.w * scale));
-      const newH   = newW * aspect;
+      const { width: svgW } = svg.getBoundingClientRect();
+      const minW = svgW / MAX_SCALE;
+      const maxW = svgW / MIN_SCALE;
+      const newW = Math.max(minW, Math.min(maxW, startVB.w * scale));
+      const newH = newW * aspect;
       const newX   = svgMidX - (midX - rect.left) * (newW / rect.width);
       const newY   = svgMidY - (midY - rect.top)  * (newH / rect.height);
       setViewBox({ x: newX, y: newY, w: newW, h: newH });
@@ -131,6 +160,12 @@ const ConceptMap = forwardRef(function ConceptMap({
       const dy = (e.clientY - startY) * (startVB.h / svg.clientHeight);
       setViewBox({ ...startVB, x: startVB.x - dx, y: startVB.y - dy });
     }
+  };
+
+  const onPointerCancel = (e) => {
+    svgPointers.current.delete(e.pointerId);
+    if (svgPointers.current.size < 2) pinchRef.current = null;
+    if (svgPointers.current.size === 0) panRef.current = null;
   };
 
   const onSvgPointerUp = (e) => {
@@ -172,10 +207,12 @@ const ConceptMap = forwardRef(function ConceptMap({
     <svg
       ref={svgRef}
       viewBox={`${vb.x} ${vb.y} ${vb.w} ${vb.h}`}
+      preserveAspectRatio="none"
       style={{ width: '100%', height: '100%', background: '#0A0A0A', touchAction: 'none' }}
       onPointerDown={onSvgPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onSvgPointerUp}
+      onPointerCancel={onPointerCancel}
     >
       <defs>
         <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
