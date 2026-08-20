@@ -20,9 +20,6 @@
 <meta name="twitter:description" content="Studio de mapas conceptuales para Claude Code. Open Source · Gratis.">
 <meta name="twitter:image" content="https://ccc.kitifica.com/icon-512.png">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
 
 <script type="application/ld+json">
 {
@@ -73,8 +70,6 @@ a { text-decoration: none; color: inherit; }
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 
-/* ─── DISPLAY FONT ─── */
-.display { font-family: 'Syne', system-ui, sans-serif; }
 
 /* ─── SHARED ─── */
 .eyebrow {
@@ -83,7 +78,7 @@ a { text-decoration: none; color: inherit; }
   display: block; margin-bottom: 14px;
 }
 .section-title {
-  font-family: 'Syne', system-ui, sans-serif;
+  font-family: system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
   font-size: clamp(1.7rem, 4vw, 2.5rem);
   font-weight: 800; letter-spacing: -0.03em;
   line-height: 1.1; text-wrap: balance;
@@ -121,7 +116,7 @@ nav {
 }
 .nav-logo { display: flex; align-items: center; gap: 10px; flex: 1; }
 .nav-brand {
-  font-family: 'Syne', system-ui, sans-serif;
+  font-family: system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px; font-weight: 700; letter-spacing: -0.01em;
 }
 .nav-brand em { font-style: normal; color: var(--orange); }
@@ -183,7 +178,7 @@ nav {
 @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.7); } }
 
 .hero h1 {
-  font-family: 'Syne', system-ui, sans-serif;
+  font-family: system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
   font-size: clamp(2.6rem, 5.5vw, 4rem);
   font-weight: 800; letter-spacing: -0.04em;
   line-height: 1.0; text-wrap: balance;
@@ -302,10 +297,10 @@ nav {
 .node-card:nth-child(4)::before { background: linear-gradient(to right, #10B981, transparent); }
 
 .node-card-icon {
-  font-size: 22px; margin-bottom: 10px; display: block;
+  display: block; margin-bottom: 10px; color: var(--text-2);
 }
 .node-card h3 {
-  font-family: 'Syne', system-ui, sans-serif;
+  font-family: system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
   font-size: 16px; font-weight: 700; margin-bottom: 8px;
 }
 .node-card p { font-size: 12px; color: var(--text-2); line-height: 1.65; }
@@ -351,7 +346,7 @@ nav {
   width: 54px; height: 54px; border-radius: 50%;
   background: var(--ink); border: 1px solid var(--border-warm);
   color: var(--orange); font-size: 16px; font-weight: 800;
-  font-family: 'Syne', system-ui, sans-serif;
+  font-family: system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
   display: flex; align-items: center; justify-content: center;
   margin: 0 auto 14px;
 }
@@ -381,7 +376,7 @@ nav {
 }
 .how-step:last-child { border-right: none; }
 .how-step:hover { background: rgba(255,255,255,0.02); }
-.how-step-icon { font-size: 28px; margin-bottom: 12px; display: block; }
+.how-step-icon { display: flex; justify-content: center; margin-bottom: 12px; color: var(--orange); }
 .how-step h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
 .how-step p { font-size: 12px; color: var(--text-2); line-height: 1.6; }
 .how-arrow {
@@ -450,7 +445,7 @@ nav {
   pointer-events: none;
 }
 .price-amount {
-  font-family: 'Syne', system-ui, sans-serif;
+  font-family: system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
   font-size: 60px; font-weight: 800; letter-spacing: -0.05em;
   line-height: 1; margin-bottom: 4px;
 }
@@ -498,7 +493,7 @@ footer { border-top: 1px solid var(--border); padding: 36px 24px; }
 }
 .footer-brand {
   display: flex; align-items: center; gap: 10px;
-  font-family: 'Syne', system-ui, sans-serif;
+  font-family: system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px; font-weight: 700;
 }
 .footer-brand em { font-style: normal; color: var(--orange); }
@@ -545,7 +540,7 @@ footer { border-top: 1px solid var(--border); padding: 36px 24px; }
       <div class="hero-badge-dot"><div class="hero-badge-pulse"></div></div>
       Studio de concepto · Claude Code
     </div>
-    <h1 class="display" style="font-size:clamp(2.4rem,5.2vw,3.8rem);font-weight:800;letter-spacing:-0.04em;line-height:1.0;text-wrap:balance;margin-bottom:20px">
+    <h1 style="font-size:clamp(2.4rem,5.2vw,3.8rem);font-weight:800;letter-spacing:-0.04em;line-height:1.0;text-wrap:balance;margin-bottom:20px">
       Del mapa<br>de ideas<br><span style="color:var(--orange)">al código.</span>
     </h1>
     <p style="font-size:16px;color:var(--text-2);line-height:1.7;max-width:400px;margin-bottom:32px">
@@ -663,7 +658,7 @@ footer { border-top: 1px solid var(--border); padding: 36px 24px; }
 
       <div class="node-card">
         <span class="node-type-badge">Conversación</span>
-        <span class="node-card-icon">💬</span>
+        <span class="node-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
         <h3>La idea en palabras</h3>
         <p>Describe tu idea libremente. El AI hace preguntas, genera preguntas guía y estructura el contexto central del proyecto.</p>
         <div class="node-card-hint">→ Claude Code leerá esto primero</div>
@@ -671,7 +666,7 @@ footer { border-top: 1px solid var(--border); padding: 36px 24px; }
 
       <div class="node-card">
         <span class="node-type-badge">Definición</span>
-        <span class="node-card-icon">📐</span>
+        <span class="node-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M8 20V10l6-6 6 6v10M8 20v-5h8v5"/></svg></span>
         <h3>El alcance exacto</h3>
         <p>Define qué incluye el POC y qué queda fuera. Cuanto más específico, menos alucinaciones en la generación.</p>
         <div class="node-card-hint">→ Delimita el scope del build</div>
@@ -679,7 +674,7 @@ footer { border-top: 1px solid var(--border); padding: 36px 24px; }
 
       <div class="node-card">
         <span class="node-type-badge">Referencia</span>
-        <span class="node-card-icon">📎</span>
+        <span class="node-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></span>
         <h3>Archivos y contexto externo</h3>
         <p>Adjunta PDFs, código existente, URLs o documentos. Claude Code los recibirá junto con el mapa completo.</p>
         <div class="node-card-hint">→ Soporta .txt .md .js .py .json…</div>
@@ -687,7 +682,7 @@ footer { border-top: 1px solid var(--border); padding: 36px 24px; }
 
       <div class="node-card">
         <span class="node-type-badge">Proceso</span>
-        <span class="node-card-icon">🔄</span>
+        <span class="node-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg></span>
         <h3>El flujo paso a paso</h3>
         <p>Describe cómo funciona la solución de inicio a fin. El flujo de usuario, los estados, las transiciones críticas.</p>
         <div class="node-card-hint">→ Claude Code sigue este flujo</div>
@@ -763,19 +758,19 @@ footer { border-top: 1px solid var(--border); padding: 36px 24px; }
 
     <div class="how-flow">
       <div class="how-step">
-        <span class="how-step-icon">📱</span>
+        <span class="how-step-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></span>
         <h3>iPhone PWA</h3>
         <p>Crea nodos, edita el mapa y toca "Construir POC" desde la palma de tu mano.</p>
       </div>
       <div style="color:var(--text-3);padding:0 4px;font-size:14px;flex-shrink:0">⟷</div>
       <div class="how-step">
-        <span class="how-step-icon">☁️</span>
+        <span class="how-step-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg></span>
         <h3>Bridge en tiempo real</h3>
         <p>Supabase Realtime sincroniza el mapa completo hacia tu Mac al instante.</p>
       </div>
       <div style="color:var(--text-3);padding:0 4px;font-size:14px;flex-shrink:0">→</div>
       <div class="how-step">
-        <span class="how-step-icon">💻</span>
+        <span class="how-step-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
         <h3>Mac + Claude Code</h3>
         <p>La app de escritorio recibe el mapa y dispara Claude Code con todo el contexto.</p>
       </div>
@@ -800,37 +795,37 @@ footer { border-top: 1px solid var(--border); padding: 36px 24px; }
     <div class="features-grid">
 
       <div class="feat-card">
-        <div class="feat-icon">🗺️</div>
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
         <h3>Canvas con pinch-to-zoom</h3>
         <p>Pan y zoom táctil en el mapa completo. Coloca nodos donde tiene sentido conceptualmente, no donde cabe en pantalla.</p>
       </div>
 
       <div class="feat-card">
-        <div class="feat-icon">🔗</div>
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
         <h3>Vectores con flechas</h3>
         <p>Conecta nodos con flechas que muestran el flujo de información. Claude Code lee las relaciones, no solo el contenido aislado.</p>
       </div>
 
       <div class="feat-card">
-        <div class="feat-icon">📎</div>
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></div>
         <h3>Adjuntar archivos</h3>
         <p>En nodos Referencia, adjunta archivos de texto, código, JSON, CSV o Markdown directamente desde tu iPhone.</p>
       </div>
 
       <div class="feat-card">
-        <div class="feat-icon">🎯</div>
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></div>
         <h3>Guía paso a paso</h3>
         <p>Un stepper contextual vive en el canvas y se actualiza solo conforme completas cada nodo y conexión.</p>
       </div>
 
       <div class="feat-card">
-        <div class="feat-icon">⚙️</div>
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
         <h3>Modelo y esfuerzo configurables</h3>
         <p>Elige el modelo de Claude y el nivel de esfuerzo por proyecto. claude-sonnet, opus o haiku — tú decides el trade-off.</p>
       </div>
 
       <div class="feat-card">
-        <div class="feat-icon">🔒</div>
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
         <h3>Tu código no sale de tu Mac</h3>
         <p>Claude Code corre local. El bridge solo transporta el contexto del mapa, no tu codebase. Open Source, auditable.</p>
       </div>
