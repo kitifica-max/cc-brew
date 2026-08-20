@@ -15,6 +15,9 @@ export default function Home() {
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [editingNodeId, setEditingNodeId]   = useState(null);
   const [buildOpen, setBuildOpen]   = useState(false);
+  const [buildStatus, setBuildStatus]     = useState('idle');
+  const [buildLog, setBuildLog]           = useState('');
+  const [buildShareUrl, setBuildShareUrl] = useState('');
   const channelRef  = useRef(null);
   const currentIdRef = useRef(null);
 
@@ -99,6 +102,13 @@ export default function Home() {
 
       ch.on('broadcast', { event: 'output' }, ({ payload }) => {
         handleBridgeOutput(payload);
+      });
+      ch.on('broadcast', { event: 'build-progress' }, ({ payload }) => {
+        setBuildLog(prev => prev + (payload.chunk ?? ''));
+      });
+      ch.on('broadcast', { event: 'build-done' }, ({ payload }) => {
+        setBuildStatus(payload.success ? 'done' : 'error');
+        setBuildShareUrl(payload.url ?? '');
       });
 
       ch.subscribe(status => {
@@ -216,8 +226,21 @@ export default function Home() {
         {buildOpen && currentProject && (
           <BuildPanel
             project={currentProject}
-            onClose={() => setBuildOpen(false)}
-            onBuild={() => sendEvent('build-poc', { projectId: currentId, projectName: currentProject.name })}
+            status={buildStatus}
+            log={buildLog}
+            shareUrl={buildShareUrl}
+            onClose={() => {
+              setBuildOpen(false);
+              setBuildStatus('idle');
+              setBuildLog('');
+              setBuildShareUrl('');
+            }}
+            onBuild={() => {
+              setBuildStatus('building');
+              setBuildLog('');
+              setBuildShareUrl('');
+              sendEvent('build-poc', { projectId: currentId, projectName: currentProject.name });
+            }}
           />
         )}
       </div>

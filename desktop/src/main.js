@@ -5,7 +5,7 @@ import { createMenuWindow, toggleMenuWindow, sendToMenu } from './menu-window.js
 import { openUpdaterWindow } from './updater-window.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { writeFileSync } from 'fs';
+import { writeFileSync, readFileSync } from 'fs';
 import { get as httpsGet } from 'https';
 import dotenv from 'dotenv';
 import PtyManager from './pty.js';
@@ -15,8 +15,8 @@ import { ALLOWED_EXTENSIONS, MAX_FILE_BYTES } from './bridge.js';
 import { getSupabaseConfig } from './supabase-config.js';
 import { createFileAuthStorage, AUTH_STORAGE_KEY } from './auth-store.js';
 import { extname, basename, resolve, sep } from 'path';
-import { homedir } from 'os';
-import { exec, spawn } from 'child_process';
+import { homedir, tmpdir } from 'os';
+import { exec, spawn, execFile } from 'child_process';
 import { createConnection as createTcpConn } from 'net';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -474,6 +474,61 @@ async function startSession() {
     const prompt = `Nuevo mapa conceptual: "${projectName}". Eres un facilitador de diseño de producto. Haz UNA pregunta clave para entender la necesidad que resuelve este producto. Responde solo con la pregunta, sin explicación.`;
     bridge._addToHistory({ role: 'user', text: prompt.trim(), projectId });
     pty?.write(prompt, false, project?.model ?? 'claude-sonnet-4-6', project?.effort ?? 'medium', projectId, true);
+  };
+
+  bridge.onBuildPoc = async (projectId, projectName) => {
+    const project = listProjects().find(p => p.id === projectId);
+    if (!project?.path) {
+      bridge?.broadcastRaw(projectId, 'build-done', { success: false, url: '' });
+      return;
+    }
+
+    const slug = projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const outDir = path.join(project.path, 'dist');
+    const url = `https://ccc.kitifica.com/${slug}`;
+
+    bridge?.broadcastRaw(projectId, 'build-progress', { chunk: 'Instruyendo a Claude Code...\n' });
+
+    if (pty) {
+      pty.write(
+        `Genera un POC estático completo en la carpeta ./dist — HTML/CSS/JS puro, sin servidor, sin env vars. Incluye index.html como punto de entrada.\r`,
+        false, project?.model ?? 'claude-sonnet-4-6', project?.effort ?? 'medium', projectId, true,
+      );
+    }
+
+    // Esperar a que Claude Code genere el POC (mock: 3s)
+    await new Promise(r => setTimeout(r, 3000));
+
+    // Empaquetar dist en zip
+    const zipPath = path.join(tmpdir(), `${slug}.zip`);
+    bridge?.broadcastRaw(projectId, 'build-progress', { chunk: 'Empaquetando dist/...\n' });
+    try {
+      await new Promise((res, rej) => {
+        execFile('zip', ['-r', zipPath, '.'], { cwd: outDir }, err => err ? rej(err) : res());
+      });
+    } catch (e) {
+      bridge?.broadcastRaw(projectId, 'build-progress', { chunk: `Error empaquetando: ${e.message}\n` });
+      bridge?.broadcastRaw(projectId, 'build-done', { success: false, url });
+      return;
+    }
+
+    // POST al endpoint de kitifica
+    bridge?.broadcastRaw(projectId, 'build-progress', { chunk: 'Subiendo a ccc.kitifica.com...\n' });
+    try {
+      const form = new FormData();
+      form.append('slug', slug);
+      form.append('file', new Blob([readFileSync(zipPath)]), `${slug}.zip`);
+      const resp = await fetch('https://ccc.kitifica.com/api/deploy', {
+        method: 'POST',
+        body: form,
+        headers: { 'X-Project-Id': projectId },
+      });
+      bridge?.broadcastRaw(projectId, 'build-done', { success: resp.ok, url });
+    } catch (e) {
+      // Endpoint no disponible aún — reportar pero incluir URL
+      bridge?.broadcastRaw(projectId, 'build-progress', { chunk: `Aviso deploy: ${e.message}\n` });
+      bridge?.broadcastRaw(projectId, 'build-done', { success: false, url });
+    }
   };
 
   bridge.onOpenClaudeDesktop = (projectId) => {

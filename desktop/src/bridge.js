@@ -46,6 +46,7 @@ export default class Bridge {
     this.onGetEnv = null;
     this.onExecCommand = null;
     this.onNewProject = null;
+    this.onBuildPoc = null;
     this._heartbeatTimer = null;
     this._history = [];
     this._streamBuffers = new Map(); // msgId → { parts: string[], projectId }
@@ -178,6 +179,10 @@ export default class Bridge {
       .on('broadcast', { event: 'new-project' }, ({ payload }) => {
         if (!this._validate(payload)) return;
         this.onNewProject?.(payload.projectId, payload.projectName);
+      })
+      .on('broadcast', { event: 'build-poc' }, ({ payload }) => {
+        if (!this._validate(payload)) return;
+        this.onBuildPoc?.(payload.projectId, payload.projectName);
       })
       .subscribe();
   }
@@ -334,6 +339,10 @@ export default class Bridge {
     this._heartbeatTimer = setInterval(() => {
       this.channel?.send({ type: 'broadcast', event: 'heartbeat', payload: { ts: Date.now() } });
     }, intervalMs);
+  }
+
+  broadcastRaw(projectId, event, payload) {
+    this.channel?.send({ type: 'broadcast', event, payload: { ...payload, projectId, ts: Date.now() } });
   }
 
   broadcastExecOutput(text, done, exitCode) {
