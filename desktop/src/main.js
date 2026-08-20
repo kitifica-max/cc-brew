@@ -470,6 +470,7 @@ async function startSession() {
 
   bridge.onNewProject = (projectId, projectName) => {
     const project = listProjects().find(p => p.id === projectId);
+    if (!project) return;
     const prompt = `Nuevo mapa conceptual: "${projectName}". Eres un facilitador de diseño de producto. Haz UNA pregunta clave para entender la necesidad que resuelve este producto. Responde solo con la pregunta, sin explicación.`;
     bridge._addToHistory({ role: 'user', text: prompt.trim(), projectId });
     pty?.write(prompt, false, project?.model ?? 'claude-sonnet-4-6', project?.effort ?? 'medium', projectId, true);
