@@ -12,6 +12,7 @@ export default function Home() {
   const [projects, setProjects]     = useState([]);
   const [currentId, setCurrentId]   = useState(null);
   const [connected, setConnected]   = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [editingNodeId, setEditingNodeId]   = useState(null);
   const [buildOpen, setBuildOpen]   = useState(false);
@@ -161,73 +162,104 @@ export default function Home() {
     setEditingNodeId(nodeId);
   }, []);
 
+  const handleDrawerSwitch = (id) => {
+    setCurrentId(id);
+    sendEvent('switch-project', { id });
+    setDrawerOpen(false);
+  };
+
+  const handleDrawerCreate = (name) => {
+    const p = makeProject(name);
+    const firstNode = makeNode('conversation', 200, 200);
+    p.nodes = [firstNode];
+    setProjects(prev => [p, ...prev]);
+    setCurrentId(p.id);
+    sendEvent('create-project', { id: p.id, name: p.name });
+    setTimeout(() => sendEvent('new-project', { projectId: p.id, projectName: p.name }), 500);
+    setDrawerOpen(false);
+  };
+
   return (
     <AuthGate>
-      <div style={{ display: 'flex', height: '100dvh', background: '#0F172A', color: '#E2E8F0' }}>
-        {/* Sidebar proyectos */}
-        <ProjectsList
-          projects={projects}
-          currentId={currentId}
-          awaitingFolder={null}
-          onSwitch={id => {
-            setCurrentId(id);
-            sendEvent('switch-project', { id });
-          }}
-          onCreate={name => {
-            const p = makeProject(name);
-            const firstNode = makeNode('conversation', 200, 200);
-            p.nodes = [firstNode];
-            setProjects(prev => [p, ...prev]);
-            setCurrentId(p.id);
-            sendEvent('create-project', { id: p.id, name: p.name });
-            setTimeout(() => sendEvent('new-project', { projectId: p.id, projectName: p.name }), 500);
-          }}
-          onDelete={id => {
-            setProjects(prev => prev.filter(p => p.id !== id));
-            setCurrentId(prev => prev === id ? projects.find(p => p.id !== id)?.id ?? null : prev);
-          }}
-          onRename={(id, name) => {
-            setProjects(prev => prev.map(p => p.id === id ? { ...p, name } : p));
-          }}
-          onOpenFolder={() => {}}
-          onCancelFolder={() => {}}
-          onShowSettings={() => {}}
-        />
+      {/* Canvas pantalla completa */}
+      <div style={{ position: 'relative', width: '100%', height: '100dvh', background: '#0F172A', overflow: 'hidden' }}>
 
-        {/* Canvas principal */}
-        <div style={{ flex: 1, position: 'relative' }}>
-          {currentProject ? (
-            <ConceptMap
-              nodes={currentProject.nodes}
-              vectors={currentProject.vectors}
-              selectedId={selectedNodeId}
-              onNodeTap={handleNodeTap}
-              onCanvasTap={handleCanvasTap}
-              onNodeMove={moveNode}
-              onAddVector={addVector}
-            />
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          height: '100%', color: '#475569', fontSize: 16 }}>
-              Crear o seleccionar un proyecto
-            </div>
-          )}
+        {currentProject ? (
+          <ConceptMap
+            nodes={currentProject.nodes}
+            vectors={currentProject.vectors}
+            selectedId={selectedNodeId}
+            onNodeTap={handleNodeTap}
+            onCanvasTap={handleCanvasTap}
+            onNodeMove={moveNode}
+            onAddVector={addVector}
+          />
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        height: '100%', color: '#475569', fontSize: 16, flexDirection: 'column', gap: 16 }}>
+            <span style={{ fontSize: 32 }}>✦</span>
+            Abre el menú para crear un proyecto
+          </div>
+        )}
 
-          {/* Indicador conexión */}
-          <div style={{ position: 'absolute', top: 12, right: 12, width: 8, height: 8,
-                        borderRadius: '50%', background: connected ? '#10B981' : '#EF4444' }} />
-
-          {/* Botón build */}
-          {currentProject && (
-            <button
-              onClick={() => setBuildOpen(true)}
-              style={{ position: 'absolute', bottom: 20, right: 20, padding: '10px 20px',
-                       background: '#6366F1', color: '#fff', border: 'none', borderRadius: 8,
-                       cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
-              Construir POC
-            </button>
-          )}
+        {/* Top bar flotante */}
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0,
+          padding: '52px 16px 16px',
+          display: 'flex', alignItems: 'center', gap: 12,
+          background: 'linear-gradient(to bottom, rgba(15,23,42,0.85) 0%, transparent 100%)',
+          pointerEvents: 'none',
+        }}>
+          <button
+            onClick={() => setDrawerOpen(true)}
+            style={{
+              pointerEvents: 'auto',
+              background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: 10, width: 36, height: 36, display: 'flex', alignItems: 'center',
+              justifyContent: 'center', cursor: 'pointer', flexShrink: 0,
+            }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E2E8F0" strokeWidth="1.5" strokeLinecap="round">
+              <path d="M3 6h18M3 12h18M3 18h18"/>
+            </svg>
+          </button>
+          <span style={{
+            flex: 1, fontSize: 15, fontWeight: 700, color: '#E2E8F0',
+            letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
+            {currentProject?.name ?? 'Sin proyecto'}
+          </span>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: connected ? '#10B981' : '#EF4444', flexShrink: 0 }} />
         </div>
+
+        {/* Drawer overlay */}
+        {drawerOpen && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 50, display: 'flex' }}>
+            <div
+              onClick={() => setDrawerOpen(false)}
+              style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }}
+            />
+            <div style={{ position: 'relative', zIndex: 51, width: 310, height: '100%', flexShrink: 0 }}>
+              <ProjectsList
+                projects={projects}
+                currentId={currentId}
+                awaitingFolder={null}
+                onSwitch={handleDrawerSwitch}
+                onCreate={handleDrawerCreate}
+                onDelete={id => {
+                  setProjects(prev => prev.filter(p => p.id !== id));
+                  setCurrentId(prev => prev === id ? projects.find(p => p.id !== id)?.id ?? null : prev);
+                  setDrawerOpen(false);
+                }}
+                onRename={(id, name) => {
+                  setProjects(prev => prev.map(p => p.id === id ? { ...p, name } : p));
+                }}
+                onOpenFolder={() => {}}
+                onCancelFolder={() => {}}
+                onShowSettings={() => {}}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Editor de nodo */}
         {editingNodeId && currentProject && (
@@ -241,6 +273,21 @@ export default function Home() {
             }}
             onTypeChange={type => updateNode(editingNodeId, { type })}
           />
+        )}
+
+        {/* Botón build */}
+        {currentProject && !editingNodeId && (
+          <button
+            onClick={() => setBuildOpen(true)}
+            style={{
+              position: 'absolute', bottom: 28, right: 20,
+              padding: '12px 22px', background: '#6366F1', color: '#fff',
+              border: 'none', borderRadius: 14, cursor: 'pointer',
+              fontSize: 14, fontWeight: 700,
+              boxShadow: '0 4px 16px rgba(99,102,241,0.4)',
+            }}>
+            Construir POC
+          </button>
         )}
 
         {/* Panel build */}
