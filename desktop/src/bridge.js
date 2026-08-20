@@ -41,10 +41,7 @@ export default class Bridge {
     this.onSaveEnv = null;
     this.onDeleteProject = null;
     this.onOpenFolder = null;
-    this.onGetMcpConfig = null;
-    this.onSaveMcpConfig = null;
     this.onOpenPreview = null;
-    this.onPhaseChange = null;
     this.onStarterMessage = null;
     this.onGetEnv = null;
     this.onExecCommand = null;
@@ -161,21 +158,9 @@ export default class Bridge {
         if (!this._validate(payload)) return;
         this._storePushSubscription(payload.subscription);
       })
-      .on('broadcast', { event: 'get-mcp-config' }, ({ payload }) => {
-        if (!this._validate(payload)) return;
-        this.onGetMcpConfig?.(payload.projectId);
-      })
-      .on('broadcast', { event: 'save-mcp-config' }, ({ payload }) => {
-        if (!this._validate(payload)) return;
-        this.onSaveMcpConfig?.(payload.projectId, payload.mcpServers);
-      })
       .on('broadcast', { event: 'open-preview' }, ({ payload }) => {
         if (!this._validate(payload)) return;
         this.onOpenPreview?.(payload.port)?.catch?.(() => {});
-      })
-      .on('broadcast', { event: 'phase-change' }, ({ payload }) => {
-        if (!this._validate(payload)) return;
-        this.onPhaseChange?.(payload.projectId, payload.phase);
       })
       .on('broadcast', { event: 'starter-message' }, ({ payload }) => {
         if (!this._validate(payload)) return;
@@ -306,20 +291,6 @@ export default class Bridge {
     this.channel?.send({
       type: 'broadcast', event: 'usage',
       payload: { cost, inputTokens, projectId, ts: Date.now() },
-    });
-  }
-
-  broadcastPhaseChange(projectId, phase) {
-    this.channel?.send({
-      type: 'broadcast', event: 'phase-changed',
-      payload: { projectId, phase, ts: Date.now() },
-    });
-  }
-
-  broadcastMcpConfig(projectId, mcpServers) {
-    this.channel?.send({
-      type: 'broadcast', event: 'mcp-config',
-      payload: { projectId, mcpServers, ts: Date.now() },
     });
   }
 

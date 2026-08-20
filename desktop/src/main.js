@@ -10,7 +10,7 @@ import { get as httpsGet } from 'https';
 import dotenv from 'dotenv';
 import PtyManager from './pty.js';
 import Bridge from './bridge.js';
-import { createProject, switchProject, getActive, listProjects, deleteProject, renameProject, saveProjectEnv, readProjectEnv, addExistingProject, readMcpConfig, saveMcpConfig, writeClaude, updateProjectPhase } from './projects.js';
+import { createProject, switchProject, getActive, listProjects, deleteProject, renameProject, saveProjectEnv, readProjectEnv, addExistingProject, writeClaude } from './projects.js';
 import { ALLOWED_EXTENSIONS, MAX_FILE_BYTES } from './bridge.js';
 import { getSupabaseConfig } from './supabase-config.js';
 import { createFileAuthStorage, AUTH_STORAGE_KEY } from './auth-store.js';
@@ -388,25 +388,6 @@ async function startSession() {
     broadcastProjects();
   };
 
-  bridge.onGetMcpConfig = (projectId) => {
-    try {
-      const mcpServers = readMcpConfig(projectId);
-      bridge.broadcastMcpConfig(projectId, mcpServers);
-    } catch (e) {
-      bridge?.broadcastMessage('system', `Error leyendo MCP config: ${e.message}`);
-    }
-  };
-
-  bridge.onSaveMcpConfig = (projectId, mcpServers) => {
-    try {
-      if (!mcpServers || typeof mcpServers !== 'object' || Array.isArray(mcpServers)) return;
-      saveMcpConfig(projectId, mcpServers);
-      bridge?.broadcastMessage('system', 'MCP servers actualizados.');
-    } catch (e) {
-      bridge?.broadcastMessage('system', `Error guardando MCP config: ${e.message}`);
-    }
-  };
-
   bridge.onRenameProject = (id, name) => {
     renameProject(id, name);
     broadcastProjects();
@@ -471,11 +452,6 @@ async function startSession() {
     setTrayMenu(pty?.running ? 'running' : 'stopped');
   };
 
-  bridge.onPhaseChange = (projectId, phase) => {
-    const updated = updateProjectPhase(projectId, phase);
-    if (updated) bridge?.broadcastPhaseChange(projectId, phase);
-  };
-
   bridge.onGetEnv = (projectId) => {
     try {
       const env = readProjectEnv(projectId);
@@ -537,12 +513,6 @@ async function signOutAndSetup() {
 }
 
 // ── Panel IPC handlers ────────────────────────────────────────────────────────
-ipcMain.handle('panel:advance-phase', (_, projectId, phase) => {
-  const updated = updateProjectPhase(projectId, phase);
-  if (updated) bridge?.broadcastPhaseChange(projectId, phase);
-  broadcastProjects();
-});
-
 ipcMain.handle('panel:open-terminal', (_, projectId) => {
   const project = listProjects().find(p => p.id === projectId);
   if (!project) return;
@@ -554,11 +524,6 @@ ipcMain.handle('panel:switch-project', (_, id) => {
   const project = switchProject(id);
   if (project && pty) pty.spawn('claude', [], project.path);
   broadcastProjects();
-});
-
-ipcMain.handle('panel:open-finder', (_, projectId) => {
-  const project = listProjects().find(p => p.id === projectId);
-  if (project?.path) shell.openPath(project.path);
 });
 
 ipcMain.handle('panel:open-menu', () => {
