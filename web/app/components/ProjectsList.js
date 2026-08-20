@@ -10,58 +10,6 @@ const ICON_FOLDER   = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height
 const ICON_PENCIL   = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="m14.363 5.652l1.48-1.48a2 2 0 0 1 2.829 0l1.414 1.414a2 2 0 0 1 0 2.828l-1.48 1.48m-4.243-4.242l-9.616 9.615a2 2 0 0 0-.578 1.238l-.242 2.74a1 1 0 0 0 1.084 1.085l2.74-.242a2 2 0 0 0 1.24-.578l9.615-9.616m-4.243-4.242l4.243 4.242"/></svg>`;
 const ICON_SETTINGS = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6"/><path d="m19.622 10.395l-1.097-2.65L20 6l-2-2l-1.735 1.483l-2.707-1.113L12.935 2h-1.954l-.632 2.401l-2.645 1.115L6 4L4 6l1.453 1.789l-1.08 2.657L2 11v2l2.401.656L5.516 16.3L4 18l2 2l1.791-1.46l2.606 1.072L11 22h2l.604-2.387l2.651-1.098C16.697 18.832 18 20 18 20l2-2l-1.484-1.75l1.098-2.652l2.386-.62V11z"/></svg>`;
 
-const PHASES = [
-  { n: 1, name: 'Ideación',          color: '#f04e23' },
-  { n: 2, name: 'POC Local',         color: '#3b82f6' },
-  { n: 3, name: 'Lanzamiento',       color: '#10b981' },
-  { n: 4, name: 'Backend',           color: '#8b5cf6' },
-  { n: 5, name: 'App Directa',       color: '#06b6d4' },
-  { n: 6, name: 'Validación',        color: '#f59e0b' },
-];
-
-function PhaseTag({ phase }) {
-  const p = PHASES[(phase ?? 1) - 1] ?? PHASES[0];
-  return (
-    <div style={{
-      display: 'inline-flex', alignItems: 'center', gap: 5,
-      padding: '3px 9px',
-      borderRadius: 20,
-      background: p.color + '1f',
-      border: `1px solid ${p.color}38`,
-      marginBottom: 8,
-    }}>
-      <div style={{ width: 5, height: 5, borderRadius: '50%', background: p.color, flexShrink: 0 }} />
-      <span style={{ fontSize: 11, fontWeight: 700, color: p.color, letterSpacing: '0.01em' }}>
-        Fase {p.n} · {p.name}
-      </span>
-    </div>
-  );
-}
-
-function PhaseDots({ phase }) {
-  const cur = phase ?? 1;
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 8 }}>
-      {PHASES.map(p => {
-        const done = p.n < cur;
-        const active = p.n === cur;
-        const phaseColor = PHASES[cur - 1]?.color ?? '#f04e23';
-        return (
-          <div key={p.n} style={{
-            width: 7, height: 7, borderRadius: '50%',
-            background: (done || active) ? phaseColor : 'rgba(0,0,0,0.12)',
-            boxShadow: active ? `0 0 0 2.5px ${phaseColor}33` : 'none',
-            flexShrink: 0,
-          }} />
-        );
-      })}
-      <span style={{ marginLeft: 4, fontSize: 10, fontWeight: 600, color: '#aaa', fontVariantNumeric: 'tabular-nums' }}>
-        {cur} / 6
-      </span>
-    </div>
-  );
-}
-
 const ONBOARDING_STEPS = [
   {
     n: 1,
@@ -72,12 +20,12 @@ const ONBOARDING_STEPS = [
   {
     n: 2,
     title: 'Crea tu primer proyecto',
-    body: 'Toca "Nuevo proyecto" aquí. CC Creator crea la carpeta en tu Mac y escribe el CLAUDE.md de la Fase 1 automáticamente.',
+    body: 'Toca "Nuevo proyecto". Claude te guiará con preguntas para definir tu producto digital desde cero.',
   },
   {
     n: 3,
-    title: 'Guía a Claude desde tu iPhone',
-    body: 'Envía prompts, sube archivos y avanza de Fase cuando estés listo. Claude ya sabe exactamente en qué etapa va tu proyecto.',
+    title: 'Construye tu mapa de concepto',
+    body: 'Añade nodos, conecta ideas y envía el contexto a Claude. Cuando tengas suficiente, genera tu POC estático con un toque.',
   },
 ];
 
@@ -134,7 +82,7 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
         {CC_LOGO}
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.1 }}>Bienvenido a CC Creator</div>
-          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 6, lineHeight: 1.4 }}>De la idea a tu App Directa en 6 fases,<br/>desde tu iPhone.</div>
+          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 6, lineHeight: 1.4 }}>Construye POCs de producto digital<br/>guiado por Claude, desde tu iPhone.</div>
         </div>
       </div>
 
@@ -286,8 +234,15 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
                     </>
                   )}
                 </div>
-                <PhaseTag phase={p.phase} />
-                <PhaseDots phase={p.phase} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', borderRadius: 20, background: 'rgba(240,78,35,0.12)', border: '1px solid rgba(240,78,35,0.22)' }}>
+                    <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#f04e23' }} />
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#f04e23', letterSpacing: '0.01em' }}>{p.nodes?.length ?? 0} nodos</span>
+                  </div>
+                  {(p.vectors?.length ?? 0) > 0 && (
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>{p.vectors.length} conexiones</span>
+                  )}
+                </div>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>
                   {modelLabel} · {p.effort}
                 </div>
@@ -369,10 +324,11 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
                   </>
                 )}
               </div>
-              <PhaseTag phase={p.phase ?? 1} />
-              <PhaseDots phase={p.phase ?? 1} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>{p.nodes?.length ?? 0} nodos{(p.vectors?.length ?? 0) > 0 ? ` · ${p.vectors.length} conexiones` : ''}</span>
+              </div>
               <div style={{ fontSize: 11, color: 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>
-                {modelLabel} · {p.effort} · {p.nodes?.length ?? 0} nodos · {new Date(p.createdAt).toLocaleDateString('es', { day: 'numeric', month: 'short' })}
+                {modelLabel} · {p.effort} · {new Date(p.createdAt).toLocaleDateString('es', { day: 'numeric', month: 'short' })}
               </div>
             </div>
           );
@@ -406,13 +362,6 @@ export default function ProjectsList({ projects, currentId, awaitingFolder, onSw
             >
               <span style={{ display: 'flex', width: 17, height: 17 }} dangerouslySetInnerHTML={{ __html: ICON_PLUS }} />
               Nuevo proyecto
-            </button>
-            <button
-              onClick={onOpenFolder}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'none', border: '1px solid var(--border)', borderRadius: 16, padding: '13px 16px', fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer' }}
-            >
-              <span style={{ display: 'flex', width: 16, height: 16 }} dangerouslySetInnerHTML={{ __html: ICON_FOLDER }} />
-              Abrir carpeta existente
             </button>
           </div>
         )}
