@@ -3,9 +3,8 @@ import React, { useState, useEffect } from 'react';
 
 const TYPE_OPTIONS = ['conversation', 'reference', 'definition', 'process'];
 const TYPE_LABELS  = { conversation: 'Conversación', reference: 'Referencia', definition: 'Definición', process: 'Proceso' };
-const TYPE_COLORS  = { conversation: '#3B82F6', reference: '#10B981', definition: '#F59E0B', process: '#8B5CF6' };
 
-export default function NodeEditor({ node, onClose, onSend, onTypeChange }) {
+export default function NodeEditor({ node, onClose, onSend, onTypeChange, onConnectStart }) {
   const [draft, setDraft] = useState(node?.content ?? '');
   const [keyboardOffset, setKeyboardOffset] = useState(0);
 
@@ -32,12 +31,20 @@ export default function NodeEditor({ node, onClose, onSend, onTypeChange }) {
           <button key={t} onClick={() => onTypeChange(t)} aria-pressed={node.type === t}
             style={{
               padding: '6px 14px', minHeight: 36, borderRadius: 20, border: 'none', cursor: 'pointer',
-              background: node.type === t ? TYPE_COLORS[t] : '#334155',
+              background: node.type === t ? '#f04e23' : '#334155',
               color: '#E2E8F0', fontSize: 12, fontWeight: 600,
             }}>
             {TYPE_LABELS[t]}
           </button>
         ))}
+        {onConnectStart && (
+          <button onClick={onConnectStart} aria-label="Conectar con otro nodo"
+            style={{ padding: '6px 14px', minHeight: 36, borderRadius: 20, cursor: 'pointer',
+                     background: 'transparent', border: '1.5px solid #334155',
+                     color: '#94A3B8', fontSize: 12, fontWeight: 600 }}>
+            Conectar →
+          </button>
+        )}
         <button onClick={onClose} aria-label="Cerrar editor"
           style={{
             marginLeft: 'auto', background: 'none', border: 'none',
