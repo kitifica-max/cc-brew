@@ -5,10 +5,12 @@ import NodeCard from './NodeCard';
 const NODE_W = 180;
 const NODE_H = 90;
 
-export default function ConceptMap({ nodes, vectors, selectedId, onNodeTap, onCanvasTap, onNodeMove }) {
+export default function ConceptMap({ nodes, vectors, selectedId, onNodeTap, onCanvasTap, onCanvasDeselect, onNodeMove }) {
   const svgRef = useRef(null);
   const dragging = useRef(null); // { id, startX, startY, nodeX, nodeY }
-  const [viewBox] = useState({ x: 0, y: 0, w: 800, h: 600 });
+  const panRef = useRef(null);   // { startX, startY, startVB }
+  const lastTap = useRef({ time: 0, x: 0, y: 0 });
+  const [viewBox, setViewBox] = useState({ x: 0, y: 0, w: 800, h: 600 });
 
   const toSvgCoords = (clientX, clientY) => {
     const svg = svgRef.current;
@@ -20,7 +22,7 @@ export default function ConceptMap({ nodes, vectors, selectedId, onNodeTap, onCa
     };
   };
 
-  const onPointerDown = (e, nodeId) => {
+  const onNodePointerDown = (e, nodeId) => {
     e.stopPropagation();
     const node = nodes.find(n => n.id === nodeId);
     if (!node) return;
@@ -28,27 +30,53 @@ export default function ConceptMap({ nodes, vectors, selectedId, onNodeTap, onCa
     e.target.setPointerCapture(e.pointerId);
   };
 
-  const onPointerMove = (e) => {
-    if (!dragging.current) return;
-    const svg = svgRef.current;
-    if (!svg) return;
-    const dx = (e.clientX - dragging.current.startX) * (viewBox.w / svg.clientWidth);
-    const dy = (e.clientY - dragging.current.startY) * (viewBox.h / svg.clientHeight);
-    onNodeMove(dragging.current.id, dragging.current.nodeX + dx, dragging.current.nodeY + dy);
+  const onSvgPointerDown = (e) => {
+    panRef.current = { startX: e.clientX, startY: e.clientY, startVB: { ...viewBox } };
+    svgRef.current?.setPointerCapture(e.pointerId);
   };
 
-  const onPointerUp = (e, nodeId) => {
+  const onPointerMove = (e) => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    if (dragging.current) {
+      const dx = (e.clientX - dragging.current.startX) * (viewBox.w / svg.clientWidth);
+      const dy = (e.clientY - dragging.current.startY) * (viewBox.h / svg.clientHeight);
+      onNodeMove(dragging.current.id, dragging.current.nodeX + dx, dragging.current.nodeY + dy);
+    } else if (panRef.current) {
+      const dx = (e.clientX - panRef.current.startX) * (panRef.current.startVB.w / svg.clientWidth);
+      const dy = (e.clientY - panRef.current.startY) * (panRef.current.startVB.h / svg.clientHeight);
+      setViewBox({ ...panRef.current.startVB, x: panRef.current.startVB.x - dx, y: panRef.current.startVB.y - dy });
+    }
+  };
+
+  const onNodePointerUp = (e, nodeId) => {
     const d = dragging.current;
     dragging.current = null;
     if (!d) return;
     const dx = Math.abs(e.clientX - d.startX);
     const dy = Math.abs(e.clientY - d.startY);
-    if (dx < 5 && dy < 5) onNodeTap(nodeId); // tap, not drag
+    if (dx < 5 && dy < 5) onNodeTap(nodeId);
   };
 
-  const onSvgClick = (e) => {
-    const { x, y } = toSvgCoords(e.clientX, e.clientY);
-    onCanvasTap(x, y);
+  const onSvgPointerUp = (e) => {
+    const p = panRef.current;
+    panRef.current = null;
+    if (!p) return;
+    const dx = Math.abs(e.clientX - p.startX);
+    const dy = Math.abs(e.clientY - p.startY);
+    if (dx < 5 && dy < 5) {
+      const { x, y } = toSvgCoords(e.clientX, e.clientY);
+      const now = Date.now();
+      const tdx = Math.abs(e.clientX - lastTap.current.x);
+      const tdy = Math.abs(e.clientY - lastTap.current.y);
+      if (now - lastTap.current.time < 300 && tdx < 40 && tdy < 40) {
+        lastTap.current = { time: 0, x: 0, y: 0 };
+        onCanvasTap(x, y);
+      } else {
+        lastTap.current = { time: now, x: e.clientX, y: e.clientY };
+        onCanvasDeselect?.();
+      }
+    }
   };
 
   return (
@@ -56,13 +84,13 @@ export default function ConceptMap({ nodes, vectors, selectedId, onNodeTap, onCa
       ref={svgRef}
       viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`}
       style={{ width: '100%', height: '100%', background: '#0F172A', touchAction: 'none' }}
-      onClick={onSvgClick}
+      onPointerDown={onSvgPointerDown}
       onPointerMove={onPointerMove}
+      onPointerUp={onSvgPointerUp}
     >
-      {/* Vectores (flechas) */}
       <defs>
         <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L8,3 z" fill="#475569" />
+          <path d="M0,0 L0,6 L8,3 z" fill="#64748B" />
         </marker>
       </defs>
       {(vectors || []).map(v => {
@@ -74,23 +102,25 @@ export default function ConceptMap({ nodes, vectors, selectedId, onNodeTap, onCa
         return (
           <g key={v.id}>
             <line x1={x1} y1={y1} x2={x2} y2={y2}
-              stroke="#475569" strokeWidth={1.5} markerEnd="url(#arrow)" />
+              stroke="#64748B" strokeWidth={1.5} markerEnd="url(#arrow)" />
             {v.label && (
-              <text x={(x1+x2)/2} y={(y1+y2)/2 - 6} fill="#94A3B8" fontSize={10}
-                textAnchor="middle" fontFamily="sans-serif">
+              <text x={(x1+x2)/2} y={(y1+y2)/2 - 6} fill="#94A3B8" fontSize={11}
+                textAnchor="middle" fontFamily="system-ui, -apple-system, sans-serif">
                 {v.label}
               </text>
             )}
           </g>
         );
       })}
-      {/* Nodos */}
       {(nodes || []).map(node => (
         <g
           key={node.id}
-          onPointerDown={e => onPointerDown(e, node.id)}
-          onPointerUp={e => { e.stopPropagation(); onPointerUp(e, node.id); }}
-          onClick={e => e.stopPropagation()}
+          role="button"
+          tabIndex={0}
+          aria-label={`Nodo ${node.type}: ${node.content || 'sin contenido'}`}
+          onPointerDown={e => onNodePointerDown(e, node.id)}
+          onPointerUp={e => { e.stopPropagation(); onNodePointerUp(e, node.id); }}
+          onKeyDown={e => e.key === 'Enter' && onNodeTap(node.id)}
         >
           <NodeCard node={node} selected={selectedId === node.id} onTap={onNodeTap} />
         </g>

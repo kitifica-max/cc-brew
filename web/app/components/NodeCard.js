@@ -22,19 +22,19 @@ export default function NodeCard({ node, selected, onTap }) {
   return (
     <g
       transform={`translate(${node.x}, ${node.y})`}
-      style={{ cursor: 'pointer' }}
+      style={{ cursor: 'pointer', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))' }}
     >
       <rect
         width={NODE_W} height={NODE_H} rx={12}
-        fill={selected ? color : '#1E293B'}
-        stroke={color} strokeWidth={selected ? 3 : 1.5}
+        fill={selected ? color : '#243147'}
+        stroke={color} strokeWidth={selected ? 3 : 2}
       />
-      <text x={10} y={18} fill={color} fontSize={10} fontWeight="600" fontFamily="sans-serif">
+      <text x={10} y={18} fill={color} fontSize={11} fontWeight="700" fontFamily="system-ui, -apple-system, sans-serif">
         {TYPE_LABELS[node.type]}
       </text>
       <foreignObject x={10} y={24} width={NODE_W - 20} height={NODE_H - 30}>
         <div xmlns="http://www.w3.org/1999/xhtml"
-          style={{ fontSize: 12, color: '#E2E8F0', fontFamily: 'sans-serif',
+          style={{ fontSize: 13, color: '#E2E8F0', fontFamily: 'system-ui, -apple-system, sans-serif',
                    overflow: 'hidden', display: '-webkit-box',
                    WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
           {node.aiContent || node.content || '...'}

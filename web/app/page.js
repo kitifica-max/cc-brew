@@ -191,27 +191,34 @@ export default function Home() {
             selectedId={selectedNodeId}
             onNodeTap={handleNodeTap}
             onCanvasTap={handleCanvasTap}
+            onCanvasDeselect={() => { setSelectedNodeId(null); setEditingNodeId(null); }}
             onNodeMove={moveNode}
             onAddVector={addVector}
           />
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        height: '100%', color: '#475569', fontSize: 16, flexDirection: 'column', gap: 16 }}>
-            <span style={{ fontSize: 32 }}>✦</span>
-            Abre el menú para crear un proyecto
+                        height: '100%', flexDirection: 'column', gap: 16, padding: '0 32px', textAlign: 'center' }}>
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{ opacity: 0.35 }}>
+              <rect x="4" y="4" width="40" height="40" rx="10" stroke="#475569" strokeWidth="2" strokeDasharray="4 3"/>
+              <rect x="14" y="17" width="20" height="14" rx="4" stroke="#475569" strokeWidth="1.5"/>
+              <line x1="14" y1="22" x2="34" y2="22" stroke="#475569" strokeWidth="1"/>
+            </svg>
+            <span style={{ fontSize: 15, color: '#64748B' }}>Abre el menú ≡ para crear un proyecto</span>
+            <span style={{ fontSize: 13, color: '#475569' }}>Doble toque en el canvas para añadir nodos</span>
           </div>
         )}
 
         {/* Top bar flotante */}
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0,
-          padding: '52px 16px 16px',
+          padding: 'calc(env(safe-area-inset-top, 20px) + 16px) 16px 16px',
           display: 'flex', alignItems: 'center', gap: 12,
           background: 'linear-gradient(to bottom, rgba(15,23,42,0.85) 0%, transparent 100%)',
           pointerEvents: 'none',
         }}>
           <button
             onClick={() => setDrawerOpen(true)}
+            aria-label="Abrir menú de proyectos"
             style={{
               pointerEvents: 'auto',
               background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.12)',
@@ -238,7 +245,7 @@ export default function Home() {
               onClick={() => setDrawerOpen(false)}
               style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }}
             />
-            <div style={{ position: 'relative', zIndex: 51, width: 310, height: '100%', flexShrink: 0 }}>
+            <div style={{ position: 'relative', zIndex: 51, width: 'min(310px, calc(100vw - 56px))', height: '100%', flexShrink: 0 }}>
               <ProjectsList
                 projects={projects}
                 currentId={currentId}
@@ -280,11 +287,11 @@ export default function Home() {
           <button
             onClick={() => setBuildOpen(true)}
             style={{
-              position: 'absolute', bottom: 28, right: 20,
-              padding: '12px 22px', background: '#6366F1', color: '#fff',
+              position: 'absolute', bottom: 'calc(28px + env(safe-area-inset-bottom, 0px))', right: 20,
+              padding: '12px 22px', background: '#f04e23', color: '#fff',
               border: 'none', borderRadius: 14, cursor: 'pointer',
               fontSize: 14, fontWeight: 700,
-              boxShadow: '0 4px 16px rgba(99,102,241,0.4)',
+              boxShadow: '0 4px 16px rgba(240,78,35,0.4)',
             }}>
             Construir POC
           </button>
