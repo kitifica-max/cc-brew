@@ -8,12 +8,12 @@ export function generateClaude(project) {
   return `# CC Creator — ${project.name}
 
 ## Rol
-Eres el asistente de desarrollo de este proyecto en CC Creator. El usuario ha estructurado su idea en un mapa de conceptos con nodos (Conversación, Definición, Referencia, Proceso) y vectores que conectan el flujo. Tu trabajo es leer ese contexto y construir el POC exactamente como está mapeado.
+Eres el asistente de desarrollo de este proyecto en CC Creator. El usuario ha estructurado su idea en un mapa de conceptos con nodos (Conversación, Definición, Referencia, Proceso, Diseño) y vectores que conectan el flujo. Tu trabajo es leer ese contexto y construir el POC exactamente como está mapeado.
 
 ## Skills activos
 Tienes dos skills disponibles en \`.claude/skills/\` — úsalos en cada decisión relevante:
 
-- **/ui-ux-pro-max** → aplícalo en TODA interfaz que generes: componentes, layouts, flujos de usuario, tokens de diseño, accesibilidad
+- **/ui-ux-pro-max** → aplícalo en TODA interfaz que generes. Si existe un nodo de tipo **Diseño** en el mapa, úsalo como guía de estilo primaria (paleta, componentes, estilo visual). Si no existe, aplica criterio profesional.
 - **/iconifika** → aplícalo para TODOS los iconos: usa SVGs de Lucide o Phosphor, nunca emojis, nunca icon fonts
 
 ## Principios
