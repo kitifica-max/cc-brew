@@ -1,8 +1,8 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 
-const TYPE_OPTIONS = ['conversation', 'reference', 'definition', 'process'];
-const TYPE_LABELS  = { conversation: 'Conversación', reference: 'Referencia', definition: 'Definición', process: 'Proceso' };
+const TYPE_OPTIONS = ['conversation', 'reference', 'definition', 'process', 'design'];
+const TYPE_LABELS  = { conversation: 'Conversación', reference: 'Referencia', definition: 'Definición', process: 'Proceso', design: 'Diseño' };
 
 export default function NodeEditor({ node, onClose, onSend, onTypeChange, onConnectStart }) {
   const [draft, setDraft] = useState(node?.content ?? '');
@@ -99,7 +99,7 @@ export default function NodeEditor({ node, onClose, onSend, onTypeChange, onConn
         <textarea
           value={draft}
           onChange={e => setDraft(e.target.value)}
-          placeholder={node.type === 'reference' ? 'URL o descripción de la referencia...' : node.type === 'conversation' ? 'Responde a la IA...' : 'Agregar contenido...'}
+          placeholder={node.type === 'reference' ? 'URL o descripción de la referencia...' : node.type === 'conversation' ? 'Responde a la IA...' : node.type === 'design' ? 'Estilo visual, paleta, componentes UI preferidos, referencias...' : 'Agregar contenido...'}
           rows={3}
           style={{
             flex: 1, background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: 8,

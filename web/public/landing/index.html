@@ -260,11 +260,12 @@ nav {
 .nodes-header { text-align: center; margin-bottom: 48px; }
 .nodes-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 12px;
 }
-@media (max-width: 860px) { .nodes-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 480px) { .nodes-grid { grid-template-columns: 1fr; } }
+@media (max-width: 1100px) { .nodes-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 680px) { .nodes-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 400px) { .nodes-grid { grid-template-columns: 1fr; } }
 
 .node-card {
   background: var(--ink-2);
@@ -294,10 +295,12 @@ nav {
 .node-card:nth-child(2) .node-type-badge { background: rgba(139,92,246,0.12); color: #8B5CF6; border-color: rgba(139,92,246,0.22); }
 .node-card:nth-child(3) .node-type-badge { background: rgba(59,130,246,0.12); color: #3B82F6; border-color: rgba(59,130,246,0.22); }
 .node-card:nth-child(4) .node-type-badge { background: rgba(16,185,129,0.12); color: #10B981; border-color: rgba(16,185,129,0.22); }
+.node-card:nth-child(5) .node-type-badge { background: rgba(236,72,153,0.12); color: #EC4899; border-color: rgba(236,72,153,0.22); }
 .node-card:nth-child(1)::before { background: linear-gradient(to right, #f04e23, transparent); }
 .node-card:nth-child(2)::before { background: linear-gradient(to right, #8B5CF6, transparent); }
 .node-card:nth-child(3)::before { background: linear-gradient(to right, #3B82F6, transparent); }
 .node-card:nth-child(4)::before { background: linear-gradient(to right, #10B981, transparent); }
+.node-card:nth-child(5)::before { background: linear-gradient(to right, #EC4899, transparent); }
 
 .node-card-icon {
   display: block; margin-bottom: 10px; color: var(--text-2);
@@ -320,7 +323,7 @@ nav {
 .steps-header { text-align: center; margin-bottom: 48px; }
 .steps-track {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   gap: 8px;
   position: relative;
 }
@@ -332,7 +335,7 @@ nav {
   background: linear-gradient(to right, transparent, var(--border-warm) 30%, var(--border-warm) 70%, transparent);
 }
 @media (max-width: 860px) {
-  .steps-track { grid-template-columns: repeat(3, 1fr); }
+  .steps-track { grid-template-columns: repeat(4, 1fr); }
   .steps-track::before { display: none; }
 }
 @media (max-width: 480px) { .steps-track { grid-template-columns: repeat(2, 1fr); } }
@@ -577,75 +580,13 @@ footer { border-top: 1px solid var(--border); padding: 36px 24px; }
   </div>
 
   <div style="display:flex;align-items:center;justify-content:center">
-    <div class="canvas-frame">
-      <div class="canvas-titlebar">
-        <div class="window-dots">
-          <div class="window-dot" style="background:#ff5f57"></div>
-          <div class="window-dot" style="background:#febc2e"></div>
-          <div class="window-dot" style="background:#28c840"></div>
-        </div>
-        <span class="canvas-proj">mi-startup-idea.ccc</span>
-      </div>
-      <div class="canvas-svg-wrap">
-        <svg class="map-svg" viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <marker id="arr" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
-              <path d="M0,0 L0,6 L7,3 z" fill="#525252"/>
-            </marker>
-          </defs>
-
-          <!-- Node 1: Conversación (top-left) -->
-          <g class="node-g n1">
-            <rect x="20" y="20" width="140" height="72" rx="8" fill="#1C1C1C" stroke="#2A2A2A" stroke-width="1.5"/>
-            <rect x="20" y="20" width="140" height="2.5" rx="1" fill="#f04e23" opacity="0.8"/>
-            <rect x="28" y="34" width="56" height="12" rx="6" fill="rgba(240,78,35,0.15)" stroke="rgba(240,78,35,0.3)" stroke-width="1"/>
-            <text x="56" y="44" font-family="ui-monospace,monospace" font-size="7" fill="#f04e23" text-anchor="middle" font-weight="700">CONVERSACIÓN</text>
-            <text x="30" y="60" font-family="system-ui,sans-serif" font-size="9.5" fill="#E0E0E0" font-weight="600">App de meditación</text>
-            <text x="30" y="74" font-family="system-ui,sans-serif" font-size="8.5" fill="#888888">para runners que no tienen</text>
-            <text x="30" y="84" font-family="system-ui,sans-serif" font-size="8.5" fill="#888888">tiempo entre semana...</text>
-          </g>
-
-          <!-- Node 2: Definición (top-right) -->
-          <g class="node-g n2">
-            <rect x="240" y="20" width="140" height="72" rx="8" fill="#1C1C1C" stroke="#2A2A2A" stroke-width="1.5"/>
-            <rect x="240" y="20" width="140" height="2.5" rx="1" fill="#8B5CF6" opacity="0.8"/>
-            <rect x="248" y="34" width="48" height="12" rx="6" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
-            <text x="272" y="44" font-family="ui-monospace,monospace" font-size="7" fill="#8B5CF6" text-anchor="middle" font-weight="700">DEFINICIÓN</text>
-            <text x="250" y="60" font-family="system-ui,sans-serif" font-size="9.5" fill="#E0E0E0" font-weight="600">Alcance del POC</text>
-            <text x="250" y="74" font-family="system-ui,sans-serif" font-size="8.5" fill="#888888">Solo iOS, sin backend,</text>
-            <text x="250" y="84" font-family="system-ui,sans-serif" font-size="8.5" fill="#888888">sesiones de 3-7 minutos.</text>
-          </g>
-
-          <!-- Node 3: Referencia (bottom-left) -->
-          <g class="node-g n3">
-            <rect x="20" y="170" width="140" height="72" rx="8" fill="#1C1C1C" stroke="#2A2A2A" stroke-width="1.5"/>
-            <rect x="20" y="170" width="140" height="2.5" rx="1" fill="#3B82F6" opacity="0.8"/>
-            <rect x="28" y="184" width="44" height="12" rx="6" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
-            <text x="50" y="194" font-family="ui-monospace,monospace" font-size="7" fill="#3B82F6" text-anchor="middle" font-weight="700">REFERENCIA</text>
-            <text x="30" y="210" font-family="system-ui,sans-serif" font-size="9.5" fill="#E0E0E0" font-weight="600">headspace-ux.pdf</text>
-            <text x="30" y="224" font-family="system-ui,sans-serif" font-size="8.5" fill="#888888">Análisis de UX de</text>
-            <text x="30" y="234" font-family="system-ui,sans-serif" font-size="8.5" fill="#888888">apps de meditación.</text>
-          </g>
-
-          <!-- Node 4: Proceso (bottom-right) -->
-          <g class="node-g n4">
-            <rect x="240" y="170" width="140" height="72" rx="8" fill="#1C1C1C" stroke="#f04e23" stroke-width="1.5"/>
-            <rect x="240" y="170" width="140" height="2.5" rx="1" fill="#10B981" opacity="0.8"/>
-            <rect x="248" y="184" width="38" height="12" rx="6" fill="rgba(16,185,129,0.15)" stroke="rgba(16,185,129,0.3)" stroke-width="1"/>
-            <text x="267" y="194" font-family="ui-monospace,monospace" font-size="7" fill="#10B981" text-anchor="middle" font-weight="700">PROCESO</text>
-            <text x="250" y="210" font-family="system-ui,sans-serif" font-size="9.5" fill="#E0E0E0" font-weight="600">Flujo usuario</text>
-            <text x="250" y="224" font-family="system-ui,sans-serif" font-size="8.5" fill="#888888">Abrir → elegir duración</text>
-            <text x="250" y="234" font-family="system-ui,sans-serif" font-size="8.5" fill="#888888">→ sesión → guardar.</text>
-          </g>
-
-          <!-- Arrows -->
-          <line class="arrow-path a1" x1="160" y1="56" x2="238" y2="56" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
-          <line class="arrow-path a2" x1="90" y1="92" x2="90" y2="168" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
-          <line class="arrow-path a3" x1="310" y1="92" x2="310" y2="168" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)"/>
-          <line class="arrow-path a3" x1="162" y1="206" x2="238" y2="206" stroke="#525252" stroke-width="1.5" marker-end="url(#arr)" style="animation-delay:1.9s"/>
-        </svg>
-      </div>
-    </div>
+    <img
+      src="hero-iphone.png"
+      alt="CC Creator en iPhone — Cómo armar tu POC"
+      loading="eager"
+      decoding="async"
+      style="max-width:100%;max-height:520px;object-fit:contain;animation:nodeIn 0.6s ease both 0.2s;filter:drop-shadow(0 24px 56px rgba(0,0,0,0.5)) drop-shadow(0 0 32px rgba(240,78,35,0.08))"
+    >
   </div>
 </section>
 
@@ -691,6 +632,14 @@ footer { border-top: 1px solid var(--border); padding: 36px 24px; }
         <div class="node-card-hint">→ Claude Code sigue este flujo</div>
       </div>
 
+      <div class="node-card">
+        <span class="node-type-badge">Diseño</span>
+        <span class="node-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></span>
+        <h3>Estilo e identidad visual</h3>
+        <p>Paleta, tipografía, componentes preferidos, referencias de diseño. ui-ux-pro-max e iconifika lo usan como guía primaria.</p>
+        <div class="node-card-hint">→ Activa skills de UI/iconos</div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -700,7 +649,7 @@ footer { border-top: 1px solid var(--border); padding: 36px 24px; }
   <div class="steps-inner">
     <div class="steps-header">
       <span class="eyebrow">El proceso completo</span>
-      <h2 class="section-title">6 pasos. Del iPhone al código.</h2>
+      <h2 class="section-title">7 pasos. Del iPhone al código.</h2>
       <p class="section-sub" style="margin:14px auto 0;text-align:center">La app te guía desde el primer nodo hasta el build — paso a paso, desde tu iPhone. Sin abrir terminal.</p>
     </div>
     <div class="steps-track">
@@ -728,19 +677,26 @@ footer { border-top: 1px solid var(--border); padding: 36px 24px; }
 
       <div class="step-card">
         <div class="step-num">4</div>
+        <h3>Define el estilo</h3>
+        <p>Nodo Diseño: paleta, tipografía, referencias visuales. ui-ux-pro-max lo usa como guía.</p>
+        <span class="step-tag" style="background:rgba(236,72,153,0.12);color:#EC4899;border-color:rgba(236,72,153,0.22)">Diseño</span>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">5</div>
         <h3>Mapea el flujo</h3>
         <p>Nodo Proceso con el recorrido de usuario de inicio a fin.</p>
         <span class="step-tag">Proceso</span>
       </div>
 
       <div class="step-card">
-        <div class="step-num">5</div>
+        <div class="step-num">6</div>
         <h3>Conecta los nodos</h3>
         <p>Toca "Conectar →" y dibuja flechas que muestran el flujo de información.</p>
       </div>
 
       <div class="step-card">
-        <div class="step-num" style="background:var(--orange);color:#fff;border-color:var(--orange)">6</div>
+        <div class="step-num" style="background:var(--orange);color:#fff;border-color:var(--orange)">7</div>
         <h3>Construye el POC</h3>
         <p>El botón naranja envía todo el mapa a Claude Code. Él genera el proyecto.</p>
         <span class="step-tag">Build</span>

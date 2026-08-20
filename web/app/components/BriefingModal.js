@@ -17,12 +17,6 @@ const QUESTIONS = [
     options: ['React / Next.js', 'Vue / Nuxt', 'HTML + CSS + JS vanilla', 'Python / Flask', 'Node.js / Express', 'Sin preferencia (elige tú)'],
   },
   {
-    id: 'style',
-    label: 'Estilo visual',
-    type: 'select',
-    options: ['Oscuro y minimalista', 'Claro y limpio', 'Colorido y expresivo', 'Sin preferencia (usa tu criterio)'],
-  },
-  {
     id: 'constraints',
     label: 'Restricciones clave',
     type: 'text',
@@ -47,6 +41,11 @@ function buildBrief(projectName, nodes, vectors, answers) {
     `### [${n.type.toUpperCase()}] ${n.content?.slice(0, 120) ?? ''}${n.content?.length > 120 ? '...' : ''}`
   ).join('\n');
 
+  const designNodes = nodes.filter(n => n.type === 'design');
+  const designSection = designNodes.length > 0
+    ? designNodes.map(n => `- ${n.content ?? ''}`).join('\n')
+    : '(Sin nodo Diseño — aplicar criterio profesional)';
+
   const vectorsSummary = vectors.length > 0
     ? vectors.map(v => {
         const from = nodes.find(n => n.id === v.fromId);
@@ -68,13 +67,15 @@ ${vectorsSummary}
 
 **Plataforma objetivo:** ${answers.platform || 'No especificada'}
 **Stack:** ${answers.stack || 'A criterio del asistente'}
-**Estilo visual:** ${answers.style || 'A criterio del asistente'}
 **Restricciones:** ${answers.constraints || 'Ninguna especificada'}
 **Audiencia:** ${answers.audience || 'No especificada'}
 **Criterio de éxito:** ${answers.success || 'No especificado'}
 
+## Diseño y estilo visual
+${designSection}
+
 ## Skills activos
-- **/ui-ux-pro-max** — aplica en toda interfaz que generes
+- **/ui-ux-pro-max** — aplica en toda interfaz. Usa el nodo Diseño como guía de estilo primaria
 - **/iconifika** — usa SVGs de Lucide/Phosphor para todos los iconos
 `;
 }

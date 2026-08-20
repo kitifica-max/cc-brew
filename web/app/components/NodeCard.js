@@ -5,6 +5,15 @@ const TYPE_LABELS = {
   reference:    'Referencia',
   definition:   'Definición',
   process:      'Proceso',
+  design:       'Diseño',
+};
+
+const TYPE_COLORS = {
+  conversation: '#f04e23',
+  reference:    '#3B82F6',
+  definition:   '#8B5CF6',
+  process:      '#10B981',
+  design:       '#EC4899',
 };
 
 const NODE_W = 180;
@@ -36,7 +45,8 @@ export default function NodeCard({ node, selected, onDelete, isConnectMode, isCo
         stroke={selected ? '#f04e23' : '#2A2A2A'}
         strokeWidth={selected ? 3 : 1.5}
       />
-      <text x={10} y={18} fill="#888888" fontSize={11} fontWeight="700"
+      <rect width={NODE_W} height={2.5} rx={1} fill={TYPE_COLORS[node.type] ?? '#444'} opacity={0.75}/>
+      <text x={10} y={18} fill={TYPE_COLORS[node.type] ?? '#888888'} fontSize={11} fontWeight="700"
         fontFamily="system-ui, -apple-system, sans-serif">
         {TYPE_LABELS[node.type] ?? node.type}
       </text>
