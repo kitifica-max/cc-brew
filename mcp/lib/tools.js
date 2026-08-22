@@ -73,6 +73,7 @@ async function read_brief({ session_id }, userId) {
 async function get_project_config({ session_id }, userId) {
   if (!await validateSession(session_id, userId)) throw new Error('Session not found')
   const data = await getBrief(session_id)
+  if (!data) throw new Error('Session data not found')
   return {
     content: [{
       type: 'text',

@@ -12,6 +12,11 @@ export async function handler(event) {
   const sessionId = parts[0] || null
   const sub = parts[1] || null  // 'brief' o undefined
 
+  // Validate sessionId format
+  if (sessionId && !/^sess_[0-9a-f]{16}$/.test(sessionId)) {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid session_id format' }) }
+  }
+
   try {
     // POST /api/sessions — crear sesión
     if (httpMethod === 'POST' && !sessionId) {
