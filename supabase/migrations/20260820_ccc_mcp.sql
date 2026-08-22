@@ -27,13 +27,15 @@ alter table public.ccc_users enable row level security;
 alter table public.ccc_sessions enable row level security;
 
 -- Usuarios leen su propio registro
+drop policy if exists "users_read_own" on public.ccc_users;
 create policy "users_read_own" on public.ccc_users
   for select using (supabase_user_id = auth.uid());
 
 -- Usuarios leen sus propias sesiones
+drop policy if exists "sessions_read_own" on public.ccc_sessions;
 create policy "sessions_read_own" on public.ccc_sessions
   for select using (
     user_id in (select id from public.ccc_users where supabase_user_id = auth.uid())
   );
 
--- Service key bypasa RLS (el MCP server usa SUPABASE_SERVICE_KEY)
+-- Service key bypasses RLS (el MCP server usa SUPABASE_SERVICE_KEY)
