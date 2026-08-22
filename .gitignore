@@ -23,4 +23,5 @@ CCProjects/
 # Tools output
 graphify-out/
 package-lock.json
+!mcp/package-lock.json
 .claude/launch.json
