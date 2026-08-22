@@ -13,7 +13,14 @@ export async function broadcastEvent(sessionId, eventType, payload) {
         }).then(() => {
           supabase.removeChannel(channel)
           resolve()
+        }).catch(() => {
+          supabase.removeChannel(channel)
+          resolve() // resolve on send failure too — don't hang
         })
+      }
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        supabase.removeChannel(channel)
+        resolve() // degrade gracefully, don't hang
       }
     })
   })

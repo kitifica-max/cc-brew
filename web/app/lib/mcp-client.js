@@ -45,5 +45,5 @@ export async function getSession(sessionId) {
 }
 
 export function getMcpAddCommand(apiKey, mcpUrl = BASE) {
-  return `claude mcp add cc-creator --transport http --env CCC_API_KEY=${apiKey} "${mcpUrl}/mcp"`
+  return `claude mcp add cc-creator --transport http --env CCC_API_KEY="${apiKey}" "${mcpUrl}/mcp"`
 }
