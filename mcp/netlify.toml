@@ -1,0 +1,23 @@
+[build]
+  command = "npm install"
+  publish = "."
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+  included_files = ["lib/**"]
+
+[[redirects]]
+  from = "/mcp"
+  to = "/.netlify/functions/mcp"
+  status = 200
+
+[[redirects]]
+  from = "/api/sessions"
+  to = "/.netlify/functions/sessions"
+  status = 200
+
+[[redirects]]
+  from = "/api/sessions/*"
+  to = "/.netlify/functions/sessions"
+  status = 200
