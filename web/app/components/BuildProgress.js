@@ -34,7 +34,7 @@ export default function BuildProgress({ sessionId, onComplete }) {
       .subscribe()
 
     return () => supabase.removeChannel(channel)
-  }, [sessionId])
+  }, [sessionId, onComplete])
 
   if (!sessionId) return null
 
@@ -49,7 +49,7 @@ export default function BuildProgress({ sessionId, onComplete }) {
           <div style={{ fontSize: 13, color: '#525252' }}>Esperando a Claude Code...</div>
         )}
         {events.map((e, i) => (
-          <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+          <div key={`${i}:${e.ts}`} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
             <div style={{
               width: 6, height: 6, borderRadius: '50%', marginTop: 5, flexShrink: 0,
               background: e.phase === 'done' ? '#10B981' : '#f04e23',
@@ -65,7 +65,7 @@ export default function BuildProgress({ sessionId, onComplete }) {
       </div>
 
       {previewUrl && (
-        <a href={previewUrl} target="_blank" rel="noopener" style={{
+        <a href={previewUrl} target="_blank" rel="noopener noreferrer" style={{
           display: 'block', marginTop: 16, padding: '12px 16px',
           background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)',
           borderRadius: 10, color: '#10B981', fontSize: 13, fontWeight: 600,
