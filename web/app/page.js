@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { supabase, getSessionId, getSessionToken } from './lib/supabase';
+import { supabase } from './lib/supabase';
 import AuthGate from './components/AuthGate';
 import ProjectsList from './components/ProjectsList';
 import ConceptMap from './components/ConceptMap';
@@ -24,15 +24,10 @@ const MODEL_LABEL = {
 export default function Home() {
   const [projects, setProjects]     = useState([]);
   const [currentId, setCurrentId]   = useState(null);
-  const [connected, setConnected]   = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [editingNodeId, setEditingNodeId]   = useState(null);
   const [briefingOpen, setBriefingOpen] = useState(false);
-  const [buildOpen, setBuildOpen]   = useState(false);
-  const [buildStatus, setBuildStatus]     = useState('idle');
-  const [buildLog, setBuildLog]           = useState('');
-  const [buildShareUrl, setBuildShareUrl] = useState('');
   const [settingsOpen, setSettingsOpen]       = useState(false);
   const [defaultModel, setDefaultModel]       = useState('claude-sonnet-4-6');
   const [defaultEffort, setDefaultEffort]     = useState('medium');
@@ -42,7 +37,6 @@ export default function Home() {
   const [connectingFromId, setConnectingFromId] = useState(null);
   const [renamingProject, setRenamingProject] = useState(false);
   const [renameValue, setRenameValue]         = useState('');
-  const channelRef     = useRef(null);
   const currentIdRef   = useRef(null);
   const connectingRef  = useRef(null);
   const mapRef         = useRef(null);
@@ -95,48 +89,9 @@ export default function Home() {
     updateNode(nodeId, { x, y });
   }, [updateNode]);
 
-  // Recibir output de Claude Code desde bridge
-  const handleBridgeOutput = useCallback((payload) => {
-    if (!currentIdRef.current) return;
-    setProjects(prev => {
-      const project = prev.find(p => p.id === currentIdRef.current);
-      if (!project) return prev;
-      const targetNode = [...project.nodes]
-        .reverse()
-        .find(n => n.type === 'conversation' && !n.aiContent);
-      if (!targetNode) return prev;
-      return prev.map(p =>
-        p.id !== currentIdRef.current ? p : {
-          ...p,
-          nodes: p.nodes.map(n =>
-            n.id === targetNode.id ? { ...n, aiContent: (n.aiContent || '') + (payload.chunk ?? '') } : n
-          ),
-        }
-      );
-    });
-  }, []);
-
-  // Bridge Supabase removido — BuildProgress maneja su propia suscripción MCP internamente.
-
-  const sendEvent = useCallback((type, payload) => {
-    channelRef.current?.send({
-      type: 'broadcast',
-      event: type,
-      payload: { ...payload, token: getSessionToken() },
-    });
-  }, []);
-
   const sendNodeContent = useCallback((nodeId, content) => {
-    const project = projects.find(p => p.id === currentIdRef.current);
-    sendEvent('input', {
-      text: content,
-      continue: true,
-      model: project?.model ?? 'claude-sonnet-4-6',
-      effort: project?.effort ?? 'medium',
-      skipPermissions: true,
-    });
     updateNode(nodeId, { content });
-  }, [sendEvent, updateNode, projects]);
+  }, [updateNode]);
 
   const handleCanvasTap = useCallback((x, y) => {
     setSelectedNodeId(null);
@@ -151,7 +106,6 @@ export default function Home() {
 
   const handleDrawerSwitch = (id) => {
     setCurrentId(id);
-    sendEvent('switch-project', { id });
     setDrawerOpen(false);
   };
 
@@ -203,6 +157,7 @@ export default function Home() {
       }
     } catch (e) {
       console.error('MCP session error:', e);
+      alert('Error al crear sesión. Intenta de nuevo.');
     }
   };
 
@@ -224,8 +179,6 @@ export default function Home() {
     p.vectors = [];
     setProjects(prev => [p, ...prev]);
     setCurrentId(p.id);
-    sendEvent('create-project', { id: p.id, name: p.name });
-    setTimeout(() => sendEvent('new-project', { projectId: p.id, projectName: p.name }), 500);
     setTimeout(() => mapRef.current?.fitAll(), 200);
     setDrawerOpen(false);
   };
@@ -321,7 +274,6 @@ export default function Home() {
               </svg>
             </button>
           )}
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: connected ? '#10B981' : '#EF4444', flexShrink: 0 }} />
         </div>
 
         {/* Drawer overlay */}
