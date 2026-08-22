@@ -5,8 +5,10 @@ import AuthGate from './components/AuthGate';
 import ProjectsList from './components/ProjectsList';
 import ConceptMap from './components/ConceptMap';
 import NodeEditor from './components/NodeEditor';
-import BuildPanel from './components/BuildPanel';
 import BriefingModal from './components/BriefingModal';
+import OnboardingMCP from './components/OnboardingMCP';
+import BuildProgress from './components/BuildProgress';
+import { createSession as mcpCreateSession, uploadBrief, getApiKey } from './lib/mcp-client';
 import SettingsPanel from './components/SettingsPanel';
 import OnboardingStepper from './components/OnboardingStepper';
 import { loadProjects, saveProjects, makeProject, makeNode, makeVector } from './lib/storage';
@@ -34,6 +36,9 @@ export default function Home() {
   const [settingsOpen, setSettingsOpen]       = useState(false);
   const [defaultModel, setDefaultModel]       = useState('claude-sonnet-4-6');
   const [defaultEffort, setDefaultEffort]     = useState('medium');
+  const [mcpSessionId, setMcpSessionId]       = useState(null);
+  const [showMcpOnboarding, setShowMcpOnboarding] = useState(false);
+  const [buildActive, setBuildActive]         = useState(false);
   const [connectingFromId, setConnectingFromId] = useState(null);
   const [renamingProject, setRenamingProject] = useState(false);
   const [renameValue, setRenameValue]         = useState('');
@@ -111,47 +116,7 @@ export default function Home() {
     });
   }, []);
 
-  // Setup canal Supabase
-  useEffect(() => {
-    if (!currentId) return;
-    let active = true;
-
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!active || !data?.session) return;
-
-      const channelName = `session:${getSessionId()}`;
-      const ch = supabase.channel(channelName, { config: { private: true } });
-
-      ch.on('broadcast', { event: 'chunk' }, ({ payload }) => {
-        handleBridgeOutput({ chunk: payload.text });
-      });
-      ch.on('broadcast', { event: 'build-progress' }, ({ payload }) => {
-        setBuildLog(prev => prev + (payload.chunk ?? ''));
-      });
-      ch.on('broadcast', { event: 'build-uploading' }, () => {
-        setBuildStatus('uploading');
-      });
-      ch.on('broadcast', { event: 'build-done' }, ({ payload }) => {
-        setBuildStatus(payload.success ? 'done' : 'error');
-        setBuildShareUrl(payload.url ?? '');
-      });
-
-      ch.subscribe(status => {
-        setConnected(status === 'SUBSCRIBED');
-      });
-
-      channelRef.current = ch;
-    })();
-
-    return () => {
-      active = false;
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
-        channelRef.current = null;
-      }
-    };
-  }, [currentId, handleBridgeOutput]);
+  // Bridge Supabase removido — BuildProgress maneja su propia suscripción MCP internamente.
 
   const sendEvent = useCallback((type, payload) => {
     channelRef.current?.send({
@@ -222,6 +187,23 @@ export default function Home() {
       setProjects(prev => prev.map(p => p.id === currentId ? { ...p, name: renameValue.trim() } : p));
     }
     setRenamingProject(false);
+  };
+
+  const handleBriefConfirm = async (briefContent) => {
+    setBriefingOpen(false);
+    try {
+      const { session_id } = await mcpCreateSession(currentProject.name);
+      setMcpSessionId(session_id);
+      await uploadBrief(session_id, briefContent);
+      const hasKey = !!getApiKey();
+      if (!hasKey) {
+        setShowMcpOnboarding(true);
+      } else {
+        setBuildActive(true);
+      }
+    } catch (e) {
+      console.error('MCP session error:', e);
+    }
   };
 
   const handleSaveDefaults = (model, effort) => {
@@ -438,37 +420,28 @@ export default function Home() {
             nodes={currentProject.nodes ?? []}
             vectors={currentProject.vectors ?? []}
             onClose={() => setBriefingOpen(false)}
-            onConfirm={(content) => {
-              sendEvent('write-brief', { projectId: currentId, content });
-              setBriefingOpen(false);
-              setBuildOpen(true);
-            }}
+            onConfirm={handleBriefConfirm}
           />
         )}
 
-        {/* Panel build */}
-        {buildOpen && currentProject && (
-          <BuildPanel
-            project={currentProject}
-            status={buildStatus}
-            log={buildLog}
-            shareUrl={buildShareUrl}
-            onClose={() => {
-              setBuildOpen(false);
-              setBuildStatus('idle');
-              setBuildLog('');
-              setBuildShareUrl('');
-            }}
-            onBuild={() => {
-              setBuildStatus('building');
-              setBuildLog('');
-              setBuildShareUrl('');
-              sendEvent('build-poc', { projectId: currentId, projectName: currentProject.name });
-            }}
+        {/* Onboarding MCP (primera vez, sin API key) */}
+        {showMcpOnboarding && (
+          <OnboardingMCP
+            apiKey={getApiKey() || '(configura tu api key en ajustes)'}
+            sessionId={mcpSessionId}
+            onDone={() => { setShowMcpOnboarding(false); setBuildActive(true); }}
+          />
+        )}
+
+        {/* Progreso build MCP */}
+        {buildActive && mcpSessionId && (
+          <BuildProgress
+            sessionId={mcpSessionId}
+            onComplete={() => setBuildActive(false)}
           />
         )}
         {/* Stepper de onboarding */}
-        {currentProject && !editingNodeId && !buildOpen && !connectingFromId && (
+        {currentProject && !editingNodeId && !buildActive && !showMcpOnboarding && !connectingFromId && (
           <OnboardingStepper project={currentProject} />
         )}
 

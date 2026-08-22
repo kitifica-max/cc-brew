@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { MODELS, EFFORTS } from '../lib/storage';
+import { getApiKey, setApiKey } from '../lib/mcp-client';
 
 const EFFORT_LABELS = { high: 'Alto', medium: 'Medio', low: 'Bajo' };
 const EFFORT_DESCS  = { high: 'Más profundo', medium: 'Balanceado', low: 'Más rápido' };
@@ -10,6 +11,8 @@ export default function SettingsPanel({ defaultModel, defaultEffort, onSave, onC
   const [userEmail, setUserEmail] = useState('');
   const [model, setModel]   = useState(defaultModel ?? 'claude-sonnet-4-6');
   const [effort, setEffort] = useState(defaultEffort ?? 'medium');
+  const [apiKey, setApiKeyState] = useState(() => getApiKey());
+  const saveApiKey = (val) => { setApiKey(val); setApiKeyState(val); };
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserEmail(data?.user?.email ?? ''));
@@ -90,6 +93,26 @@ export default function SettingsPanel({ defaultModel, defaultEffort, onSave, onC
                 </button>
               );
             })}
+          </div>
+        </div>
+
+        {/* CCC API Key */}
+        <div style={{ marginBottom: 28 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#525252', marginBottom: 4 }}>CCC API Key</div>
+          <div style={{ fontSize: 12, color: '#525252', marginBottom: 12 }}>Requerida para crear sesiones MCP</div>
+          <input
+            value={apiKey}
+            onChange={e => saveApiKey(e.target.value)}
+            placeholder="uk_..."
+            style={{
+              width: '100%', boxSizing: 'border-box',
+              background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: 8,
+              color: '#E0E0E0', padding: '8px 12px', fontSize: 13, outline: 'none',
+              fontFamily: 'inherit',
+            }}
+          />
+          <div style={{ fontSize: 11, color: '#525252', marginTop: 4 }}>
+            Genera tu key en app.ccc.app/settings
           </div>
         </div>
 
