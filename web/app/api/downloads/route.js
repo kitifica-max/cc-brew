@@ -6,11 +6,11 @@ export async function GET() {
   const token = process.env.GITHUB_TOKEN;
   const headers = {
     'Accept': 'application/vnd.github+json',
-    'User-Agent': 'cc-controller-landing',
+    'User-Agent': 'cc-brew-landing',
     ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
   };
 
-  const res = await fetch('https://api.github.com/repos/kitifica-max/cc-controller/releases', {
+  const res = await fetch('https://api.github.com/repos/kitifica-max/cc-brew/releases', {
     headers,
     next: { revalidate: 300 },
   });

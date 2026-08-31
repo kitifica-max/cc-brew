@@ -5,8 +5,8 @@ export async function GET() {
   if (!token) return Response.json({ error: 'no token' }, { status: 500 });
 
   const res = await fetch(
-    'https://api.github.com/repos/kitifica-max/cc-controller/releases/latest',
-    { headers: { Authorization: `Bearer ${token}`, 'User-Agent': 'CC-Controller-Web' } }
+    'https://api.github.com/repos/kitifica-max/cc-brew/releases/latest',
+    { headers: { Authorization: `Bearer ${token}`, 'User-Agent': 'CC-Brew-Web' } }
   );
 
   if (!res.ok) return Response.json({ error: 'github error', status: res.status }, { status: 502 });

@@ -146,4 +146,12 @@ CC Brew recomienda (no impone) según lo que el proyecto necesite:
 
 ## Licencia
 
+## Repositorio
+
+[github.com/kitifica-max/cc-brew](https://github.com/kitifica-max/cc-brew)
+
+---
+
+## Licencia
+
 [MIT](LICENSE)
