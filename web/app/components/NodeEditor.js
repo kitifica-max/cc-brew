@@ -46,7 +46,7 @@ export default function NodeEditor({ node, onClose, onSend, onTypeChange, onConn
           <button key={t} onClick={() => onTypeChange(t)} aria-pressed={node.type === t}
             style={{
               padding: '6px 14px', minHeight: 36, borderRadius: 20, border: 'none', cursor: 'pointer',
-              background: node.type === t ? '#f04e23' : '#2A2A2A',
+              background: node.type === t ? '#7c3aed' : '#2A2A2A',
               color: '#E0E0E0', fontSize: 12, fontWeight: 600,
             }}>
             {TYPE_LABELS[t]}
@@ -108,9 +108,9 @@ export default function NodeEditor({ node, onClose, onSend, onTypeChange, onConn
         />
         <button onClick={() => onSend(draft)}
           style={{
-            padding: '0 16px', background: '#f04e23', color: '#fff', border: 'none',
+            padding: '0 16px', background: '#7c3aed', color: '#fff', border: 'none',
             borderRadius: 8, cursor: 'pointer', fontWeight: 700,
-            boxShadow: '0 2px 8px rgba(240,78,35,0.35)',
+            boxShadow: '0 2px 8px rgba(124,58,237,0.35)',
           }}>
           Enviar
         </button>

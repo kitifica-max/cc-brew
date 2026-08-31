@@ -20,6 +20,9 @@
   var isOther  = isAnd && (/MIUI|XiaoMi|MiuiBrowser/.test(ua) || /HUAWEI|HMSCore/.test(ua));
   var isSafari = !isIOS && !isIPadOS && !isAnd && /Safari/.test(ua) && !/Chrome|CriOS/.test(ua);
 
+  // Solo forzar instalación en móvil — en desktop se usa la app directo en el navegador
+  if (!isIOS && !isIPadOS && !isAnd) return;
+
   var initDev = (isIOS || isIPadOS) ? 'ios'
     : isOther  ? 'other'
     : isAnd    ? 'android'

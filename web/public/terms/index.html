@@ -2,18 +2,20 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Términos de Uso — CC Controller</title>
+  <title>Términos de Uso — CC Brew</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Términos de uso de CC Controller. Condiciones para usar la aplicación y la PWA.">
+  <meta name="description" content="Términos de uso de CC Brew — la app y el skill de Kitifica que convierten tu idea en un CLAUDE.md listo para construir con Claude Code.">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://ccc.kitifica.com/terms/">
-  <meta property="og:title" content="Términos de Uso — CC Controller">
-  <meta property="og:url" content="https://ccc.kitifica.com/terms/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="canonical" href="https://ccbrew.kitifica.com/terms/">
+  <meta property="og:title" content="Términos de Uso — CC Brew">
+  <meta property="og:url" content="https://ccbrew.kitifica.com/terms/">
   <meta property="og:type" content="website">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --orange: #f04e23;
+      --orange: #7c3aed;
       --teal:   #00b09b;
       --bg:     #0e0e0f;
       --surface:#1a1a1b;
@@ -29,9 +31,7 @@
       background: rgba(14,14,15,0.9); backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
     }
-    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-weight: 700; font-size: 15px; }
-    .nav-icon { width: 28px; height: 28px; background: var(--orange); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
-    .nav-icon svg { width: 16px; height: 16px; fill: #fff; }
+    .nav-brand { display: flex; align-items: center; text-decoration: none; }
     .nav-back { color: var(--muted); text-decoration: none; font-size: 13px; }
     .nav-back:hover { color: var(--text); }
     main { max-width: 720px; margin: 0 auto; padding: 64px 24px 96px; }
@@ -45,7 +45,7 @@
     a { color: var(--teal); text-decoration: none; }
     a:hover { text-decoration: underline; }
     code { font-family: monospace; font-size: 13px; background: rgba(255,255,255,0.07); padding: 2px 6px; border-radius: 4px; }
-    .highlight { background: rgba(240,78,35,0.07); border-left: 3px solid var(--orange); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+    .highlight { background: rgba(124,58,237,0.07); border-left: 3px solid var(--orange); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 24px 0; }
     .highlight p { margin: 0; color: #ccc; }
     footer { text-align: center; padding: 32px 24px; border-top: 1px solid var(--border); }
     footer a { color: var(--muted); font-size: 13px; margin: 0 12px; }
@@ -55,67 +55,87 @@
 <body>
 <nav>
   <a href="/landing/" class="nav-brand">
-    <div class="nav-icon">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
-    </div>
-    CC Controller
+    <svg width="88" height="32" viewBox="0 0 928.69 336.66" aria-hidden="true"><g>
+      <rect fill="#ccc" x="0" y="0" width="928.69" height="336.66" rx="168.33" ry="168.33"/>
+      <g>
+        <g>
+          <path fill="#0d0c0f" d="M451.33,183.92c-3.29,15.28-14.82,26.42-35.33,26.42-25.98,0-38.26-18.39-38.26-41.69s12.67-42.59,39.11-42.59c21.82,0,32.39,12.81,34.39,26.5h-17.72c-1.71-6.32-6.11-12.61-17.24-12.61-14.61,0-20.25,13.14-20.25,28.05,0,13.85,4.89,28.44,20.73,28.44,11.56,0,15.21-7.74,16.75-12.52h17.82Z"/>
+          <path fill="#0d0c0f" d="M529.29,183.92c-3.29,15.28-14.82,26.42-35.33,26.42-25.98,0-38.26-18.39-38.26-41.69s12.67-42.59,39.11-42.59c21.82,0,32.39,12.81,34.39,26.5h-17.72c-1.71-6.32-6.11-12.61-17.24-12.61-14.61,0-20.25,13.14-20.25,28.05,0,13.85,4.89,28.44,20.73,28.44,11.56,0,15.21-7.74,16.75-12.52h17.82Z"/>
+          <path fill="#0d0c0f" d="M551.11,127.24h35.8c19.8,0,27.31,10.32,27.31,20.96,0,9.24-4.89,15.23-10.43,17.76,5.52,2.08,12.77,7.91,12.77,18.68,0,14.02-11.01,24.53-28.44,24.53h-37v-81.93ZM584.88,159.56c8.42,0,11.89-3.78,11.89-9.53s-4.55-9.1-11.39-9.1h-16.88v18.63h16.37ZM568.5,195.49h15.98c9.57,0,13.91-4,13.91-11.43,0-6.6-4.26-10.82-14.01-10.82h-15.89v22.25Z"/>
+          <path fill="#0d0c0f" d="M628.38,164.35c0-6.11-.01-11.54-.12-16.69h16.7c.22,1.38.45,7.48.45,10.8,2.71-7.03,9.27-12.17,19.74-12.23v16.25c-12.36-.32-19.74,3.01-19.74,19.87v26.82h-17.03v-44.83Z"/>
+          <path fill="#0d0c0f" d="M687.68,182.06c.01,7.69,3.87,15.21,12.35,15.21,7.09,0,9.12-2.85,10.73-6.57h17.05c-2.18,7.53-8.9,19.89-28.22,19.89s-29.05-15.15-29.05-31.29c0-19.3,9.9-33.08,29.66-33.08,21.13,0,28.31,15.28,28.31,30.64,0,2.08,0,3.43-.22,5.19h-40.59ZM711.44,171.6c-.12-7.16-2.98-13.19-11.28-13.19s-11.44,5.63-12.12,13.19h23.4Z"/>
+          <path fill="#0d0c0f" d="M751.85,147.66c5.55,24.7,8.57,38.73,9.73,46.36h.22c1.26-6.85,3.02-16.51,10.51-46.36h15.83c6.97,30.24,9.04,39.14,9.9,45.76h.12c1.25-6.33,3.14-15.55,10.31-45.76h16.86l-18.25,61.51h-18.25c-5.06-23.34-7.97-35.63-9.37-43.71h-.12c-.98,7.71-4.3,21.65-9.72,43.71h-18.32l-17.47-61.51h18.02Z"/>
+        </g>
+        <g>
+          <path fill="#0d0c0f" d="M170.95,93.66c-37.95,3.73-67.61,35.73-67.61,74.67,0,38.93,29.65,70.94,67.61,74.67,3.98.39,7.42-2.77,7.42-6.77V100.43c0-4-3.44-7.16-7.42-6.77Z"/>
+          <path fill="#0d0c0f" d="M252.77,93.66c-37.95,3.73-67.61,35.73-67.61,74.67,0,38.93,29.65,70.94,67.61,74.67,3.98.39,7.42-2.77,7.42-6.77V100.43c0-4-3.44-7.16-7.42-6.77Z"/>
+          <path fill="#0d0c0f" d="M319.87,168.3c14.07-5.86,23.97-19.74,23.97-35.94,0-20.19-15.38-36.79-35.06-38.72v-.02h-34.41c-3.2,0-5.79,2.59-5.79,5.79v137.78c0,3.2,2.59,5.79,5.79,5.79h33.77c.21.02.42.02.64,0,19.69-1.93,35.07-18.54,35.07-38.73,0-16.2-9.9-30.09-23.98-35.95Z"/>
+        </g>
+      </g>
+    </g></svg>
   </a>
-  <a href="/landing/" class="nav-back">← Volver al inicio</a>
+  <a href="/landing/" class="nav-back">← Volver a CC Brew</a>
 </nav>
 
 <main>
   <div class="page-label">Legal</div>
   <h1>Términos de Uso</h1>
-  <p class="updated">Última actualización: 10 de agosto de 2026</p>
+  <p class="updated">Última actualización: 28 de agosto de 2026</p>
 
   <div class="highlight">
-    <p><strong>Resumen:</strong> CC Controller es software de código abierto bajo licencia MIT. Lo usas tal como está, bajo tu propia responsabilidad.</p>
+    <p><strong>Resumen:</strong> CC Brew convierte tu idea en un CLAUDE.md listo para construir. Es un punto de partida generado con IA, no un producto terminado — revísalo antes de usarlo. La app cobra por proyecto (créditos sin vencimiento); el Skill + MCP para Claude Code es gratis.</p>
   </div>
 
   <h2>1. Aceptación</h2>
-  <p>Al descargar, instalar o usar CC Controller (la aplicación de escritorio, la PWA, o cualquier componente del repositorio), aceptas estos términos. Si no estás de acuerdo, no uses el software.</p>
+  <p>Al usar CC Brew — la app web (<a href="https://ccbrew.kitifica.com">ccbrew.kitifica.com</a>), el Skill o el MCP para Claude Code — aceptas estos términos. Si no estás de acuerdo, no uses el servicio.</p>
 
   <h2>2. Descripción del servicio</h2>
-  <p>CC Controller es una herramienta para desarrolladores que permite controlar Claude Code CLI desde un dispositivo móvil mediante una PWA. Consiste en:</p>
+  <p>CC Brew toma tu idea, tu marca y a quién querés convencer, y genera un cuestionario dirigido, un semáforo de viabilidad y un archivo <code>CLAUDE.md</code> con el brief listo para que Claude Code construya la herramienta. Se ofrece de dos formas:</p>
   <ul>
-    <li>Una aplicación de escritorio Electron para macOS.</li>
-    <li>Una PWA (Progressive Web App) accesible desde cualquier navegador móvil moderno.</li>
-    <li>Un canal de comunicación en tiempo real usando Supabase Realtime.</li>
+    <li><strong>App (PWA)</strong>: desde el navegador, en <a href="https://ccbrew.kitifica.com">ccbrew.kitifica.com</a>, con planes de créditos de pago.</li>
+    <li><strong>Skill + MCP</strong>: gratis, para usar directo desde Claude Code con el comando <code>/cc-brew</code>.</li>
+  </ul>
+  <p>El resultado (cuestionario, semáforo, CLAUDE.md) es generado con inteligencia artificial y depende de la información que proporcionás. No sustituye tu propio criterio: revisalo antes de construir sobre él.</p>
+
+  <h2>3. Cuenta</h2>
+  <p>La app requiere una cuenta (correo y contraseña) para guardar tus proyectos y tu saldo de créditos. Sos responsable de mantener tus credenciales seguras y de toda actividad bajo tu cuenta.</p>
+
+  <h2>4. Créditos y pagos</h2>
+  <p>La primera cuenta arranca con 3 proyectos de prueba gratis. Los créditos adicionales se compran por planes (por ejemplo, 5, 12 o 20 proyectos) y <strong>no vencen</strong>. Cada crédito equivale a un proyecto completo (cuestionario + semáforo + CLAUDE.md). También existe "Trae tu API" — un pago único de $39 para usar tu propia clave de Anthropic con proyectos ilimitados, sin créditos ni renovación. No hay suscripción ni cobro recurrente automático — pagás solo cuando comprás más créditos o el acceso de por vida.</p>
+  <p>Las compras se procesan mediante un proveedor de pagos externo. Por tratarse de un bien digital consumido al generarse (el crédito se descuenta al completar el proyecto), las compras no son reembolsables salvo que la ley aplicable indique lo contrario. Si tuviste un problema real con una compra, escribinos a <a href="mailto:hola@kitifica.com">hola@kitifica.com</a>.</p>
+
+  <h2>5. Contenido y propiedad</h2>
+  <p>Vos sos dueño de la idea, la información de marca y el material que subís, así como del CLAUDE.md y demás resultados que CC Brew genera para tu proyecto. Podés usarlos, editarlos y construir sobre ellos libremente.</p>
+  <p>Nos das permiso para procesar ese contenido (incluyendo enviarlo a proveedores de IA como Anthropic) únicamente con el fin de generar tu resultado. No usamos tu contenido para entrenar modelos ni lo compartimos con terceros salvo lo necesario para operar el servicio.</p>
+
+  <h2>6. Uso aceptable</h2>
+  <p>Al usar CC Brew, aceptás no:</p>
+  <ul>
+    <li>Subir contenido ilegal, que infrinja derechos de terceros, o que busque generar material dañino a través de la IA.</li>
+    <li>Intentar comprometer la seguridad de la app, la API o las cuentas de otros usuarios.</li>
+    <li>Automatizar compras o abusar de los créditos gratuitos con múltiples cuentas.</li>
+    <li>Revender o redistribuir el acceso a la app o al MCP como si fuera propio.</li>
   </ul>
 
-  <h2>3. Licencia</h2>
-  <p>CC Controller se distribuye bajo la <a href="https://github.com/kitifica-max/cc-controller/blob/main/LICENSE" target="_blank" rel="noopener">Licencia MIT</a>. Puedes usar, copiar, modificar, fusionar, publicar, distribuir y sublicenciar el software libremente, siempre que se incluya el aviso de copyright original.</p>
-
-  <h2>4. Uso aceptable</h2>
-  <p>CC Controller está diseñado para uso legítimo de desarrollo de software. Queda prohibido:</p>
+  <h2>7. Servicios de terceros</h2>
+  <p>CC Brew depende de:</p>
   <ul>
-    <li>Usar el software para actividades ilegales o que violen derechos de terceros.</li>
-    <li>Intentar comprometer la seguridad de otros usuarios o del servicio de Supabase.</li>
-    <li>Distribuir versiones modificadas que contengan malware o código malicioso.</li>
-    <li>Usar el servicio de relay de Supabase bundled para fines distintos al funcionamiento normal de la app.</li>
+    <li><strong>Anthropic / Claude</strong>: procesa tu idea para generar preguntas, semáforo y CLAUDE.md, sujeto a los <a href="https://www.anthropic.com/legal/consumer-terms" target="_blank" rel="noopener">Términos de Uso de Anthropic</a>. El Skill y el MCP requieren una suscripción activa a Claude Code.</li>
+    <li><strong>Supabase</strong>: almacena tu cuenta y tus proyectos, sujeto a sus <a href="https://supabase.com/terms" target="_blank" rel="noopener">términos</a>.</li>
+    <li>Un proveedor de pagos externo para procesar la compra de créditos.</li>
   </ul>
+  <p>Kitifica no es responsable de cambios o interrupciones en estos servicios de terceros que afecten el funcionamiento de CC Brew.</p>
 
-  <h2>5. Requisitos de terceros</h2>
-  <p>CC Controller requiere:</p>
-  <ul>
-    <li><strong>Claude Code CLI</strong>: sujeto a los <a href="https://www.anthropic.com/legal/consumer-terms" target="_blank" rel="noopener">Términos de Uso de Anthropic</a>. Se requiere una suscripción activa a Claude.</li>
-    <li><strong>Supabase</strong>: el relay usa una instancia gestionada por Kitifica, sujeta a los <a href="https://supabase.com/terms" target="_blank" rel="noopener">Términos de Supabase</a>.</li>
-  </ul>
-  <p>Kitifica no es responsable de cambios en los servicios de terceros que afecten el funcionamiento de CC Controller.</p>
+  <h2>8. Sin garantías</h2>
+  <p>CC Brew se provee <strong>"tal como está"</strong> (<em>as is</em>). No garantizamos que el CLAUDE.md generado sea correcto, completo o adecuado para tu caso particular, ni que el servicio esté libre de errores o disponible sin interrupciones.</p>
 
-  <h2>6. Sin garantías</h2>
-  <p>CC Controller se provee <strong>"tal como está"</strong> (<em>as is</em>), sin garantías de ningún tipo, expresas o implícitas. Kitifica no garantiza que el software esté libre de errores, sea continuo o seguro.</p>
+  <h2>9. Limitación de responsabilidad</h2>
+  <p>En ningún caso Kitifica será responsable por daños directos, indirectos, incidentales, especiales o consecuentes derivados del uso de CC Brew o de decisiones tomadas a partir de su resultado, incluso si se advirtió de la posibilidad de dichos daños.</p>
 
-  <h2>7. Limitación de responsabilidad</h2>
-  <p>En ningún caso Kitifica será responsable por daños directos, indirectos, incidentales, especiales o consecuentes derivados del uso o la imposibilidad de uso de CC Controller, incluso si se advirtió de la posibilidad de dichos daños.</p>
+  <h2>10. Modificaciones a los términos</h2>
+  <p>Kitifica puede actualizar estos términos en cualquier momento. Los cambios se publican en esta página. El uso continuado del servicio tras un cambio implica su aceptación.</p>
 
-  <h2>8. Disponibilidad del servicio relay</h2>
-  <p>Kitifica se reserva el derecho de modificar, suspender o descontinuar el servicio de relay (instancia de Supabase bundled) en cualquier momento, con o sin previo aviso. El código fuente completo está disponible para que cualquier usuario pueda alojar su propia instancia.</p>
-
-  <h2>9. Modificaciones a los términos</h2>
-  <p>Kitifica puede actualizar estos términos en cualquier momento. Los cambios se publicarán en esta página. El uso continuado tras los cambios implica la aceptación.</p>
-
-  <h2>10. Contacto</h2>
+  <h2>11. Contacto</h2>
   <p>Para consultas: <a href="mailto:hola@kitifica.com">hola@kitifica.com</a></p>
 </main>
 
@@ -123,7 +143,6 @@
   <a href="/landing/">Inicio</a>
   <a href="/privacy/">Privacidad</a>
   <a href="/contact/">Contacto</a>
-  <a href="https://github.com/kitifica-max/cc-controller" target="_blank" rel="noopener">GitHub</a>
 </footer>
 </body>
 </html>
