@@ -49,18 +49,41 @@ Desde tu celular o laptop, donde estés. Instalada como app nativa. Sin Claude C
 - Primeros 3 proyectos gratis
 
 ### Gratis con Claude Code
-Desde tu equipo con Claude Code instalado. Procesamiento local, cero créditos.
+
+Desde tu equipo con Claude Code. Un comando para conectar el MCP, un archivo para el Skill. Procesamiento en tu equipo, cero créditos.
+
+- Gratis con tu suscripción de Claude
+- Requiere Claude Code CLI instalado
+- Usa `/cc-brew` directo en el chat
+- Solo funciona desde tu equipo de escritorio
+
+#### MCP
+
+Pegá este prompt en Claude Code. Reemplazá `TU_API_KEY` con tu clave — la encontrás en [ccbrew.kitifica.com](https://ccbrew.kitifica.com) → Ajustes → API Key.
 
 ```bash
-# Instalar MCP
-claude mcp add cc-brew --transport http "https://ccbrew-mcp.netlify.app/mcp" \
-  --header "Authorization: Bearer TU_API_KEY" --scope user
+# Instalar el MCP de CC Brew. Reemplaza TU_API_KEY con tu clave
+# (la encontrás en ccbrew.kitifica.com → Ajustes → API Key) y ejecuta:
 
-# Usar en el chat
-/cc-brew
+claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" \
+  --header "Authorization: Bearer TU_API_KEY" --scope user
 ```
 
+#### Skill
+
 [Descargar SKILL.md](https://ccbrew.kitifica.com/skill/SKILL.md)
+
+Arrastrá el archivo al chat de Claude Code y pegá este prompt:
+
+```
+Instala este archivo como una Skill de Claude Code:
+1. Muévelo a ~/.claude/skills/cc-brew/SKILL.md
+2. Agrega esta entrada en ~/.claude/CLAUDE.md:
+
+# cc-brew
+- **cc-brew** (`~/.claude/skills/cc-brew/SKILL.md`) - estructura ideas de producto antes de construirlas con Claude Code
+  Trigger: `/cc-brew`
+```
 
 ---
 
