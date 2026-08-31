@@ -1,11 +1,11 @@
 {
-  "name": "CC Creator",
-  "short_name": "CC Creator",
-  "description": "De la idea a tu App Directa en 6 fases, guiado por Claude.",
+  "name": "CC Brew",
+  "short_name": "CC Brew",
+  "description": "De la idea a una herramienta a tu medida que convence al cliente, guiado por Claude.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fde8e4",
-  "theme_color": "#f04e23",
+  "background_color": "#7c3aed",
+  "theme_color": "#7c3aed",
   "orientation": "portrait",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },

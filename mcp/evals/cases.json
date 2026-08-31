@@ -1,0 +1,84 @@
+[
+  {
+    "id": "well-defined-saas",
+    "description": "Idea clara con usuario, flujo y scope acotado",
+    "idea_text": "Quiero una app web para freelancers que envíen facturas a clientes. El cliente puede ver la factura, aprobarla y el freelancer recibe notificación por email. Solo web, sin pagos reales en v1, usar PDF generado en el browser.",
+    "answers": {
+      "q1": [0],
+      "q2": [1],
+      "q3": [0],
+      "q4": [2]
+    },
+    "expected": {
+      "claridad_problema": { "min": 1 },
+      "usuario_y_journey": { "min": 1 },
+      "alcance_v1": { "min": 1 },
+      "viabilidad": { "min": 1 },
+      "isBlocked": false
+    }
+  },
+  {
+    "id": "vague-idea",
+    "description": "Idea vaga sin usuario ni scope definido",
+    "idea_text": "Una plataforma de productividad para equipos con IA.",
+    "answers": {
+      "q1": [0],
+      "q2": [0],
+      "q3": [0],
+      "q4": [0]
+    },
+    "expected": {
+      "claridad_problema": { "max": 1 },
+      "alcance_v1": { "max": 1 },
+      "isBlocked": true
+    }
+  },
+  {
+    "id": "too-large-scope",
+    "description": "Idea buena pero scope demasiado grande",
+    "idea_text": "App de delivery completa: usuarios piden, restaurantes aceptan, repartidores entregan, con pagos reales, chat en tiempo real, reviews, y panel admin.",
+    "answers": {
+      "q1": [0],
+      "q2": [0],
+      "q3": [0],
+      "q4": [0]
+    },
+    "expected": {
+      "alcance_v1": { "max": 1 },
+      "viabilidad": { "max": 1 },
+      "isBlocked": true
+    }
+  },
+  {
+    "id": "cli-tool-clear",
+    "description": "Tool CLI bien definido, sin deps externas",
+    "idea_text": "Un CLI en Node.js que lee un archivo CSV de gastos personales y genera un reporte de texto en consola con totales por categoría y el mes de mayor gasto.",
+    "answers": {
+      "q1": [0],
+      "q2": [0],
+      "q3": [0],
+      "q4": [0]
+    },
+    "expected": {
+      "claridad_problema": { "min": 1 },
+      "alcance_v1": { "min": 1 },
+      "viabilidad": { "exact": 2 },
+      "isBlocked": false
+    }
+  },
+  {
+    "id": "mobile-with-auth",
+    "description": "App móvil con auth social — dependencia externa en v1",
+    "idea_text": "App móvil para runners que registren sus rutas con GPS, las compartan con amigos. Login con Google. Mapa con historial de rutas. Sincronización en tiempo real.",
+    "answers": {
+      "q1": [0],
+      "q2": [0],
+      "q3": [0],
+      "q4": [0]
+    },
+    "expected": {
+      "viabilidad": { "max": 1 },
+      "restricciones": { "max": 1 }
+    }
+  }
+]

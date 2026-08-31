@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Instalar CC Brew — Skill + MCP para Claude Code</title>
+  <meta name="description" content="Copia dos prompts en Claude Code y tienes /cc-brew disponible en cualquier proyecto. Sin terminal, sin scripts.">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange: #7c3aed;
+      --green: #22c55e;
+      --bg: #0f0f0f;
+      --bg-2: #181818;
+      --bg-code: #111111;
+      --text: #f0f0f0;
+      --text-2: #aaaaaa;
+      --text-3: #555555;
+      --border: #2a2a2a;
+      --border-code: #2a2a2a;
+      --step-line: #2a2a2a;
+      --badge-bg: rgba(34,197,94,0.1);
+      --badge-text: #4ade80;
+      --badge-border: rgba(34,197,94,0.2);
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        --bg: #ffffff;
+        --bg-2: #f8f8f6;
+        --bg-code: #1a1a1a;
+        --text: #111111;
+        --text-2: #444444;
+        --text-3: #888888;
+        --border: #e5e5e5;
+        --step-line: #e5e5e5;
+        --badge-bg: #f0fdf4;
+        --badge-text: #16a34a;
+        --badge-border: #bbf7d0;
+      }
+    }
+    :root[data-theme="light"] {
+      --bg: #ffffff;
+      --bg-2: #f8f8f6;
+      --bg-code: #1a1a1a;
+      --text: #111111;
+      --text-2: #444444;
+      --text-3: #888888;
+      --border: #e5e5e5;
+      --step-line: #e5e5e5;
+      --badge-bg: #f0fdf4;
+      --badge-text: #16a34a;
+      --badge-border: #bbf7d0;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-text { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); }
+    .nav-logo-badge {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+      background: var(--badge-bg); color: var(--badge-text); border: 1px solid var(--badge-border);
+      border-radius: 6px; padding: 2px 8px; text-transform: uppercase;
+    }
+    .nav-back {
+      font-size: 13px; color: var(--text-3); text-decoration: none;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .nav-back:hover { color: var(--text-2); }
+
+    /* HERO */
+    .hero {
+      max-width: 700px; margin: 0 auto;
+      padding: 60px 24px 20px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--green);
+      display: block; margin-bottom: 14px;
+    }
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 700; letter-spacing: -0.03em;
+      line-height: 1.1; text-wrap: balance;
+      margin-bottom: 16px;
+    }
+    .hero p {
+      font-size: 16px; color: var(--text-2); line-height: 1.7;
+      max-width: 520px; margin: 0 auto 32px;
+    }
+    .hero-time {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--text-3);
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 6px 14px;
+    }
+    .hero-time span { color: var(--green); font-weight: 700; }
+
+    /* PREREQ */
+    .prereq {
+      max-width: 700px; margin: 40px auto 0;
+      padding: 0 24px;
+    }
+    .prereq-box {
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px 20px;
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .prereq-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .prereq-body h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .prereq-body p { font-size: 13px; color: var(--text-2); line-height: 1.5; }
+    .prereq-body a { color: var(--orange); text-decoration: none; }
+    .prereq-body a:hover { text-decoration: underline; }
+
+    /* STEPS */
+    .steps {
+      max-width: 700px; margin: 52px auto 0;
+      padding: 0 24px 80px;
+    }
+    .step {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 0 20px;
+      margin-bottom: 0;
+    }
+    .step-left {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .step-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--orange); color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-line-v {
+      width: 2px; flex: 1; background: var(--step-line);
+      margin-top: 8px; min-height: 32px;
+    }
+    .step-body {
+      padding-bottom: 44px;
+      min-width: 0;
+    }
+    .step:last-child .step-body { padding-bottom: 0; }
+    .step:last-child .step-line-v { display: none; }
+
+    .step-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text-3);
+      margin-bottom: 4px; display: block; margin-top: 6px;
+    }
+    .step-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px; font-weight: 700;
+      letter-spacing: -0.02em; margin-bottom: 10px;
+    }
+    .step-desc {
+      font-size: 14px; color: var(--text-2); line-height: 1.65;
+      margin-bottom: 14px;
+    }
+    .step-desc strong { color: var(--text); }
+
+    /* CODE BLOCK */
+    .code-block {
+      background: var(--bg-code);
+      border: 1px solid var(--border-code);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .code-header {
+      background: #1e1e1e;
+      padding: 8px 14px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .code-lang {
+      font-size: 11px; font-weight: 600; color: #555; font-family: monospace;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .copy-btn {
+      font-size: 11px; font-weight: 600; color: #666;
+      background: none; border: 1px solid #333; border-radius: 5px;
+      padding: 3px 10px; cursor: pointer; transition: all 0.15s;
+      font-family: inherit;
+    }
+    .copy-btn:hover { border-color: #555; color: #aaa; }
+    .copy-btn.copied { border-color: #22c55e; color: #22c55e; }
+    .code-body {
+      padding: 16px 18px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 13px; line-height: 1.75; color: #d4d4d4;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .cm { color: #6a9955; } /* comment */
+    .ck { color: #569cd6; } /* keyword */
+    .cs { color: #22c55e; } /* string/value */
+    .co { color: #7c3aed; } /* option/flag */
+    .cp { color: #dcdcaa; } /* path */
+
+    /* INLINE CODE */
+    code {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      background: rgba(124,58,237,0.1);
+      color: var(--orange);
+      border-radius: 4px;
+      padding: 1px 6px;
+    }
+
+    /* TIP BOX */
+    .tip {
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px; color: var(--badge-text);
+      line-height: 1.55; margin-bottom: 14px;
+    }
+    .tip strong { font-weight: 700; }
+
+    /* WARN BOX */
+    .warn {
+      background: rgba(124,58,237,0.07);
+      border: 1px solid rgba(124,58,237,0.2);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px; color: var(--orange);
+      line-height: 1.55; margin-bottom: 14px;
+    }
+
+    /* FILE PATH PILL */
+    .file-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px; color: #d4d4d4;
+      background: #1a1a1a; border: 1px solid #2a2a2a;
+      border-radius: 6px; padding: 4px 10px;
+      margin-bottom: 10px;
+    }
+    .file-pill-icon { color: #555; font-size: 11px; }
+
+    /* VERIFY BOX */
+    .verify-box {
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+      margin-top: 52px;
+    }
+    .verify-box h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px; font-weight: 700; margin-bottom: 8px;
+    }
+    .verify-box p { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+    .verify-box .trigger-demo {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 14px;
+      background: #1a1a1a; border: 1px solid #2a2a2a;
+      border-radius: 8px; padding: 10px 16px;
+      font-family: 'Courier New', monospace; font-size: 14px; color: #22c55e;
+    }
+
+    /* INSTALLER HERO */
+    .installer-hero {
+      max-width: 700px; margin: 48px auto 0;
+      padding: 0 24px;
+    }
+    .installer-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 32px 28px;
+      text-align: center;
+    }
+    .installer-card h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px; font-weight: 700;
+      letter-spacing: -0.02em; margin-bottom: 8px;
+    }
+    .installer-card p {
+      font-size: 14px; color: var(--text-2); line-height: 1.6;
+      max-width: 440px; margin: 0 auto 24px;
+    }
+    .btn-download {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--orange); color: #fff !important;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px; font-weight: 700;
+      border-radius: 14px; padding: 14px 28px;
+      text-decoration: none; transition: opacity 0.15s;
+    }
+    .btn-download:hover { opacity: 0.88; }
+    .installer-os {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      font-size: 11px; color: var(--text-3);
+      margin-top: 12px;
+    }
+    .installer-divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 28px 0; color: var(--text-3); font-size: 12px;
+    }
+    .installer-divider::before, .installer-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .oneliner-block {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg-code); border: 1px solid var(--border-code);
+      border-radius: 10px; padding: 12px 16px;
+      font-family: 'Courier New', monospace; font-size: 12.5px; color: #d4d4d4;
+      overflow-x: auto; text-align: left;
+    }
+    .oneliner-copy {
+      margin-left: auto; flex-shrink: 0;
+      font-size: 11px; font-weight: 600; color: #666;
+      background: none; border: 1px solid #333; border-radius: 5px;
+      padding: 3px 10px; cursor: pointer; transition: all 0.15s;
+      font-family: inherit;
+    }
+    .oneliner-copy:hover { border-color: #555; color: #aaa; }
+    .oneliner-copy.copied { border-color: #22c55e; color: #22c55e; }
+
+    /* MANUAL — details */
+    .manual-section {
+      max-width: 700px; margin: 40px auto 0;
+      padding: 0 24px;
+    }
+    .manual-section details {
+      border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .manual-section summary {
+      padding: 16px 20px;
+      font-size: 14px; font-weight: 600; color: var(--text-2);
+      cursor: pointer; list-style: none;
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--bg-2);
+    }
+    .manual-section summary::-webkit-details-marker { display: none; }
+    .manual-section summary::after {
+      content: '+'; font-size: 18px; color: var(--text-3);
+      transition: transform 0.2s;
+    }
+    .manual-section details[open] summary::after { content: '−'; }
+    .manual-inner { padding: 0 20px 24px; }
+
+    /* CTA FINAL */
+    .cta-final {
+      max-width: 700px; margin: 48px auto;
+      padding: 0 24px;
+      text-align: center;
+    }
+    .cta-final p { font-size: 14px; color: var(--text-3); margin-top: 12px; }
+    .cta-final a { color: var(--orange); text-decoration: none; }
+    .btn-primary {
+      display: inline-block;
+      background: var(--orange); color: #fff !important;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 700;
+      border-radius: 12px; padding: 12px 26px;
+      text-decoration: none; transition: opacity 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+
+    @media (max-width: 540px) {
+      .step { grid-template-columns: 36px 1fr; gap: 0 14px; }
+      .step-num { width: 30px; height: 30px; font-size: 13px; }
+      .code-body { font-size: 11.5px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <span class="nav-logo-text">CC Brew</span>
+    <span class="nav-logo-badge">Gratis</span>
+  </a>
+  <a href="/landing/" class="nav-back">← Volver al sitio</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-eyebrow">Instalación</span>
+  <h1>Instala CC Brew en Claude Code</h1>
+  <p>Dos prompts. Los pegás en Claude Code y él hace el resto — sin terminal, sin scripts que descargar y ejecutar.</p>
+</div>
+
+<!-- PREREQ NOTE -->
+<div class="prereq" style="margin-top:20px;">
+  <div class="prereq-box">
+    <div class="prereq-icon" style="width:22px;height:22px;flex-shrink:0;margin-top:2px;"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><g fill="none" stroke="#888" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2m4 7h4m-4 5h4m-8-5h.01M8 16h.01"/></g></svg></div>
+    <div class="prereq-body">
+      <h4>Antes de instalar: obtén tu API Key</h4>
+      <p>Ve a <a href="https://ccbrew.kitifica.com" target="_blank" rel="noopener">ccbrew.kitifica.com</a> → Ajustes → API Key. La vas a necesitar para el paso 1.</p>
+    </div>
+  </div>
+</div>
+
+<!-- STEPS -->
+<div class="steps">
+  <div class="step">
+    <div class="step-left">
+      <div class="step-num">1</div>
+      <div class="step-line-v"></div>
+    </div>
+    <div class="step-body">
+      <span class="step-label">Paso 1</span>
+      <h3 class="step-title">Instala el MCP</h3>
+      <p class="step-desc">Copia este prompt y pégalo en el chat de Claude Code. Reemplaza <code>TU_API_KEY</code> por la clave que copiaste arriba — Claude Code ejecuta el comando por ti.</p>
+      <div class="code-block" id="code-mcp">
+        <div class="code-header">
+          <span class="code-lang">prompt</span>
+          <button class="copy-btn" onclick="copyCode('code-mcp', this)">Copiar</button>
+        </div>
+        <div class="code-body">Instala el MCP de CC Brew. Reemplaza TU_API_KEY con tu clave de CC Brew (la encontrás en ccbrew.kitifica.com → Ajustes → API Key) y ejecuta:
+
+<span class="ck">claude</span> mcp add cc-brew --transport http <span class="cs">"https://cc-brew-mcp.netlify.app/mcp"</span> --header <span class="co">"Authorization: Bearer TU_API_KEY"</span> --scope user</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left">
+      <div class="step-num">2</div>
+      <div class="step-line-v"></div>
+    </div>
+    <div class="step-body">
+      <span class="step-label">Paso 2</span>
+      <h3 class="step-title">Instala el Skill</h3>
+      <p class="step-desc">Descarga el archivo, arrástralo al chat de Claude Code y pega este prompt.</p>
+      <a href="/skill/SKILL.md" download="SKILL.md" class="btn-download" style="margin-bottom:14px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Descargar SKILL.md
+      </a>
+      <div class="code-block" id="code-skill">
+        <div class="code-header">
+          <span class="code-lang">prompt</span>
+          <button class="copy-btn" onclick="copyCode('code-skill', this)">Copiar</button>
+        </div>
+        <div class="code-body">Instala este archivo como una Skill de Claude Code:
+1. Muévelo a ~/.claude/skills/cc-brew/SKILL.md
+2. Agrega esta entrada en ~/.claude/CLAUDE.md:
+
+<span class="co"># cc-brew</span>
+- <span class="cs">**cc-brew**</span> (<span class="cp">`~/.claude/skills/cc-brew/SKILL.md`</span>) - estructura ideas de producto antes de construirlas con Claude Code
+  Trigger: <span class="co">`/cc-brew`</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left">
+      <div class="step-num">✓</div>
+    </div>
+    <div class="step-body">
+      <div class="verify-box" style="margin-top:0;">
+        <h3>Verifica en Claude Code</h3>
+        <p>Desde cualquier proyecto:</p>
+        <div class="trigger-demo"><span style="color:#555;">›</span> /cc-brew</div>
+      </div>
+    </div>
+  </div>
+</div><!-- /steps -->
+
+<!-- CTA FINAL -->
+<div class="cta-final">
+  <a href="https://ccbrew.kitifica.com" class="btn-primary">Ir a CC Brew para obtener mi API Key →</a>
+  <p>¿Prefieres la app móvil sin instalar nada? Usa <a href="https://ccbrew.kitifica.com">ccbrew.kitifica.com</a> desde tu celular.</p>
+</div>
+
+<script>
+  function copyCode(id, btn) {
+    const el = document.getElementById(id).querySelector('.code-body');
+    const text = el.innerText.replace(/\n$/, '');
+    navigator.clipboard.writeText(text).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+    });
+    btn.textContent = '✓ Copiado'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+  }
+</script>
+
+</body>
+</html>

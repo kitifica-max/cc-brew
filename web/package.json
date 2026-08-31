@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "deploy": "netlify deploy --prod --build --site 3783f87f-48db-4310-9b95-ee842b4d4b81"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
@@ -12,7 +13,8 @@
     "next": "^14.2.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "resend": "^6.18.1"
+    "resend": "^6.18.1",
+    "standardwebhooks": "^1.1.1"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.15.13",

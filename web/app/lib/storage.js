@@ -24,6 +24,13 @@ export function loadProjects() {
       createdAt: p.createdAt ?? Date.now(),
       nodes: p.nodes ?? [],
       vectors: p.vectors ?? [],
+      ideaText: p.ideaText ?? null,
+      ideaMode: p.ideaMode ?? 'idea',
+      claudeMd: p.claudeMd ?? null,
+      semaforo: p.semaforo ?? null,
+      sessionId: p.sessionId ?? null,
+      pendingFollowupAnswers: p.pendingFollowupAnswers ?? null,
+      documentConfirmed: p.documentConfirmed ?? false,
     }));
   } catch { return []; }
 }
@@ -46,6 +53,14 @@ export function makeProject(name = 'Nuevo proyecto', id = null) {
     createdAt: Date.now(),
     nodes: [],
     vectors: [],
+    // v2 fields
+    ideaText: null,
+    ideaMode: 'idea',
+    claudeMd: null,
+    semaforo: null,
+    sessionId: null,
+    pendingFollowupAnswers: null,
+    documentConfirmed: false,
   };
 }
 

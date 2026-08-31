@@ -1,12 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
-const URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export const CONFIGURED = Boolean(URL && ANON_KEY);
+const isValidUrl = (u) => { try { new URL(u); return true; } catch { return false; } };
+const safeUrl = rawUrl && isValidUrl(rawUrl) ? rawUrl : 'https://unconfigured.supabase.co';
 
-// createClient lanza si falta la URL, y eso tumba el prerender del build.
-export const supabase = createClient(URL || 'https://unconfigured.supabase.co', ANON_KEY || 'unconfigured');
+export const CONFIGURED = Boolean(rawUrl && isValidUrl(rawUrl) && ANON_KEY);
+
+export const supabase = createClient(safeUrl, ANON_KEY || 'unconfigured');
 
 const SESSION_ID_KEY = 'cc-session-id';
 const TOKEN_KEY = 'cc-session-token';

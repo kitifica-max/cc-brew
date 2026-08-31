@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://ccc.kitifica.com/landing/</loc>
+    <loc>https://ccbrew.kitifica.com/landing/</loc>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
     <lastmod>2026-08-10</lastmod>
   </url>
   <url>
-    <loc>https://ccc.kitifica.com/privacy/</loc>
+    <loc>https://ccbrew.kitifica.com/privacy/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
     <lastmod>2026-08-10</lastmod>
   </url>
   <url>
-    <loc>https://ccc.kitifica.com/terms/</loc>
+    <loc>https://ccbrew.kitifica.com/terms/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
     <lastmod>2026-08-10</lastmod>
   </url>
   <url>
-    <loc>https://ccc.kitifica.com/contact/</loc>
+    <loc>https://ccbrew.kitifica.com/contact/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
     <lastmod>2026-08-10</lastmod>

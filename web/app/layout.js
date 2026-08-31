@@ -2,15 +2,23 @@ import './globals.css';
 import InstallPopup from './components/InstallPopup';
 
 export const metadata = {
-  title: 'CC Creator',
-  description: 'Control Claude Code desde tu móvil',
+  title: 'CC Brew',
+  description: 'De tu idea a una herramienta a tu medida que convence al cliente',
   manifest: '/manifest.json',
-  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'CC Creator' },
-  icons: { icon: '/favicon.ico', apple: '/icon-192.png' },
+  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'CC Brew' },
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon.ico' },
+    ],
+    apple: '/icon-192.png',
+  },
 };
 
 export const viewport = {
-  themeColor: '#f04e23',
+  themeColor: '#7c3aed',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,

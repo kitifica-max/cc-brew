@@ -1,9 +1,10 @@
 [build]
   command = "npm install"
-  publish = "."
+  publish = "public"
 
 [build.environment]
   NODE_VERSION = "22"
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
 [functions]
   directory = "netlify/functions"
@@ -12,7 +13,7 @@
 
 [[redirects]]
   from = "/mcp"
-  to = "/.netlify/functions/mcp"
+  to = "/.netlify/functions/mcp-rpc"
   status = 200
 
 [[redirects]]
@@ -23,4 +24,14 @@
 [[redirects]]
   from = "/api/sessions/*"
   to = "/.netlify/functions/sessions"
+  status = 200
+
+[[redirects]]
+  from = "/api/ai/process"
+  to = "/.netlify/functions/ai-process"
+  status = 200
+
+[[redirects]]
+  from = "/api/account"
+  to = "/.netlify/functions/account"
   status = 200

@@ -9,7 +9,7 @@ const TYPE_LABELS = {
 };
 
 const TYPE_COLORS = {
-  conversation: '#f04e23',
+  conversation: '#7c3aed',
   reference:    '#3B82F6',
   definition:   '#8B5CF6',
   process:      '#10B981',
@@ -31,18 +31,18 @@ export default function NodeCard({ node, selected, onDelete, isConnectMode, isCo
       {/* Connect target ring */}
       {isConnectMode && !isConnectSource && (
         <rect width={NODE_W} height={NODE_H} rx={12}
-          fill="none" stroke="#f04e23" strokeWidth={2.5} strokeDasharray="6 4" opacity={0.65}/>
+          fill="none" stroke="#7c3aed" strokeWidth={2.5} strokeDasharray="6 4" opacity={0.65}/>
       )}
       {/* Connect source highlight */}
       {isConnectSource && (
         <rect width={NODE_W} height={NODE_H} rx={12}
-          fill="rgba(240,78,35,0.08)" stroke="#f04e23" strokeWidth={3} opacity={0.9}/>
+          fill="rgba(124,58,237,0.08)" stroke="#7c3aed" strokeWidth={3} opacity={0.9}/>
       )}
 
       <rect
         width={NODE_W} height={NODE_H} rx={12}
-        fill={selected ? 'rgba(240,78,35,0.18)' : '#1C1C1C'}
-        stroke={selected ? '#f04e23' : '#2A2A2A'}
+        fill={selected ? 'rgba(124,58,237,0.18)' : '#1C1C1C'}
+        stroke={selected ? '#7c3aed' : '#2A2A2A'}
         strokeWidth={selected ? 3 : 1.5}
       />
       <rect width={NODE_W} height={2.5} rx={1} fill={TYPE_COLORS[node.type] ?? '#444'} opacity={0.75}/>
