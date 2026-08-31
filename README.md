@@ -1,115 +1,135 @@
 <p align="center">
-  <img src="logos/logoccc2.svg" alt="CC Creator" width="160"/>
+  <img src="logos/ccbrew_fav.svg" alt="CC Brew" width="160"/>
 </p>
 
-# CC Creator — Studio de Apps Directas guiado por Claude
+# CC Brew — De idea a herramienta que convence a tu cliente
 
-De la idea a tu App Directa en 6 fases. CC Creator envuelve Claude Code en un proceso estructurado: guía a Claude fase a fase, escribe el `CLAUDE.md` automáticamente y te deja controlar todo desde tu iPhone.
+CC Brew estructura tu idea, define qué debe convencer a tu cliente y genera un `CLAUDE.md` listo para construir con Claude Code.
 
 ```
-iPhone (App Directa)  ──── Supabase Realtime ────  Mac (Electron tray)
-  Escribe prompt                                      claude CLI
-  Avanza de fase          ──────►                    CLAUDE.md automático
-  Ve streaming            ◄──────                    Output token a token
+ccbrew.kitifica.com (PWA)  ──── Supabase  �───  Claude Code
+  Idea libre                                    CLAUDE.md
+  Cuestionario          ──────►                 6 criterios
+  Semáforo IA           ◄──────                 Validación
 ```
 
-**Sin cuenta Supabase propia. Sin SSH. Sin túneles. Sin config de red.**
+**Gratis con Claude Code · App Directa desde $4 · Sin vencimiento**
 
 ---
 
-## Sistema de 6 Fases
+## Cómo funciona
 
-| # | Fase | Objetivo |
-|---|------|----------|
-| 1 | **Ideación** | Definir el problema, usuarios, y alcance del MVP |
-| 2 | **POC Local** | Construir el prototipo funcional en local |
-| 3 | **Lanzamiento** | Deploy, dominio y pipeline de CI/CD |
-| 4 | **Backend** | Base de datos, auth, APIs y servicios externos |
-| 5 | **App Directa Completa** | PWA instalable con offline, push y UX nativa |
-| 6 | **Validación** | Métricas, feedback de usuarios y decisiones de producto |
-
-Cada avance de fase escribe un `CLAUDE.md` actualizado en el proyecto. Claude Code lo lee nativamente — sin copiar contexto, sin instrucciones manuales.
+1. **Escribí tu idea** — sin estructura, sin límites. Contale a la IA qué querés lograr.
+2. **Respondé unas preguntas** — opción múltiple, menos de un minuto. Cubre recorrido del cliente, alcance v1, restricciones y reacción esperada.
+3. **CLAUDE.md listo** — documento con Fase 1 (qué construir ahora) y Fase 2 (visión futura, bloqueada). Copialo o compartilo directo.
 
 ---
 
-## Requisitos
+## 6 criterios de validación
 
-- **Mac** con macOS 12+ (Apple Silicon o Intel)
-- **Claude Code CLI** instalado: `npm install -g @anthropic-ai/claude-code`
-- Suscripción activa a Claude (Max o Pro — requerida por el CLI)
-- iPhone o cualquier móvil con navegador moderno
+| Criterio | ¿Qué mide? | Bloquea? |
+|---|---|---|
+| Claridad de la objeción | ¿Qué duda o resistencia del cliente hay que resolver? | Sí |
+| Alcance v1 | ¿Qué entra y qué queda fuera de la primera versión? | Sí |
+| Recorrido del cliente | ¿Cómo ve y usa la herramienta el cliente, paso a paso? | No |
+| Dependencias externas | ¿Hay integraciones complejas sin resolver? | No |
+| Coherencia | ¿Las respuestas son consistentes entre sí? | No |
+| Viabilidad | ¿Tamaño realista para una primera pieza? | No |
 
 ---
 
-## Instalación
+## Dos formas de usar
 
-### Homebrew (recomendado)
+### App Directa (PWA)
+Desde tu celular o laptop, donde estés. Instalada como app nativa. Sin Claude Code requerido.
+
+- [ccbrew.kitifica.com](https://ccbrew.kitifica.com)
+- iOS, Android, Windows, macOS
+- Créditos por proyecto, sin vencimiento
+- Primeros 3 proyectos gratis
+
+### Gratis con Claude Code
+Desde tu equipo con Claude Code instalado. Procesamiento local, cero créditos.
 
 ```bash
-brew install --cask kitifica-max/tap/cc-controller
+# Instalar MCP
+claude mcp add cc-brew --transport http "https://ccbrew-mcp.netlify.app/mcp" \
+  --header "Authorization: Bearer TU_API_KEY" --scope user
+
+# Usar en el chat
+/cc-brew
 ```
 
-macOS no bloqueará la app instalada vía Homebrew.
-
-### DMG manual
-
-Desde [GitHub Releases](https://github.com/kitifica-max/cc-controller/releases/latest):
-
-| Chip | Archivo |
-|---|---|
-| Apple Silicon (M1/M2/M3/M4) | `CC.Creator-*-arm64.dmg` |
-| Intel | `CC.Creator-*.dmg` |
-
-> **DMG sin firmar:** clic derecho → *Abrir* → confirmar. Solo una vez. Ver [Seguridad](#seguridad).
-
-Arrastra CC Creator a Applications. Al abrir, aparece en el tray (barra superior) sin ícono en el Dock.
+[Descargar SKILL.md](https://ccbrew.kitifica.com/skill/SKILL.md)
 
 ---
 
-## Setup inicial
+## Precios
 
-La primera vez, CC Creator abre el asistente de configuración:
+| Plan | Precio | Proyectos | Por proyecto |
+|---|---|---|---|
+| Inicio | $4 | 5 | $0.80 |
+| Creador | $9 | 12 | $0.75 |
+| Estudio | $12 | 20 | $0.60 |
+| Trae tu API | $29 (pago único) | Ilimitados | — |
 
-1. Ingresa tu correo y contraseña — la misma cuenta que usas en la App Directa
-2. Genera un `SESSION_ID` único para tu instalación
-3. Genera un `SESSION_TOKEN` aleatorio (mín. 32 chars)
-4. Muestra el **código de emparejamiento** (`sessionId:token`)
-5. Guarda la config en `~/.config/cc-controller/.env` y la sesión en `~/.config/cc-controller/auth.json`
-
-### Conectar tu iPhone
-
-1. Abre [ccc.kitifica.com](https://ccc.kitifica.com) en Safari
-2. Agrega a la pantalla de inicio (Share → Add to Home Screen)
-3. Pega el código de emparejamiento cuando la App Directa lo solicite
-4. En el tray → clic derecho → **Iniciar**
+Créditos sin vencimiento. Primeros 3 proyectos gratis con cada cuenta nueva.
 
 ---
 
-## Uso diario
-
-### Proyectos y fases
-
-- Toca el nombre del proyecto en el header → lista de proyectos
-- **Nuevo proyecto:** CC Creator crea `~/CCProjects/<slug>/` en el Mac
-- **Avanzar de fase:** toca el indicador de fase → panel de fases → selecciona la siguiente
-- CC Creator escribe el `CLAUDE.md` del proyecto al cambiar de fase
-- **Abrir en Claude Code:** botón en el header → abre Terminal con `cd <proyecto> && claude`
-
-### Secrets por categoría
-
-Settings (⚙️) → Secrets. Las claves se organizan por categoría (API Keys, Database, Auth, etc.) y se guardan en:
+## Arquitectura
 
 ```
-~/CCProjects/<proyecto>/.env
+web/app/
+├── page.js                    # PWA principal
+└── components/
+    ├── AuthGate.js            # Autenticación
+    ├── IdeaCapture.js         # Campo de idea libre
+    ├── ContextCapture.js      # Público objetivo + marca
+    ├── Questionnaire.js       # Cuestionario de opción múltiple
+    ├── SemaforoView.js        # 6 criterios de validación
+    ├── DocumentViewer.js      # Visualización del CLAUDE.md
+    ├── BuyMinutes.js          # Compra de créditos
+    └── OnboardingTour.js      # Tour de inducción
+
+mcp/
+├── netlify/functions/
+│   ├── ai-process.mjs        # Procesamiento con Claude
+│   └── sessions.mjs          # Gestión de sesiones
+└── lib/
+    ├── tools.js              # Herramientas MCP
+    └── sessions.js           # Sesiones y créditos
 ```
 
-con permisos `600`. Nunca se almacenan en la App Directa ni en Supabase.
+| Componente | Tecnología | Rol |
+|---|---|---|
+| PWA | Next.js + Netlify | Interfaz de captura y validación |
+| MCP Server | Netlify Functions | Procesamiento con Claude Code |
+| Backend | Supabase | Auth, datos, storage, pagos |
+| Pagos | Wompi | Créditos y proyectos |
 
-### Subir archivos desde iPhone
+---
 
-Toca el ícono de clip. El archivo viaja a Supabase Storage temporalmente, el desktop lo descarga al directorio del proyecto y lo elimina de Storage inmediatamente.
+## Desarrollo local
 
-Formatos: `.png .jpg .jpeg .gif .pdf .txt .md .json .csv .svg .zip` (máx. 10 MB)
+```bash
+# PWA
+cd web && npm install && npm run dev
+
+# MCP Server
+cd mcp && npm install && npm run dev
+```
+
+---
+
+## Stack recomendado para proyectos generados
+
+CC Brew recomienda (no impone) según lo que el proyecto necesite:
+
+- **Backend:** Supabase, Firebase, Neon, PlanetScale o Convex
+- **Deploy:** Netlify, Vercel, Cloudflare Pages, Railway o Render
+- **Repo:** GitHub, GitLab o Bitbucket
+- **SEO:** Meta tags, sitemap, llms.txt, datos estructurados
 
 ---
 
@@ -117,93 +137,10 @@ Formatos: `.png .jpg .jpeg .gif .pdf .txt .md .json .csv .svg .zip` (máx. 10 MB
 
 | Medida | Detalle |
 |---|---|
-| **Canal privado** | El canal `session:<id>` es privado: Supabase evalúa RLS sobre `realtime.messages` con el JWT de tu cuenta. Sin sesión autorizada no hay suscripción. |
-| **Código de emparejamiento** | `SESSION_ID` único por instalación + `SESSION_TOKEN` ≥ 32 chars. Segunda capa: sin ese par exacto, cualquier evento se descarta. |
-| **Sin puertos abiertos** | El Mac no escucha en ningún puerto. Todo viaja por Supabase WebSocket (WSS/TLS). Sin SSH, sin ngrok. |
-| **Path traversal bloqueado** | Toda ruta de archivo se valida dentro de `~/CCProjects/`. Paths con `../` rechazados. |
-| **Whitelist de archivos** | Solo extensiones permitidas, máx. 10 MB. Eliminado de Storage tras descargarse. |
-| **Secretos con permisos 600** | `.env` de cada proyecto escrito con `mode 0o600`. |
-| **Hardened Runtime** | `hardenedRuntime: true` en el build de Electron. |
-| **Open source** | Todo el código está en GitHub. Sin binarios opacos. |
-
-> Si pierdes el iPhone: cambia `SESSION_TOKEN` en `~/.config/cc-controller/.env` y reinicia CC Creator. El dispositivo anterior no puede reconectar.
-
----
-
-## Arquitectura
-
-```
-desktop/src/
-├── main.js          # Entry point — tray, setup, event wiring, powerSaveBlocker
-├── bridge.js        # Supabase Realtime bridge (broadcast + storage)
-├── pty.js           # Claude CLI runner (child_process + streaming)
-├── projects.js      # ProjectManager (~/.config + ~/CCProjects)
-├── claude-md.js     # Generador de CLAUDE.md por fase
-└── setup-window.js  # Wizard de primer setup
-
-web/app/
-├── page.js                    # Chat UI principal con streaming
-└── components/
-    ├── AuthGate.js            # Emparejamiento de código
-    ├── PhasePanel.js          # Visualización y cambio de fase
-    ├── SecretsSheet.js        # Secrets por categoría
-    ├── SettingsSheet.js       # Modelo, effort, proyectos
-    ├── ProjectsList.js        # Lista y gestión de proyectos
-    └── FileUpload.js          # Subida de archivos
-```
-
-| Componente | Tecnología | Rol |
-|---|---|---|
-| Desktop | Electron 30 + Node.js | Ejecuta `claude` CLI, gestiona fases y CLAUDE.md |
-| App Directa | Next.js 14 + Netlify | Control remoto e interfaz de fases desde el móvil |
-| Bridge | Supabase Realtime (Broadcast) | Canal WebSocket cifrado entre ambos |
-| Storage | Supabase Storage (`uploads`) | Tránsito temporal de archivos |
-
-Supabase está **bundled** — los devs no necesitan cuenta propia.
-
----
-
-## Desarrollo local
-
-```bash
-# Desktop
-cd desktop && npm install && npm run dev
-
-# App Directa
-cd web && npm install && npm run dev
-```
-
-### Construir DMG
-
-```bash
-cd desktop
-# Apple Silicon
-npm run build -- --mac --arm64
-
-# Intel
-npm run build -- --mac --x64
-```
-
-Los DMGs quedan en `desktop/dist/`.
-
----
-
-## Solución de problemas
-
-**"Desktop detenido" en la App Directa aunque Electron corra**
-→ Electron envía heartbeat cada 20s. Si la App Directa no recibe uno en 45s, marca el desktop como detenido. Clic derecho en tray → Iniciar.
-
-**"no se puede abrir porque proviene de un desarrollador no identificado"**
-→ Instala vía Homebrew (sin este problema) o clic derecho → Abrir → confirmar.
-
-**La App Directa pide código de emparejamiento otra vez**
-→ El localStorage fue borrado. Abre CC Creator → clic derecho → Copiar código de emparejamiento.
-
-**La respuesta de Claude tiene caracteres extraños (`[0m`, `[31m`)**
-→ El bridge filtra ANSI automáticamente. Si persisten, actualiza a la versión más reciente.
-
-**El Mac se duerme y la sesión se cae**
-→ CC Creator activa `prevent-display-sleep` automáticamente mientras la sesión corre.
+| **Canal privado** | Supabase RLS sobre cada cuenta |
+| **Créditos protegidos** | RPC server-side, saldo verificado antes de procesar |
+| **API key encriptada** | Almacenada con Supabase Vault |
+| **Open source** | Todo el código está en GitHub |
 
 ---
 
