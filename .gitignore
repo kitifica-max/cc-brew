@@ -28,3 +28,8 @@ package-lock.json
 
 # Local Netlify folder
 .netlify
+
+# Source/working files
+video/
+*.blend
+*.blend1
