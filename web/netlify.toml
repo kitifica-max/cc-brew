@@ -1,6 +1,6 @@
 [build]
   base    = "web"
-  command = "npm run build"
+  command = "cd ../mcp && npm ci && cd ../web && npm run build"
   publish = ".next"
 
 [build.environment]
