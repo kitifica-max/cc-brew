@@ -52,12 +52,12 @@ test('deleteProject removes from list', () => {
 
 test('saveProjectEnv creates .env with correct key-value pairs', () => {
   const p = createProject('test-env-1', 'Env App');
-  saveProjectEnv('test-env-1', { GITHUB_TOKEN: 'ghp_12345', NETLIFY_AUTH_TOKEN: 'net_678' });
+  saveProjectEnv('test-env-1', { MY_API_TOKEN: 'test-token-abc', BUILD_TOKEN: 'build-xyz-678' });
   const envPath = join(p.path, '.env');
   assert.ok(existsSync(envPath));
   const content = readFileSync(envPath, 'utf8');
-  assert.ok(content.includes('GITHUB_TOKEN="ghp_12345"'));
-  assert.ok(content.includes('NETLIFY_AUTH_TOKEN="net_678"'));
+  assert.ok(content.includes('MY_API_TOKEN="test-token-abc"'));
+  assert.ok(content.includes('BUILD_TOKEN="build-xyz-678"'));
 });
 
 test('saveProjectEnv rejects nonexistent project id', () => {
