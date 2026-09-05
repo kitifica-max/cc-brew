@@ -2,8 +2,8 @@ import './globals.css';
 import InstallPopup from './components/InstallPopup';
 
 export const metadata = {
-  title: 'CC Brew',
-  description: 'De tu idea a una herramienta a tu medida que convence al cliente',
+  title: 'CC Brew — ¿Vale la pena construir tu idea?',
+  description: 'Evaluamos tu idea antes de que gastes tiempo y dinero. Te decimos si construirla, replantearla o dejarla.',
   manifest: '/manifest.json',
   appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'CC Brew' },
   icons: {
@@ -14,6 +14,11 @@ export const metadata = {
       { url: '/favicon.ico' },
     ],
     apple: '/icon-192.png',
+  },
+  openGraph: {
+    title: 'CC Brew — ¿Vale la pena construir tu idea?',
+    description: 'Evaluamos tu idea antes de que gastes tiempo y dinero. Te decimos si construirla, replantearla o dejarla.',
+    type: 'website',
   },
 };
 

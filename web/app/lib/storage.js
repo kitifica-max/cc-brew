@@ -25,11 +25,13 @@ export function loadProjects() {
       nodes: p.nodes ?? [],
       vectors: p.vectors ?? [],
       ideaText: p.ideaText ?? null,
-      ideaMode: p.ideaMode ?? 'idea',
       claudeMd: p.claudeMd ?? null,
       semaforo: p.semaforo ?? null,
+      brief: p.brief ?? p.claudeMd ?? null,
+      decision: p.decision ?? p.semaforo ?? null,
       sessionId: p.sessionId ?? null,
-      pendingFollowupAnswers: p.pendingFollowupAnswers ?? null,
+      pendingAnswers: p.pendingAnswers ?? null,
+      pendingQuestions: p.pendingQuestions ?? null,
       documentConfirmed: p.documentConfirmed ?? false,
     }));
   } catch { return []; }
@@ -53,13 +55,14 @@ export function makeProject(name = 'Nuevo proyecto', id = null) {
     createdAt: Date.now(),
     nodes: [],
     vectors: [],
-    // v2 fields
     ideaText: null,
-    ideaMode: 'idea',
     claudeMd: null,
     semaforo: null,
+    brief: null,
+    decision: null,
     sessionId: null,
-    pendingFollowupAnswers: null,
+    pendingAnswers: null,
+    pendingQuestions: null,
     documentConfirmed: false,
   };
 }

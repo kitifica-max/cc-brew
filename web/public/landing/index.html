@@ -1,7 +1,7 @@
-<title>CC Brew — De idea a herramienta que convence a tu cliente</title>
+<title>CC Brew — Antes de construir, preguntate si vale la pena</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="CC Brew convierte tu idea en el brief de una herramienta de marketing o ventas a tu medida — con tu marca y tu cliente objetivo como input real para Claude Code. Gratis con Claude Code, o desde $4.">
+<meta name="description" content="CC Brew te ayuda a evaluar una idea antes de construirla con IA. Desafía tus supuestos, encuentra los puntos débiles y decidí si vale la pena invertir tiempo en construirla.">
 <meta name="robots" content="index, follow">
 <meta name="author" content="Kitifica">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -13,14 +13,14 @@
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="CC Brew">
-<meta property="og:title" content="CC Brew — De idea a herramienta que convence a tu cliente">
-<meta property="og:description" content="CC Brew convierte tu idea en el brief de una herramienta de marketing o ventas a tu medida — con tu marca y tu cliente objetivo como input real para Claude Code. Gratis con Claude Code, o desde $4.">
+<meta property="og:title" content="CC Brew — Antes de construir, preguntate si vale la pena">
+<meta property="og:description" content="Evalúa tu idea antes de construirla con IA. Encuentra los puntos débiles, decidí si vale la pena, y llevá lo que sobreviva a Claude Code.">
 <meta property="og:url" content="https://ccbrew.kitifica.com/landing/">
 <meta property="og:image" content="https://ccbrew.kitifica.com/icon-512.png">
 <meta property="og:locale" content="es_ES">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="CC Brew — De idea a herramienta que convence a tu cliente">
-<meta name="twitter:description" content="Tu marca + tu cliente objetivo → un CLAUDE.md listo para que Claude Code construya algo a tu medida. Gratis con Claude Code o desde $4.">
+<meta name="twitter:title" content="CC Brew — Antes de construir, preguntate si vale la pena">
+<meta name="twitter:description" content="Evalúa tu idea antes de construirla con IA. BUILD / RETHINK / DON'T BUILD — la decisión que te ahorra días de construcción innecesaria.">
 <meta name="twitter:image" content="https://ccbrew.kitifica.com/icon-512.png">
 
 <script type="application/ld+json">
@@ -30,7 +30,7 @@
   "name": "CC Brew",
   "operatingSystem": "iOS, Android, Web",
   "applicationCategory": "DeveloperApplication",
-  "description": "Convierte una idea de marketing o ventas en un CLAUDE.md a tu medida — con lineamientos de marca y perfil de cliente objetivo como input real para Claude Code.",
+  "description": "Herramienta para evaluar ideas antes de construirlas con IA. Desafía supuestos, encuentra puntos débiles y decide si vale la pena construir.",
   "url": "https://ccbrew.kitifica.com/landing/",
   "offers": { "@type": "Offer", "price": "4", "priceCurrency": "USD" },
   "author": { "@type": "Organization", "name": "Kitifica", "url": "https://kitifica.com" }
@@ -58,6 +58,9 @@
   --paper-border: rgba(22,20,28,0.10);
   --r:           16px;
   --tr:          140ms ease;
+  --green:       #10B981;
+  --red:         #EF4444;
+  --amber:       #F59E0B;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -71,7 +74,6 @@ a { text-decoration: none; color: inherit; }
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 
-/* ─── SHARED ─── */
 .eyebrow {
   font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
   text-transform: uppercase; color: var(--orange);
@@ -101,7 +103,7 @@ a { text-decoration: none; color: inherit; }
 }
 .btn-ghost:hover { border-color: rgba(255,255,255,0.18); color: var(--text); }
 
-/* ─── NAV ─── */
+/* NAV */
 nav {
   position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
   z-index: 100;
@@ -134,7 +136,7 @@ nav {
 
 section[id], #hero { scroll-margin-top: 96px; }
 
-/* ─── HERO ─── */
+/* HERO */
 .hero {
   min-height: 100svh;
   display: grid; grid-template-columns: 1fr 1fr;
@@ -179,22 +181,9 @@ section[id], #hero { scroll-margin-top: 96px; }
 }
 .hero h1 .accent { color: var(--orange); }
 .hero-sub { font-size: 16px; color: var(--text-2); line-height: 1.7; max-width: 420px; margin-bottom: 32px; }
-.hero-subtitle {
-  font-family: 'Space Grotesk', system-ui, sans-serif;
-  font-size: clamp(1.15rem, 2.2vw, 1.5rem); font-weight: 500;
-  color: var(--text-2); letter-spacing: -0.01em; line-height: 1.3;
-  max-width: 460px; margin-bottom: 32px; text-wrap: balance;
-}
 .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
-.hero-note { font-size: 11px; color: var(--text-3); margin-bottom: 10px; }
-.hero-cert { display: inline-flex; align-items: center; gap: 7px; margin-top: 2px; padding: 6px 12px; background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.2); border-radius: 20px; text-decoration: none; transition: border-color 200ms, background 200ms; }
-.hero-cert:hover { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.4); }
-.hero-cert-check { font-size: 11px; color: #10B981; font-weight: 700; }
-.hero-cert-label { font-size: 11px; font-weight: 700; color: #10B981; }
-.hero-cert-scores { font-size: 10px; color: var(--text-3); padding-left: 7px; border-left: 1px solid rgba(255,255,255,0.1); }
 .hero-right { display: flex; align-items: center; justify-content: center; overflow: visible; }
 
-/* Hero image */
 @keyframes heroFadeIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
 .hero-img-wrap {
   animation: heroFadeIn 0.8s ease 0.2s both;
@@ -212,11 +201,10 @@ section[id], #hero { scroll-margin-top: 96px; }
   .hero-left { padding-right: 0; }
   .hero-right { display: none; }
   .hero-sub { max-width: 100%; font-size: 15px; }
-  .hero-subtitle { max-width: 100%; }
   .hero h1 { font-size: clamp(2rem, 8vw, 2.8rem); }
 }
 
-/* ─── FEATURE BAR ─── */
+/* FEATURE BAR */
 .feature-bar {
   border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
   padding: 18px 24px; background: var(--ink-2);
@@ -233,13 +221,12 @@ section[id], #hero { scroll-margin-top: 96px; }
   border: 1px solid var(--border); background: var(--ink-2);
 }
 .feature-pill .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
-.feature-pill .dot.green { background: #10B981; }
+.feature-pill .dot.green { background: var(--green); }
+.feature-pill .dot.red { background: var(--red); }
 .feature-bar-sep { color: var(--ink-4); font-size: 14px; }
 
-/* ─── PROBLEM ─── */
-.problem-section {
-  padding: 100px 24px;
-}
+/* PROBLEM */
+.problem-section { padding: 100px 24px; }
 .problem-inner { max-width: 680px; margin: 0 auto; text-align: center; }
 .problem-inner .section-title { margin-bottom: 24px; }
 .problem-body {
@@ -247,14 +234,9 @@ section[id], #hero { scroll-margin-top: 96px; }
   display: flex; flex-direction: column; gap: 16px;
 }
 .problem-body strong { color: var(--text); }
-.problem-cta { margin-top: 36px; display: flex; justify-content: center; }
-
-/* Instancia clara — "el problema": ruptura tonal contra el hero oscuro. */
 .problem-section--light { background: var(--paper); color: var(--paper-ink); }
 .problem-section--light .problem-body { color: var(--paper-ink-2); }
 .problem-section--light .problem-body strong { color: var(--paper-ink); }
-
-/* Instancia acento — "iteración incluida": el momento de marca a todo color. */
 .problem-section--accent { background: var(--orange); color: #fff; position: relative; overflow: hidden; }
 .problem-section--accent::before {
   content: ''; position: absolute; inset: 0;
@@ -267,7 +249,7 @@ section[id], #hero { scroll-margin-top: 96px; }
 .problem-section--accent .problem-body { color: rgba(255,255,255,0.85); }
 .problem-section--accent .problem-body strong { color: #fff; }
 
-/* ─── STEPS ─── */
+/* STEPS */
 .steps-section { padding: 80px 24px; }
 .steps-inner { max-width: 1100px; margin: 0 auto; }
 .steps-header { text-align: center; margin-bottom: 48px; }
@@ -303,114 +285,135 @@ section[id], #hero { scroll-margin-top: 96px; }
   display: inline-block; margin-top: 12px;
   font-size: 10px; color: var(--text-3); font-style: italic;
 }
-.step-tag {
-  display: inline-block; margin-top: 10px;
-  font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-  padding: 2px 7px; border-radius: 5px;
-  background: var(--orange-dim); color: var(--orange); border: 1px solid var(--border-warm);
-}
 
-/* ─── STACK POR DEFAULT ─── */
-.stack-section { padding: 80px 24px; }
-.stack-inner { max-width: 1000px; margin: 0 auto; }
-.stack-header { text-align: center; margin-bottom: 40px; }
-.stack-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-@media (max-width: 760px) { .stack-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 420px) { .stack-grid { grid-template-columns: 1fr; } }
-.stack-card {
+/* DECISION DEMO */
+.decision-section { padding: 80px 24px; }
+.decision-inner { max-width: 900px; margin: 0 auto; }
+.decision-header { text-align: center; margin-bottom: 48px; }
+.decision-demo {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+  max-width: 800px; margin: 0 auto;
+}
+@media (max-width: 640px) { .decision-demo { grid-template-columns: 1fr; } }
+
+.decision-card {
   background: var(--ink-2); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 20px 16px;
+  border-radius: var(--r); padding: 24px 20px;
   transition: border-color var(--tr), transform var(--tr);
 }
-.stack-card:hover { border-color: var(--border-warm); transform: translateY(-2px); }
-.stack-icon {
-  width: 32px; height: 32px; margin-bottom: 14px; color: var(--text);
-  display: flex; align-items: center; justify-content: center; font-size: 32px;
-}
-.stack-icon svg { width: 100%; height: 100%; }
-.stack-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
-.stack-card p { font-size: 11.5px; color: var(--text-2); line-height: 1.55; }
-.stack-note {
-  text-align: center; font-size: 11px; color: var(--text-3); font-style: italic;
-  margin-top: 40px;
-}
-.stack-visual {
-  display: flex; align-items: flex-start; gap: 16px; margin-top: 32px;
-  background: var(--orange-dim); border: 1px solid var(--border-warm);
-  border-radius: var(--r); padding: 20px 22px;
-}
-.stack-visual-icon { font-size: 24px; flex-shrink: 0; line-height: 1; margin-top: 2px; }
-.stack-visual h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
-.stack-visual p { font-size: 12.5px; color: var(--text-2); line-height: 1.6; }
+.decision-card:hover { transform: translateY(-2px); }
+.decision-card.build { border-color: rgba(16,185,129,0.3); }
+.decision-card.build:hover { border-color: rgba(16,185,129,0.5); }
+.decision-card.rethink { border-color: rgba(245,158,11,0.3); }
+.decision-card.rethink:hover { border-color: rgba(245,158,11,0.5); }
+.decision-card.dont { border-color: rgba(239,68,68,0.3); }
+.decision-card.dont:hover { border-color: rgba(239,68,68,0.5); }
 
-/* ─── SEMÁFORO ─── */
-.sema-section { padding: 80px 24px; background: var(--paper); color: var(--paper-ink); }
-.sema-inner { max-width: 900px; margin: 0 auto; }
-.sema-header { text-align: center; margin-bottom: 48px; }
-.sema-header .section-sub { color: var(--paper-ink-2); }
-.sema-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-@media (max-width: 640px) { .sema-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 400px) { .sema-grid { grid-template-columns: 1fr; } }
-
-.sema-card {
-  background: #fff; border: 1px solid var(--paper-border);
-  border-radius: var(--r); padding: 18px 16px;
-  transition: border-color var(--tr), transform var(--tr);
-}
-.sema-card:hover { border-color: rgba(124,58,237,0.35); transform: translateY(-2px); }
-.sema-icon { width: 24px; height: 24px; margin-bottom: 10px; display: block; flex-shrink: 0; }
-.sema-icon svg { width: 100%; height: 100%; }
-.sema-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; color: var(--paper-ink); }
-.sema-card p { font-size: 11px; color: var(--paper-ink-2); line-height: 1.55; }
-.sema-tag {
-  display: inline-block; margin-top: 8px;
-  font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-  padding: 2px 6px; border-radius: 4px;
-}
-.sema-tag.block { background: rgba(239,68,68,0.12); color: #EF4444; border: 1px solid rgba(239,68,68,0.25); }
-.sema-tag.warn  { background: rgba(245,158,11,0.12); color: #F59E0B; border: 1px solid rgba(245,158,11,0.25); }
-.sema-cta { text-align: center; margin-top: 36px; }
-
-/* ─── ROUTES ─── */
-.routes-section { padding: 80px 24px; }
-.routes-inner { max-width: 900px; margin: 0 auto; }
-.routes-header { text-align: center; margin-bottom: 48px; }
-.routes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 600px) { .routes-grid { grid-template-columns: 1fr; } }
-
-.route-card {
-  background: var(--ink-2); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 28px 24px; position: relative; overflow: hidden;
-  transition: border-color var(--tr), transform var(--tr);
-}
-.route-card:hover { transform: translateY(-2px); }
-.route-card.paid { border-color: rgba(139,92,246,0.3); }
-.route-card.paid:hover { border-color: rgba(139,92,246,0.5); }
-.route-card.free { border-color: rgba(16,185,129,0.3); }
-.route-card.free:hover { border-color: rgba(16,185,129,0.5); }
-.route-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-}
-.route-card.paid::before { background: linear-gradient(to right, #8B5CF6, transparent); }
-.route-card.free::before { background: linear-gradient(to right, #10B981, transparent); }
-
-.route-badge {
-  display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: 0.1em;
+.decision-label {
+  display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
   text-transform: uppercase; padding: 3px 9px; border-radius: 6px; margin-bottom: 14px;
 }
-.route-badge.paid { background: rgba(139,92,246,0.15); color: #8B5CF6; border: 1px solid rgba(139,92,246,0.3); }
-.route-badge.free { background: rgba(16,185,129,0.15); color: #10B981; border: 1px solid rgba(16,185,129,0.3); }
+.decision-label.build { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+.decision-label.rethink { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+.decision-label.dont { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
 
-.route-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-.route-card p { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-bottom: 18px; }
-.route-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
-.route-list li {
-  display: flex; align-items: flex-start; gap: 8px;
-  font-size: 12px; color: var(--text-2); line-height: 1.45;
+.decision-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+.decision-card p { font-size: 12px; color: var(--text-2); line-height: 1.6; margin-bottom: 8px; }
+.decision-field { margin-bottom: 12px; }
+.decision-field-label { font-size: 10px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+.decision-field-value { font-size: 12px; color: var(--text); line-height: 1.5; }
+
+/* CAN SAY NO */
+.sayan-section {
+  padding: 80px 24px;
+  background: var(--ink-2);
 }
-.route-list li::before { content: '✓'; color: var(--orange); font-weight: 700; flex-shrink: 0; margin-top: 0.5px; }
+.sayan-inner { max-width: 700px; margin: 0 auto; text-align: center; }
+.sayan-quote {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-weight: 700; letter-spacing: -0.03em;
+  line-height: 1.2; margin-bottom: 20px;
+  text-wrap: balance;
+}
+.sayan-sub { font-size: 15px; color: var(--text-2); line-height: 1.7; max-width: 520px; margin: 0 auto; }
 
-/* ─── PRICING ─── */
+/* WHAT YOU SAVE */
+.save-section { padding: 80px 24px; }
+.save-inner { max-width: 900px; margin: 0 auto; }
+.save-header { text-align: center; margin-bottom: 48px; }
+.save-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 640px) { .save-grid { grid-template-columns: 1fr; } }
+.save-card {
+  background: var(--ink-2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 20px 16px; text-align: center;
+  transition: border-color var(--tr), transform var(--tr);
+}
+.save-card:hover { border-color: var(--border-warm); transform: translateY(-2px); }
+.save-icon { font-size: 28px; margin-bottom: 12px; }
+.save-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+.save-card p { font-size: 11px; color: var(--text-2); line-height: 1.55; }
+
+/* CLAUDE CODE INTEGRATION */
+.claude-section { padding: 80px 24px; background: var(--ink-2); }
+.claude-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+}
+.claude-desc { font-size: 16px; color: var(--text-2); line-height: 1.65; margin: 16px 0 24px; max-width: 420px; }
+.claude-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border); }
+.claude-tab-btn {
+  padding: 8px 16px; font-size: 12px; font-weight: 600; color: var(--text-3);
+  background: none; border: none; border-bottom: 2px solid transparent;
+  cursor: pointer; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s;
+  font-family: inherit; letter-spacing: 0.03em;
+}
+.claude-tab-btn.active { color: var(--orange); border-bottom-color: var(--orange); }
+.claude-tab-btn:hover:not(.active) { color: var(--text-2); }
+.claude-tab-panel { display: none; }
+.claude-tab-panel.active { display: block; }
+.claude-code {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 0 0 10px 10px; padding: 16px 18px; font-family: monospace; font-size: 11px;
+  color: #888; line-height: 1.8; overflow-x: auto; margin-bottom: 16px;
+}
+.claude-code.rounded { border-radius: 10px; margin-top: 10px; }
+.claude-install-wrap {
+  border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 16px;
+}
+.claude-install-wrap .claude-tabs { border-bottom: 1px solid var(--border); padding: 0 4px; background: rgba(255,255,255,0.02); }
+
+.claude-mockup { border-radius: 14px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+.mock-header {
+  display: flex; align-items: center; gap: 6px; padding: 10px 14px;
+  background: var(--ink); border-bottom: 1px solid var(--border);
+}
+.mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+.mock-dot.red { background: #ef4444; }
+.mock-dot.yellow { background: #f59e0b; }
+.mock-dot.green { background: #22c55e; }
+.mock-title { margin-left: 6px; font-size: 11px; font-weight: 600; color: var(--text-3); letter-spacing: 0.04em; }
+.mock-body { padding: 16px; background: var(--ink-2); display: flex; flex-direction: column; gap: 12px; }
+.mock-user-msg, .mock-claude-msg { display: flex; gap: 10px; align-items: flex-start; }
+.mock-avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+.user-av { background: #7c3aed; color: #fff; }
+.claude-av { background: #d97706; color: #fff; }
+.mock-bubble { font-size: 12px; line-height: 1.5; color: var(--text-2); background: var(--ink); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; }
+.user-bubble { background: rgba(124,58,237,0.1); border-color: rgba(124,58,237,0.2); }
+.mock-claude-content { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.mock-tool-call {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 10px; font-size: 11px; font-family: 'Space Grotesk', monospace;
+}
+.tool-icon { font-size: 10px; opacity: 0.6; }
+.tool-name { color: var(--orange); font-weight: 600; }
+.tool-sep { color: var(--text-3); }
+.tool-method { color: var(--text-2); }
+.tool-spinner { margin-left: auto; width: 10px; height: 10px; border: 1.5px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* PRICING */
 .pricing-section { padding: 80px 24px; background: var(--paper); color: var(--paper-ink); }
 .pricing-inner { max-width: 900px; margin: 0 auto; }
 .pricing-header { text-align: center; margin-bottom: 12px; }
@@ -472,45 +475,6 @@ section[id], #hero { scroll-margin-top: 96px; }
 }
 .plan-cta.secondary:hover { border-color: rgba(22,20,28,0.28); color: var(--paper-ink); }
 
-.byo-api-wrap { margin-top: 40px; }
-.byo-api-eyebrow {
-  text-align: center; font-size: 12px; font-weight: 700; color: var(--paper-ink-2);
-  margin-bottom: 14px;
-}
-.byo-api-card {
-  background: var(--ink); color: var(--text); border: 1px solid var(--border-warm);
-  border-radius: var(--r); padding: 32px; position: relative; overflow: hidden;
-  display: grid; grid-template-columns: 1fr auto; gap: 28px; align-items: center;
-}
-.byo-api-card::before {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(ellipse 420px 260px at 100% 0%, rgba(124,58,237,0.22), transparent);
-}
-@media (max-width: 700px) { .byo-api-card { grid-template-columns: 1fr; padding: 24px; } }
-.byo-api-badge {
-  display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
-  background: var(--orange-dim); color: var(--orange); border: 1px solid var(--border-warm);
-  border-radius: 6px; padding: 3px 8px; margin-bottom: 12px;
-}
-.byo-api-card h3 {
-  font-family: 'Space Grotesk', system-ui, sans-serif;
-  font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; color: var(--text);
-}
-.byo-api-sub { font-size: 12.5px; color: var(--orange); font-weight: 700; margin-bottom: 10px; }
-.byo-api-card > div:first-child > p { font-size: 13.5px; color: var(--text-2); line-height: 1.6; margin-bottom: 14px; max-width: 480px; }
-.byo-api-bullets { list-style: none; display: flex; flex-direction: column; gap: 7px; }
-.byo-api-bullets li { font-size: 12.5px; color: var(--text-2); line-height: 1.5; display: flex; gap: 8px; }
-.byo-api-bullets li::before { content: '✓'; color: var(--orange); font-weight: 700; flex-shrink: 0; }
-.byo-api-cta-col { text-align: center; }
-.byo-api-price { font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 40px; font-weight: 700; letter-spacing: -0.03em; color: var(--text); line-height: 1; }
-.byo-api-price-note { font-size: 11px; color: var(--text-3); margin: 4px 0 16px; }
-.byo-api-cta {
-  display: inline-block; white-space: nowrap; background: var(--orange); color: #fff;
-  padding: 13px 22px; border-radius: 100px; font-size: 13px; font-weight: 700;
-  transition: background var(--tr), transform var(--tr);
-}
-.byo-api-cta:hover { background: #6c32ce; transform: translateY(-1px); }
-
 .pricing-free {
   margin-top: 40px; text-align: center; padding: 18px 20px;
   background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25);
@@ -526,110 +490,14 @@ section[id], #hero { scroll-margin-top: 96px; }
 .pricing-welcome strong { color: var(--orange); }
 .pricing-welcome p { font-size: 13px; color: var(--paper-ink-2); line-height: 1.6; }
 
-/* ─── SKILL SECTION ─── */
-.skill-section { padding: 80px 24px; background: var(--ink-2); }
-.skill-inner {
-  max-width: 1100px; margin: 0 auto;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+/* FAQ */
+.faq-section { padding: 80px 24px; background: var(--paper); color: var(--paper-ink); position: relative; overflow: hidden; }
+.faq-section::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: url('ccb_logo_v11.png');
+  background-size: cover; background-position: center; background-repeat: no-repeat;
+  opacity: 0.5; pointer-events: none;
 }
-.skill-eyebrow { color: #22c55e; display: inline-block; }
-.skill-desc { font-size: 16px; color: var(--text-2); line-height: 1.65; margin: 16px 0 24px; max-width: 420px; }
-.skill-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border); }
-.skill-tab-btn {
-  padding: 8px 16px; font-size: 12px; font-weight: 600; color: var(--text-3);
-  background: none; border: none; border-bottom: 2px solid transparent;
-  cursor: pointer; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s;
-  font-family: inherit; letter-spacing: 0.03em;
-}
-.skill-tab-btn.active { color: var(--orange); border-bottom-color: var(--orange); }
-.skill-tab-btn:hover:not(.active) { color: var(--text-2); }
-.skill-tab-panel { display: none; }
-.skill-tab-panel.active { display: block; }
-.skill-code {
-  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-  border-radius: 0 0 10px 10px; padding: 16px 18px; font-family: monospace; font-size: 11px;
-  color: #888; line-height: 1.8; overflow-x: auto; margin-bottom: 16px;
-}
-.skill-code.rounded { border-radius: 10px; margin-top: 10px; }
-.skill-code .comment { color: var(--text-3); }
-.skill-code .cmd { color: #22c55e; }
-.skill-code .flag { color: var(--orange); }
-.skill-install-wrap {
-  border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 16px;
-}
-.skill-install-wrap .skill-tabs { border-bottom: 1px solid var(--border); padding: 0 4px; background: rgba(255,255,255,0.02); }
-.skill-cta-dl {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 11px 22px; border-radius: 8px;
-  background: var(--orange); color: #fff !important; font-size: 14px; font-weight: 600;
-  text-decoration: none; transition: opacity var(--tr); margin-bottom: 16px;
-}
-.skill-cta-dl:hover { opacity: 0.85; }
-.skill-cta-dl-note { font-size: 11px; color: var(--text-3); margin-bottom: 16px; }
-.skill-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-.skill-cta-primary {
-  display: inline-block; padding: 12px 24px; border-radius: 8px;
-  background: var(--orange); color: #fff !important; font-size: 14px; font-weight: 600;
-  text-decoration: none; transition: opacity var(--tr);
-}
-.skill-cta-primary:hover { opacity: 0.85; }
-.skill-cta-ghost {
-  display: inline-block; padding: 12px 24px; border-radius: 8px;
-  background: transparent; border: 1px solid rgba(255,255,255,0.15);
-  color: var(--text-2); font-size: 14px; font-weight: 600; text-decoration: none;
-  transition: border-color var(--tr), color var(--tr);
-}
-.skill-cta-ghost:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
-.skill-step-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); display: block; padding: 12px 18px 4px; }
-
-/* Skill mockup */
-.skill-mockup { border-radius: 14px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
-.mock-header {
-  display: flex; align-items: center; gap: 6px; padding: 10px 14px;
-  background: var(--ink); border-bottom: 1px solid var(--border);
-}
-.mock-dot { width: 10px; height: 10px; border-radius: 50%; }
-.mock-dot.red { background: #ef4444; }
-.mock-dot.yellow { background: #f59e0b; }
-.mock-dot.green { background: #22c55e; }
-.mock-title { margin-left: 6px; font-size: 11px; font-weight: 600; color: var(--text-3); letter-spacing: 0.04em; }
-.mock-body { padding: 16px; background: var(--ink-2); display: flex; flex-direction: column; gap: 12px; }
-.mock-user-msg, .mock-claude-msg { display: flex; gap: 10px; align-items: flex-start; }
-.mock-avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
-.user-av { background: #7c3aed; color: #fff; }
-.claude-av { background: #d97706; color: #fff; }
-.mock-bubble { font-size: 12px; line-height: 1.5; color: var(--text-2); background: var(--ink); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; }
-.user-bubble { background: rgba(124,58,237,0.1); border-color: rgba(124,58,237,0.2); }
-.mock-claude-content { display: flex; flex-direction: column; gap: 6px; flex: 1; }
-.mock-tool-call {
-  display: flex; align-items: center; gap: 5px;
-  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-  border-radius: 6px; padding: 5px 10px; font-size: 11px; font-family: 'Space Grotesk', monospace;
-}
-.tool-icon { font-size: 10px; opacity: 0.6; }
-.tool-name { color: var(--orange); font-weight: 600; }
-.tool-sep { color: var(--text-3); }
-.tool-method { color: var(--text-2); }
-.tool-spinner { margin-left: auto; width: 10px; height: 10px; border: 1.5px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.tool-done { opacity: 0.6; }
-.tool-check { margin-left: auto; color: #22c55e; font-size: 12px; }
-.mock-claudemd { border: 1px solid rgba(251,191,36,0.25); border-radius: 8px; overflow: hidden; }
-.claudemd-header { display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: rgba(251,191,36,0.08); border-bottom: 1px solid rgba(251,191,36,0.15); }
-.claudemd-icon { font-size: 12px; }
-.claudemd-filename { font-size: 11px; font-weight: 600; color: #fbbf24; font-family: 'Space Grotesk', monospace; }
-.claudemd-content { padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; }
-.md-line { font-size: 10.5px; line-height: 1.5; font-family: 'Space Grotesk', monospace; }
-.md-h1 { color: var(--text); font-weight: 700; }
-.md-h2 { color: var(--text-2); font-weight: 600; margin-top: 4px; }
-.md-body { color: var(--text-3); }
-.md-fade { color: var(--border); }
-@media (max-width: 768px) {
-  .skill-inner { grid-template-columns: 1fr; gap: 36px; }
-}
-
-/* ─── FAQ ─── */
-.faq-section { padding: 80px 24px; background: var(--paper); color: var(--paper-ink); }
 .faq-inner { max-width: 700px; margin: 0 auto; }
 .faq-header { text-align: center; margin-bottom: 40px; }
 .faq-list { display: flex; flex-direction: column; gap: 12px; }
@@ -647,7 +515,7 @@ details[open] .faq-q::after { content: '–'; }
 .faq-a { padding: 0 20px 18px; font-size: 13px; color: var(--paper-ink-2); line-height: 1.7; }
 .faq-a code { background: var(--paper-2); padding: 1px 5px; border-radius: 4px; font-size: 12px; color: var(--paper-ink); }
 
-/* ─── CTA FINAL ─── */
+/* CTA FINAL */
 .cta-section { padding: 80px 24px 120px; }
 .cta-inner {
   max-width: 600px; margin: 0 auto; text-align: center;
@@ -672,7 +540,7 @@ details[open] .faq-q::after { content: '–'; }
 .cta-inner .btn-ghost { color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.35); }
 .cta-inner .btn-ghost:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
 
-/* ─── FOOTER ─── */
+/* FOOTER */
 footer {
   border-top: 1px solid var(--border);
   padding: 28px 24px;
@@ -692,87 +560,6 @@ footer {
 .footer-kitifica:hover { opacity: 0.7; }
 .footer-kitifica svg { display: block; }
 
-/* ─── APP DIRECTA ─── */
-.appdirecta-section {
-  padding: 90px 24px;
-  background: linear-gradient(to bottom, var(--ink), rgba(124,58,237,0.03) 50%, var(--ink));
-  border-top: 1px solid var(--border);
-}
-.appdirecta-inner { max-width: 860px; margin: 0 auto; text-align: center; }
-.appdirecta-logo-link {
-  display: inline-block; margin-bottom: 24px;
-  opacity: 0.92; transition: opacity var(--tr);
-}
-.appdirecta-logo-link img { display: block; width: 100px; height: 100px; }
-.appdirecta-logo-link:hover { opacity: 1; }
-.appdirecta-kicker {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--orange); display: block; margin-bottom: 14px;
-}
-.appdirecta-title {
-  font-family: 'Space Grotesk', system-ui, sans-serif;
-  font-size: clamp(1.7rem, 4vw, 2.4rem); font-weight: 700; letter-spacing: -0.03em;
-  line-height: 1.1; text-wrap: balance; margin-bottom: 18px;
-}
-.appdirecta-desc {
-  font-size: 16px; color: var(--text-2); line-height: 1.75;
-  max-width: 580px; margin: 0 auto 44px;
-}
-.appdirecta-feats {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
-  margin-bottom: 36px; text-align: left;
-}
-@media (max-width: 560px) { .appdirecta-feats { grid-template-columns: 1fr; } }
-.appdirecta-feat {
-  display: flex; align-items: flex-start; gap: 14px;
-  background: var(--ink-2); border: 1px solid var(--border);
-  border-radius: 14px; padding: 18px 16px;
-  transition: border-color var(--tr);
-}
-.appdirecta-feat:hover { border-color: var(--border-warm); }
-.appdirecta-feat-icon {
-  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
-  background: var(--orange-dim); border: 1px solid var(--border-warm);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--orange);
-}
-.appdirecta-feat-icon svg { width: 18px; height: 18px; }
-.appdirecta-feat-body h4 { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
-.appdirecta-feat-body p { font-size: 12px; color: var(--text-2); line-height: 1.5; }
-
-/* ─── METODOLOGÍA ─── */
-.metodo-section { padding: 80px 24px; }
-.metodo-inner { max-width: 1000px; margin: 0 auto; }
-.metodo-header { text-align: center; margin-bottom: 16px; }
-.metodo-intro {
-  text-align: center; font-size: 15px; color: var(--text-2);
-  line-height: 1.75; max-width: 600px; margin: 0 auto 44px;
-}
-.metodo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
-@media (max-width: 640px) { .metodo-grid { grid-template-columns: 1fr; } }
-.metodo-card {
-  background: var(--ink-2); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 22px 20px;
-  transition: border-color var(--tr), transform var(--tr);
-}
-.metodo-card:hover { border-color: var(--border-warm); transform: translateY(-2px); }
-.metodo-fail {
-  font-size: 9px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
-  color: #EF4444; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
-  border-radius: 5px; padding: 2px 8px; display: inline-block; margin-bottom: 12px;
-}
-.metodo-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
-.metodo-card p { font-size: 12px; color: var(--text-2); line-height: 1.6; }
-.metodo-fix {
-  margin-top: 12px; font-size: 11px; color: var(--orange);
-  font-weight: 600; display: flex; align-items: center; gap: 5px;
-}
-.metodo-note {
-  text-align: center; font-size: 14px; color: var(--text-2);
-  padding: 20px 24px; background: var(--ink-2); border: 1px solid var(--border-warm);
-  border-radius: 12px; line-height: 1.65;
-}
-.metodo-note strong { color: var(--text); }
 .sec-icon {
   display: inline-flex; align-items: center; justify-content: center;
   width: 52px; height: 52px; border-radius: 16px;
@@ -780,16 +567,8 @@ footer {
   margin-bottom: 18px; color: var(--orange);
 }
 .sec-icon svg { width: 28px; height: 28px; }
-.cta-logo { display: inline-flex; width: 60px; height: 60px; border-radius: 16px; overflow: hidden; margin-bottom: 18px; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
-.cta-logo svg { width: 100%; height: 100%; display: block; }
 .step-icon { color: var(--orange); margin-bottom: 8px; }
 .step-icon svg { width: 22px; height: 22px; }
-.metodo-icon { color: var(--orange); margin-bottom: 10px; line-height: 1; }
-.metodo-icon svg { width: 20px; height: 20px; }
-.plan-icon { color: var(--orange); margin-bottom: 12px; line-height: 1; }
-.plan-icon svg { width: 24px; height: 24px; }
-.route-icon { color: var(--orange); margin-bottom: 14px; line-height: 1; }
-.route-icon svg { width: 28px; height: 28px; }
 </style>
 
 <div class="hero-bg"></div>
@@ -821,37 +600,31 @@ footer {
   </div>
   <div class="nav-links">
     <a href="#como-funciona" class="nav-link">Cómo funciona</a>
+    <a href="#decision" class="nav-link">La decisión</a>
     <a href="#precios" class="nav-link">Precios</a>
-    <a href="#app-directa" class="nav-link">App Directa</a>
     <a href="#faq" class="nav-link">FAQ</a>
   </div>
-  <a href="https://ccbrew.kitifica.com" class="nav-cta">Estructurar mi idea →</a>
+  <a href="https://ccbrew.kitifica.com" class="nav-cta">Evaluar mi idea →</a>
 </nav>
 
 <!-- HERO -->
 <section class="hero" id="hero">
   <div class="hero-left">
-    <span class="eyebrow" style="margin-bottom:10px;">Para equipos de marketing y ventas</span>
     <div class="hero-badge">
       <div class="hero-badge-dot"><div class="hero-badge-pulse"></div></div>
       Gratis con Claude Code · Planes desde $4
     </div>
 
-    <h1>De una idea a un proyecto listo para construir.<br><span style="color:var(--orange)">Valídala antes de escribir una línea de código.</span></h1>
+    <h1>Antes de construir,<br><span class="accent">preguntate si vale la pena.</span></h1>
 
     <p class="hero-sub">
-      CC Brew estructura tu idea, define qué debe convencer a tu cliente y genera un CLAUDE.md listo para construir con IA.
+      IA hace que construir sea barato. Pero construir la cosa equivocada también. CC Brew desafía tu idea antes de que Claude Code pierda tiempo en ella.
     </p>
 
     <div class="hero-actions">
-      <a href="https://ccbrew.kitifica.com" class="btn btn-primary">Estructurar mi idea gratis →</a>
-      <a href="#precios" class="btn btn-ghost">Ver precios → desde $4</a>
+      <a href="https://ccbrew.kitifica.com" class="btn btn-primary">Evaluar mi idea gratis →</a>
+      <a href="#como-funciona" class="btn btn-ghost">Cómo funciona →</a>
     </div>
-    <a href="https://kitifica.com/validador/" target="_blank" rel="noopener" class="hero-cert">
-      <span class="hero-cert-check">✓</span>
-      <span class="hero-cert-label">Kitifica Certificada</span>
-      <span class="hero-cert-scores">99 Performance · 100 SEO · PWA</span>
-    </a>
   </div>
 
   <div class="hero-right" aria-hidden="true">
@@ -874,13 +647,13 @@ footer {
 <!-- FEATURE BAR -->
 <div class="feature-bar">
   <div class="feature-bar-inner">
-    <span class="feature-pill"><span class="dot" style="background:#8B5CF6"></span>Celular o laptop · donde se te ocurra</span>
-    <span class="feature-bar-sep">·</span>
+    <span class="feature-pill"><span class="dot red"></span>Puede decir "no construyas esto"</span>
+    <span class="feature-pill-sep">·</span>
+    <span class="feature-pill"><span class="dot"></span>10 criterios de evaluación</span>
+    <span class="feature-pill-sep">·</span>
     <span class="feature-pill"><span class="dot green"></span>Gratis con Claude Code</span>
-    <span class="feature-bar-sep">·</span>
-    <span class="feature-pill"><span class="dot"></span>6 criterios de validación</span>
-    <span class="feature-bar-sep">·</span>
-    <span class="feature-pill"><span class="dot"></span>Sin vencimiento</span>
+    <span class="feature-pill-sep">·</span>
+    <span class="feature-pill"><span class="dot"></span>5-10 minutos de reflexión</span>
   </div>
 </div>
 
@@ -888,15 +661,12 @@ footer {
 <section class="problem-section problem-section--light">
   <div class="problem-inner">
     <div class="sec-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M5.31171 10.7615C8.23007 5.58716 9.68925 3 12 3C14.3107 3 15.7699 5.58716 18.6883 10.7615L19.0519 11.4063C21.4771 15.7061 22.6897 17.856 21.5937 19.428C20.4978 21 17.7864 21 12.3637 21H11.6363C6.21356 21 3.50217 21 2.40626 19.428C1.31034 17.856 2.52291 15.7061 4.94805 11.4063L5.31171 10.7615ZM12 7.25C12.4142 7.25 12.75 7.58579 12.75 8V13C12.75 13.4142 12.4142 13.75 12 13.75C11.5858 13.75 11.25 13.4142 11.25 13V8C11.25 7.58579 11.5858 7.25 12 7.25ZM12 17C12.5523 17 13 16.5523 13 16C13 15.4477 12.5523 15 12 15C11.4477 15 11 15.4477 11 16C11 16.5523 11.4477 17 12 17Z" clip-rule="evenodd"/></svg></div>
-    <span class="eyebrow">Por qué una plantilla genérica no convence a nadie</span>
-    <h2 class="section-title">Las herramientas todo-en-uno te <em style="font-style:normal;color:var(--orange);">alquilan</em> una plantilla. CC Brew te da algo que es tuyo.</h2>
+    <span class="eyebrow">El problema</span>
+    <h2 class="section-title">Construir nunca fue tan fácil. <span style="color:var(--orange)">El problema es saber qué vale la pena construir.</span></h2>
     <div class="problem-body">
-      <p>Los editores cerrados te encajan en sus bloques, integraciones y forma de trabajar. El resultado se parece al de cualquier otro usuario de la plataforma.</p>
-      <p>CC Brew es diferente: antes de construir, le entrega a Claude Code tu marca, tu cliente, tu objetivo y la reacción que buscas. Claude Code construye con <strong>libertad total de stack e integraciones</strong>.</p>
-      <p>Sin plantillas. Sin semanas de desarrollo. Sin depender de una plataforma para evolucionar.</p>
-    </div>
-    <div class="problem-cta">
-      <a href="https://ccbrew.kitifica.com" class="btn btn-primary" style="font-size:14px;padding:13px 26px;">Estructurar mi próxima idea →</a>
+      <p>Antes, construir software era caro. Tomaba semanas, costaba miles de dólares, y por eso pensabas dos veces antes de empezar.</p>
+      <p><strong>Ahora construir es barato.</strong> Claude Code puede generar una app en minutos. Pero tu tiempo no se volvió barato. Y construir la cosa equivocada sigue siendo una pérdida enorme.</p>
+      <p><strong>CC Brew existe para esa pausa inteligente</strong> — el momento entre "se me ocurrió algo" y "voy a construirlo" donde descubrís si realmente vale la pena.</p>
     </div>
   </div>
 </section>
@@ -906,423 +676,158 @@ footer {
   <div class="steps-inner">
     <div class="steps-header">
       <span class="eyebrow">Cómo funciona</span>
-      <h2 class="section-title">Tres minutos. Unas preguntas. Un CLAUDE.md que Claude Code entiende.</h2>
-      <p class="section-sub" style="margin:14px auto 0;text-align:center;">Sin formularios, sin estructura forzada. Solo tú explicando tu idea.</p>
+      <h2 class="section-title">Cinco minutos que pueden ahorrarte días.</h2>
+      <p class="section-sub" style="margin:14px auto 0;text-align:center;">No es un formulario largo. Es una conversación corta que desafía tu idea.</p>
     </div>
 
     <div class="steps-track">
       <div class="step-card highlight">
         <div class="step-num"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><path fill-rule="evenodd" d="M3.25 22C3.25 21.5858 3.58579 21.25 4 21.25H20C20.4142 21.25 20.75 21.5858 20.75 22C20.75 22.4142 20.4142 22.75 20 22.75H4C3.58579 22.75 3.25 22.4142 3.25 22Z" clip-rule="evenodd"/><path d="M11.5201 14.929L11.5201 14.9289L17.4368 9.01225C16.6315 8.6771 15.6777 8.12656 14.7757 7.22455C13.8736 6.32238 13.323 5.36846 12.9879 4.56312L7.07106 10.4799L7.07101 10.48C6.60932 10.9417 6.37846 11.1725 6.17992 11.4271C5.94571 11.7273 5.74491 12.0522 5.58107 12.396C5.44219 12.6874 5.33894 12.9972 5.13245 13.6167L4.04356 16.8833C3.94194 17.1882 4.02128 17.5243 4.2485 17.7515C4.47573 17.9787 4.81182 18.0581 5.11667 17.9564L8.38334 16.8676C9.00281 16.6611 9.31256 16.5578 9.60398 16.4189C9.94775 16.2551 10.2727 16.0543 10.5729 15.8201C10.8275 15.6215 11.0584 15.3907 11.5201 14.929Z"/><path d="M19.0786 7.37044C20.3071 6.14188 20.3071 4.14999 19.0786 2.92142C17.85 1.69286 15.8581 1.69286 14.6296 2.92142L13.9199 3.63105C13.9296 3.6604 13.9397 3.69015 13.9502 3.72028C14.2103 4.47 14.701 5.45281 15.6243 6.37602C16.5475 7.29923 17.5303 7.78999 18.28 8.05009C18.31 8.0605 18.3396 8.07054 18.3688 8.08021L19.0786 7.37044Z"/></g></svg></div>
-        <h3>Escribe tu idea</h3>
-        <p>Sin estructura, sin límites. Contale a la IA qué querés lograr — y, si querés, quién es tu cliente y cómo es tu marca. La IA adapta las preguntas a tu idea, no al revés.</p>
-        <span class="step-result">→ Cuestionario personalizado en segundos</span>
+        <h3>Contale tu idea</h3>
+        <p>Libre, sin estructura. Explicá qué querés construir, para quién, y qué problema creés que resuelve.</p>
+        <span class="step-result">→ La IA afina y detecta supuestos</span>
       </div>
 
       <div class="step-card">
         <div class="step-num"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 13.5997 2.37562 15.1116 3.04346 16.4525C3.22094 16.8088 3.28001 17.2161 3.17712 17.6006L2.58151 19.8267C2.32295 20.793 3.20701 21.677 4.17335 21.4185L6.39939 20.8229C6.78393 20.72 7.19121 20.7791 7.54753 20.9565C8.88836 21.6244 10.4003 22 12 22Z"/></svg></div>
-        <h3>Responde unas preguntas</h3>
-        <p>Opción múltiple, sin texto libre. Cubre el recorrido del cliente, alcance v1, restricciones y qué reacción esperás de él. Menos de un minuto — o dejá que la IA responda por vos.</p>
-        <span class="step-result">→ Si la idea no está lista, te pregunta antes de bloquearte</span>
+        <h3>Te cuestionamos</h3>
+        <p>Preguntas que van al punto. No un formulario largo — una interrogación adaptada a los puntos débiles de tu idea.</p>
+        <span class="step-result">→ Detectamos lo que falta o no cierra</span>
       </div>
 
       <div class="step-card highlight">
         <div class="step-num"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M4.17157 3.17157C3 4.34315 3 6.22876 3 10V14C3 17.7712 3 19.6569 4.17157 20.8284C5.34315 22 7.22876 22 11 22H13C16.7712 22 18.6569 22 19.8284 20.8284C21 19.6569 21 17.7712 21 14V10C21 6.22876 21 4.34315 19.8284 3.17157C18.6569 2 16.7712 2 13 2H11C7.22876 2 5.34315 2 4.17157 3.17157ZM7.25 8C7.25 7.58579 7.58579 7.25 8 7.25H16C16.4142 7.25 16.75 7.58579 16.75 8C16.75 8.41421 16.4142 8.75 16 8.75H8C7.58579 8.75 7.25 8.41421 7.25 8ZM7.25 12C7.25 11.5858 7.58579 11.25 8 11.25H16C16.4142 11.25 16.75 11.5858 16.75 12C16.75 12.4142 16.4142 12.75 16 12.75H8C7.58579 12.75 7.25 12.4142 7.25 12ZM8 15.25C7.58579 15.25 7.25 15.5858 7.25 16C7.25 16.4142 7.58579 16.75 8 16.75H13C13.4142 16.75 13.75 16.4142 13.75 16C13.75 15.5858 13.4142 15.25 13 15.25H8Z" clip-rule="evenodd"/></svg></div>
-        <h3>CLAUDE.md listo</h3>
-        <p>Documento con Fase 1 (qué construir ahora) y Fase 2 (visión futura, bloqueada). Cópialo o compártelo directo.</p>
-        <span class="step-result">→ Claude Code construye sin pedir aclaraciones</span>
+        <h3>Recibí tu decisión</h3>
+        <p><strong>BUILD</strong>, <strong>RETHINK</strong> o <strong>DON'T BUILD</strong> — con las razones, el mayor riesgo, y qué hacer antes de abrir Claude Code.</p>
+        <span class="step-result">→ Si vale, llevá el brief a Claude Code</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ITERACIÓN -->
-<section class="problem-section problem-section--accent">
-  <div class="problem-inner">
-    <div class="sec-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM5.46056 11.0833C5.83331 7.79988 8.62404 5.25 12.0096 5.25C14.148 5.25 16.0489 6.26793 17.2521 7.84246C17.5036 8.17158 17.4406 8.64227 17.1115 8.89376C16.7824 9.14526 16.3117 9.08233 16.0602 8.7532C15.1289 7.53445 13.6613 6.75 12.0096 6.75C9.45213 6.75 7.33639 8.63219 6.9733 11.0833H7.33652C7.63996 11.0833 7.9135 11.2662 8.02953 11.5466C8.14556 11.8269 8.0812 12.1496 7.86649 12.364L6.69823 13.5307C6.40542 13.8231 5.9311 13.8231 5.63829 13.5307L4.47003 12.364C4.25532 12.1496 4.19097 11.8269 4.30699 11.5466C4.42302 11.2662 4.69656 11.0833 5 11.0833H5.46056ZM18.3617 10.4693C18.0689 10.1769 17.5946 10.1769 17.3018 10.4693L16.1335 11.636C15.9188 11.8504 15.8545 12.1731 15.9705 12.4534C16.0865 12.7338 16.3601 12.9167 16.6635 12.9167H17.0267C16.6636 15.3678 14.5479 17.25 11.9905 17.25C10.3464 17.25 8.88484 16.4729 7.9529 15.2638C7.70002 14.9358 7.22908 14.8748 6.90101 15.1277C6.57295 15.3806 6.512 15.8515 6.76487 16.1796C7.96886 17.7416 9.86205 18.75 11.9905 18.75C15.376 18.75 18.1667 16.2001 18.5395 12.9167H19C19.3035 12.9167 19.577 12.7338 19.693 12.4534C19.8091 12.1731 19.7447 11.8504 19.53 11.636L18.3617 10.4693Z" clip-rule="evenodd"/></svg></div>
-    <span class="eyebrow">Iteración incluida</span>
-    <h2 class="section-title">Toda buena herramienta se pule antes de convencer.</h2>
-    <div class="problem-body">
-      <p>Ninguna propuesta sale perfecta a la primera. Se ajusta, se transforma, se afina hasta llegar a la versión que sí convence. CC Brew no te entrega algo cerrado — te entrega el punto de partida que Claude Code sigue puliendo con vos, en lenguaje natural, hasta llegar a esa versión final.</p>
+<!-- LA DECISIÓN -->
+<section class="decision-section" id="decision">
+  <div class="decision-inner">
+    <div class="decision-header">
+      <span class="eyebrow">Build · Rethink · Don't Build</span>
+      <h2 class="section-title">No te decimos qué construir. <span style="color:var(--orange)">Te ayudamos a decidir si vale la pena.</span></h2>
+      <p class="section-sub" style="margin:14px auto 0;text-align:center;">Cada idea recibe una evaluación honesta. Basada en lo que nos contaste, no en lo que queremos escuchar.</p>
+    </div>
+
+    <div class="decision-demo">
+      <div class="decision-card build">
+        <span class="decision-label build">BUILD</span>
+        <h3>Dashboard de métricas para restaurantes</h3>
+        <div class="decision-field">
+          <div class="decision-field-label">Señal más fuerte</div>
+          <div class="decision-field-value">Problema claro: el dueño no puede ver sus ventas en tiempo real desde el celular.</div>
+        </div>
+        <div class="decision-field">
+          <div class="decision-field-label">Mayor riesgo</div>
+          <div class="decision-field-value">La integración con el POS puede complicar la V1.</div>
+        </div>
+        <div class="decision-field">
+          <div class="decision-field-label">Antes de construir</div>
+          <div class="decision-field-value">Validá que el POS que usan tiene API pública.</div>
+        </div>
+      </div>
+
+      <div class="decision-card rethink">
+        <span class="decision-label rethink">RETHINK</span>
+        <h3>App de fitness con IA</h3>
+        <div class="decision-field">
+          <div class="decision-field-label">Señal más fuerte</div>
+          <div class="decision-field-value">El problema existe — la gente abandona rutinas genéricas.</div>
+        </div>
+        <div class="decision-field">
+          <div class="decision-field-label">Mayor riesgo</div>
+          <div class="decision-field-value">Demasiadas features en V1: nutrition tracking, video calls, AI coaching.</div>
+        </div>
+        <div class="decision-field">
+          <div class="decision-field-label">Qué cambiaría la decisión</div>
+          <div class="decision-field-value">Empezar con solo AI coaching. Sin video. Sin nutrition.</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- METODOLOGÍA -->
-<section class="metodo-section">
-  <div class="metodo-inner">
-    <div class="metodo-header">
-      <span class="eyebrow">Por qué funciona · La investigación detrás</span>
-      <h2 class="section-title">Los 3 fracasos que hacen que una herramienta no convenza — y cómo los resuelve</h2>
-    </div>
-    <p class="metodo-intro">
-      Analizamos por qué las herramientas construidas con IA no logran convencer al cliente que las ve. El patrón se repite: la herramienta funciona — pero no resuelve la objeción real, no suena a la marca, o nadie puede medir si convenció. Cada criterio del semáforo mapea a uno de estos fracasos.
+<!-- PUEDE DECIR NO -->
+<section class="sayan-section">
+  <div class="sayan-inner">
+    <span class="eyebrow">No somos tu cheerleader</span>
+    <div class="sayan-quote">CC Brew no está acá para bancar tu idea.<br><span style="color:var(--orange)">Está acá para desafiarla.</span></div>
+    <p class="sayan-sub">
+      Una buena herramienta de evaluación debe poder decirte "no construyas esto todavía". Y eso es exactamente lo que hacemos. Porque perdurar el tiempo es peor que la mala noticia.
     </p>
-    <div class="metodo-grid">
-      <div class="metodo-card">
-        <div class="metodo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M11.2479 2C6.30929 2.36618 2.36618 6.30929 2 11.2479H4.98056C5.39592 11.2479 5.73264 11.5846 5.73264 12C5.73264 12.4154 5.39592 12.7521 4.98056 12.7521H2C2.36618 17.6907 6.30929 21.6338 11.2479 22V19.0194C11.2479 18.6041 11.5846 18.2674 12 18.2674C12.4154 18.2674 12.7521 18.6041 12.7521 19.0194V22C17.6907 21.6338 21.6338 17.6907 22 12.7521H19.0194C18.6041 12.7521 18.2674 12.4154 18.2674 12C18.2674 11.5846 18.6041 11.2479 19.0194 11.2479H22C21.6338 6.30929 17.6907 2.36618 12.7521 2V4.98056C12.7521 5.39592 12.4154 5.73264 12 5.73264C11.5846 5.73264 11.2479 5.39592 11.2479 4.98056V2ZM9.24236 12C9.24236 11.5846 9.57908 11.2479 9.99444 11.2479H11.2479V9.99444C11.2479 9.57908 11.5846 9.24236 12 9.24236C12.4154 9.24236 12.7521 9.57908 12.7521 9.99444V11.2479H14.0056C14.4209 11.2479 14.7576 11.5846 14.7576 12C14.7576 12.4154 14.4209 12.7521 14.0056 12.7521H12.7521V14.0056C12.7521 14.4209 12.4154 14.7576 12 14.7576C11.5846 14.7576 11.2479 14.4209 11.2479 14.0056V12.7521H9.99444C9.57908 12.7521 9.24236 12.4154 9.24236 12Z" clip-rule="evenodd"/></svg></div>
-        <span class="metodo-fail">Sin esto → falla</span>
-        <h4>Claridad de la objeción</h4>
-        <p>Sin saber qué objeción hay que resolver, Claude Code construye "una herramienta bonita" que no ataca el precio, la confianza o la urgencia real del cliente.</p>
-        <div class="metodo-fix">↳ CC Brew la extrae antes de arrancar</div>
-      </div>
-      <div class="metodo-card">
-        <div class="metodo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><path fill-rule="evenodd" d="M10 6V18C10 19.4001 10 20.1002 9.72752 20.635C9.48783 21.1054 9.10538 21.4878 8.63498 21.7275C8.1002 22 7.40013 22 6 22C4.59987 22 3.8998 22 3.36502 21.7275C2.89462 21.4878 2.51217 21.1054 2.27248 20.635C2 20.1002 2 19.4001 2 18V6C2 4.59987 2 3.8998 2.27248 3.36502C2.51217 2.89462 2.89462 2.51217 3.36502 2.27248C3.8998 2 4.59987 2 6 2C7.40013 2 8.1002 2 8.63498 2.27248C9.10538 2.51217 9.48783 2.89462 9.72752 3.36502C10 3.8998 10 4.59987 10 6ZM7 19.75C7.41421 19.75 7.75 19.4142 7.75 19C7.75 18.5858 7.41421 18.25 7 18.25H5C4.58579 18.25 4.25 18.5858 4.25 19C4.25 19.4142 4.58579 19.75 5 19.75H7Z" clip-rule="evenodd"/><path d="M19.0599 10.6144L13.2219 16.704C12.492 17.4653 12.1271 17.8459 11.8135 17.7199C11.5 17.5939 11.5 17.0666 11.5 16.0119L11.5 7.7738C11.5012 7.11381 11.7633 6.48107 12.2291 6.01357L13.2839 4.95882L13.7141 4.62987C14.7183 3.86212 15.2204 3.47825 15.7673 3.3603C16.2175 3.26322 16.6857 3.29236 17.1204 3.4445C17.6484 3.62934 18.099 4.0725 19.0003 4.95883C19.9999 5.95839 20.4997 6.45818 20.685 7.03056C20.843 7.51871 20.847 8.04366 20.6964 8.53417C20.5199 9.10931 20.0332 9.61101 19.0599 10.6144Z"/><path d="M12.7897 22H17.8994C19.2995 22 19.9996 22 20.5344 21.7275C21.0048 21.4878 21.3872 21.1054 21.6269 20.635C21.8994 20.1002 21.8994 19.4001 21.8994 18C21.8994 16.5999 21.8994 15.8998 21.6269 15.365C21.3872 14.8946 21.0048 14.5122 20.5344 14.2725C19.9996 14 19.2995 14 17.8994 14H17.6797L11.878 19.798C11.636 20.0399 11.5 20.3391 11.5 20.6813C11.5 21.3936 12.0774 22 12.7897 22Z"/></g></svg></div>
-        <span class="metodo-fail">Sin esto → falla</span>
-        <h4>Lineamientos de marca</h4>
-        <p>Sin marca definida, la herramienta sale con colores y tono genéricos. El cliente nota que no es "de la empresa" — y eso resta credibilidad justo cuando más importa.</p>
-        <div class="metodo-fix">↳ Se consolidan desde tu web, imágenes o documento</div>
-      </div>
-      <div class="metodo-card">
-        <div class="metodo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><path d="M17.2929 2.29289C17 2.58579 17 3.05719 17 4V17C17 17.9428 17 18.4142 17.2929 18.7071C17.5858 19 18.0572 19 19 19C19.9428 19 20.4142 19 20.7071 18.7071C21 18.4142 21 17.9428 21 17V4C21 3.05719 21 2.58579 20.7071 2.29289C20.4142 2 19.9428 2 19 2C18.0572 2 17.5858 2 17.2929 2.29289Z"/><path d="M10 7C10 6.05719 10 5.58579 10.2929 5.29289C10.5858 5 11.0572 5 12 5C12.9428 5 13.4142 5 13.7071 5.29289C14 5.58579 14 6.05719 14 7V17C14 17.9428 14 18.4142 13.7071 18.7071C13.4142 19 12.9428 19 12 19C11.0572 19 10.5858 19 10.2929 18.7071C10 18.4142 10 17.9428 10 17V7Z"/><path d="M3.29289 9.29289C3 9.58579 3 10.0572 3 11V17C3 17.9428 3 18.4142 3.29289 18.7071C3.58579 19 4.05719 19 5 19C5.94281 19 6.41421 19 6.70711 18.7071C7 18.4142 7 17.9428 7 17V11C7 10.0572 7 9.58579 6.70711 9.29289C6.41421 9 5.94281 9 5 9C4.05719 9 3.58579 9 3.29289 9.29289Z"/><path d="M3 21.25C2.58579 21.25 2.25 21.5858 2.25 22C2.25 22.4142 2.58579 22.75 3 22.75H21C21.4142 22.75 21.75 22.4142 21.75 22C21.75 21.5858 21.4142 21.25 21 21.25H3Z"/></g></svg></div>
-        <span class="metodo-fail">Sin esto → falla</span>
-        <h4>Forma de medir si convenció</h4>
-        <p>Sin una reacción esperada definida — pide cotización, agenda llamada, dice que sí — nadie sabe si la herramienta funcionó o solo se vio bien.</p>
-        <div class="metodo-fix">↳ Se define antes del semáforo, no después</div>
-      </div>
-    </div>
-    <div class="metodo-note">
-      <strong>CC Brew no es un editor de plantillas.</strong> Es el proceso de preparación que separa "esto sí convence" de "volvamos a empezar."
-    </div>
   </div>
 </section>
 
-<!-- SEMÁFORO -->
-<section class="sema-section">
-  <div class="sema-inner">
-    <div class="sema-header">
-      <span class="eyebrow">Validación de idea — la metodología detrás</span>
-      <h2 class="section-title">6 criterios diseñados para que la herramienta convenza, no solo funcione</h2>
-      <p class="section-sub" style="margin:14px auto 0;text-align:center;">No son preguntas de formulario. Son los 6 puntos donde más fallan las herramientas de venta — validados antes de que empieces a construir.</p>
+<!-- QUÉ AHORRAS -->
+<section class="save-section">
+  <div class="save-inner">
+    <div class="save-header">
+      <span class="eyebrow">Qué evitás</span>
+      <h2 class="section-title">¿Cuánto te cuesta construir algo que nunca debiste construir?</h2>
+      <p class="section-sub" style="margin:14px auto 0;text-align:center;">CC Brew te ayuda a evitar:</p>
     </div>
 
-    <div class="sema-grid">
-      <div class="sema-card">
-        <span class="sema-icon" style="color:#EF4444"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m15 9l-6 6m0-6l6 6"/></g></svg></span>
-        <h4>Claridad de la objeción</h4>
-        <p>¿Se explica qué objeción o necesidad del cliente hay que resolver?</p>
-        <span class="sema-tag block">Bloquea si falla</span>
+    <div class="save-grid">
+      <div class="save-card">
+        <div class="save-icon">⏱</div>
+        <h4>Tiempo perdido</h4>
+        <p>Días o semanas construyendo algo que nadie pidió.</p>
       </div>
-      <div class="sema-card">
-        <span class="sema-icon" style="color:#EF4444"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m15 9l-6 6m0-6l6 6"/></g></svg></span>
-        <h4>Alcance de la herramienta</h4>
-        <p>¿Hay tanto qué incluye como qué excluye explícitamente?</p>
-        <span class="sema-tag block">Bloquea si falla</span>
+      <div class="save-card">
+        <div class="save-icon">🧩</div>
+        <h4>Complejidad innecesaria</h4>
+        <p>Features que complican el proyecto sin justificación.</p>
       </div>
-      <div class="sema-card">
-        <span class="sema-icon" style="color:#F59E0B"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01"/></svg></span>
-        <h4>Recorrido del cliente</h4>
-        <p>¿Está definido cómo el cliente ve y usa la herramienta, paso a paso?</p>
-        <span class="sema-tag warn">Advertencia</span>
-      </div>
-      <div class="sema-card">
-        <span class="sema-icon" style="color:#F59E0B"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01"/></svg></span>
-        <h4>Dependencias externas</h4>
-        <p>¿Hay integraciones complejas sin resolver en Fase 1?</p>
-        <span class="sema-tag warn">Advertencia</span>
-      </div>
-      <div class="sema-card">
-        <span class="sema-icon" style="color:#10B981"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12l2 2l4-4"/></g></svg></span>
-        <h4>Coherencia</h4>
-        <p>¿La idea es consistente consigo misma, sin contradicciones entre partes?</p>
-        <span class="sema-tag warn">Advertencia</span>
-      </div>
-      <div class="sema-card">
-        <span class="sema-icon" style="color:#10B981"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12l2 2l4-4"/></g></svg></span>
-        <h4>Viabilidad</h4>
-        <p>¿Tamaño realista para una primera pieza? ¿Sin dependencias que bloqueen el v1?</p>
-        <span class="sema-tag warn">Informativo</span>
-      </div>
-    </div>
-
-    <div class="sema-cta">
-      <a href="https://ccbrew.kitifica.com" class="btn btn-primary" style="font-size:14px;padding:13px 26px;">Probar con mi idea →</a>
-    </div>
-  </div>
-</section>
-
-<!-- ROUTES -->
-<section class="routes-section">
-  <div class="routes-inner">
-    <div class="routes-header">
-      <span class="eyebrow">Dos formas de usar CC Brew</span>
-      <h2 class="section-title">Una funciona en cualquier dispositivo. La otra usa Claude Code en tu equipo.</h2>
-      <p class="section-sub" style="margin:14px auto 0;text-align:center;">Mismo resultado. Lo que cambia es dónde y cuándo puedes usarla.</p>
-    </div>
-
-    <div class="routes-grid">
-      <div class="route-card paid">
-        <div class="route-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M12.0516 2H11.9484C10.2682 1.99999 8.93732 1.99997 7.89575 2.14245C6.82382 2.28908 5.95621 2.59803 5.27199 3.29418C4.58778 3.99033 4.28413 4.87308 4.14001 5.9637C3.99997 7.02343 3.99999 8.37751 4 10.087V13.9129C3.99999 15.6225 3.99997 16.9766 4.14001 18.0363C4.28413 19.1269 4.58778 20.0097 5.27199 20.7058C5.95621 21.402 6.82382 21.7109 7.89575 21.8575C8.93731 22 10.2682 22 11.9484 22H12.0516C13.7318 22 15.0627 22 16.1043 21.8575C17.1762 21.7109 18.0438 21.402 18.728 20.7058C19.4122 20.0097 19.7159 19.1269 19.86 18.0363C20 16.9766 20 15.6225 20 13.913V10.0871C20 8.37754 20 7.02343 19.86 5.9637C19.7159 4.87308 19.4122 3.99033 18.728 3.29418C18.0438 2.59803 17.1762 2.28908 16.1043 2.14245C15.0627 1.99997 13.7318 1.99999 12.0516 2ZM8.57143 18.5116C8.57143 18.1263 8.87843 17.814 9.25714 17.814H14.7429C15.1216 17.814 15.4286 18.1263 15.4286 18.5116C15.4286 18.8969 15.1216 19.2093 14.7429 19.2093H9.25714C8.87843 19.2093 8.57143 18.8969 8.57143 18.5116Z" clip-rule="evenodd"/></svg></div>
-        <span class="route-badge paid">IA de Kitifica · App Directa</span>
-        <h3>Desde tu celular o laptop, donde estés</h3>
-        <p>La idea que se te ocurre en el taxi, en el gym, esperando el café — o directo desde tu laptop. Estructúrala ahí mismo. Kitifica procesa, no tu equipo. Sin Claude Code instalado.</p>
-        <ul class="route-list">
-          <li>Funciona desde el celular o laptop · instala como app nativa</li>
-          <li>Sin Claude Code requerido en tu equipo</li>
-          <li>iOS, Android, Windows — cualquier dispositivo</li>
-          <li>Pago por proyecto · sin vencimiento · desde $4</li>
-        </ul>
-      </div>
-
-      <div class="route-card free">
-        <div class="route-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><path d="M14.1809 4.2755C14.581 4.3827 14.8185 4.79396 14.7113 5.19406L10.7377 20.0238C10.6304 20.4239 10.2192 20.6613 9.81909 20.5541C9.41899 20.4469 9.18156 20.0356 9.28876 19.6355L13.2624 4.80583C13.3696 4.40573 13.7808 4.16829 14.1809 4.2755Z"/><path d="M16.4425 7.32781C16.7196 7.01993 17.1938 6.99497 17.5017 7.27206L19.2392 8.8358C19.9756 9.49847 20.5864 10.0482 21.0058 10.5467C21.4468 11.071 21.7603 11.6342 21.7603 12.3295C21.7603 13.0248 21.4468 13.5881 21.0058 14.1123C20.5864 14.6109 19.9756 15.1606 19.2392 15.8233L17.5017 17.387C17.1938 17.6641 16.7196 17.6391 16.4425 17.3313C16.1654 17.0234 16.1904 16.5492 16.4983 16.2721L18.1947 14.7452C18.9826 14.0362 19.5138 13.5558 19.8579 13.1467C20.1882 12.7541 20.2603 12.525 20.2603 12.3295C20.2603 12.1341 20.1882 11.9049 19.8579 11.5123C19.5138 11.1033 18.9826 10.6229 18.1947 9.91383L16.4983 8.387C16.1904 8.10991 16.1654 7.63569 16.4425 7.32781Z"/><path d="M7.50178 8.387C7.80966 8.10991 7.83462 7.63569 7.55752 7.32781C7.28043 7.01993 6.80621 6.99497 6.49833 7.27206L4.76084 8.8358C4.0245 9.49847 3.41369 10.0482 2.99428 10.5467C2.55325 11.071 2.23975 11.6342 2.23975 12.3295C2.23975 13.0248 2.55325 13.5881 2.99428 14.1123C3.41369 14.6109 4.02449 15.1606 4.76082 15.8232L6.49833 17.387C6.80621 17.6641 7.28043 17.6391 7.55752 17.3313C7.83462 17.0234 7.80966 16.5492 7.50178 16.2721L5.80531 14.7452C5.01743 14.0362 4.48623 13.5558 4.14213 13.1467C3.81188 12.7541 3.73975 12.525 3.73975 12.3295C3.73975 12.1341 3.81188 11.9049 4.14213 11.5123C4.48623 11.1033 5.01743 10.6229 5.80531 9.91383L7.50178 8.387Z"/></g></svg></div>
-        <span class="route-badge free">Gratis · requiere Claude Code</span>
-        <h3>Desde tu equipo con Claude Code</h3>
-        <p>Si ya tienes Claude Code instalado, úsalo como motor. Un comando para conectar el MCP, un archivo para el Skill. Procesamiento en tu equipo, cero créditos.</p>
-        <ul class="route-list">
-          <li>Gratis con tu suscripción de Claude</li>
-          <li>Requiere Claude Code CLI instalado</li>
-          <li>Usa <code style="font-size:10px;background:rgba(16,185,129,0.15);color:#10B981;padding:1px 5px;border-radius:4px;">/cc-brew</code> directo en el chat</li>
-          <li>Solo funciona desde tu equipo de escritorio</li>
-        </ul>
-      </div>
-    </div>
-    <p style="margin:48px auto 0;text-align:center;font-size:13px;color:var(--text-2);max-width:540px;">¿Ya tienes tu propia API key de Anthropic? Existe una tercera vía: pagás una sola vez y generás proyectos sin límite — <a href="#precios" style="color:#8B5CF6;text-decoration:none;font-weight:600;">ver plan Trae tu API →</a></p>
-  </div>
-</section>
-
-<!-- STACK POR DEFAULT -->
-<section class="stack-section" id="stack">
-  <div class="stack-inner">
-    <div class="stack-header">
-      <span class="eyebrow">Listo para producción</span>
-      <h2 class="section-title">Libertad total de stack — sin improvisar la infraestructura</h2>
-      <p class="section-sub" style="margin:14px auto 0;text-align:center;">No hay un stack fijo. Claude Code recomienda entre las herramientas más usadas según lo que tu proyecto necesita — vos decidís, o dejás que elija por vos. Los comandos de CLI quedan listos en el documento igual.</p>
-    </div>
-
-    <div class="stack-grid">
-      <div class="stack-card">
-        <div class="stack-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg></div>
-        <h4>Backend y base de datos</h4>
-        <p>Supabase, Firebase, Neon, PlanetScale o Convex — la opción se elige según lo que tu proyecto necesita, con los comandos de CLI para conectar ya en el documento.</p>
-      </div>
-      <div class="stack-card">
-        <div class="stack-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg></div>
-        <h4>Deploy</h4>
-        <p>Netlify, Vercel, Cloudflare Pages, Railway o Render — instalación del CLI, login y el comando exacto para publicar, sin importar cuál.</p>
-      </div>
-      <div class="stack-card">
-        <div class="stack-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="6" y1="3" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg></div>
-        <h4>Repositorio</h4>
-        <p>GitHub, GitLab o Bitbucket — creamos el repo donde ya trabajás, conectado al deploy para que cada push publique solo.</p>
-      </div>
-      <div class="stack-card">
-        <div class="stack-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
-        <h4>SEO y visibilidad en IA</h4>
-        <p>Meta tags, sitemap y Search Console para buscadores tradicionales — más llms.txt y datos estructurados para que ChatGPT, Perplexity o Claude puedan encontrar y citar tu herramienta.</p>
-      </div>
-    </div>
-
-    <p class="stack-note">Se agregan solo cuando tu proyecto los necesita — un CLI tool no lleva SEO, un prototipo local no lleva backend.</p>
-
-    <div class="stack-visual">
-      <div class="stack-visual-icon">📎</div>
-      <div>
-        <h4>Referencias visuales</h4>
-        <p>Adjuntá capturas, mockups o wireframes al describir tu idea — se convierten en guía de diseño dentro del mismo CLAUDE.md.</p>
+      <div class="save-card">
+        <div class="save-icon">🎯</div>
+        <h4>Alcance desbordado</h4>
+        <p>Una V1 que intenta ser todo y no es nada.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- APP DIRECTA -->
-<section class="appdirecta-section" id="app-directa">
-  <div class="appdirecta-inner">
-    <a href="https://kitifica.com/appdirecta/" target="_blank" rel="noopener" class="appdirecta-logo-link" aria-label="Conocer App Directa">
-      <img src="appdirecta_b.svg" alt="App Directa" width="100" height="100" style="display:block;">
-    </a>
-    <span class="appdirecta-kicker">App Directa · La ruta paga, explicada</span>
-    <h2 class="appdirecta-title">Tu mejor idea no espera a que abras el laptop</h2>
-    <p class="appdirecta-desc">
-      En el taxi. Esperando el café. Entre reuniones. O directo desde tu laptop. CC Brew vive como app nativa — sin App Store, sin instalaciones — en cualquier dispositivo. Estructuras tu idea en 3 minutos, ahí mismo, antes de que se pierda. Cuando abras Claude Code en tu equipo, el CLAUDE.md ya está listo.
-    </p>
-    <div class="appdirecta-feats">
-      <div class="appdirecta-feat">
-        <div class="appdirecta-feat-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
-        </div>
-        <div class="appdirecta-feat-body">
-          <h4>Sin App Store ni Play Store</h4>
-          <p>Instala desde el navegador en iOS o Android en un toque</p>
-        </div>
-      </div>
-      <div class="appdirecta-feat">
-        <div class="appdirecta-feat-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M15.914 4a1.5 1.5 0 0 0-2.474-1.561l-9 9A1.5 1.5 0 0 0 5.5 14h4.002a.5.5 0 0 1 .471.666L8.086 20a1.5 1.5 0 0 0 2.475 1.56l9-9A1.5 1.5 0 0 0 18.5 10h-3.997a.5.5 0 0 1-.472-.667z"/></svg>
-        </div>
-        <div class="appdirecta-feat-body">
-          <h4>Sin Claude Code instalado</h4>
-          <p>El procesamiento lo hace Kitifica, no tu equipo</p>
-        </div>
-      </div>
-      <div class="appdirecta-feat">
-        <div class="appdirecta-feat-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20a14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
-        </div>
-        <div class="appdirecta-feat-body">
-          <h4>iOS, Android, Windows, macOS</h4>
-          <p>Cualquier dispositivo con navegador moderno</p>
-        </div>
-      </div>
-      <div class="appdirecta-feat">
-        <div class="appdirecta-feat-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M6 16c5 0 7-8 12-8a4 4 0 0 1 0 8c-5 0-7-8-12-8a4 4 0 1 0 0 8"/></svg>
-        </div>
-        <div class="appdirecta-feat-body">
-          <h4>Sin vencimiento</h4>
-          <p>Tus créditos disponibles cuando los necesites</p>
-        </div>
-      </div>
-    </div>
-    <p style="text-align:center;margin:0 0 18px;"><span class="route-badge paid" style="font-size:12px;">✓ Tus primeros 3 proyectos van por nuestra cuenta — sin tarjeta, sin compromiso</span></p>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
-      <a href="https://ccbrew.kitifica.com" class="btn btn-primary">Abrir en mi celular o laptop →</a>
-      <a href="https://kitifica.com/appdirecta/" target="_blank" rel="noopener" class="btn btn-ghost">¿Qué es App Directa?</a>
-      <a href="#precios" class="btn btn-ghost">Ver precios</a>
-    </div>
-  </div>
-</section>
-
-<!-- PRICING -->
-<section class="pricing-section" id="precios">
-  <div class="pricing-inner">
-    <div class="pricing-header">
-      <span class="eyebrow">Precios</span>
-      <h2 class="section-title">Paga por proyecto. Sin sorpresas.</h2>
-    </div>
-
-    <div class="pricing-unit">
-      <p><strong>1 crédito = 1 proyecto completo</strong> — cuestionario + semáforo + CLAUDE.md. Sin vencimiento.</p>
-    </div>
-
-    <div class="pricing-welcome">
-      <p><strong>Tus primeros proyectos van por nuestra cuenta.</strong> Cada cuenta nueva arranca con 3 proyectos de prueba gratis — sin tarjeta, sin compromiso, elijas el plan que elijas.</p>
-    </div>
-
-    <div class="pricing-grid">
-      <div class="plan-card">
-        <div class="plan-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M21.1009 8.00353C21.0442 7.99996 20.9825 7.99998 20.9186 8L20.9026 8.00001H18.3941C16.3264 8.00001 14.5572 9.62757 14.5572 11.75C14.5572 13.8724 16.3264 15.5 18.3941 15.5H20.9026L20.9186 15.5C20.9825 15.5 21.0442 15.5001 21.1009 15.4965C21.9408 15.4434 22.6835 14.7862 22.746 13.8682C22.7501 13.808 22.75 13.7431 22.75 13.683L22.75 13.6667V9.83334L22.75 9.81702C22.75 9.75688 22.7501 9.69199 22.746 9.6318C22.6835 8.71381 21.9408 8.05657 21.1009 8.00353ZM18.1717 12.75C18.704 12.75 19.1355 12.3023 19.1355 11.75C19.1355 11.1977 18.704 10.75 18.1717 10.75C17.6394 10.75 17.2078 11.1977 17.2078 11.75C17.2078 12.3023 17.6394 12.75 18.1717 12.75Z"/><path d="M20.9179 17C21.067 16.9961 21.1799 17.1342 21.1394 17.2778C20.9387 17.9902 20.62 18.5975 20.1088 19.1088C19.3604 19.8571 18.4114 20.1892 17.239 20.3469C16.0998 20.5 14.6442 20.5 12.8064 20.5H10.6936C8.85583 20.5 7.40019 20.5 6.26098 20.3469C5.08856 20.1892 4.13961 19.8571 3.39124 19.1088C2.64288 18.3604 2.31076 17.4114 2.15314 16.239C1.99997 15.0998 1.99998 13.6442 2 11.8064V11.6936C1.99998 9.85583 1.99997 8.40019 2.15314 7.26098C2.31076 6.08856 2.64288 5.13961 3.39124 4.39124C4.13961 3.64288 5.08856 3.31076 6.26098 3.15314C7.40019 2.99997 8.85582 2.99998 10.6936 3L12.8064 3C14.6442 2.99998 16.0998 2.99997 17.239 3.15314C18.4114 3.31076 19.3604 3.64288 20.1088 4.39124C20.62 4.90252 20.9386 5.50974 21.1394 6.22218C21.1799 6.36575 21.067 6.50387 20.9179 6.5L18.394 6.50001C15.5574 6.50001 13.0571 8.74091 13.0571 11.75C13.0571 14.7591 15.5574 17 18.394 17L20.9179 17ZM5.75 7C5.33579 7 5 7.33579 5 7.75C5 8.16421 5.33579 8.5 5.75 8.5H9.75C10.1642 8.5 10.5 8.16421 10.5 7.75C10.5 7.33579 10.1642 7 9.75 7H5.75Z"/></g></svg></div>
-        <div class="plan-name">Inicio</div>
-        <div class="plan-price">
-          <span class="plan-currency">$</span>
-          <span class="plan-amount">4</span>
-        </div>
-        <div class="plan-mins">5 proyectos</div>
-        <div class="plan-rate">$0.80 / proyecto</div>
-        <div class="plan-projects">
-          Para explorar ideas.<br>
-          Sin vencimiento.
-        </div>
-        <a href="https://ccbrew.kitifica.com" class="plan-cta secondary">Empezar con 5 proyectos →</a>
-      </div>
-
-      <div class="plan-card featured">
-        <div class="plan-popular">Más popular</div>
-        <div class="plan-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M9.15316 5.40838C10.4198 3.13613 11.0531 2 12 2C12.9469 2 13.5802 3.13612 14.8468 5.40837L15.1745 5.99623C15.5345 6.64193 15.7144 6.96479 15.9951 7.17781C16.2757 7.39083 16.6251 7.4699 17.3241 7.62805L17.9605 7.77203C20.4201 8.32856 21.65 8.60682 21.9426 9.54773C22.2352 10.4886 21.3968 11.4691 19.7199 13.4299L19.2861 13.9372C18.8096 14.4944 18.5713 14.773 18.4641 15.1177C18.357 15.4624 18.393 15.8341 18.465 16.5776L18.5306 17.2544C18.7841 19.8706 18.9109 21.1787 18.1449 21.7602C17.3788 22.3417 16.2273 21.8115 13.9243 20.7512L13.3285 20.4768C12.6741 20.1755 12.3469 20.0248 12 20.0248C11.6531 20.0248 11.3259 20.1755 10.6715 20.4768L10.0757 20.7512C7.77268 21.8115 6.62118 22.3417 5.85515 21.7602C5.08912 21.1787 5.21588 19.8706 5.4694 17.2544L5.53498 16.5776C5.60703 15.8341 5.64305 15.4624 5.53586 15.1177C5.42868 14.773 5.19043 14.4944 4.71392 13.9372L4.2801 13.4299C2.60325 11.4691 1.76482 10.4886 2.05742 9.54773C2.35002 8.60682 3.57986 8.32856 6.03954 7.77203L6.67589 7.62805C7.37485 7.4699 7.72433 7.39083 8.00494 7.17781C8.28555 6.96479 8.46553 6.64194 8.82547 5.99623L9.15316 5.40838Z"/></svg></div>
-        <div class="plan-name">Creador</div>
-        <div class="plan-price">
-          <span class="plan-currency">$</span>
-          <span class="plan-amount">9</span>
-        </div>
-        <div class="plan-mins">12 proyectos</div>
-        <div class="plan-rate">$0.75 / proyecto · 6% de ahorro</div>
-        <div class="plan-projects">
-          Para builders activos.<br>
-          Sin vencimiento.
-        </div>
-        <a href="https://ccbrew.kitifica.com" class="plan-cta primary">Elegir Creador — 12 proyectos</a>
-      </div>
-
-      <div class="plan-card">
-        <div class="plan-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="9.001" cy="6" r="4"/><ellipse cx="9.001" cy="17.001" rx="7" ry="4"/><path d="M20.9996 17.0005C20.9996 18.6573 18.9641 20.0004 16.4788 20.0004C17.211 19.2001 17.7145 18.1955 17.7145 17.0018C17.7145 15.8068 17.2098 14.8013 16.4762 14.0005C18.9615 14.0005 20.9996 15.3436 20.9996 17.0005Z"/><path d="M17.9996 6.00073C17.9996 7.65759 16.6565 9.00073 14.9996 9.00073C14.6383 9.00073 14.292 8.93687 13.9712 8.81981C14.4443 7.98772 14.7145 7.02522 14.7145 5.99962C14.7145 4.97477 14.4447 4.01294 13.9722 3.18127C14.2927 3.06446 14.6387 3.00073 14.9996 3.00073C16.6565 3.00073 17.9996 4.34388 17.9996 6.00073Z"/></g></svg></div>
-        <div class="plan-name">Estudio</div>
-        <div class="plan-price">
-          <span class="plan-currency">$</span>
-          <span class="plan-amount">12</span>
-        </div>
-        <div class="plan-mins">20 proyectos</div>
-        <div class="plan-rate">$0.60 / proyecto · 25% de ahorro</div>
-        <div class="plan-projects">
-          Para equipos y agencias.<br>
-          Sin vencimiento.
-        </div>
-        <a href="https://ccbrew.kitifica.com" class="plan-cta secondary">Elegir Estudio — 20 proyectos</a>
-      </div>
-    </div>
-
-    <div class="byo-api-wrap">
-      <div class="byo-api-eyebrow">¿Ya tienes tu propia API de Anthropic?</div>
-      <div class="byo-api-card">
-        <div>
-          <span class="byo-api-badge">Pago único</span>
-          <h3>Trae tu API</h3>
-          <div class="byo-api-sub">Acceso de por vida</div>
-          <p>Usa tu propia API key de Anthropic. Proyectos ilimitados, para siempre. Sin créditos, sin renovación.</p>
-          <ul class="byo-api-bullets">
-            <li>Proyectos ilimitados, sin límite de tiempo, una vez conectada tu API key</li>
-            <li>Usa tu propia cuenta de Anthropic (solo se acepta API key de Anthropic)</li>
-            <li>Se paga solo una vez — sin suscripción, sin vencimiento</li>
-            <li>Ideal si generas más de 50-60 proyectos al año — a partir de ahí, sale más barato que comprar créditos</li>
-          </ul>
-        </div>
-        <div class="byo-api-cta-col">
-          <div class="byo-api-price"><s style="opacity:0.45;font-size:0.6em;font-weight:400;vertical-align:middle;">$39</s> $29</div>
-          <div class="byo-api-price-note">precio especial · pago único</div>
-          <a href="https://ccbrew.kitifica.com" class="byo-api-cta">Conectar mi API de Anthropic →</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="pricing-free">
-      <p>
-        <strong>¿Tienes Claude Code?</strong> Instala el MCP + Skill y usa <code style="background:rgba(16,185,129,0.2);color:#10B981;padding:1px 6px;border-radius:4px;">/cc-brew</code> directo desde el chat — completamente gratis.
-        <a href="#skill" style="color:#10B981;font-weight:700;margin-left:6px;">Ver instrucciones →</a>
-      </p>
-    </div>
-  </div>
-</section>
-
-<!-- SKILL SECTION -->
-<section class="skill-section" id="skill">
-  <div class="skill-inner">
+<!-- CLAUDE CODE -->
+<section class="claude-section" id="claude-code">
+  <div class="claude-inner">
     <div>
       <div class="sec-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><path d="M14.1809 4.2755C14.581 4.3827 14.8185 4.79396 14.7113 5.19406L10.7377 20.0238C10.6304 20.4239 10.2192 20.6613 9.81909 20.5541C9.41899 20.4469 9.18156 20.0356 9.28876 19.6355L13.2624 4.80583C13.3696 4.40573 13.7808 4.16829 14.1809 4.2755Z"/><path d="M16.4425 7.32781C16.7196 7.01993 17.1938 6.99497 17.5017 7.27206L19.2392 8.8358C19.9756 9.49847 20.5864 10.0482 21.0058 10.5467C21.4468 11.071 21.7603 11.6342 21.7603 12.3295C21.7603 13.0248 21.4468 13.5881 21.0058 14.1123C20.5864 14.6109 19.9756 15.1606 19.2392 15.8233L17.5017 17.387C17.1938 17.6641 16.7196 17.6391 16.4425 17.3313C16.1654 17.0234 16.1904 16.5492 16.4983 16.2721L18.1947 14.7452C18.9826 14.0362 19.5138 13.5558 19.8579 13.1467C20.1882 12.7541 20.2603 12.525 20.2603 12.3295C20.2603 12.1341 20.1882 11.9049 19.8579 11.5123C19.5138 11.1033 18.9826 10.6229 18.1947 9.91383L16.4983 8.387C16.1904 8.10991 16.1654 7.63569 16.4425 7.32781Z"/><path d="M7.50178 8.387C7.80966 8.10991 7.83462 7.63569 7.55752 7.32781C7.28043 7.01993 6.80621 6.99497 6.49833 7.27206L4.76084 8.8358C4.0245 9.49847 3.41369 10.0482 2.99428 10.5467C2.55325 11.071 2.23975 11.6342 2.23975 12.3295C2.23975 13.0248 2.55325 13.5881 2.99428 14.1123C3.41369 14.6109 4.02449 15.1606 4.76082 15.8232L6.49833 17.387C6.80621 17.6641 7.28043 17.6391 7.55752 17.3313C7.83462 17.0234 7.80966 16.5492 7.50178 16.2721L5.80531 14.7452C5.01743 14.0362 4.48623 13.5558 4.14213 13.1467C3.81188 12.7541 3.73975 12.525 3.73975 12.3295C3.73975 12.1341 3.81188 11.9049 4.14213 11.5123C4.48623 11.1033 5.01743 10.6229 5.80531 9.91383L7.50178 8.387Z"/></g></svg></div>
-      <span class="eyebrow skill-eyebrow">Gratis · Claude Code</span>
-      <h2 class="section-title">Usa CC Brew directo desde Claude Code</h2>
-      <p class="skill-desc">Sin abrir la app. Sin cambiar de pestaña. Escribe <code style="background:rgba(34,197,94,0.15);color:#22c55e;padding:2px 7px;border-radius:5px;">/cc-brew</code> en cualquier proyecto y Claude Code te guía por el flujo completo — preguntas, semáforo y CLAUDE.md — guardado automáticamente.</p>
-      <div class="skill-install-wrap">
-        <div class="skill-tabs">
-          <button class="skill-tab-btn active" onclick="skillTab(this,'mcp')">MCP</button>
-          <button class="skill-tab-btn" onclick="skillTab(this,'skill')">Skill</button>
+      <span class="eyebrow" style="color:#22c55e">Gratis con Claude Code</span>
+      <h2 class="section-title">Cuando vale la pena, construí con Claude Code</h2>
+      <p class="claude-desc">CC Brew no compite con Claude Code — lo complementa. Primero evaluás. Si la idea sobrevive, llevás el brief directo a Claude Code.</p>
+      <div class="claude-install-wrap">
+        <div class="claude-tabs">
+          <button class="claude-tab-btn active" onclick="claudeTab(this,'mcp')">MCP</button>
+          <button class="claude-tab-btn" onclick="claudeTab(this,'skill')">Skill</button>
         </div>
-
-        <!-- MCP -->
-        <div id="skill-tab-mcp" class="skill-tab-panel active" style="padding:16px 18px 14px;">
-          <div style="font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:10px;">Pegá este prompt en Claude Code. Reemplazá <code style="color:var(--orange);background:rgba(124,58,237,0.1);padding:1px 5px;border-radius:4px;">TU_API_KEY</code> con tu clave — la encontrás en <strong style="color:var(--text);">ccbrew.kitifica.com → Ajustes → API Key</strong>.</div>
-          <div class="skill-code" style="border-radius:8px 8px 0 0;margin-bottom:0;white-space:pre-wrap;line-height:1.6;font-size:11px;">Instala el MCP de CC Brew. Reemplaza TU_API_KEY con tu clave de CC Brew (la encontrás en ccbrew.kitifica.com → Ajustes → API Key) y ejecuta:
-
-claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --header "Authorization: Bearer TU_API_KEY" --scope user</div>
-          <button id="copy-mcp-btn" onclick="copyInstallPrompt('mcp')" style="width:100%;padding:10px;background:var(--orange);border:none;border-radius:0 0 8px 8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:background 200ms;">Copiar prompt</button>
+        <div id="claude-tab-mcp" class="claude-tab-panel active" style="padding:16px 18px 14px;">
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:10px;">Pegá este prompt en Claude Code. Reemplazá <code style="color:var(--orange);background:rgba(124,58,237,0.1);padding:1px 5px;border-radius:4px;">TU_API_KEY</code> con tu clave.</div>
+          <div class="claude-code" style="border-radius:8px 8px 0 0;margin-bottom:0;white-space:pre-wrap;line-height:1.6;font-size:11px;">claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --header "Authorization: Bearer TU_API_KEY" --scope user</div>
+          <button id="copy-mcp-btn" onclick="copyInstallPrompt('mcp')" style="width:100%;padding:10px;background:var(--orange);border:none;border-radius:0 0 8px 8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:background 200ms;">Copiar comando</button>
         </div>
-
-        <!-- SKILL -->
-        <div id="skill-tab-skill" class="skill-tab-panel" style="padding:16px 18px 14px;">
-          <a href="/skill/SKILL.md" download="SKILL.md" class="skill-cta-dl">
+        <div id="claude-tab-skill" class="claude-tab-panel" style="padding:16px 18px 14px;">
+          <a href="/skill/SKILL.md" download="SKILL.md" style="display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:8px;background:var(--orange);color:#fff;font-size:14px;font-weight:600;text-decoration:none;transition:opacity 140ms;margin-bottom:12px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Descargar SKILL.md
           </a>
-          <div class="skill-cta-dl-note">Arrastrá el archivo al chat de Claude Code y pegá este prompt:</div>
-          <div class="skill-code" style="border-radius:8px 8px 0 0;margin-bottom:0;white-space:pre-wrap;line-height:1.6;font-size:11px;">Instala este archivo como una Skill de Claude Code:
+          <div style="font-size:11px;color:var(--text-3);margin-bottom:12px;">Arrastrá el archivo al chat de Claude Code y pegá este prompt:</div>
+          <div class="claude-code" style="border-radius:8px 8px 0 0;margin-bottom:0;white-space:pre-wrap;line-height:1.6;font-size:11px;">Instala este archivo como una Skill de Claude Code:
 1. Muévelo a ~/.claude/skills/cc-brew/SKILL.md
-2. Agrega esta entrada en ~/.claude/CLAUDE.md:
+2. Agrega esta entrada en ~/.claude/CLAUDE.md
 
 # cc-brew
-- **cc-brew** (`~/.claude/skills/cc-brew/SKILL.md`) - estructura ideas de producto antes de construirlas con Claude Code
+- **cc-brew** (`~/.claude/skills/cc-brew/SKILL.md`) - evalúa ideas antes de construirlas
   Trigger: `/cc-brew`</div>
           <button id="copy-skill-btn" onclick="copyInstallPrompt('skill')" style="width:100%;padding:10px;background:#2A2A2A;border:none;border-radius:0 0 8px 8px;color:#E0E0E0;font-size:13px;font-weight:700;cursor:pointer;transition:background 200ms;">Copiar prompt</button>
         </div>
       </div>
     </div>
-    <div class="skill-mockup">
+    <div class="claude-mockup">
       <div class="mock-header">
         <span class="mock-dot red"></span>
         <span class="mock-dot yellow"></span>
@@ -1336,7 +841,7 @@ claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --
         </div>
         <div class="mock-claude-msg">
           <span class="mock-avatar claude-av">C</span>
-          <div class="mock-bubble" style="font-size:11px;line-height:1.5;">Cuéntame tu idea. Sin estructura — como se te ocurra.</div>
+          <div class="mock-bubble" style="font-size:11px;line-height:1.5;">Contame tu idea. Sin estructura — como se te ocurra.</div>
         </div>
         <div class="mock-user-msg">
           <span class="mock-avatar user-av">D</span>
@@ -1345,7 +850,7 @@ claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --
         <div class="mock-claude-msg">
           <span class="mock-avatar claude-av">C</span>
           <div class="mock-claude-content">
-            <div class="mock-bubble" style="font-size:11px;line-height:1.5;"><strong>Pregunta 1</strong><br><br>¿Quién usa la pantalla principal?<br><br>1. El host en la entrada<br>2. El mesero desde su celular<br>3. Cocina en pantalla fija<br>4. Todos a la vez</div>
+            <div class="mock-bubble" style="font-size:11px;line-height:1.5;"><strong>Evaluación:</strong><br><br> Problema claro: sí<br> Alcance V1: parcial — ¿qué excluís?<br> Complejidad: media</div>
             <div class="mock-tool-call">
               <span class="tool-icon">⚙</span>
               <span class="tool-name">cc-brew</span>
@@ -1353,23 +858,82 @@ claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --
               <span class="tool-method">save_evaluation</span>
               <span class="tool-spinner"></span>
             </div>
-            <div class="mock-claudemd">
-              <div class="claudemd-header">
-                <span class="claudemd-icon">📄</span>
-                <span class="claudemd-filename">CLAUDE.md</span>
-              </div>
-              <div class="claudemd-content">
-                <div class="md-line md-h1"># Gestor de mesas — v1</div>
-                <div class="md-line md-h2">## Criterio de éxito de v1</div>
-                <div class="md-line md-body">El host ve y cambia estado de 20 mesas sin recargar.</div>
-                <div class="md-line md-h2">## Primeros 3 pasos</div>
-                <div class="md-line md-body">1. Crear grid de mesas con estados...</div>
-                <div class="md-line md-fade">…</div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="precios">
+  <div class="pricing-inner">
+    <div class="pricing-header">
+      <span class="eyebrow">Precios</span>
+      <h2 class="section-title">Un minsuto de reflexión. Sin sorpresas.</h2>
+    </div>
+
+    <div class="pricing-unit">
+      <p><strong>1 crédito = 1 evaluación completa</strong> — interrogación + evaluación + decisión + brief. Sin vencimiento.</p>
+    </div>
+
+    <div class="pricing-welcome">
+      <p><strong>Tus primeras evaluaciones van por nuestra cuenta.</strong> Cada cuenta nueva arranca con 3 evaluaciones gratis — sin tarjeta, sin compromiso.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="plan-card">
+        <div class="plan-name">Inicio</div>
+        <div class="plan-price">
+          <span class="plan-currency">$</span>
+          <span class="plan-amount">4</span>
+        </div>
+        <div class="plan-mins">5 evaluaciones</div>
+        <div class="plan-rate">$0.80 / evaluación</div>
+        <div class="plan-projects">
+          Para explorar ideas.<br>
+          Sin vencimiento.
+        </div>
+        <a href="https://ccbrew.kitifica.com" class="plan-cta secondary">Empezar con 5 evaluaciones →</a>
+      </div>
+
+      <div class="plan-card featured">
+        <div class="plan-popular">Más popular</div>
+        <div class="plan-name">Creador</div>
+        <div class="plan-price">
+          <span class="plan-currency">$</span>
+          <span class="plan-amount">9</span>
+        </div>
+        <div class="plan-mins">12 evaluaciones</div>
+        <div class="plan-rate">$0.75 / evaluación</div>
+        <div class="plan-projects">
+          Para builders activos.<br>
+          Sin vencimiento.
+        </div>
+        <a href="https://ccbrew.kitifica.com" class="plan-cta primary">Elegir Creador — 12 evaluaciones</a>
+      </div>
+
+      <div class="plan-card">
+        <div class="plan-name">Estudio</div>
+        <div class="plan-price">
+          <span class="plan-currency">$</span>
+          <span class="plan-amount">12</span>
+        </div>
+        <div class="plan-mins">20 evaluaciones</div>
+        <div class="plan-rate">$0.60 / evaluación · 25% de ahorro</div>
+        <div class="plan-projects">
+          Para equipos y agencias.<br>
+          Sin vencimiento.
+        </div>
+        <a href="https://ccbrew.kitifica.com" class="plan-cta secondary">Elegir Estudio — 20 evaluaciones</a>
+      </div>
+    </div>
+
+    <div class="pricing-free">
+      <p>
+        <strong>¿Tienes Claude Code?</strong> Instalá el MCP + Skill y usá <code style="background:rgba(16,185,129,0.2);color:#10B981;padding:1px 6px;border-radius:4px;">/cc-brew</code> directo desde el chat — completamente gratis.
+        <a href="#claude-code" style="color:#10B981;font-weight:700;margin-left:6px;">Ver instrucciones →</a>
+      </p>
     </div>
   </div>
 </section>
@@ -1385,58 +949,36 @@ claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --
 
     <div class="faq-list">
       <details class="faq-item">
-        <summary class="faq-q">¿Para qué pagar créditos si hay una forma gratis?</summary>
-        <div class="faq-a">La ruta gratuita requiere tener Claude Code CLI instalado <strong>en tu equipo</strong> y estar sentado frente a él. La IA de Kitifica (App Directa) funciona desde cualquier dispositivo, en cualquier momento — tu celular, una tablet, el equipo de otra persona. El valor de los créditos es ese: capturar y estructurar la idea ahí donde se te ocurrió, no cuando llegues al escritorio. Si ya tienes tu propia API key de Anthropic y generás muchos proyectos, <strong>Trae tu API ($29, precio especial · pago único)</strong> te da proyectos ilimitados para siempre, sin comprar más créditos. Para quienes trabajan con Claude Code todo el día, la ruta gratuita es perfecta. Para los demás, App Directa — o el pago único si generás con frecuencia — es lo que tiene sentido.</div>
+        <summary class="faq-q">¿CC Brew me dice si mi startup va a tener éxito?</summary>
+        <div class="faq-a">No. CC Brew no puede predecir el éxito de nada. Lo que hace es ayudarte a <strong>tomar una mejor decisión de construir / no construir</strong> con la información que tenés ahora. Es un sistema de evaluación y razonamiento, no un oráculo.</div>
       </details>
-
       <details class="faq-item">
-        <summary class="faq-q">¿Qué es un crédito de procesamiento?</summary>
-        <div class="faq-a">1 crédito = 1 proyecto completo (cuestionario + semáforo + CLAUDE.md). Se descuenta una sola vez, cuando tu CLAUDE.md queda listo — sin importar cuántas veces lo revises o pidas mejorarlo después.</div>
+        <summary class="faq-q">¿Qué pasa si la decisión es "DON'T BUILD"?</summary>
+        <div class="faq-a">CC Brew te explica por qué la idea no justifica el esfuerzo en este momento, y qué tendría que cambiar para que sí lo haga. Muchas veces eso es más valioso que un "sí, construí". <strong>Decidir no construir es un éxito del producto.</strong></div>
       </details>
-
+      <details class="faq-item">
+        <summary class="faq-q">¿Puedo seguir construyendo si la decisión es RETHINK?</summary>
+        <div class="faq-a">Sí. RETHINK significa que la idea tiene potencial pero hay algo importante que resolver antes. CC Brew te dice exactamente qué falta. Si lo resolvés, podés volver a evaluar.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">¿Cuánto tiempo toma una evaluación?</summary>
+        <div class="faq-a">5-10 minutos. No es un Business Model Canvas de 45 minutos. Es una conversación corta que puede ahorrarte días de construcción innecesaria.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">¿Qué es un crédito de evaluación?</summary>
+        <div class="faq-a">1 crédito = 1 evaluación completa (interrogación + evaluación + decisión + brief). Se descuenta una sola vez, cuando tu decisión queda lista — sin importar cuántas veces la revises después.</div>
+      </details>
       <details class="faq-item">
         <summary class="faq-q">¿Los créditos vencen?</summary>
         <div class="faq-a">No. Los créditos que compres quedan en tu cuenta sin fecha de expiración. Úsalos a tu ritmo.</div>
       </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Puedo usar mi propia API key en vez de pagar por créditos?</summary>
-        <div class="faq-a">Sí. Con el plan "Trae tu API" ($39, pago único) conectas tu propia API key de Anthropic y tienes proyectos ilimitados para siempre, sin comprar más créditos. Solo se aceptan API keys de Anthropic. Tu clave se guarda encriptada y nunca se usa para otro fin que no sea procesar tus propios proyectos.</div>
-      </details>
-
       <details class="faq-item">
         <summary class="faq-q">¿Cómo funciona la ruta gratuita con Claude Code?</summary>
-        <div class="faq-a">Si tienes Claude Code CLI instalado, tienes dos opciones gratuitas: (1) Selecciona "Claude Code local" en ⚙️ dentro de la app — CC Brew usa tu Claude Code como motor. (2) Instala el <strong>Skill</strong> y el MCP para ejecutar CC Brew directamente desde el chat con <code>/cc-brew</code>, sin abrir la app. Los comandos están en la sección <a href="#skill" style="color:var(--orange);">Skill</a> de esta página.</div>
+        <div class="faq-a">Si tenés Claude Code CLI instalado, instalás el Skill y el MCP para ejecutar CC Brew directamente desde el chat con <code>/cc-brew</code>, sin abrir la app. Los comandos están en la sección <a href="#claude-code" style="color:var(--orange);">Claude Code</a> de esta página.</div>
       </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Qué es el Skill de CC Brew y cómo lo instalo?</summary>
-        <div class="faq-a">El Skill es un archivo (<code>SKILL.md</code>) que le enseña a Claude Code cómo ejecutar el flujo completo de CC Brew desde el chat. La forma más fácil de instalarlo es con el instalador automático: descárgalo desde <a href="/instalar/" style="color:var(--orange);">/instalar</a> o ejecuta <code>bash &lt;(curl -fsSL https://ccbrew.kitifica.com/instalar/install.sh)</code> en tu terminal. Instala el MCP y el Skill en un solo paso.</div>
-      </details>
-
       <details class="faq-item">
         <summary class="faq-q">¿Funciona en Android? ¿En Windows?</summary>
-        <div class="faq-a">Sí. CC Brew es una PWA que funciona en cualquier dispositivo con navegador moderno — iOS, Android, Windows, macOS, Linux. Instálala desde el navegador como app nativa.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Qué es el CLAUDE.md y para qué sirve?</summary>
-        <div class="faq-a">Es el documento de instrucciones que Claude Code lee al iniciar. Describe qué construir, el flujo principal, qué está fuera de alcance y el stack sugerido. Con un buen CLAUDE.md, Claude Code construye exactamente lo que pediste — sin pedirte aclaraciones.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Y si la herramienta necesita cambios antes de estar lista?</summary>
-        <div class="faq-a">Toda herramienta se pule antes de convencer. Le pedís el ajuste a Claude Code en lenguaje natural — cambiá esto, mejorá aquello — y la vas afinando hasta la versión final, sin depender de un editor externo ni de un tercero.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Qué son la Fase 1 y la Fase 2 en el documento?</summary>
-        <div class="faq-a">La Fase 1 es la primera versión funcional: solo el núcleo de la app, sin complejidad extra. La Fase 2 describe la visión de crecimiento pero está marcada como bloqueada — para que Claude Code construya algo real y terminado en la primera sesión, no una app a medias.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Mis ideas quedan guardadas?</summary>
-        <div class="faq-a">Los proyectos se guardan localmente en tu dispositivo. El texto de tu idea y el CLAUDE.md generado viven en tu sesión. No almacenamos ni leemos el contenido de tus ideas más allá del procesamiento necesario para generar el documento.</div>
+        <div class="faq-a">Sí. CC Brew es una PWA que funciona en cualquier dispositivo con navegador moderno — iOS, Android, Windows, macOS, Linux.</div>
       </details>
     </div>
   </div>
@@ -1445,26 +987,14 @@ claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --
 <!-- CTA FINAL -->
 <section class="cta-section">
   <div class="cta-inner">
-    <div class="cta-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 431.63 431.63">
-      <rect fill="#0d0c0f" width="431.63" height="431.63" rx="63.18" ry="63.18"/>
-      <path fill="#fff" d="M115.04,342.22c-2.21,10.25-9.94,17.72-23.71,17.72-17.43,0-25.67-12.34-25.67-27.97s8.5-28.57,26.24-28.57c14.64,0,21.73,8.59,23.07,17.78h-11.89c-1.15-4.24-4.1-8.46-11.57-8.46-9.8,0-13.59,8.82-13.59,18.82,0,9.29,3.28,19.08,13.91,19.08,7.76,0,10.2-5.2,11.24-8.4h11.96Z"/>
-      <path fill="#fff" d="M167.34,342.22c-2.21,10.25-9.94,17.72-23.71,17.72-17.43,0-25.67-12.34-25.67-27.97s8.5-28.57,26.24-28.57c14.64,0,21.73,8.59,23.07,17.78h-11.89c-1.15-4.24-4.1-8.46-11.57-8.46-9.8,0-13.59,8.82-13.59,18.82,0,9.29,3.28,19.08,13.91,19.08,7.76,0,10.2-5.2,11.24-8.4h11.96Z"/>
-      <path fill="#fff" d="M181.99,304.2h24.02c13.28,0,18.32,6.92,18.32,14.06,0,6.2-3.28,10.22-7,11.92,3.71,1.4,8.57,5.3,8.57,12.53,0,9.41-7.39,16.46-19.08,16.46h-24.83v-54.97ZM204.64,325.88c5.65,0,7.98-2.53,7.98-6.4s-3.05-6.11-7.64-6.11h-11.33v12.5h10.99ZM193.65,349.99h10.72c6.42,0,9.33-2.68,9.33-7.67,0-4.43-2.86-7.26-9.4-7.26h-10.66v14.93Z"/>
-      <path fill="#fff" d="M233.83,329.1c0-4.1,0-7.74-.08-11.19h11.21c.15.92.3,5.02.3,7.25,1.82-4.72,6.22-8.16,13.24-8.2v10.9c-8.29-.21-13.24,2.02-13.24,13.33v17.99h-11.43v-30.07Z"/>
-      <path fill="#fff" d="M273.61,340.98c0,5.16,2.59,10.21,8.28,10.21,4.76,0,6.12-1.91,7.2-4.41h11.44c-1.46,5.05-5.97,13.35-18.93,13.35s-19.49-10.16-19.49-20.99c0-12.95,6.64-22.19,19.9-22.19,14.17,0,18.99,10.25,18.99,20.56,0,1.4,0,2.3-.15,3.48h-27.23ZM289.55,333.96c-.08-4.8-2-8.85-7.57-8.85s-7.68,3.78-8.13,8.85h15.7Z"/>
-      <path fill="#fff" d="M316.66,317.9c3.72,16.57,5.75,25.98,6.53,31.11h.15c.85-4.59,2.03-11.07,7.05-31.11h10.62c4.68,20.29,6.07,26.26,6.65,30.7h.08c.84-4.25,2.11-10.44,6.92-30.7h11.31l-12.25,41.27h-12.25c-3.39-15.66-5.35-23.9-6.28-29.33h-.08c-.66,5.17-2.88,14.53-6.52,29.33h-12.29l-11.72-41.27h12.09Z"/>
-      <path fill="#fff" d="M149.06,71.55c-48.13,4.73-85.73,45.31-85.73,94.68,0,49.37,37.6,89.96,85.73,94.68,5.05.5,9.42-3.51,9.42-8.58V80.13c0-5.07-4.37-9.08-9.42-8.58Z"/>
-      <path fill="#fff" d="M252.81,71.55c-48.13,4.73-85.73,45.31-85.73,94.68,0,49.37,37.6,89.96,85.73,94.68,5.05.5,9.42-3.51,9.42-8.58V80.13c0-5.07-4.37-9.08-9.42-8.58Z"/>
-      <path fill="#fff" d="M337.9,166.2c17.85-7.43,30.39-25.03,30.39-45.57,0-25.6-19.5-46.65-44.45-49.1v-.02h-43.64c-4.05,0-7.34,3.28-7.34,7.34v174.72c0,4.05,3.28,7.34,7.34,7.34h42.82c.27.02.54.03.82,0,24.96-2.45,44.47-23.51,44.47-49.11,0-20.55-12.56-38.16-30.41-45.58Z"/>
-    </svg></div>
-    <span class="eyebrow">Donde se te ocurra · cuando se te ocurra</span>
-    <h2>Construye tu próxima herramienta de venta desde donde estás</h2>
-    <p>Abre la app en tu celular o laptop, contale tu idea, tu marca y a quién querés convencer — CC Brew arma el brief en 3 minutos. Sin instalaciones. Sin Claude Code requerido.</p>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center;">
+    <span class="eyebrow">5 minutos de reflexión</span>
+    <h2>¿Vale la pena construirlo?</h2>
+    <p>Descubrílo antes de que Claude Code pierda tiempo en algo que no debería existir.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
       <a href="https://ccbrew.kitifica.com" class="btn btn-primary" style="font-size:15px;padding:14px 28px;border-radius:14px;">
-        Estructurar mi idea ahora →
+        Evaluar mi idea ahora →
       </a>
-      <a href="#precios" class="btn btn-ghost" style="font-size:14px;">Ver precios</a>
+      <a href="#como-funciona" class="btn btn-ghost" style="font-size:14px;">Ver cómo funciona</a>
     </div>
   </div>
 </section>
@@ -1474,29 +1004,26 @@ claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --
   <span class="footer-brand">CC <em>Brew</em> by Kitifica</span>
   <div class="footer-links">
     <a href="#como-funciona" class="footer-link">Cómo funciona</a>
-    <a href="#skill" class="footer-link">Skill</a>
+    <a href="#decision" class="footer-link">La decisión</a>
     <a href="#precios" class="footer-link">Precios</a>
     <a href="#faq" class="footer-link">FAQ</a>
     <a href="https://ccbrew.kitifica.com" class="footer-link">Abrir app</a>
-    <a href="https://kitifica.com/appdirecta/" target="_blank" rel="noopener" class="footer-link">App Directa</a>
-    <a href="/terms/" class="footer-link">Términos y condiciones</a>
+    <a href="/terms/" class="footer-link">Términos</a>
   </div>
-  <a href="https://kitifica.com/" target="_blank" rel="noopener" class="footer-kitifica">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 508.3 135.4" fill="#fff" style="height:16px;width:auto;display:block"><path d="M107.7,56.9v50.7c0,4.1-3.4,7.5-7.5,7.5H25.1c-4.1,0-7.5-3.3-7.5-7.5v-49.4c-3.6-.2-7.1-.9-10.6-1.2v50.6c0,10,8.1,18.1,18.1,18.1h75.2c10,0,18.1-8.1,18.1-18.1v-50.7h-10.6Z"/><path d="M109.3,19.2H16c-8.8,0-16,7.2-16,16v17.7c0,5.2,4.2,9.4,9.3,9.4h41.8c-.7-3.6-.4-7.3,1.1-10.7H10.7v-16.4c0-2.9,2.4-5.3,5.3-5.3h93.3c2.9,0,5.3,2.4,5.3,5.3v16.4h-40.3c0,3.6-.2,7.2-1.2,10.7h42.8c5.2,0,9.3-4.2,9.3-9.4v-17.7c0-8.8-7.2-16-16-16Z"/><path d="M86.9,24.5h-10.7v-10.7c0-1.8-1.4-3.2-3.2-3.2h-20.8c-1.8,0-3.2,1.4-3.2,3.2v10.7h-10.7v-10.7c0-7.6,6.2-13.8,13.8-13.8h20.8c7.6,0,13.8,6.2,13.8,13.8v10.7Z"/><path d="M65.3,73.9h-5.3c-7.6,0-13.8-6.2-13.8-13.8v-5.3c0-7.6,6.2-13.8,13.8-13.8h5.3c7.6,0,13.8,6.2,13.8,13.8v5.3c0,7.6-6.2,13.8-13.8,13.8ZM60,51.6c-1.8,0-3.2,1.4-3.2,3.2v5.3c0,1.8,1.4,3.2,3.2,3.2h5.3c1.8,0,3.2-1.4,3.2-3.2v-5.3c0-1.8-1.4-3.2-3.2-3.2,0,0-5.3,0-5.3,0Z"/><path d="M171,109.6c-1.7,1.9-4.2,2.9-7.4,2.9s-5.6-1-7.4-2.9c-1.7-1.9-2.6-4.4-2.6-7.5v-60.9c0-3,.9-5.5,2.6-7.4,1.7-1.9,4.2-2.9,7.4-2.9s5.6,1,7.4,2.9c1.7,1.9,2.6,4.4,2.6,7.4v20.7h10.9l16.1-26c1-1.7,2.2-3,3.4-3.8,1.2-.8,2.9-1.2,5-1.2s5.2,1,7.1,2.9c2,1.9,2.9,4.2,2.9,6.8s-.4,3.7-1.3,5l-17,25.5,17.9,26.6c1,1.6,1.4,3.2,1.4,5,0,2.7-1,5-3.1,6.9-2.1,2-4.5,2.9-7.3,2.9s-3.7-.4-5-1.3c-1.3-.8-2.4-2.2-3.4-3.9l-17.1-26.4h-10.5v21.2c0,3.1-.9,5.6-2.6,7.5Z"/><path d="M243.9,45c-2.3,2.1-5.3,3.2-9,3.2s-6.8-1.1-9.1-3.2c-2.3-2.1-3.4-5.1-3.4-8.8s1.1-6.6,3.4-8.7c2.3-2.1,5.3-3.2,9.1-3.2s6.7,1,9,3.2,3.4,5,3.4,8.7-1.1,6.6-3.4,8.8ZM242.4,109.6c-1.7,1.9-4.1,2.9-7.3,2.9s-5.6-1-7.4-2.9c-1.8-2-2.7-4.4-2.7-7.5v-37.1c0-3,.9-5.5,2.6-7.4,1.7-1.9,4.2-2.9,7.5-2.9s5.6.9,7.3,2.8c1.7,1.9,2.6,4.4,2.6,7.5v37.1c0,3.1-.9,5.6-2.6,7.5Z"/><path d="M287.2,94.5c1.7,0,3.1.7,4.3,2s1.8,3.1,1.8,5.4-.7,4.9-2.1,6.7c-2.6,3.2-7.1,4.8-13.4,4.8s-12-2.1-15.4-6.2c-3.4-4.1-5-9.5-5-16.1v-19.2h-1.4c-2.4,0-4.3-.8-5.9-2.3-1.6-1.6-2.3-3.6-2.3-6s.8-4.3,2.3-5.9,3.5-2.3,5.9-2.3h2.4c.2-1.3.5-2.5,1-3.8,1.9-6.4,5.1-9.5,9.9-9.5s8.1,3,8.1,9v4.3h6.4c2.4,0,4.3.8,5.8,2.3,1.5,1.5,2.3,3.5,2.3,5.9s-.8,4.4-2.3,6c-1.5,1.6-3.5,2.3-5.8,2.3h-6.4v17c0,2.2.3,3.9.8,5.1s1.6,1.8,3.3,1.8,1.8-.2,2.8-.6c1.1-.4,2-.6,2.9-.6Z"/><path d="M316.1,45c-2.2,2.1-5.3,3.2-9,3.2s-6.8-1.1-9.1-3.2c-2.3-2.1-3.4-5.1-3.4-8.8s1.1-6.6,3.4-8.7,5.3-3.2,9.1-3.2,6.7,1,9,3.2,3.4,5,3.4,8.7-1.1,6.6-3.4,8.8ZM314.5,109.6c-1.7,1.9-4.1,2.9-7.3,2.9s-5.6-1-7.4-2.9c-1.8-2-2.7-4.4-2.7-7.5v-37.1c0-3,.9-5.5,2.6-7.4,1.7-1.9,4.2-2.9,7.5-2.9s5.6.9,7.3,2.8c1.7,1.9,2.5,4.4,2.5,7.5v37.1c0,3.1-.9,5.6-2.5,7.5Z"/><path d="M375.7,55.4c2.7,0,4.7.8,6.1,2.3,1.4,1.5,2.1,3.5,2.1,6v38.4c0,3.1-.9,5.6-2.5,7.5-1.7,1.9-4.1,2.9-7.3,2.9s-5.6-1-7.4-2.9c-1.8-2-2.7-4.4-2.7-7.5v-30.2h-13.8v53.2c0,3-.9,5.5-2.5,7.4-1.7,1.9-4.1,2.9-7.3,2.9s-5.8-.9-7.5-2.8c-1.7-1.9-2.6-4.4-2.6-7.5l-.2-53.2h-.3c-2.4,0-4.3-.8-5.9-2.3-1.5-1.6-2.3-3.6-2.3-6s.8-4.3,2.3-5.9,3.5-2.3,5.9-2.3h.3c.7-10.7,3.7-18.2,9.1-22.6,5.4-4.4,12.6-6.5,21.6-6.5s15,1.9,19.2,5.6c2.1,1.8,3.2,3.9,3.2,6.3s-.7,4.3-2,5.5c-1.4,1.3-3,1.9-5,1.9s-4.1-.5-7.1-1.6-5.8-1.6-8.6-1.6c-6.1,0-9.4,4.3-10,13h25.4Z"/><path d="M419.7,113.4c-9.5,0-17-2.8-22.3-8.3s-8-12.7-8-21.5,2.8-16.2,8.5-21.7,13.2-8.2,22.7-8.2,11.5,1.2,15,3.4c3,2.1,4.5,4.8,4.5,8.2s-.7,3.8-2,5.3c-1.3,1.4-3.1,2.2-5.3,2.2s-3.2-.4-5.3-1.2c-2.1-.8-4.2-1.2-6.2-1.2-3.8,0-6.7,1.2-8.9,3.7-2.1,2.5-3.2,5.6-3.2,9.5s1.1,6.9,3.2,9.4c2.1,2.5,5.1,3.7,8.9,3.7s4.1-.4,6.2-1.2c2.1-.8,3.9-1.2,5.3-1.2,2.2,0,4,.7,5.3,2.2,1.3,1.4,2,3.2,2,5.2,0,3.5-1.6,6.2-4.9,8.2-3.5,2.3-8.6,3.4-15.4,3.4Z"/><path d="M467.4,113.5c-7.8,0-14-2.8-18.6-8.3-4.6-5.5-6.9-12.7-6.9-21.6s2.4-16.1,7.1-21.6,11.1-8.3,19.1-8.3,14.1,3.2,17.4,9.7h.2v-1.3c.1-2.2.9-4,2.3-5.4s3.3-2,5.8-2,4.6.8,6,2.3c1.4,1.5,2.1,3.5,2.1,6v26.9c0,1.4.1,2.5.3,3.3.2.8.4,1.3.7,1.6.2.3.7.7,1.4,1.3,2.7,1.9,4,4.4,4,7.5s-1,5.3-2.9,7.2c-1.9,1.8-4.6,2.7-8,2.7s-6.3-1-8.3-3-3.2-4-3.8-6h-.2c-1.6,2.9-4,5.1-7.1,6.7-3.1,1.6-6.6,2.3-10.6,2.3ZM465.2,93c1.9,2.3,4.4,3.5,7.6,3.5s5.7-1.1,7.5-3.4,2.7-5.4,2.7-9.6c0-4.1-.9-7.3-2.7-9.5-1.8-2.2-4.3-3.3-7.6-3.3s-5.6,1.2-7.5,3.4-2.8,5.4-2.8,9.4.9,7,2.8,9.4Z"/></svg>
-  </a>
-  <span class="footer-copy">© 2026 Kitifica · de idea a código, sin fricciones</span>
+  <span class="footer-copy">© 2026 Kitifica · Think before you build</span>
 </footer>
+
 <script>
-function skillTab(btn, id) {
-  btn.closest('.skill-install-wrap').querySelectorAll('.skill-tab-btn').forEach(b => b.classList.remove('active'));
-  btn.closest('.skill-install-wrap').querySelectorAll('.skill-tab-panel').forEach(p => p.classList.remove('active'));
+function claudeTab(btn, id) {
+  btn.closest('.claude-install-wrap').querySelectorAll('.claude-tab-btn').forEach(b => b.classList.remove('active'));
+  btn.closest('.claude-install-wrap').querySelectorAll('.claude-tab-panel').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('skill-tab-' + id).classList.add('active');
+  document.getElementById('claude-tab-' + id).classList.add('active');
 }
 function copyInstallPrompt(id) {
   const prompts = {
-    mcp: 'Instala el MCP de CC Brew. Reemplaza TU_API_KEY con tu clave de CC Brew (la encontrás en ccbrew.kitifica.com → Ajustes → API Key) y ejecuta:\n\nclaude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --header "Authorization: Bearer TU_API_KEY" --scope user',
-    skill: 'Instala este archivo como una Skill de Claude Code:\n1. Muévelo a ~/.claude/skills/cc-brew/SKILL.md\n2. Agrega esta entrada en ~/.claude/CLAUDE.md:\n\n# cc-brew\n- **cc-brew** (`~/.claude/skills/cc-brew/SKILL.md`) - estructura ideas de producto antes de construirlas con Claude Code\n  Trigger: `/cc-brew`'
+    mcp: 'claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --header "Authorization: Bearer TU_API_KEY" --scope user',
+    skill: 'Instala este archivo como una Skill de Claude Code:\n1. Muévelo a ~/.claude/skills/cc-brew/SKILL.md\n2. Agrega esta entrada en ~/.claude/CLAUDE.md:\n\n# cc-brew\n- **cc-brew** (`~/.claude/skills/cc-brew/SKILL.md`) - evalúa ideas antes de construirlas con Claude Code\n  Trigger: `/cc-brew`'
   };
   navigator.clipboard.writeText(prompts[id]).catch(() => {});
   const btn = document.getElementById('copy-' + id + '-btn');
@@ -1509,7 +1036,6 @@ function copyInstallPrompt(id) {
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script>
-/* ── SITE-WIDE GSAP ANIMATIONS ─────────────────────────────────── */
 (function () {
   if (!window.gsap || !window.ScrollTrigger) return;
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1517,39 +1043,27 @@ function copyInstallPrompt(id) {
 
   gsap.registerPlugin(ScrollTrigger);
 
-  // Google Fonts (Space Grotesk, display=swap) carga async y puede mover el
-  // layout al swapear — si eso pasa DESPUÉS de que ScrollTrigger calculó los
-  // puntos de disparo, quedan desalineados y una animación de fade-in
-  // (arranca en opacity:0 via .from()) puede no disparar nunca — el elemento
-  // se queda invisible. Recalcular cuando la fuente y todos los recursos
-  // terminen de cargar corrige los triggers contra el layout final.
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(function () { ScrollTrigger.refresh(); });
   }
   window.addEventListener('load', function () { ScrollTrigger.refresh(); });
 
-  /* ── NAV ── */
   gsap.from('nav', { y: -28, opacity: 0, duration: 0.55, ease: 'power2.out', delay: 0.05 });
 
-  /* ── HERO LEFT — cascade ── */
   (function () {
     var tl = gsap.timeline({ delay: 0.1 });
     tl.from('.hero .eyebrow',     { opacity: 0, y: 12, duration: 0.4, ease: 'power2.out' })
       .from('.hero-badge',        { opacity: 0, y: 10, duration: 0.38 }, '-=0.22')
       .from('.hero h1',           { opacity: 0, y: 26, duration: 0.55, ease: 'power3.out' }, '-=0.2')
-      .from('.hero-subtitle',     { opacity: 0, y: 16, duration: 0.45 }, '-=0.2')
       .from('.hero-sub',          { opacity: 0, y: 12, duration: 0.4 },  '-=0.2')
-      .from('.hero-actions > *',  { opacity: 0, y: 10, stagger: 0.09, duration: 0.35 }, '-=0.18')
-      .from('.hero-cert',         { opacity: 0, duration: 0.3 }, '-=0.1');
+      .from('.hero-actions > *',  { opacity: 0, y: 10, stagger: 0.09, duration: 0.35 }, '-=0.18');
   })();
 
-  /* ── HERO SVG — parallax on scroll ── */
   gsap.to('#hero-stack', {
     y: -55, ease: 'none',
     scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1.4 }
   });
 
-  /* ── HERO BG — mouse parallax ── */
   (function () {
     var bg = document.querySelector('.hero-bg');
     if (!bg) return;
@@ -1565,35 +1079,21 @@ function copyInstallPrompt(id) {
     }, { passive: true });
   })();
 
-  /* ── FEATURE BAR ── */
   gsap.from('.feature-pill', {
     opacity: 0, x: -10, stagger: 0.07, duration: 0.45,
     scrollTrigger: { trigger: '.feature-bar', start: 'top 92%' }
   });
 
-  /* ── helper: section cascade ── */
-  function sectionReveal(trigger, items, stagger) {
-    gsap.from(items, {
-      opacity: 0, y: 26, duration: 0.55, ease: 'power2.out',
-      stagger: stagger || 0,
-      scrollTrigger: { trigger: trigger, start: 'top 84%' }
-    });
-  }
-
-  /* ── PROBLEM SECTIONS ── */
   document.querySelectorAll('.problem-section').forEach(function (sec) {
     var tl = gsap.timeline({ scrollTrigger: { trigger: sec, start: 'top 82%' } });
     var ey = sec.querySelector('.eyebrow');
     var ti = sec.querySelector('.section-title');
     var ps = sec.querySelectorAll('.problem-body p');
-    var cta = sec.querySelector('.problem-cta');
     if (ey)  tl.from(ey, { opacity: 0, y: 14, duration: 0.42 });
     if (ti)  tl.from(ti, { opacity: 0, y: 22, duration: 0.55, ease: 'power3.out' }, '-=0.22');
     if (ps.length) tl.from(ps, { opacity: 0, y: 12, stagger: 0.1, duration: 0.45 }, '-=0.15');
-    if (cta) tl.from(cta, { opacity: 0, y: 10, duration: 0.35 }, '-=0.1');
   });
 
-  /* ── STEPS ── */
   (function () {
     var tl = gsap.timeline({ scrollTrigger: { trigger: '.steps-section', start: 'top 82%' } });
     tl.from('.steps-header .eyebrow, .steps-header .section-title, .steps-header .section-sub',
@@ -1601,33 +1101,33 @@ function copyInstallPrompt(id) {
     tl.from('.step-card', { opacity: 0, y: 34, scale: 0.96, stagger: 0.12, duration: 0.6, ease: 'power2.out' }, '-=0.1');
   })();
 
-  /* ── STACK ── */
   (function () {
-    var tl = gsap.timeline({ scrollTrigger: { trigger: '.stack-section', start: 'top 82%' } });
-    tl.from('.stack-header .eyebrow, .stack-header .section-title, .stack-header .section-sub',
+    var tl = gsap.timeline({ scrollTrigger: { trigger: '.decision-section', start: 'top 82%' } });
+    tl.from('.decision-header .eyebrow, .decision-header .section-title, .decision-header .section-sub',
       { opacity: 0, y: 18, stagger: 0.1, duration: 0.5 });
-    tl.from('.stack-card', { opacity: 0, y: 26, stagger: 0.08, duration: 0.5 }, '-=0.15');
-    tl.from('.stack-visual', { opacity: 0, y: 18, duration: 0.5 }, '-=0.2');
+    tl.from('.decision-card', { opacity: 0, y: 30, stagger: 0.14, duration: 0.6, ease: 'power2.out' }, '-=0.1');
   })();
 
-  /* ── SEMA ── */
   (function () {
-    var tl = gsap.timeline({ scrollTrigger: { trigger: '.sema-section', start: 'top 82%' } });
-    tl.from('.sema-header .eyebrow, .sema-header .section-title, .sema-header .section-sub',
-      { opacity: 0, y: 18, stagger: 0.1, duration: 0.5, ease: 'power2.out' });
-    tl.from('.sema-card', { opacity: 0, y: 26, scale: 0.97, stagger: 0.07, duration: 0.5 }, '-=0.1');
-    tl.from('.sema-cta', { opacity: 0, y: 12, duration: 0.4 }, '-=0.1');
+    var tl = gsap.timeline({ scrollTrigger: { trigger: '.sayan-section', start: 'top 82%' } });
+    tl.from('.sayan-quote', { opacity: 0, y: 22, duration: 0.6, ease: 'power3.out' });
+    tl.from('.sayan-sub', { opacity: 0, y: 14, duration: 0.45 }, '-=0.2');
   })();
 
-  /* ── ROUTES ── */
   (function () {
-    var tl = gsap.timeline({ scrollTrigger: { trigger: '.routes-section', start: 'top 82%' } });
-    tl.from('.routes-header .eyebrow, .routes-header .section-title, .routes-header .section-sub',
+    var tl = gsap.timeline({ scrollTrigger: { trigger: '.save-section', start: 'top 82%' } });
+    tl.from('.save-header .eyebrow, .save-header .section-title, .save-header .section-sub',
       { opacity: 0, y: 18, stagger: 0.1, duration: 0.5 });
-    tl.from('.route-card', { opacity: 0, y: 30, stagger: 0.14, duration: 0.6, ease: 'power2.out' }, '-=0.1');
+    tl.from('.save-card', { opacity: 0, y: 26, stagger: 0.08, duration: 0.5 }, '-=0.1');
   })();
 
-  /* ── PRICING ── */
+  (function () {
+    var tl = gsap.timeline({ scrollTrigger: { trigger: '.claude-section', start: 'top 82%' } });
+    tl.from('.claude-section > div:first-child > *',
+      { opacity: 0, y: 22, stagger: 0.1, duration: 0.5, ease: 'power2.out' });
+    tl.from('.claude-mockup', { opacity: 0, x: 32, duration: 0.65, ease: 'power2.out' }, '-=0.4');
+  })();
+
   (function () {
     var tl = gsap.timeline({ scrollTrigger: { trigger: '.pricing-section', start: 'top 80%' } });
     tl.from('.pricing-header .eyebrow, .pricing-header .section-title',
@@ -1637,33 +1137,6 @@ function copyInstallPrompt(id) {
     tl.from('.pricing-free', { opacity: 0, y: 14, duration: 0.4 }, '-=0.2');
   })();
 
-  /* ── SKILL SECTION ── */
-  (function () {
-    var tl = gsap.timeline({ scrollTrigger: { trigger: '.skill-section', start: 'top 82%' } });
-    tl.from('.skill-inner > div:first-child > *',
-      { opacity: 0, y: 22, stagger: 0.1, duration: 0.5, ease: 'power2.out' });
-    tl.from('.skill-mockup', { opacity: 0, x: 32, duration: 0.65, ease: 'power2.out' }, '-=0.4');
-  })();
-
-  /* ── APP DIRECTA ── */
-  (function () {
-    var tl = gsap.timeline({ scrollTrigger: { trigger: '.appdirecta-section', start: 'top 82%' } });
-    tl.from('.appdirecta-kicker, .appdirecta-title, .appdirecta-desc',
-      { opacity: 0, y: 18, stagger: 0.1, duration: 0.5 }, '-=0.2');
-    tl.from('.appdirecta-feat',
-      { opacity: 0, y: 24, stagger: 0.08, duration: 0.5 }, '-=0.1');
-  })();
-
-  /* ── METODOLOGÍA ── */
-  (function () {
-    var tl = gsap.timeline({ scrollTrigger: { trigger: '.metodo-section', start: 'top 82%' } });
-    tl.from('.metodo-header .eyebrow, .metodo-header .section-title, .metodo-intro',
-      { opacity: 0, y: 18, stagger: 0.1, duration: 0.5 });
-    tl.from('.metodo-card', { opacity: 0, y: 26, stagger: 0.08, duration: 0.5 }, '-=0.1');
-    tl.from('.metodo-note', { opacity: 0, y: 14, duration: 0.4 }, '-=0.1');
-  })();
-
-  /* ── FAQ ── */
   (function () {
     var tl = gsap.timeline({ scrollTrigger: { trigger: '.faq-section', start: 'top 82%' } });
     tl.from('.faq-header .eyebrow, .faq-header .section-title',
@@ -1672,13 +1145,11 @@ function copyInstallPrompt(id) {
       { opacity: 0, y: 20, stagger: 0.06, duration: 0.45 }, '-=0.1');
   })();
 
-  /* ── CTA FINAL — punch in ── */
   gsap.from('.cta-inner', {
     opacity: 0, scale: 0.92, y: 36, duration: 0.85, ease: 'back.out(1.5)',
     scrollTrigger: { trigger: '.cta-section', start: 'top 84%' }
   });
 
-  /* ── FOOTER ── */
   gsap.from('.footer-brand, .footer-links, .footer-copy', {
     opacity: 0, y: 14, stagger: 0.08, duration: 0.45,
     scrollTrigger: { trigger: 'footer', start: 'top 94%' }
@@ -1692,12 +1163,8 @@ function copyInstallPrompt(id) {
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var svg = document.getElementById('hero-stack');
   var hiddenOnMobile = window.matchMedia && !window.matchMedia('(min-width: 861px)').matches;
-  if (!svg || !window.gsap || reduced || hiddenOnMobile) return; // .hero-right ya es display:none en mobile — no correr GSAP de fondo ahí
+  if (!svg || !window.gsap || reduced || hiddenOnMobile) return;
 
-  // Todas las piezas quedan siempre ensambladas y visibles — nunca salen del
-  // viewBox, nunca desaparecen. Cada una se balancea en el sitio y vuelve
-  // exacto a rotation:0 / y:0 antes de repetir, así el frame 1 y el último
-  // frame del loop son el mismo frame (sin salto visible al reiniciar).
   var pieces = [
     { sel: '#piece-1-dark',   rot: 3, y: 3 },
     { sel: '#piece-2-blob',   rot: 5, y: 4 },
@@ -1715,8 +1182,6 @@ function copyInstallPrompt(id) {
     tl.to(p.sel, { rotation: 0, y: 0, duration: 0.45, ease: 'sine.inOut' }, t0 + 1.0);
   });
 
-  // Salto sincronizado de todo el grupo (capa aparte, #hero-jump) — vuelve
-  // a y:0 antes de que el timeline cierre, sin pisar el balanceo de cada pieza.
   var jumpStart = (pieces.length - 1) * 0.18 + 1.0 + 0.45 + 0.3;
   tl.to('#hero-jump', { y: -14, duration: 0.22, ease: 'power2.out' }, jumpStart);
   tl.to('#hero-jump', { y: 0, duration: 0.42, ease: 'bounce.out' }, jumpStart + 0.22);

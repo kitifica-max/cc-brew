@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { decryptSecret } from '../../lib/crypto.js'
 import { supabase } from '../../lib/db.js'
-import { callModel, callModelJson, buildContextText, SEMAFORO_PROMPT, CLAUDE_MD_PROMPT } from '../../lib/ai-shared.js'
+import { callModel, callModelJson, buildContextText, EVALUATION_PROMPT, BUILD_BRIEF_PROMPT } from '../../lib/ai-shared.js'
 
 // Solo el step "evaluate" vive acá: es el único que genera contenido largo
 // (CLAUDE_MD_PROMPT, hasta 7000 tokens) — los logs de producción mostraban
@@ -51,9 +51,9 @@ export async function handler(event) {
   const followupJson = followup_answers ? JSON.stringify(followup_answers, null, 2) : null
 
   try {
-    const [semaforo, claudeMdText] = await Promise.all([
-      callModelJson(client, SEMAFORO_PROMPT(idea_text, contextText, answersJson, followupJson, mode), 1500),
-      callModel(client, CLAUDE_MD_PROMPT(idea_text, contextText, answersJson, followupJson, mode), 7000),
+    const [evaluation, briefText] = await Promise.all([
+      callModelJson(client, EVALUATION_PROMPT(idea_text, contextText, answersJson, followupJson, mode), 2500),
+      callModel(client, BUILD_BRIEF_PROMPT(idea_text, contextText, answersJson, followupJson, mode), 7000),
     ])
     // upsert, no update: si el debounce de sync del cliente todavía no
     // escribió la fila (carrera con patchProject), esto la crea. onConflict
@@ -62,8 +62,11 @@ export async function handler(event) {
     const { error } = await supabase.from('ccc_projects').upsert({
       id: project_id,
       user_id,
-      claude_md: claudeMdText.trim(),
-      semaforo,
+      brief: briefText.trim(),
+      decision: evaluation,
+      // Legacy fields for backward compatibility
+      claude_md: briefText.trim(),
+      semaforo: evaluation,
       generation_error: null,
     }, { onConflict: 'id' })
     if (error) console.error('ai-process-evaluate-background: fallo guardando resultado:', error)
