@@ -66,8 +66,13 @@ export async function evaluateIdea(projectId, ideaText, answers, followupAnswers
     brand_profile: brandProfile,
     mode,
   })
-  return pollEvaluateResult(projectId)
-  // { semaforo: {...}, claude_md: '...' }
+  const result = await pollEvaluateResult(projectId)
+  // Map legacy fields to new names
+  return {
+    ...result,
+    decision: result.decision ?? result.semaforo,
+    brief: result.brief ?? result.claude_md,
+  }
 }
 
 // Afina la idea del usuario antes de generar el cuestionario. Puede devolver

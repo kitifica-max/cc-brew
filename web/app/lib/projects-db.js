@@ -5,9 +5,10 @@ function toDb(p) {
     id: p.id,
     name: p.name,
     idea_text: p.ideaText ?? null,
-    idea_mode: p.ideaMode ?? 'idea',
     claude_md: p.claudeMd ?? null,
     semaforo: p.semaforo ?? null,
+    brief: p.brief ?? null,
+    decision: p.decision ?? null,
     session_id: p.sessionId ?? null,
     pending_questions: p.pendingQuestions ?? null,
     pending_answers: p.pendingAnswers ?? null,
@@ -31,9 +32,10 @@ function fromDb(r) {
     name: r.name,
     path: null,
     ideaText: r.idea_text ?? null,
-    ideaMode: r.idea_mode ?? 'idea',
     claudeMd: r.claude_md ?? null,
     semaforo: r.semaforo ?? null,
+    brief: r.brief ?? r.claude_md ?? null,
+    decision: r.decision ?? r.semaforo ?? null,
     sessionId: r.session_id ?? null,
     pendingQuestions: r.pending_questions ?? null,
     pendingAnswers: r.pending_answers ?? null,
@@ -92,12 +94,20 @@ export async function pollEvaluateResult(projectId, { intervalMs = 3000, timeout
     await new Promise(r => setTimeout(r, intervalMs))
     const { data, error } = await supabase
       .from('ccc_projects')
-      .select('claude_md, semaforo, generation_error')
+      .select('claude_md, semaforo, brief, decision, generation_error')
       .eq('id', projectId)
       .maybeSingle()
-    if (error) { console.error('pollEvaluateResult:', error); continue } // hiccup de red — seguir esperando, no abortar por una lectura fallida
+    if (error) { console.error('pollEvaluateResult:', error); continue }
     if (data?.generation_error) throw new Error(data.generation_error)
-    if (data?.claude_md) return { claude_md: data.claude_md, semaforo: data.semaforo }
+    if (data?.brief || data?.claude_md) {
+      return {
+        brief: data.brief ?? data.claude_md,
+        decision: data.decision ?? data.semaforo,
+        // Legacy fields for backward compatibility
+        claude_md: data.claude_md,
+        semaforo: data.semaforo,
+      }
+    }
   }
   throw new Error('La generación está tardando más de lo esperado. Intenta de nuevo en un momento.')
 }

@@ -11,7 +11,9 @@ export function modeLine(mode) {
     : ''
 }
 
-export const SEMAFORO_PROMPT = (ideaText, contextText, answersJson, followupAnswersJson, mode) => `Eres un estratega de marketing y ventas senior evaluando si una herramienta está lista para construirse con Claude Code.
+// --- NUEVO FRAMEWORK: 10 criterios + decisión BUILD/RETHINK/DON'T BUILD ---
+
+export const EVALUATION_PROMPT = (ideaText, contextText, answersJson, followupAnswersJson, mode) => `Eres un evaluador de productos brutally honesto. Tu trabajo es decirle a alguien si su idea vale la pena construirla — no motivarlo, no ser amable, ser útil.
 
 ${modeLine(mode)}IDEA DEL USUARIO:
 ${ideaText}
@@ -20,21 +22,60 @@ RESPUESTAS AL CUESTIONARIO:
 ${answersJson}
 ${followupAnswersJson ? `\nRESPUESTAS DE SEGUIMIENTO:\n${followupAnswersJson}` : ''}
 
-Evalúa estos 6 criterios. Score: 0=rojo (no cumple), 1=amarillo (parcial), 2=verde (cumple):
+EVALÚA ESTOS 10 CRITERIOS. Para cada uno, asigná una señal: "strong", "moderate", "weak", o "unknown".
 
-1. claridad_objecion: ¿Está clara la objeción o necesidad puntual del cliente que la herramienta tiene que resolver? No un dolor genérico — el de esta persona.
-2. alcance_v1: ¿El alcance de la herramienta es concreto y acotado? ¿Hay cosas explícitamente excluidas?
-3. recorrido_cliente: ¿Hay un recorrido definido de cómo el cliente ve/usa la pieza, paso a paso?
-4. dependencias_externas: ¿Sin dependencias complejas sin resolver (pagos, auth, APIs de terceros)?
-5. coherencia: ¿Las respuestas del cuestionario son coherentes entre sí y con la idea original?
-6. viabilidad: ¿Tamaño apropiado para construirse en una sesión? ¿Sin bloqueos técnicos evidentes?
+1. problem_clarity: ¿El problema está claramente definido? ¿Se sabe qué dolor resuelve y para quién?
+2. target_audience: ¿El público objetivo está definido con precisión? ¿No es "todos"?
+3. value_proposition: ¿La propuesta de valor es clara y diferenciada? ¿Por qué esta y no otra?
+4. competition: ¿Se conoce la competencia? ¿Hay diferenciación real?
+5. feasibility: ¿Es técnicamente factible de construir? ¿Sin bloqueos técnicos críticos?
+6. monetization: ¿Hay un modelo de monetación claro? ¿O al menos una hipótesis?
+7. mvp_scope: ¿El alcance del MVP es acotado y realista? ¿O es un proyecto entero disfrazado de v1?
+8. distribution: ¿Cómo llega al cliente? ¿Hay un canal definido?
+9. timing: ¿Por qué ahora? ¿Hay algo que haga este momento especial?
+10. founder_fit: ¿El fundador tiene las capacidades/contexto para construir esto?
 
-Para criterios con score 0 o 1: genera 1-2 preguntas de seguimiento específicas (solo si NO hay followup_answers).
+Para cada criterio también generá un "reason" (1-2 frases explicando la señal).
+
+Después, hacé un RED TEAM ANALYSIS:
+- strongest_signal: La señal más positiva de toda la evaluación
+- biggest_risk: El riesgo más grande que podría hacer fracasar esto
+- what_would_change: Qué información adicional cambiaría la decisión
+
+Finalmente, dale una DECISIÓN:
+- "BUILD": Si hay suficiente señal positiva como para construir
+- "RETHINK": Si hay potencial pero faltan señales críticas
+- "DON_T_BUILD": Si las señales son demasiado débiles
+
+Y explicá "why" (2-3 frases directas, sin rodeos).
+
+Si hay followup_answers y la info es insuficiente, podés decir "NOT_ENOUGH_SIGNAL" o "VALIDATE_FIRST" como decisión — no fuerces una decisión cuando no hay datos.
 
 Responde SOLO con JSON válido, sin markdown:
-{"claridad_objecion":0,"alcance_v1":0,"recorrido_cliente":0,"dependencias_externas":0,"coherencia":0,"viabilidad":0,"mensajes":{"claridad_objecion":"...","alcance_v1":"...","recorrido_cliente":"...","dependencias_externas":"...","coherencia":"...","viabilidad":"..."},"followup_questions":[{"id":"f1","text":"...","type":"single","options":["opcion 1","opcion 2","opcion 3"]}]}`
+{
+  "decision": "BUILD|RETHINK|DON_T_BUILD",
+  "why": "...",
+  "strongest_signal": "...",
+  "biggest_risk": "...",
+  "what_would_change": "...",
+  "criteria": {
+    "problem_clarity": {"signal": "strong|moderate|weak|unknown", "reason": "..."},
+    "target_audience": {"signal": "...", "reason": "..."},
+    "value_proposition": {"signal": "...", "reason": "..."},
+    "competition": {"signal": "...", "reason": "..."},
+    "feasibility": {"signal": "...", "reason": "..."},
+    "monetization": {"signal": "...", "reason": "..."},
+    "mvp_scope": {"signal": "...", "reason": "..."},
+    "distribution": {"signal": "...", "reason": "..."},
+    "timing": {"signal": "...", "reason": "..."},
+    "founder_fit": {"signal": "...", "reason": "..."}
+  },
+  "before_you_build": "...",
+  "v1_scope": "...",
+  "dont_build_yet": "..."
+}`
 
-export const CLAUDE_MD_PROMPT = (ideaText, contextText, answersJson, followupAnswersJson, mode) => `Eres un estratega de marketing y ventas senior. Genera un CLAUDE.md completo para esta herramienta.
+export const BUILD_BRIEF_PROMPT = (ideaText, contextText, answersJson, followupAnswersJson, mode) => `Eres un estratega de producto senior. Generá un BRIEF de construcción para esta idea que ya fue evaluada positivamente.
 
 ${modeLine(mode)}IDEA:
 ${ideaText}
@@ -43,83 +84,43 @@ RESPUESTAS:
 ${answersJson}
 ${followupAnswersJson ? `\nRESPUESTAS DE SEGUIMIENTO:\n${followupAnswersJson}` : ''}
 
-Genera el documento con esta estructura exacta (markdown puro, sin JSON):
+Genera el documento con esta estructura (markdown puro):
 
-# [Nombre descriptivo de la herramienta] — v1
+# [Nombre descriptivo] — Brief de Construcción
 
-## La objeción a resolver
-[Qué duda o resistencia tiene el cliente, y cómo esta pieza la resuelve — 2-3 frases directas. Empieza por la objeción, no por la herramienta.]
+## Para quién es
+[1-2 frases sobre el usuario/cliente目标 y qué necesita]
 
-## Perfil de público objetivo
-[Si el contexto incluye un PERFIL DE PÚBLICO OBJETIVO, transcribilo como lista: Rol y nivel de decisión, Objetivo o dolor específico, Objeción principal, Qué necesita ver o sentir para decir que sí, Etapa del proceso de compra, Canal de consumo. Si no hay ese contexto, omití esta sección completa.]
+## Qué resuelve
+[El problema concreto que esta herramienta resuelve]
 
-## Lineamientos de marca
-[Si el contexto incluye LINEAMIENTOS DE MARCA, resumilos acá — tono, paleta, tipografía, reglas de uso. Si no hay ese contexto, omití esta sección completa.]
-
-## Recorrido del cliente (happy path)
-1. [Paso 1 — qué ve/hace el cliente primero]
-2. [Paso 2]
-3. [Paso 3]
-
-## Criterio de éxito de v1
-Al terminar de ver/usar la herramienta, [tipo de cliente] [reacción o decisión concreta esperada] — no un criterio técnico, la señal de que la pieza convenció.
-
-## Complejidad del proyecto
-**[Baja / Media / Alta]** — [1 frase que justifica la categoría basada en flujos, integraciones y alcance]
-
-- 🟢 Baja: un flujo principal, sin integraciones externas, datos simples, sin auth compleja
-- 🟡 Media: 2-3 flujos, 1-2 integraciones (auth, una API), datos relacionales moderados
-- 🔴 Alta: múltiples flujos, pagos reales, tiempo real, múltiples roles o integraciones complejas
-
-## Restricciones
-- Plataforma: [web / móvil / desktop / CLI]
-- Stack: [preferido o recomendado]
-- Integraciones: [listar solo las necesarias para v1, o "ninguna" si aplica]
+## Criterio de éxito
+[Cómo sabemos que funcionó — no métricas técnicas, sino la señal del cliente]
 
 ## Alcance v1 — incluye
 - [Feature 1]
 - [Feature 2]
 
-## Alcance v1 — excluye (construir después)
-- [Cosa 1]
-- [Cosa 2]
+## Alcance v1 — excluye
+- [Lo que se construye después]
 
 ## Stack recomendado
-[Stack simple. HTML/JS para web simple, Next.js para apps, SQLite para datos locales.]
+[Tech stack simple y concreto]
 
-## Referencias visuales
-[Solo si la IDEA incluye una sección "Referencias visuales adjuntas": resumí en 1-2 frases por imagen qué guía de diseño aporta cada una — estilo, layout, paleta, patrones de interacción — como contexto para quien construya v1. Si la idea NO incluye esa sección, omití "## Referencias visuales" por completo, sin dejar el título vacío.]
-
-## SEO y visibilidad en IA
-[Solo si la plataforma es web Y el proyecto es de cara al público (no un CLI, no una herramienta interna): lista concreta de lo que hay que configurar — meta title/description por página, Open Graph tags, sitemap.xml, robots.txt, verificación de Google Search Console (meta tag o archivo de verificación), datos estructurados JSON-LD si el tipo de contenido lo amerita, URLs semánticas. Sumá también visibilidad para IA: un archivo llms.txt en la raíz que describa el sitio en texto plano para agentes/crawlers de IA, y contenido bien estructurado (FAQs con schema.org/FAQPage, respuestas directas y citables) para que ChatGPT, Perplexity o el buscador de Claude puedan encontrar y citar la herramienta. Si no aplica, omití "## SEO y visibilidad en IA" por completo.]
-
-## Backend y base de datos
-[Solo si el proyecto necesita persistir datos compartidos entre usuarios, autenticación, o almacenamiento: recomendá UNA opción concreta de entre las más usadas — Supabase, Firebase, Neon, PlanetScale o Convex — según lo que el proyecto realmente necesita (Supabase o Firebase si hace falta auth + storage + DB en un combo; Neon o PlanetScale si alcanza con una DB relacional gestionada; Convex si el proyecto es reactivo en tiempo real). Si el usuario ya pidió o mencionó una opción específica, usá esa sin importar cuál sea. Incluí los pasos de CLI de la opción elegida. Si el proyecto no necesita backend (todo local o solo cliente), omití "## Backend y base de datos" por completo.]
-
-## Deploy
-[Solo si es un proyecto web que se va a desplegar: recomendá UNA opción concreta de entre las más usadas — Netlify, Vercel, Cloudflare Pages, Railway o Render — según el tipo de proyecto (Netlify o Vercel para sitios/apps estáticas o Next.js; Railway o Render si el proyecto corre un servidor persistente o un backend propio). Si el usuario ya pidió o mencionó una opción específica, usá esa. Incluí instalación del CLI, login, y el comando de publicación de la opción elegida. Si no aplica (CLI tool, script local, librería), omití "## Deploy" por completo.]
-
-## Repositorio
-[Solo si el proyecto se despliega o necesita control de versiones remoto: GitHub es la opción más usada — pasos para crear el repo (\`gh repo create <nombre> --private --source=. --remote=origin\`) y conectarlo al deploy elegido para que cada push publique solo. Si el usuario ya usa GitLab o Bitbucket, usá esa plataforma en su lugar. Si no aplica, omití "## Repositorio" por completo.]
-
-## v2+ — visión de escalamiento (bloqueada — no ejecutar ahora)
-- [Feature futuro]
+## Restricciones
+- Plataforma: [web/móvil/desktop]
+- Integraciones: [las necesarias]
 
 ## Primeros 3 pasos
 1. [Acción concreta hoy]
-2. [Construir la pieza mínima del recorrido del cliente]
-3. [Mostrarla a alguien real y ver si reacciona como se espera]
+2. [Construir la pieza mínima]
+3. [Validar con alguien real]
+
+## Referencias visuales
+[Solo si la idea incluye imágenes]
 
 ---
-*Generado por CC Brew · No ejecutar v2+ hasta validar v1*
-
-Regla de complejidad: evalúa y elige UNA categoría basándote en señales objetivas del proyecto:
-- Baja: 1 flujo principal, sin pagos, sin auth social, sin tiempo real, datos simples (lista, formulario, CRUD básico)
-- Media: 2-3 flujos, auth (email/social), 1 API externa, notificaciones, datos con relaciones
-- Alta: pagos reales (Stripe/Wompi), tiempo real (sockets), múltiples roles de usuario, más de 2 integraciones externas, lógica de negocio compleja
-No menciones tiempo — la categoría es sobre scope y dependencias, no sobre velocidad del desarrollador.
-
-Regla de secciones condicionales (Referencias visuales, SEO, Backend, Deploy, Repositorio): evaluá cada una de forma independiente según lo que ESTE proyecto realmente necesita — no las incluyas todas por default ni las omitas todas por default. Un CLI tool o script local no lleva SEO ni Netlify. Un proyecto que no comparte datos entre usuarios no lleva Supabase. Nunca dejes un título de sección seguido de un placeholder sin completar — si no aplica, el título entero desaparece del documento.`
+*Generado por CC Brew · Evaluado como BUILD*`
 
 export function buildContextText(audienceProfile, brandProfile) {
   const parts = []

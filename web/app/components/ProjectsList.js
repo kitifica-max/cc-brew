@@ -22,10 +22,17 @@ function fmtRelative(iso) {
 }
 
 function StatusTag({ p }) {
-  if (p.claudeMd) return (
-    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', color: '#22c55e', background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 6, padding: '2px 7px', textTransform: 'uppercase', flexShrink: 0 }}>CLAUDE.md ✓</span>
+  const decision = p.decision?.decision;
+  if (decision === 'BUILD' || p.brief) return (
+    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', color: '#22c55e', background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 6, padding: '2px 7px', textTransform: 'uppercase', flexShrink: 0 }}>BUILD ✓</span>
   );
-  if (p.ideaText || p.sessionId || p.pendingQuestions) return (
+  if (decision === 'RETHINK') return (
+    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', color: '#F59E0B', background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 6, padding: '2px 7px', textTransform: 'uppercase', flexShrink: 0 }}>RETHINK</span>
+  );
+  if (decision === 'DON_T_BUILD') return (
+    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', color: '#EF4444', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 6, padding: '2px 7px', textTransform: 'uppercase', flexShrink: 0 }}>NO CONSTRUIR</span>
+  );
+  if (p.ideaText || p.pendingQuestions) return (
     <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', color: '#f59e0b', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 6, padding: '2px 7px', textTransform: 'uppercase', flexShrink: 0 }}>En proceso</span>
   );
   return null;
@@ -37,7 +44,7 @@ const ICON_PLUS     = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height
 const ICON_FOLDER   = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M2 11V4.6a.6.6 0 0 1 .6-.6h6.178a.6.6 0 0 1 .39.144l3.164 2.712a.6.6 0 0 0 .39.144H21.4a.6.6 0 0 1 .6.6V11M2 11v8.4a.6.6 0 0 0 .6.6h18.8a.6.6 0 0 0 .6-.6V11M2 11h20"/></svg>`;
 const ICON_PENCIL   = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="m14.363 5.652l1.48-1.48a2 2 0 0 1 2.829 0l1.414 1.414a2 2 0 0 1 0 2.828l-1.48 1.48m-4.243-4.242l-9.616 9.615a2 2 0 0 0-.578 1.238l-.242 2.74a1 1 0 0 0 1.084 1.085l2.74-.242a2 2 0 0 0 1.24-.578l9.615-9.616m-4.243-4.242l4.243 4.242"/></svg>`;
 const ICON_SETTINGS = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6"/><path d="m19.622 10.395l-1.097-2.65L20 6l-2-2l-1.735 1.483l-2.707-1.113L12.935 2h-1.954l-.632 2.401l-2.645 1.115L6 4L4 6l1.453 1.789l-1.08 2.657L2 11v2l2.401.656L5.516 16.3L4 18l2 2l1.791-1.46l2.606 1.072L11 22h2l.604-2.387l2.651-1.098C16.697 18.832 18 20 18 20l2-2l-1.484-1.75l1.098-2.652l2.386-.62V11z"/></svg>`;
-const ICON_REFRESH   = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M3 12a9 9 0 0 1 15.36-6.36L21 8M3 12a9 9 0 0 0 15.36 6.36L21 16M21 8V3m0 5h-5M21 16v5m0-5h-5"/></svg>`;
+const ICON_REFRESH   = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path fill="currentColor" d="M12 20q-3.35 0-5.675-2.325T4 12t2.325-5.675T12 4q1.725 0 3.3.712T18 6.75V5q0-.425.288-.712T19 4t.713.288T20 5v5q0 .425-.288.713T19 11h-5q-.425 0-.712-.288T13 10t.288-.712T14 9h3.2q-.8-1.4-2.187-2.2T12 6Q9.5 6 7.75 7.75T6 12t1.75 4.25T12 18q1.7 0 3.113-.862t2.187-2.313q.2-.35.563-.487t.737-.013q.4.125.575.525t-.025.75q-1.025 2-2.925 3.2T12 20"/></svg>`;
 
 const ONBOARDING_STEPS = [
   {
