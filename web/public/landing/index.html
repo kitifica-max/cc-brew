@@ -506,7 +506,6 @@ footer {
 <!-- SPLASH -->
 <div id="ccbrew-splash" style="position:fixed;inset:0;z-index:9999;background:#7c3aed;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:opacity 0.35s ease;">
   <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.09) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.09) 1px,transparent 1px);background-size:40px 40px;-webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);"></div>
-  <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background-image:url(/ccb_logo_v10.png);background-size:cover;background-position:center;background-repeat:no-repeat;mix-blend-mode:hard-light;opacity:0.30;"></div>
   <style>
     @keyframes ccb-splash-in{0%{opacity:0;transform:scale(.82) translateY(10px)}60%{opacity:1;transform:scale(1.04) translateY(0)}100%{opacity:1;transform:scale(1) translateY(0)}}
     @keyframes ccb-splash-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
@@ -622,8 +621,9 @@ footer {
 </div>
 
 <!-- EL PROBLEMA -->
-<section class="problem-section problem-section--light">
-  <div class="problem-inner">
+<section class="problem-section problem-section--light" style="position:relative;overflow:hidden;">
+  <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background-image:url(/ccb_logo_v10.png);background-size:cover;background-position:center;background-repeat:no-repeat;mix-blend-mode:hard-light;opacity:0.60;z-index:0;"></div>
+  <div class="problem-inner" style="position:relative;z-index:1;">
     <div class="sec-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M5.31171 10.7615C8.23007 5.58716 9.68925 3 12 3C14.3107 3 15.7699 5.58716 18.6883 10.7615L19.0519 11.4063C21.4771 15.7061 22.6897 17.856 21.5937 19.428C20.4978 21 17.7864 21 12.3637 21H11.6363C6.21356 21 3.50217 21 2.40626 19.428C1.31034 17.856 2.52291 15.7061 4.94805 11.4063L5.31171 10.7615ZM12 7.25C12.4142 7.25 12.75 7.58579 12.75 8V13C12.75 13.4142 12.4142 13.75 12 13.75C11.5858 13.75 11.25 13.4142 11.25 13V8C11.25 7.58579 11.5858 7.25 12 7.25ZM12 17C12.5523 17 13 16.5523 13 16C13 15.4477 12.5523 15 12 15C11.4477 15 11 15.4477 11 16C11 16.5523 11.4477 17 12 17Z" clip-rule="evenodd"/></svg></div>
     <span class="eyebrow">El problema</span>
     <h2 class="section-title">Construir nunca fue tan fácil. <span style="color:var(--orange)">El problema es saber qué vale la pena construir.</span></h2>
