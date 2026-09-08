@@ -23,6 +23,20 @@
   status = 301
   force = true
 
+# Landing en root — sirve /landing/ en / sin cambiar la URL del browser.
+[[redirects]]
+  from = "/"
+  to = "/landing/"
+  status = 200
+  force = true
+
+# /landing/ redirige permanentemente a / (URL canónica).
+[[redirects]]
+  from = "/landing/"
+  to = "/"
+  status = 301
+  force = true
+
 [[headers]]
   for = "/*"
   [headers.values]

@@ -6,7 +6,7 @@
 <meta name="author" content="Kitifica">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="canonical" href="https://ccbrew.kitifica.com/landing/">
+<link rel="canonical" href="https://ccbrew.kitifica.com/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="CC Brew">
 <meta property="og:title" content="CC Brew — Antes de construir, preguntate si vale la pena">
 <meta property="og:description" content="Evalúa tu idea antes de construirla con IA. Encuentra los puntos débiles, decidí si vale la pena, y llevá lo que sobreviva a Claude Code.">
-<meta property="og:url" content="https://ccbrew.kitifica.com/landing/">
+<meta property="og:url" content="https://ccbrew.kitifica.com/">
 <meta property="og:image" content="https://ccbrew.kitifica.com/icon-512.png">
 <meta property="og:locale" content="es_ES">
 <meta name="twitter:card" content="summary_large_image">
@@ -357,8 +357,13 @@ section[id], #hero { scroll-margin-top: 96px; }
 /* CLAUDE CODE INTEGRATION */
 .claude-section { padding: 80px 24px; background: var(--ink-2); }
 .claude-inner {
-  max-width: 1100px; margin: 0 auto;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1.1fr 1fr; gap: 48px; align-items: center;
+}
+.claude-install-col { display: flex; flex-direction: column; justify-content: center; }
+@media (max-width: 860px) {
+  .claude-inner { grid-template-columns: 1fr; gap: 32px; }
+  .claude-mockup { display: none; }
 }
 .claude-desc { font-size: 16px; color: var(--text-2); line-height: 1.65; margin: 16px 0 24px; max-width: 420px; }
 .claude-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border); }
@@ -412,83 +417,6 @@ section[id], #hero { scroll-margin-top: 96px; }
 .tool-method { color: var(--text-2); }
 .tool-spinner { margin-left: auto; width: 10px; height: 10px; border: 1.5px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-/* PRICING */
-.pricing-section { padding: 80px 24px; background: var(--paper); color: var(--paper-ink); }
-.pricing-inner { max-width: 900px; margin: 0 auto; }
-.pricing-header { text-align: center; margin-bottom: 12px; }
-.pricing-unit {
-  text-align: center; margin-bottom: 36px;
-  background: #fff; border: 1px solid var(--paper-border);
-  border-radius: 12px; padding: 14px 20px; max-width: 560px; margin-left: auto; margin-right: auto;
-}
-.pricing-unit p { font-size: 13px; color: var(--paper-ink-2); line-height: 1.65; }
-.pricing-unit strong { color: var(--paper-ink); }
-.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-@media (max-width: 700px) { .pricing-grid { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto; } }
-
-.plan-card {
-  background: #fff; border: 1px solid var(--paper-border);
-  border-radius: var(--r); padding: 28px 22px; position: relative; overflow: hidden;
-  transition: border-color var(--tr), transform var(--tr);
-}
-.plan-card:hover { transform: translateY(-2px); }
-.plan-card.featured {
-  border-color: rgba(124,58,237,0.4);
-  background: linear-gradient(145deg, rgba(124,58,237,0.08), #fff);
-}
-.plan-card.featured::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(to right, var(--orange), #aa7ff3);
-}
-.plan-popular {
-  position: absolute; top: 16px; right: 16px;
-  font-size: 9px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
-  background: var(--orange-dim); color: var(--orange);
-  border: 1px solid var(--border-warm); border-radius: 5px; padding: 2px 7px;
-}
-.plan-name { font-size: 12px; font-weight: 700; color: var(--paper-ink-2); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 12px; }
-.plan-price { display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px; }
-.plan-amount {
-  font-family: 'Space Grotesk', system-ui, sans-serif;
-  font-size: 40px; font-weight: 700; letter-spacing: -0.03em; color: var(--paper-ink);
-}
-.plan-currency { font-size: 18px; color: var(--paper-ink-2); font-weight: 700; }
-.plan-mins { font-size: 13px; color: var(--paper-ink-2); margin-bottom: 6px; }
-.plan-rate { font-size: 11px; color: var(--paper-ink-2); margin-bottom: 20px; }
-.plan-projects {
-  font-size: 12px; color: var(--paper-ink-2);
-  background: var(--paper-2); border-radius: 8px; padding: 10px 12px;
-  margin-bottom: 20px; line-height: 1.5;
-}
-.plan-projects strong { color: var(--paper-ink); }
-.plan-cta {
-  display: block; width: 100%; padding: 12px 0; border-radius: 10px;
-  font-size: 13px; font-weight: 700; cursor: pointer; border: none;
-  text-align: center; transition: all var(--tr); box-sizing: border-box;
-}
-.plan-cta.primary { background: var(--orange); color: #fff; }
-.plan-cta.primary:hover { background: #6c32ce; }
-.plan-cta.secondary {
-  background: transparent; color: var(--paper-ink-2);
-  border: 1px solid var(--paper-border);
-}
-.plan-cta.secondary:hover { border-color: rgba(22,20,28,0.28); color: var(--paper-ink); }
-
-.pricing-free {
-  margin-top: 40px; text-align: center; padding: 18px 20px;
-  background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25);
-  border-radius: var(--r);
-}
-.pricing-free strong { color: #0d9668; }
-.pricing-free p { font-size: 13px; color: var(--paper-ink-2); line-height: 1.6; }
-.pricing-welcome {
-  margin-bottom: 20px; text-align: center; padding: 18px 20px;
-  background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.3);
-  border-radius: var(--r);
-}
-.pricing-welcome strong { color: var(--orange); }
-.pricing-welcome p { font-size: 13px; color: var(--paper-ink-2); line-height: 1.6; }
 
 /* FAQ */
 .faq-section { padding: 80px 24px; background: var(--paper); color: var(--paper-ink); position: relative; overflow: hidden; }
@@ -575,6 +503,41 @@ footer {
 <div class="hero-grid"></div>
 
 <!-- NAV -->
+<!-- SPLASH -->
+<div id="ccbrew-splash" style="position:fixed;inset:0;z-index:9999;background:#7c3aed;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:opacity 0.35s ease;">
+  <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.09) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.09) 1px,transparent 1px);background-size:40px 40px;-webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);"></div>
+  <style>
+    @keyframes ccb-splash-in{0%{opacity:0;transform:scale(.82) translateY(10px)}60%{opacity:1;transform:scale(1.04) translateY(0)}100%{opacity:1;transform:scale(1) translateY(0)}}
+    @keyframes ccb-splash-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+    #ccbrew-splash-logo{animation:ccb-splash-in 620ms cubic-bezier(.16,1,.3,1) both,ccb-splash-breathe 2.6s ease-in-out 620ms infinite}
+    @media(prefers-reduced-motion:reduce){#ccbrew-splash-logo{animation:none}}
+  </style>
+  <svg id="ccbrew-splash-logo" width="160" height="160" viewBox="0 0 431.63 431.63" xmlns="http://www.w3.org/2000/svg">
+    <rect fill="#ccc" width="431.63" height="431.63" rx="63.18" ry="63.18"/>
+    <path fill="#0d0c0f" d="M115.04,342.22c-2.21,10.25-9.94,17.72-23.71,17.72-17.43,0-25.67-12.34-25.67-27.97s8.5-28.57,26.24-28.57c14.64,0,21.73,8.59,23.07,17.78h-11.89c-1.15-4.24-4.1-8.46-11.57-8.46-9.8,0-13.59,8.82-13.59,18.82,0,9.29,3.28,19.08,13.91,19.08,7.76,0,10.2-5.2,11.24-8.4h11.96Z"/>
+    <path fill="#0d0c0f" d="M167.34,342.22c-2.21,10.25-9.94,17.72-23.71,17.72-17.43,0-25.67-12.34-25.67-27.97s8.5-28.57,26.24-28.57c14.64,0,21.73,8.59,23.07,17.78h-11.89c-1.15-4.24-4.1-8.46-11.57-8.46-9.8,0-13.59,8.82-13.59,18.82,0,9.29,3.28,19.08,13.91,19.08,7.76,0,10.2-5.2,11.24-8.4h11.96Z"/>
+    <path fill="#0d0c0f" d="M181.99,304.2h24.02c13.28,0,18.32,6.92,18.32,14.06,0,6.2-3.28,10.22-7,11.92,3.71,1.4,8.57,5.3,8.57,12.53,0,9.41-7.39,16.46-19.08,16.46h-24.83v-54.97ZM204.64,325.88c5.65,0,7.98-2.53,7.98-6.4s-3.05-6.11-7.64-6.11h-11.33v12.5h10.99ZM193.65,349.99h10.72c6.42,0,9.33-2.68,9.33-7.67,0-4.43-2.86-7.26-9.4-7.26h-10.66v14.93Z"/>
+    <path fill="#0d0c0f" d="M233.83,329.1c0-4.1,0-7.74-.08-11.19h11.21c.15.92.3,5.02.3,7.25,1.82-4.72,6.22-8.16,13.24-8.2v10.9c-8.29-.21-13.24,2.02-13.24,13.33v17.99h-11.43v-30.07Z"/>
+    <path fill="#0d0c0f" d="M273.61,340.98c0,5.16,2.59,10.21,8.28,10.21,4.76,0,6.12-1.91,7.2-4.41h11.44c-1.46,5.05-5.97,13.35-18.93,13.35s-19.49-10.16-19.49-20.99c0-12.95,6.64-22.19,19.9-22.19,14.17,0,18.99,10.25,18.99,20.56,0,1.4,0,2.3-.15,3.48h-27.23ZM289.55,333.96c-.08-4.8-2-8.85-7.57-8.85s-7.68,3.78-8.13,8.85h15.7Z"/>
+    <path fill="#0d0c0f" d="M316.66,317.9c3.72,16.57,5.75,25.98,6.53,31.11h.15c.85-4.59,2.03-11.07,7.05-31.11h10.62c4.68,20.29,6.07,26.26,6.65,30.7h.08c.84-4.25,2.11-10.44,6.92-30.7h11.31l-12.25,41.27h-12.25c-3.39-15.66-5.35-23.9-6.28-29.33h-.08c-.66,5.17-2.88,14.53-6.52,29.33h-12.29l-11.72-41.27h12.09Z"/>
+    <path fill="#0d0c0f" d="M149.06,71.55c-48.13,4.73-85.73,45.31-85.73,94.68,0,49.37,37.6,89.96,85.73,94.68,5.05.5,9.42-3.51,9.42-8.58V80.13c0-5.07-4.37-9.08-9.42-8.58Z"/>
+    <path fill="#0d0c0f" d="M252.81,71.55c-48.13,4.73-85.73,45.31-85.73,94.68,0,49.37,37.6,89.96,85.73,94.68,5.05.5,9.42-3.51,9.42-8.58V80.13c0-5.07-4.37-9.08-9.42-8.58Z"/>
+    <path fill="#0d0c0f" d="M337.9,166.2c17.85-7.43,30.39-25.03,30.39-45.57,0-25.6-19.5-46.65-44.45-49.1v-.02h-43.64c-4.05,0-7.34,3.28-7.34,7.34v174.72c0,4.05,3.28,7.34,7.34,7.34h42.82c.27.02.54.03.82,0,24.96-2.45,44.47-23.51,44.47-49.11,0-20.55-12.56-38.16-30.41-45.58Z"/>
+  </svg>
+</div>
+<script>
+(function(){
+  var MIN=900, ready=false, elapsed=false;
+  function hide(){
+    var s=document.getElementById('ccbrew-splash');
+    if(s){s.style.opacity='0';setTimeout(function(){s.style.display='none';},350);}
+  }
+  setTimeout(function(){elapsed=true;if(ready)hide();},MIN);
+  if(document.readyState==='complete'){ready=true;if(elapsed)hide();}
+  else window.addEventListener('load',function(){ready=true;if(elapsed)hide();});
+})();
+</script>
+
 <nav aria-label="Navegación principal">
   <div class="nav-logo">
     <svg width="110" height="40" viewBox="0 0 928.69 336.66" aria-hidden="true"><g id="Layer_1-2" data-name="Layer 1">
@@ -601,10 +564,10 @@ footer {
   <div class="nav-links">
     <a href="#como-funciona" class="nav-link">Cómo funciona</a>
     <a href="#decision" class="nav-link">La decisión</a>
-    <a href="#precios" class="nav-link">Precios</a>
+    <a href="#claude-code" class="nav-link">Instalar</a>
     <a href="#faq" class="nav-link">FAQ</a>
   </div>
-  <a href="https://ccbrew.kitifica.com" class="nav-cta">Evaluar mi idea →</a>
+  <a href="#claude-code" class="nav-cta">Instalar gratis →</a>
 </nav>
 
 <!-- HERO -->
@@ -612,13 +575,13 @@ footer {
   <div class="hero-left">
     <div class="hero-badge">
       <div class="hero-badge-dot"><div class="hero-badge-pulse"></div></div>
-      Gratis con Claude Code · Planes desde $4
+      Gratis con Claude Code
     </div>
 
     <h1>Antes de construir,<br><span class="accent">preguntate si vale la pena.</span></h1>
 
     <p class="hero-sub">
-      IA hace que construir sea barato. Pero construir la cosa equivocada también. CC Brew desafía tu idea antes de que Claude Code pierda tiempo en ella.
+      Con IA construir es barato. Pero construir la cosa equivocada sale caro. CC Brew desafía tu idea antes de que Claude Code pierda tiempo en ella.
     </p>
 
     <div class="hero-actions">
@@ -658,8 +621,9 @@ footer {
 </div>
 
 <!-- EL PROBLEMA -->
-<section class="problem-section problem-section--light">
-  <div class="problem-inner">
+<section class="problem-section problem-section--light" style="position:relative;overflow:hidden;">
+  <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background-image:url(/ccb_logo_v10.png);background-size:cover;background-position:center;background-repeat:no-repeat;mix-blend-mode:hard-light;opacity:0.60;z-index:0;"></div>
+  <div class="problem-inner" style="position:relative;z-index:1;">
     <div class="sec-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M5.31171 10.7615C8.23007 5.58716 9.68925 3 12 3C14.3107 3 15.7699 5.58716 18.6883 10.7615L19.0519 11.4063C21.4771 15.7061 22.6897 17.856 21.5937 19.428C20.4978 21 17.7864 21 12.3637 21H11.6363C6.21356 21 3.50217 21 2.40626 19.428C1.31034 17.856 2.52291 15.7061 4.94805 11.4063L5.31171 10.7615ZM12 7.25C12.4142 7.25 12.75 7.58579 12.75 8V13C12.75 13.4142 12.4142 13.75 12 13.75C11.5858 13.75 11.25 13.4142 11.25 13V8C11.25 7.58579 11.5858 7.25 12 7.25ZM12 17C12.5523 17 13 16.5523 13 16C13 15.4477 12.5523 15 12 15C11.4477 15 11 15.4477 11 16C11 16.5523 11.4477 17 12 17Z" clip-rule="evenodd"/></svg></div>
     <span class="eyebrow">El problema</span>
     <h2 class="section-title">Construir nunca fue tan fácil. <span style="color:var(--orange)">El problema es saber qué vale la pena construir.</span></h2>
@@ -774,17 +738,17 @@ footer {
 
     <div class="save-grid">
       <div class="save-card">
-        <div class="save-icon">⏱</div>
+        <div class="save-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></g></svg></div>
         <h4>Tiempo perdido</h4>
         <p>Días o semanas construyendo algo que nadie pidió.</p>
       </div>
       <div class="save-card">
-        <div class="save-icon">🧩</div>
+        <div class="save-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.39 4.39a1 1 0 0 0 1.68-.474a2.5 2.5 0 1 1 3.014 3.015a1 1 0 0 0-.474 1.68l1.683 1.682a2.414 2.414 0 0 1 0 3.414L19.61 15.39a1 1 0 0 1-1.68-.474a2.5 2.5 0 1 0-3.014 3.015a1 1 0 0 1 .474 1.68l-1.683 1.682a2.414 2.414 0 0 1-3.414 0L8.61 19.61a1 1 0 0 0-1.68.474a2.5 2.5 0 1 1-3.014-3.015a1 1 0 0 0 .474-1.68l-1.683-1.682a2.414 2.414 0 0 1 0-3.414L4.39 8.61a1 1 0 0 1 1.68.474a2.5 2.5 0 1 0 3.014-3.015a1 1 0 0 1-.474-1.68l1.683-1.682a2.414 2.414 0 0 1 3.414 0z"/></svg></div>
         <h4>Complejidad innecesaria</h4>
         <p>Features que complican el proyecto sin justificación.</p>
       </div>
       <div class="save-card">
-        <div class="save-icon">🎯</div>
+        <div class="save-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M22 12h-4M6 12H2m10-6V2m0 20v-4"/></g></svg></div>
         <h4>Alcance desbordado</h4>
         <p>Una V1 que intenta ser todo y no es nada.</p>
       </div>
@@ -800,32 +764,6 @@ footer {
       <span class="eyebrow" style="color:#22c55e">Gratis con Claude Code</span>
       <h2 class="section-title">Cuando vale la pena, construí con Claude Code</h2>
       <p class="claude-desc">CC Brew no compite con Claude Code — lo complementa. Primero evaluás. Si la idea sobrevive, llevás el brief directo a Claude Code.</p>
-      <div class="claude-install-wrap">
-        <div class="claude-tabs">
-          <button class="claude-tab-btn active" onclick="claudeTab(this,'mcp')">MCP</button>
-          <button class="claude-tab-btn" onclick="claudeTab(this,'skill')">Skill</button>
-        </div>
-        <div id="claude-tab-mcp" class="claude-tab-panel active" style="padding:16px 18px 14px;">
-          <div style="font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:10px;">Pegá este prompt en Claude Code. Reemplazá <code style="color:var(--orange);background:rgba(124,58,237,0.1);padding:1px 5px;border-radius:4px;">TU_API_KEY</code> con tu clave.</div>
-          <div class="claude-code" style="border-radius:8px 8px 0 0;margin-bottom:0;white-space:pre-wrap;line-height:1.6;font-size:11px;">claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --header "Authorization: Bearer TU_API_KEY" --scope user</div>
-          <button id="copy-mcp-btn" onclick="copyInstallPrompt('mcp')" style="width:100%;padding:10px;background:var(--orange);border:none;border-radius:0 0 8px 8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:background 200ms;">Copiar comando</button>
-        </div>
-        <div id="claude-tab-skill" class="claude-tab-panel" style="padding:16px 18px 14px;">
-          <a href="/skill/SKILL.md" download="SKILL.md" style="display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:8px;background:var(--orange);color:#fff;font-size:14px;font-weight:600;text-decoration:none;transition:opacity 140ms;margin-bottom:12px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Descargar SKILL.md
-          </a>
-          <div style="font-size:11px;color:var(--text-3);margin-bottom:12px;">Arrastrá el archivo al chat de Claude Code y pegá este prompt:</div>
-          <div class="claude-code" style="border-radius:8px 8px 0 0;margin-bottom:0;white-space:pre-wrap;line-height:1.6;font-size:11px;">Instala este archivo como una Skill de Claude Code:
-1. Muévelo a ~/.claude/skills/cc-brew/SKILL.md
-2. Agrega esta entrada en ~/.claude/CLAUDE.md
-
-# cc-brew
-- **cc-brew** (`~/.claude/skills/cc-brew/SKILL.md`) - evalúa ideas antes de construirlas
-  Trigger: `/cc-brew`</div>
-          <button id="copy-skill-btn" onclick="copyInstallPrompt('skill')" style="width:100%;padding:10px;background:#2A2A2A;border:none;border-radius:0 0 8px 8px;color:#E0E0E0;font-size:13px;font-weight:700;cursor:pointer;transition:background 200ms;">Copiar prompt</button>
-        </div>
-      </div>
     </div>
     <div class="claude-mockup">
       <div class="mock-header">
@@ -852,7 +790,7 @@ footer {
           <div class="mock-claude-content">
             <div class="mock-bubble" style="font-size:11px;line-height:1.5;"><strong>Evaluación:</strong><br><br> Problema claro: sí<br> Alcance V1: parcial — ¿qué excluís?<br> Complejidad: media</div>
             <div class="mock-tool-call">
-              <span class="tool-icon">⚙</span>
+              <span class="tool-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0a2.34 2.34 0 0 0 3.319 1.915a2.34 2.34 0 0 1 2.33 4.033a2.34 2.34 0 0 0 0 3.831a2.34 2.34 0 0 1-2.33 4.033a2.34 2.34 0 0 0-3.319 1.915a2.34 2.34 0 0 1-4.659 0a2.34 2.34 0 0 0-3.32-1.915a2.34 2.34 0 0 1-2.33-4.033a2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></g></svg></span>
               <span class="tool-name">cc-brew</span>
               <span class="tool-sep">·</span>
               <span class="tool-method">save_evaluation</span>
@@ -862,78 +800,33 @@ footer {
         </div>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- PRICING -->
-<section class="pricing-section" id="precios">
-  <div class="pricing-inner">
-    <div class="pricing-header">
-      <span class="eyebrow">Precios</span>
-      <h2 class="section-title">Un minsuto de reflexión. Sin sorpresas.</h2>
-    </div>
-
-    <div class="pricing-unit">
-      <p><strong>1 crédito = 1 evaluación completa</strong> — interrogación + evaluación + decisión + brief. Sin vencimiento.</p>
-    </div>
-
-    <div class="pricing-welcome">
-      <p><strong>Tus primeras evaluaciones van por nuestra cuenta.</strong> Cada cuenta nueva arranca con 3 evaluaciones gratis — sin tarjeta, sin compromiso.</p>
-    </div>
-
-    <div class="pricing-grid">
-      <div class="plan-card">
-        <div class="plan-name">Inicio</div>
-        <div class="plan-price">
-          <span class="plan-currency">$</span>
-          <span class="plan-amount">4</span>
+    <div class="claude-install-col">
+      <div class="claude-install-wrap">
+        <div class="claude-tabs">
+          <button class="claude-tab-btn active" onclick="claudeTab(this,'skill')">Skill</button>
+          <button class="claude-tab-btn" onclick="claudeTab(this,'mcp')">MCP</button>
         </div>
-        <div class="plan-mins">5 evaluaciones</div>
-        <div class="plan-rate">$0.80 / evaluación</div>
-        <div class="plan-projects">
-          Para explorar ideas.<br>
-          Sin vencimiento.
+        <div id="claude-tab-skill" class="claude-tab-panel active" style="padding:16px 18px 14px;">
+          <a href="/skill/SKILL.md" download="SKILL.md" onclick="trackInstall('skill_download')" style="display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:8px;background:var(--orange);color:#fff;font-size:14px;font-weight:600;text-decoration:none;transition:opacity 140ms;margin-bottom:12px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Descargar SKILL.md
+          </a>
+          <div style="font-size:11px;color:var(--text-3);margin-bottom:12px;">Arrastrá el archivo al chat de Claude Code y pegá este prompt:</div>
+          <div class="claude-code" style="border-radius:8px 8px 0 0;margin-bottom:0;white-space:pre-wrap;line-height:1.6;font-size:11px;">Instala este archivo como una Skill de Claude Code:
+1. Muévelo a ~/.claude/skills/cc-brew/SKILL.md
+2. Agrega esta entrada en ~/.claude/CLAUDE.md
+
+# cc-brew
+- **cc-brew** (`~/.claude/skills/cc-brew/SKILL.md`) - evalúa ideas antes de construirlas
+  Trigger: `/cc-brew`</div>
+          <button id="copy-skill-btn" onclick="copyInstallPrompt('skill')" style="width:100%;padding:10px;background:#2A2A2A;border:none;border-radius:0 0 8px 8px;color:#E0E0E0;font-size:13px;font-weight:700;cursor:pointer;transition:background 200ms;">Copiar prompt</button>
         </div>
-        <a href="https://ccbrew.kitifica.com" class="plan-cta secondary">Empezar con 5 evaluaciones →</a>
+        <div id="claude-tab-mcp" class="claude-tab-panel" style="padding:16px 18px 14px;">
+          <div style="font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:10px;">Ejecutá este comando en tu terminal. Un solo paso.</div>
+          <div class="claude-code" style="border-radius:8px 8px 0 0;margin-bottom:0;white-space:pre-wrap;line-height:1.6;font-size:11px;">claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --scope user</div>
+          <button id="copy-mcp-btn" onclick="copyInstallPrompt('mcp')" style="width:100%;padding:10px;background:var(--orange);border:none;border-radius:0 0 8px 8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:background 200ms;">Copiar comando</button>
+        </div>
       </div>
-
-      <div class="plan-card featured">
-        <div class="plan-popular">Más popular</div>
-        <div class="plan-name">Creador</div>
-        <div class="plan-price">
-          <span class="plan-currency">$</span>
-          <span class="plan-amount">9</span>
-        </div>
-        <div class="plan-mins">12 evaluaciones</div>
-        <div class="plan-rate">$0.75 / evaluación</div>
-        <div class="plan-projects">
-          Para builders activos.<br>
-          Sin vencimiento.
-        </div>
-        <a href="https://ccbrew.kitifica.com" class="plan-cta primary">Elegir Creador — 12 evaluaciones</a>
-      </div>
-
-      <div class="plan-card">
-        <div class="plan-name">Estudio</div>
-        <div class="plan-price">
-          <span class="plan-currency">$</span>
-          <span class="plan-amount">12</span>
-        </div>
-        <div class="plan-mins">20 evaluaciones</div>
-        <div class="plan-rate">$0.60 / evaluación · 25% de ahorro</div>
-        <div class="plan-projects">
-          Para equipos y agencias.<br>
-          Sin vencimiento.
-        </div>
-        <a href="https://ccbrew.kitifica.com" class="plan-cta secondary">Elegir Estudio — 20 evaluaciones</a>
-      </div>
-    </div>
-
-    <div class="pricing-free">
-      <p>
-        <strong>¿Tienes Claude Code?</strong> Instalá el MCP + Skill y usá <code style="background:rgba(16,185,129,0.2);color:#10B981;padding:1px 6px;border-radius:4px;">/cc-brew</code> directo desde el chat — completamente gratis.
-        <a href="#claude-code" style="color:#10B981;font-weight:700;margin-left:6px;">Ver instrucciones →</a>
-      </p>
     </div>
   </div>
 </section>
@@ -965,20 +858,28 @@ footer {
         <div class="faq-a">5-10 minutos. No es un Business Model Canvas de 45 minutos. Es una conversación corta que puede ahorrarte días de construcción innecesaria.</div>
       </details>
       <details class="faq-item">
-        <summary class="faq-q">¿Qué es un crédito de evaluación?</summary>
-        <div class="faq-a">1 crédito = 1 evaluación completa (interrogación + evaluación + decisión + brief). Se descuenta una sola vez, cuando tu decisión queda lista — sin importar cuántas veces la revises después.</div>
+        <summary class="faq-q">¿Necesito Claude Code para usar CC Brew?</summary>
+        <div class="faq-a">Sí. CC Brew corre dentro de Claude Code CLI. Instalás el Skill, agregás <code>/cc-brew</code> a tu CLAUDE.md y ya. Los comandos están en la sección <a href="#claude-code" style="color:var(--orange);">Instalar</a> de esta página.</div>
       </details>
       <details class="faq-item">
-        <summary class="faq-q">¿Los créditos vencen?</summary>
-        <div class="faq-a">No. Los créditos que compres quedan en tu cuenta sin fecha de expiración. Úsalos a tu ritmo.</div>
+        <summary class="faq-q">¿Es realmente gratis?</summary>
+        <div class="faq-a">Sí. CC Brew usa tu suscripción de Claude Code — no hay créditos, no hay cuenta aparte, no hay pago adicional. Si ya pagás Claude Code, CC Brew es gratis para vos.</div>
       </details>
       <details class="faq-item">
-        <summary class="faq-q">¿Cómo funciona la ruta gratuita con Claude Code?</summary>
-        <div class="faq-a">Si tenés Claude Code CLI instalado, instalás el Skill y el MCP para ejecutar CC Brew directamente desde el chat con <code>/cc-brew</code>, sin abrir la app. Los comandos están en la sección <a href="#claude-code" style="color:var(--orange);">Claude Code</a> de esta página.</div>
+        <summary class="faq-q">¿Puedo evaluar tantas ideas como quiera?</summary>
+        <div class="faq-a">Sí, sin límite. Cada <code>/cc-brew</code> es una evaluación independiente. Podés evaluar una idea hoy y otra mañana sin ningún costo adicional.</div>
       </details>
       <details class="faq-item">
-        <summary class="faq-q">¿Funciona en Android? ¿En Windows?</summary>
-        <div class="faq-a">Sí. CC Brew es una PWA que funciona en cualquier dispositivo con navegador moderno — iOS, Android, Windows, macOS, Linux.</div>
+        <summary class="faq-q">¿Necesito instalar el MCP o solo el Skill alcanza?</summary>
+        <div class="faq-a">El Skill solo ya es suficiente para el flujo completo. El MCP agrega persistencia en la nube — guarda tu sesión y el brief en una base de datos. Si solo querés evaluar y obtener la decisión, el Skill es todo lo que necesitás.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">¿En qué idioma funciona?</summary>
+        <div class="faq-a">En el idioma en que hables. Si describís tu idea en español, CC Brew responde en español. Si la describís en inglés, responde en inglés. No hay configuración necesaria.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">¿El brief generado es suficiente para que Claude Code construya la app?</summary>
+        <div class="faq-a">Es un punto de partida sólido. El brief define el problema, el usuario, el alcance de v1 y el stack recomendado. Podés pasárselo directamente a Claude Code y arrancar desde ahí, aunque el detalle técnico depende de lo que hayas respondido en la evaluación.</div>
       </details>
     </div>
   </div>
@@ -1003,11 +904,14 @@ footer {
 <footer>
   <span class="footer-brand">CC <em>Brew</em> by Kitifica</span>
   <div class="footer-links">
+    <a href="https://github.com/kitifica-max/cc-brew" target="_blank" rel="noopener" class="footer-link" style="display:inline-flex;align-items:center;gap:5px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/></svg>
+      GitHub
+    </a>
     <a href="#como-funciona" class="footer-link">Cómo funciona</a>
     <a href="#decision" class="footer-link">La decisión</a>
-    <a href="#precios" class="footer-link">Precios</a>
+    <a href="#claude-code" class="footer-link">Instalar</a>
     <a href="#faq" class="footer-link">FAQ</a>
-    <a href="https://ccbrew.kitifica.com" class="footer-link">Abrir app</a>
     <a href="/terms/" class="footer-link">Términos</a>
   </div>
   <span class="footer-copy">© 2026 Kitifica · Think before you build</span>
@@ -1020,12 +924,20 @@ function claudeTab(btn, id) {
   btn.classList.add('active');
   document.getElementById('claude-tab-' + id).classList.add('active');
 }
+function trackInstall(event) {
+  fetch('/.netlify/functions/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ event })
+  }).catch(() => {});
+}
 function copyInstallPrompt(id) {
   const prompts = {
-    mcp: 'claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --header "Authorization: Bearer TU_API_KEY" --scope user',
+    mcp: 'claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --scope user',
     skill: 'Instala este archivo como una Skill de Claude Code:\n1. Muévelo a ~/.claude/skills/cc-brew/SKILL.md\n2. Agrega esta entrada en ~/.claude/CLAUDE.md:\n\n# cc-brew\n- **cc-brew** (`~/.claude/skills/cc-brew/SKILL.md`) - evalúa ideas antes de construirlas con Claude Code\n  Trigger: `/cc-brew`'
   };
   navigator.clipboard.writeText(prompts[id]).catch(() => {});
+  if (id === 'mcp') trackInstall('mcp_copy');
   const btn = document.getElementById('copy-' + id + '-btn');
   const orig = btn.textContent;
   btn.textContent = '✓ Copiado';
@@ -1123,18 +1035,10 @@ function copyInstallPrompt(id) {
 
   (function () {
     var tl = gsap.timeline({ scrollTrigger: { trigger: '.claude-section', start: 'top 82%' } });
-    tl.from('.claude-section > div:first-child > *',
-      { opacity: 0, y: 22, stagger: 0.1, duration: 0.5, ease: 'power2.out' });
-    tl.from('.claude-mockup', { opacity: 0, x: 32, duration: 0.65, ease: 'power2.out' }, '-=0.4');
-  })();
-
-  (function () {
-    var tl = gsap.timeline({ scrollTrigger: { trigger: '.pricing-section', start: 'top 80%' } });
-    tl.from('.pricing-header .eyebrow, .pricing-header .section-title',
-      { opacity: 0, y: 18, stagger: 0.1, duration: 0.5 });
-    tl.from('.pricing-welcome, .pricing-unit', { opacity: 0, y: 14, duration: 0.5 }, '-=0.1');
-    tl.from('.plan-card', { opacity: 0, y: 32, scale: 0.96, stagger: 0.12, duration: 0.65, ease: 'back.out(1.2)' }, '-=0.1');
-    tl.from('.pricing-free', { opacity: 0, y: 14, duration: 0.4 }, '-=0.2');
+    tl.from('.claude-section > div:first-child > :first-child',
+      { opacity: 0, y: 22, duration: 0.5, ease: 'power2.out' });
+    tl.from('.claude-mockup', { opacity: 0, x: 32, duration: 0.65, ease: 'power2.out' }, '-=0.3');
+    tl.from('.claude-install-col', { opacity: 0, x: 32, duration: 0.65, ease: 'power2.out' }, '-=0.45');
   })();
 
   (function () {

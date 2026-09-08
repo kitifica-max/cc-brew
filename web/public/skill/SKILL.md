@@ -149,34 +149,39 @@ Qué cambiaría: [info faltante]
 
 ---
 
-### Paso 7 — Guardar y sincronizar
+### Paso 7 — Guardar resultado
 
-Escribí el brief en el directorio actual si el usuario quiere proceder:
+Si la decisión es BUILD, escribí el brief como `CC-BREW-BRIEF.md` en el directorio actual:
 
 ```bash
-# Escribe el brief en el directorio actual del proyecto
+# Claude Code escribe el archivo directamente
 ```
 
-Si el MCP `cc-brew` está disponible, sincronizá con la PWA para que el usuario pueda verlo en `ccbrew.kitifica.com`.
+Si el MCP `cc-brew` está disponible, guardá la sesión con `save_evaluation` y el brief con `brief_md`.
 
 ---
 
 ## Instalación (para el usuario)
 
-**1. Instalar el MCP de CC Brew** (desde `ccbrew.kitifica.com/instalar`):
-```bash
-claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" \
-  --header "Authorization: Bearer TU_API_KEY" --scope user
-```
-
-**2. Instalar el Skill:**
+**Opción A — Skill solo** (sin MCP, flujo completo en Claude Code):
 ```bash
 mkdir -p ~/.claude/skills/cc-brew
 curl -o ~/.claude/skills/cc-brew/SKILL.md \
   https://ccbrew.kitifica.com/skill/SKILL.md
 ```
 
-**3. Activar en CLAUDE.md** (global o por proyecto):
+**Opción B — Skill + MCP** (guarda sesiones en la nube):
+```bash
+# 1. MCP
+claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --scope user
+
+# 2. Skill
+mkdir -p ~/.claude/skills/cc-brew
+curl -o ~/.claude/skills/cc-brew/SKILL.md \
+  https://ccbrew.kitifica.com/skill/SKILL.md
+```
+
+**Activar en CLAUDE.md** (global o por proyecto):
 ```markdown
 # cc-brew
 - **cc-brew** (`~/.claude/skills/cc-brew/SKILL.md`) - evalúa si una idea vale la pena construirla
