@@ -2,142 +2,124 @@
   <img src="logos/ccbrew_fav.svg" alt="CC Brew" width="160"/>
 </p>
 
-# CC Brew — De idea a herramienta que convence a tu cliente
+# CC Brew — Antes de construir, preguntate si vale la pena
 
-CC Brew estructura tu idea, define qué debe convencer a tu cliente y genera un `CLAUDE.md` listo para construir con Claude Code.
+Con IA construir es barato. Pero construir la cosa equivocada sale caro. CC Brew desafía tu idea antes de que Claude Code pierda tiempo en ella.
+
+**BUILD / RETHINK / DON'T BUILD** — una decisión honesta basada en 10 criterios. Si la respuesta es BUILD, te damos un brief listo para que Claude Code la construya.
 
 ```
-ccbrew.kitifica.com (PWA)  ──── Supabase  �───  Claude Code
-  Idea libre                                    CLAUDE.md
-  Cuestionario          ──────►                 6 criterios
-  Semáforo IA           ◄──────                 Validación
+/cc-brew en Claude Code
+  Idea libre
+  Cuestionario adaptativo (6-10 preguntas)
+  Evaluación con 10 criterios
+  Decisión: BUILD · RETHINK · DON'T BUILD
+  Brief (solo si BUILD)
 ```
 
-**Gratis con Claude Code · App Directa desde $4 · Sin vencimiento**
+**Gratis con tu suscripción de Claude Code · Sin créditos adicionales**
 
 ---
 
 ## Cómo funciona
 
-1. **Escribí tu idea** — sin estructura, sin límites. Contale a la IA qué querés lograr.
-2. **Respondé unas preguntas** — opción múltiple, menos de un minuto. Cubre recorrido del cliente, alcance v1, restricciones y reacción esperada.
-3. **CLAUDE.md listo** — documento con Fase 1 (qué construir ahora) y Fase 2 (visión futura, bloqueada). Copialo o compartilo directo.
+1. **Contale tu idea** — sin estructura. Qué es, para quién es, y qué problema creés que resuelve.
+2. **Te cuestionamos** — preguntas diseñadas para encontrar lo que no cierra. No te ayudamos a desarrollar la idea — la cuestionamos.
+3. **Recibí tu decisión** — **BUILD**, **RETHINK** o **DON'T BUILD** con las razones, el mayor riesgo y qué hacer antes de abrir Claude Code.
 
 ---
 
-## 6 criterios de validación
+## 10 criterios de evaluación
 
-| Criterio | ¿Qué mide? | Bloquea? |
-|---|---|---|
-| Claridad de la objeción | ¿Qué duda o resistencia del cliente hay que resolver? | Sí |
-| Alcance v1 | ¿Qué entra y qué queda fuera de la primera versión? | Sí |
-| Recorrido del cliente | ¿Cómo ve y usa la herramienta el cliente, paso a paso? | No |
-| Dependencias externas | ¿Hay integraciones complejas sin resolver? | No |
-| Coherencia | ¿Las respuestas son consistentes entre sí? | No |
-| Viabilidad | ¿Tamaño realista para una primera pieza? | No |
+| Criterio | ¿Qué mide? |
+|---|---|
+| `problem_clarity` | ¿El problema está claramente definido? |
+| `target_audience` | ¿El público está definido con precisión? |
+| `value_proposition` | ¿La propuesta es clara y diferenciada? |
+| `competition` | ¿Se conoce la competencia? ¿Hay diferenciación? |
+| `feasibility` | ¿Es técnicamente factible? |
+| `monetization` | ¿Hay modelo de monetación o hipótesis? |
+| `mvp_scope` | ¿El MVP es acotado y realista? |
+| `distribution` | ¿Cómo llega al cliente? |
+| `timing` | ¿Por qué ahora? |
+| `founder_fit` | ¿El fundador tiene el contexto/capacidades? |
+
+**Señales:** `strong` | `moderate` | `weak` | `unknown`
 
 ---
 
-## Dos formas de usar
+## La decisión
 
-### App Directa (PWA)
-Desde tu celular o laptop, donde estés. Instalada como app nativa. Sin Claude Code requerido.
+### BUILD
+Señal suficiente para construir. Se genera un brief con el problema, el usuario, el alcance de v1 y el stack recomendado.
 
-- [ccbrew.kitifica.com](https://ccbrew.kitifica.com)
-- iOS, Android, Windows, macOS
-- Créditos por proyecto, sin vencimiento
-- Primeros 3 proyectos gratis
+### RETHINK
+Hay potencial pero faltan señales críticas. CC Brew te dice exactamente qué falta.
 
-### Gratis con Claude Code
+### DON'T BUILD
+Señales demasiado débiles. No significa que el producto falló — significa que te ahorraste días de construir algo que no debería existir.
 
-Desde tu equipo con Claude Code. Un comando para conectar el MCP, un archivo para el Skill. Procesamiento en tu equipo, cero créditos.
+---
 
-- Gratis con tu suscripción de Claude
-- Requiere Claude Code CLI instalado
-- Usa `/cc-brew` directo en el chat
-- Solo funciona desde tu equipo de escritorio
+## Instalación
 
-#### MCP
-
-Pegá este prompt en Claude Code. Reemplazá `TU_API_KEY` con tu clave — la encontrás en [ccbrew.kitifica.com](https://ccbrew.kitifica.com) → Ajustes → API Key.
+### Skill (recomendado)
 
 ```bash
-# Instalar el MCP de CC Brew. Reemplaza TU_API_KEY con tu clave
-# (la encontrás en ccbrew.kitifica.com → Ajustes → API Key) y ejecuta:
-
-claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" \
-  --header "Authorization: Bearer TU_API_KEY" --scope user
+mkdir -p ~/.claude/skills/cc-brew
+curl -o ~/.claude/skills/cc-brew/SKILL.md \
+  https://ccbrew.kitifica.com/skill/SKILL.md
 ```
 
-#### Skill
+Agregá esta entrada en `~/.claude/CLAUDE.md`:
 
-[Descargar SKILL.md](https://ccbrew.kitifica.com/skill/SKILL.md)
-
-Arrastrá el archivo al chat de Claude Code y pegá este prompt:
-
-```
-Instala este archivo como una Skill de Claude Code:
-1. Muévelo a ~/.claude/skills/cc-brew/SKILL.md
-2. Agrega esta entrada en ~/.claude/CLAUDE.md:
-
+```markdown
 # cc-brew
-- **cc-brew** (`~/.claude/skills/cc-brew/SKILL.md`) - estructura ideas de producto antes de construirlas con Claude Code
+- **cc-brew** (`~/.claude/skills/cc-brew/SKILL.md`) - evalúa ideas antes de construirlas
   Trigger: `/cc-brew`
 ```
 
----
+### Skill + MCP (guarda sesiones en la nube)
 
-## Precios
+```bash
+# 1. MCP
+claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --scope user
 
-| Plan | Precio | Proyectos | Por proyecto |
-|---|---|---|---|
-| Inicio | $4 | 5 | $0.80 |
-| Creador | $9 | 12 | $0.75 |
-| Estudio | $12 | 20 | $0.60 |
-| Trae tu API | $29 (pago único) | Ilimitados | — |
-
-Créditos sin vencimiento. Primeros 3 proyectos gratis con cada cuenta nueva.
+# 2. Skill
+mkdir -p ~/.claude/skills/cc-brew
+curl -o ~/.claude/skills/cc-brew/SKILL.md \
+  https://ccbrew.kitifica.com/skill/SKILL.md
+```
 
 ---
 
 ## Arquitectura
 
 ```
-web/app/
-├── page.js                    # PWA principal
-└── components/
-    ├── AuthGate.js            # Autenticación
-    ├── IdeaCapture.js         # Campo de idea libre
-    ├── ContextCapture.js      # Público objetivo + marca
-    ├── Questionnaire.js       # Cuestionario de opción múltiple
-    ├── SemaforoView.js        # 6 criterios de validación
-    ├── DocumentViewer.js      # Visualización del CLAUDE.md
-    ├── BuyMinutes.js          # Compra de créditos
-    └── OnboardingTour.js      # Tour de inducción
-
-mcp/
-├── netlify/functions/
-│   ├── ai-process.mjs        # Procesamiento con Claude
-│   └── sessions.mjs          # Gestión de sesiones
-└── lib/
-    ├── tools.js              # Herramientas MCP
-    └── sessions.js           # Sesiones y créditos
+cc-brew/
+├── web/public/landing/    # Landing page (HTML estático)
+├── web/public/skill/      # SKILL.md para descarga
+├── mcp/                   # MCP server (Netlify Functions)
+│   ├── lib/tools.js       # Herramientas MCP
+│   └── netlify/functions/ # Functions serverless
+├── supabase/              # Migraciones y esquema
+└── docs/skills/cc-brew/   # SKILL.md fuente
 ```
 
 | Componente | Tecnología | Rol |
 |---|---|---|
-| PWA | Next.js + Netlify | Interfaz de captura y validación |
-| MCP Server | Netlify Functions | Procesamiento con Claude Code |
-| Backend | Supabase | Auth, datos, storage, pagos |
-| Pagos | Wompi | Créditos y proyectos |
+| Skill | Markdown | Flujo completo de evaluación en Claude Code |
+| MCP Server | Netlify Functions | Persistencia de sesiones en la nube |
+| Backend | Supabase | Auth, datos, storage |
+| Landing | HTML estático | ccbrew.kitifica.com |
 
 ---
 
 ## Desarrollo local
 
 ```bash
-# PWA
-cd web && npm install && npm run dev
+# Landing
+cd web && npx serve public/landing
 
 # MCP Server
 cd mcp && npm install && npm run dev
@@ -145,31 +127,7 @@ cd mcp && npm install && npm run dev
 
 ---
 
-## Stack recomendado para proyectos generados
-
-CC Brew recomienda (no impone) según lo que el proyecto necesite:
-
-- **Backend:** Supabase, Firebase, Neon, PlanetScale o Convex
-- **Deploy:** Netlify, Vercel, Cloudflare Pages, Railway o Render
-- **Repo:** GitHub, GitLab o Bitbucket
-- **SEO:** Meta tags, sitemap, llms.txt, datos estructurados
-
----
-
-## Seguridad
-
-| Medida | Detalle |
-|---|---|
-| **Canal privado** | Supabase RLS sobre cada cuenta |
-| **Créditos protegidos** | RPC server-side, saldo verificado antes de procesar |
-| **API key encriptada** | Almacenada con Supabase Vault |
-| **Open source** | Todo el código está en GitHub |
-
----
-
-## Licencia
-
-## Repositorio
+## Repo
 
 [github.com/kitifica-max/cc-brew](https://github.com/kitifica-max/cc-brew)
 
