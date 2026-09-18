@@ -5,7 +5,8 @@
   "engines": { "node": ">=20" },
   "scripts": {
     "test": "node evals/run.mjs",
-    "deploy": "netlify deploy --prod --build --site 32ab4992-9183-4b1b-a48b-b25393830b64"
+    "sync-skill": "node scripts/sync-skill.mjs",
+    "deploy": "npm run sync-skill && netlify deploy --prod --build --site 32ab4992-9183-4b1b-a48b-b25393830b64"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.36.0",
