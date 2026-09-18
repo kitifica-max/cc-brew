@@ -63,7 +63,7 @@ Antes de evaluar, ancla la idea a datos reales de intención de búsqueda con la
 3. Con `avg_interest` (0-100) y `trend` que devuelve cada llamada, clasificá:
    - **Sin interés** (`avg_interest` <5): casi nadie busca esto. Advertí que el problema puede ser una alucinación o requerir mucha inversión en educar al mercado.
    - **Interés bajo** (5-20) / **moderado** (20-50) / **alto** (≥50): más señal, no garantía — sin dato de competencia, no se puede saber si el nicho está saturado.
-   - Sumá la tendencia (`subiendo`/`bajando`/`estable`) como matiz: "interés alto y subiendo" pesa más que "interés alto y bajando".
+   - Sumá la tendencia (`subiendo`/`bajando`/`estable`) como matiz: "interés alto y subiendo" pesa más que "interés alto y bajando". Si `trend` viene `sin_datos` (Trends no devolvió ningún punto para ese keyword/geo), no hay tendencia que sumar — tratalo igual que sin interés.
 4. Resumí en una tabla markdown (Término · Interés promedio · Tendencia · Veredicto) y cerrá con un veredicto binario que alimenta el Paso 4: "La demanda justifica seguir evaluando" o "Los datos sugieren pivotar el enfoque antes de construir". Tono pragmático y escéptico — sos la voz de los números, no la motivación.
 
 Si la tool falla (Google Trends no es oficial — puede bloquear o rate-limitar sin aviso), decilo explícitamente y seguí sin este dato. No inventes números.
@@ -126,7 +126,7 @@ Explicá por qué en 2-3 frases directas, sin rodeos.
 
 ### Paso 5 — Brief (solo si BUILD)
 
-Si la decisión es BUILD, generá un brief de construcción:
+Si la decisión es BUILD, generá un brief de construcción. Sé específico, no genérico: "Stack recomendado" es la tecnología (ej. "Next.js + SQLite local"); "Arquitectura" es cómo se organiza (módulos clave, cómo fluye la información entre ellos, qué vive en cliente vs. servidor). "Alcance v1 — excluye" nombra features concretas que quedan afuera, no un "más adelante" vago.
 
 ```markdown
 # [Nombre] — Brief de Construcción
@@ -140,15 +140,18 @@ Si la decisión es BUILD, generá un brief de construcción:
 ## Criterio de éxito
 [Cómo sabemos que funcionó]
 
+## Arquitectura
+[Módulos clave y cómo fluye la información entre ellos — específico, no genérico]
+
 ## Alcance v1 — incluye
 - [Feature 1]
 - [Feature 2]
 
 ## Alcance v1 — excluye
-- [Lo que se construye después]
+- [Feature concreta que queda afuera por ahora, no un "más adelante" genérico]
 
 ## Stack recomendado
-[Tech stack simple]
+[Tecnología concreta — nunca "el stack que prefieras"]
 
 ## Restricciones
 - Plataforma: [web/móvil/desktop]
