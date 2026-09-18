@@ -39,3 +39,27 @@ jobs:
           node-version: 20
       - run: npm install
       - run: npm run build
+
+  mcp:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mcp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # Estos scripts no tienen dependencias npm (solo node:url/fs/path built-in) —
+      # sin npm install a propósito, para no depender de credenciales de Supabase
+      # que db.js exige al importarse (tools.js no se ejecuta acá, solo --check).
+      - run: node --check lib/prompts/business-check.js
+      - run: node --check scripts/sync-skill.mjs
+      - run: node --check lib/trends.js
+      - run: node --check lib/tools.js
+      - run: node lib/prompts/business-check.js
+      - run: node lib/trends.js
+      - run: node scripts/sync-skill.mjs
+      # Si esto falla: alguien commiteó business-check.js sin re-correr
+      # sync-skill, o editó SKILL.md a mano dentro de una sección generada.
+      - run: git diff --exit-code -- ../docs/skills/cc-brew/SKILL.md ../web/public/skill/SKILL.md

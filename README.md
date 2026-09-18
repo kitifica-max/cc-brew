@@ -98,12 +98,14 @@ curl -o ~/.claude/skills/cc-brew/SKILL.md \
 ```
 cc-brew/
 ├── web/public/landing/    # Landing page (HTML estático)
-├── web/public/skill/      # SKILL.md para descarga
+├── web/public/skill/      # SKILL.md publicado — lo que de verdad instalan los usuarios
+├── docs/skills/cc-brew/   # SKILL.md espejo en el repo (mismo contenido)
 ├── mcp/                   # MCP server (Netlify Functions)
 │   ├── lib/tools.js       # Herramientas MCP
+│   ├── lib/prompts/       # Fuente única de los criterios de evaluación (Business Check)
+│   ├── scripts/           # Genera las secciones compartidas de ambos SKILL.md
 │   └── netlify/functions/ # Functions serverless
-├── supabase/              # Migraciones y esquema
-└── docs/skills/cc-brew/   # SKILL.md fuente
+└── supabase/              # Migraciones y esquema
 ```
 
 | Componente | Tecnología | Rol |
