@@ -852,12 +852,18 @@ footer {
 # cc-brew
 - **cc-brew** (`~/.claude/skills/cc-brew/SKILL.md`) - evalúa ideas antes de construirlas
   Trigger: `/cc-brew`</div>
-          <button id="copy-skill-btn" onclick="copyInstallPrompt('skill')" style="width:100%;padding:10px;background:#2A2A2A;border:none;border-radius:0 0 8px 8px;color:#E0E0E0;font-size:13px;font-weight:700;cursor:pointer;transition:background 200ms;">Copiar prompt</button>
+          <button id="copy-skill-btn" onclick="copyInstallPrompt('skill')" style="width:100%;padding:10px;background:#2A2A2A;border:none;border-radius:0 0 8px 8px;color:#E0E0E0;font-size:13px;font-weight:700;cursor:pointer;transition:background 200ms;display:flex;align-items:center;justify-content:center;gap:8px;">
+            <span>Copiar prompt</span>
+            <span id="skill-copy-count" style="font-size:11px;font-weight:500;color:#666;background:#1A1A1A;border-radius:4px;padding:1px 6px;display:none;"></span>
+          </button>
         </div>
         <div id="claude-tab-mcp" class="claude-tab-panel" style="padding:16px 18px 14px;">
           <div style="font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:10px;">Ejecutá este comando en tu terminal. Un solo paso.</div>
           <div class="claude-code" style="border-radius:8px 8px 0 0;margin-bottom:0;white-space:pre-wrap;line-height:1.6;font-size:11px;">claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --scope user</div>
-          <button id="copy-mcp-btn" onclick="copyInstallPrompt('mcp')" style="width:100%;padding:10px;background:var(--orange);border:none;border-radius:0 0 8px 8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:background 200ms;">Copiar comando</button>
+          <button id="copy-mcp-btn" onclick="copyInstallPrompt('mcp')" style="width:100%;padding:10px;background:var(--orange);border:none;border-radius:0 0 8px 8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:background 200ms;display:flex;align-items:center;justify-content:center;gap:8px;">
+            <span>Copiar comando</span>
+            <span id="mcp-copy-count" style="font-size:11px;font-weight:500;color:rgba(255,255,255,0.6);background:rgba(0,0,0,0.2);border-radius:4px;padding:1px 6px;display:none;"></span>
+          </button>
         </div>
       </div>
     </div>
@@ -968,17 +974,54 @@ function trackInstall(event) {
     body: JSON.stringify({ event })
   }).catch(() => {});
 }
+// Copy counts loaded from server { skill_copy: N, mcp_copy: N }
+var _copyCounts = { skill_copy: 0, mcp_copy: 0 };
+
+function _renderCount(id, count) {
+  var elId = id === 'skill' ? 'skill-copy-count' : 'mcp-copy-count';
+  var el = document.getElementById(elId);
+  if (!el) return;
+  if (count > 0) {
+    el.textContent = count + (count === 1 ? ' persona lo probó' : ' personas lo probaron');
+    el.style.display = '';
+  }
+}
+
+function _loadCopyCounts() {
+  fetch('/.netlify/functions/track')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      _copyCounts.skill_copy = data.skill_copy || 0;
+      _copyCounts.mcp_copy   = data.mcp_copy   || 0;
+      _renderCount('skill', _copyCounts.skill_copy);
+      _renderCount('mcp',   _copyCounts.mcp_copy);
+    })
+    .catch(function() {});
+}
+
 function copyInstallPrompt(id) {
-  const prompts = {
+  var prompts = {
     mcp: 'claude mcp add cc-brew --transport http "https://cc-brew-mcp.netlify.app/mcp" --scope user',
     skill: 'Instala este archivo como una Skill de Claude Code:\n1. Muévelo a ~/.claude/skills/cc-brew/SKILL.md\n2. Agrega esta entrada en ~/.claude/CLAUDE.md:\n\n# cc-brew\n- **cc-brew** (`~/.claude/skills/cc-brew/SKILL.md`) - evalúa ideas antes de construirlas con Claude Code\n  Trigger: `/cc-brew`'
   };
-  navigator.clipboard.writeText(prompts[id]).catch(() => {});
-  if (id === 'mcp') trackInstall('mcp_copy');
-  const btn = document.getElementById('copy-' + id + '-btn');
-  const orig = btn.textContent;
-  btn.textContent = '✓ Copiado';
-  setTimeout(() => btn.textContent = orig, 2000);
+  navigator.clipboard.writeText(prompts[id]).catch(function() {});
+  var eventName = id + '_copy';
+  trackInstall(eventName);
+  // Optimistic counter increment
+  _copyCounts[eventName] = (_copyCounts[eventName] || 0) + 1;
+  _renderCount(id, _copyCounts[eventName]);
+  var btn = document.getElementById('copy-' + id + '-btn');
+  var span = btn.querySelector('span');
+  var orig = span.textContent;
+  span.textContent = '✓ Copiado';
+  setTimeout(function() { span.textContent = orig; }, 2000);
+}
+
+// Load counts on page ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _loadCopyCounts);
+} else {
+  _loadCopyCounts();
 }
 </script>
 
