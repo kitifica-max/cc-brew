@@ -64,11 +64,20 @@ export const TOOL_DEFINITIONS = [
         what_would_change: { type: 'string' },
         resource_estimate: {
           type: 'object',
-          description: '{ hours_low, hours_high, infra_notes } — estimado de horas de desarrollo V1 y notas de costo de infraestructura inicial',
+          description: 'Estimado de horas de desarrollo V1 y notas de costo de infraestructura inicial',
+          properties: {
+            hours_low: { type: 'number' },
+            hours_high: { type: 'number' },
+            infra_notes: { type: 'string' },
+          },
         },
         stack_recommendation: {
           type: 'object',
-          description: '{ approach, reasoning } — recomendación de stack no genérica',
+          description: 'Recomendación de stack no genérica',
+          properties: {
+            approach: { type: 'string' },
+            reasoning: { type: 'string' },
+          },
         },
         brief_md: { type: 'string', description: 'Brief de construcción en markdown. Solo si decision es BUILD.' },
       },

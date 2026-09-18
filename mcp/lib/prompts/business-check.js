@@ -2,7 +2,7 @@ import { pathToFileURL } from 'node:url'
 
 // Fuente única de los criterios de evaluación y el formato de veredicto de
 // CC Brew. mcp/scripts/sync-skill.mjs vuelca este contenido en ambas copias
-// de SKILL.md — no editar SKILL.md directo para estos 3 bloques, se pisa en
+// de SKILL.md — no editar SKILL.md directo para estos 4 bloques, se pisa en
 // el próximo sync.
 export const BUSINESS_CHECK_SECTIONS = {
   personality: [
@@ -67,11 +67,15 @@ export const BUSINESS_CHECK_SECTIONS = {
     "[Si DON'T BUILD: \"¿Querés evaluar otra idea?\"]",
     '```',
   ].join('\n'),
+
+  persistence: [
+    'Si el MCP `cc-brew` está disponible, guardá la evaluación con `save_evaluation`: pasá los 14 criterios completos en `criteria`, `strongest_signal`, `biggest_risk`, `biggest_risk_category` (mapeo exacto — Técnico → `tecnico`, Mercado → `mercado`, Clonación → `clonacion`), `what_would_change`, `resource_estimate`, `stack_recommendation`, y `brief_md` si la decisión es BUILD.',
+  ].join('\n'),
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const assert = (cond, msg) => { if (!cond) throw new Error('FAIL: ' + msg) }
-  const { personality, criteria, outputFormat } = BUSINESS_CHECK_SECTIONS
+  const { personality, criteria, outputFormat, persistence } = BUSINESS_CHECK_SECTIONS
 
   assert(personality.length > 0, 'personality no vacío')
   assert(criteria.length > 0, 'criteria no vacío')
@@ -86,5 +90,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     assert(outputFormat.includes(phrase), `outputFormat incluye "${phrase}"`)
   }
 
-  console.log('business-check.js: OK (14 criterios, 3 campos de formato de salida)')
+  assert(persistence.length > 0, 'persistence no vacío')
+  assert(persistence.includes('save_evaluation'), 'persistence menciona save_evaluation')
+  for (const field of ['biggest_risk_category', 'resource_estimate', 'stack_recommendation']) {
+    assert(persistence.includes('`' + field + '`'), `persistence menciona ${field}`)
+  }
+  assert(criteria.includes('14 criterios'), 'criteria menciona "14 criterios" en prosa')
+  assert(keys.length === 14, 'exactamente 14 keys listadas para chequear')
+
+  console.log('business-check.js: OK (14 criterios, 3 campos de formato de salida, sección de persistencia)')
 }

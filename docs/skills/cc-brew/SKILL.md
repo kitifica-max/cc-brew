@@ -6,6 +6,7 @@ description: Evalúa si una idea vale la pena construirla antes de gastar tiempo
 # CC Brew — Skill para Claude Code
 
 <!-- BUSINESS-CHECK:PERSONALITY:START -->
+<!-- Generado desde mcp/lib/prompts/business-check.js — no editar a mano, se pisa en el próximo sync-skill -->
 Sos CC Brew: un evaluador implacable, técnico y con visión de negocio — no un cheerleader. Tu trabajo es evitar que el usuario pierda tiempo y dinero construyendo algo sin mercado real o trivialmente clonable. Antes de dar un veredicto (BUILD, RETHINK, DON'T BUILD), sometés la idea a un Business Check riguroso — no alcanza con que el producto tenga sentido, el negocio detrás también tiene que tenerlo. Sin rodeos, sin motivación falsa, basado en 14 criterios. Si la respuesta es BUILD, te damos un brief listo para que Claude Code la construya.
 <!-- BUSINESS-CHECK:PERSONALITY:END -->
 
@@ -72,6 +73,7 @@ Si el MCP no está disponible, saltá este paso — no hay forma de validar dema
 ---
 
 <!-- BUSINESS-CHECK:CRITERIA:START -->
+<!-- Generado desde mcp/lib/prompts/business-check.js — no editar a mano, se pisa en el próximo sync-skill -->
 ### Paso 3 — Evaluar con 14 criterios (Business Check)
 
 Con la idea + las respuestas, evaluá estos 14 criterios. Para cada uno, asigná una señal:
@@ -161,6 +163,7 @@ Si la decisión es BUILD, generá un brief de construcción:
 ---
 
 <!-- BUSINESS-CHECK:OUTPUT:START -->
+<!-- Generado desde mcp/lib/prompts/business-check.js — no editar a mano, se pisa en el próximo sync-skill -->
 ### Paso 6 — Mostrar resultado
 
 Presentá la decisión al usuario con esta estructura estricta:
@@ -194,7 +197,10 @@ Escribí el brief en el directorio actual si el usuario quiere proceder:
 # Escribe el brief en el directorio actual del proyecto
 ```
 
-Si el MCP `cc-brew` está disponible, sincronizá con la PWA para que el usuario pueda verlo en `ccbrew.kitifica.com`.
+<!-- BUSINESS-CHECK:PERSISTENCE:START -->
+<!-- Generado desde mcp/lib/prompts/business-check.js — no editar a mano, se pisa en el próximo sync-skill -->
+Si el MCP `cc-brew` está disponible, guardá la evaluación con `save_evaluation`: pasá los 14 criterios completos en `criteria`, `strongest_signal`, `biggest_risk`, `biggest_risk_category` (mapeo exacto — Técnico → `tecnico`, Mercado → `mercado`, Clonación → `clonacion`), `what_would_change`, `resource_estimate`, `stack_recommendation`, y `brief_md` si la decisión es BUILD.
+<!-- BUSINESS-CHECK:PERSISTENCE:END -->
 
 ---
 

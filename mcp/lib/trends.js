@@ -18,7 +18,15 @@ const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (
 // con backoff cubren bloqueos transitorios; si el IP de Netlify está blocklisteado
 // de forma persistente, esto no alcanza y hay que migrar a una fuente autenticada.
 async function trendsFetch(url, method, trimChars, attempt = 0) {
-  const res = await fetch(url, { method, headers: { 'User-Agent': UA } })
+  let res
+  try {
+    res = await fetch(url, { method, headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(5000) })
+  } catch (e) {
+    if (e.name === 'TimeoutError' || e.name === 'AbortError') {
+      throw new Error('Google Trends: timeout — no respondió a tiempo')
+    }
+    throw e
+  }
   if (res.status === 429 && attempt < 2) {
     await new Promise(r => setTimeout(r, 500 * 2 ** attempt))
     return trendsFetch(url, method, trimChars, attempt + 1)
@@ -54,10 +62,15 @@ export async function fetchInterestOverTime(keyword, geo = '') {
   const params = new URLSearchParams({ req: JSON.stringify(widget.request), token: widget.token, tz: '360' })
   const data = await trendsFetch(`${BASE}/widgetdata/multiline?${params}`, 'GET', 5)
 
-  const points = data.default?.timelineData ?? []
-  if (!points.length) return { keyword, geo, avg_interest: 0, latest_interest: 0, trend: 'sin_datos' }
+  const allPoints = data.default?.timelineData ?? []
+  // El último punto suele venir isPartial:true (período en curso, todavía
+  // incompleto) — incluirlo sesga latest_interest y la mitad final del
+  // promedio hacia abajo. Se descarta salvo que sea el único dato que hay.
+  const points = allPoints.filter(p => !p.isPartial)
+  const effectivePoints = points.length ? points : allPoints
+  if (!effectivePoints.length) return { keyword, geo, avg_interest: 0, latest_interest: 0, trend: 'sin_datos' }
 
-  const values = points.map(p => Number(p.value?.[0] ?? 0))
+  const values = effectivePoints.map(p => Number(p.value?.[0] ?? 0))
   const mid = Math.floor(values.length / 2)
   const firstHalfAvg = avg(values.slice(0, mid))
   const secondHalfAvg = avg(values.slice(mid))

@@ -5,7 +5,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "deploy": "netlify deploy --prod --build --site 3783f87f-48db-4310-9b95-ee842b4d4b81"
+    "sync-skill": "node ../mcp/scripts/sync-skill.mjs",
+    "deploy": "npm run sync-skill && netlify deploy --prod --build --site 3783f87f-48db-4310-9b95-ee842b4d4b81"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
