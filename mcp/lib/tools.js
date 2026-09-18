@@ -1,4 +1,5 @@
 import { supabase } from './db.js'
+import { fetchInterestOverTime, classifyDemand } from './trends.js'
 
 export const TOOL_DEFINITIONS = [
   {
@@ -47,7 +48,7 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'save_evaluation',
-    description: 'Guarda la evaluación (10 criterios + decisión BUILD/RETHINK/DON\'T BUILD) y el brief generado.',
+    description: 'Guarda la evaluación (14 criterios: 10 de producto + 4 de Business Check + decisión BUILD/RETHINK/DON\'T BUILD) y el brief generado.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -55,11 +56,20 @@ export const TOOL_DEFINITIONS = [
         decision: { type: 'string', enum: ['BUILD', 'RETHINK', 'DON\'T BUILD', 'NOT_ENOUGH_SIGNAL', 'VALIDATE_FIRST'] },
         criteria: {
           type: 'object',
-          description: 'Objeto con señal (strong|moderate|weak|unknown) para cada uno de los 10 criterios',
+          description: 'Objeto con señal (strong|moderate|weak|unknown) para cada uno de los 14 criterios (10 de producto + moat, gtm, unit_economics, usage_frequency)',
         },
         strongest_signal: { type: 'string' },
         biggest_risk: { type: 'string' },
+        biggest_risk_category: { type: 'string', enum: ['tecnico', 'mercado', 'clonacion'], description: 'Clasificación de biggest_risk' },
         what_would_change: { type: 'string' },
+        resource_estimate: {
+          type: 'object',
+          description: '{ hours_low, hours_high, infra_notes } — estimado de horas de desarrollo V1 y notas de costo de infraestructura inicial',
+        },
+        stack_recommendation: {
+          type: 'object',
+          description: '{ approach, reasoning } — recomendación de stack no genérica',
+        },
         brief_md: { type: 'string', description: 'Brief de construcción en markdown. Solo si decision es BUILD.' },
       },
       required: ['session_id', 'decision', 'criteria'],
@@ -75,6 +85,18 @@ export const TOOL_DEFINITIONS = [
         metadata: { type: 'object', description: 'Datos opcionales adicionales' },
       },
       required: ['event'],
+    },
+  },
+  {
+    name: 'validate_demand',
+    description: 'Consulta Google Trends para UN término de búsqueda: interés relativo (0-100) y tendencia (subiendo/bajando/estable) en los últimos 12 meses. Llamala una vez por cada término (3-5 por idea) antes de decidir — cero asunciones sobre demanda sin datos. Sin keyword difficulty (Trends no lo mide) — solo nivel de interés.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        keyword: { type: 'string', description: 'Término tal como lo escribiría un usuario real en Google' },
+        geo: { type: 'string', description: 'Código de país ISO 3166-1 alpha-2 (ej. "US", "SV", "MX"). Vacío = mundial. Por defecto mundial.' },
+      },
+      required: ['keyword'],
     },
   },
 ]
@@ -127,13 +149,19 @@ async function get_answers({ session_id }) {
   }
 }
 
-async function save_evaluation({ session_id, decision, criteria, strongest_signal, biggest_risk, what_would_change, brief_md }) {
+async function save_evaluation({
+  session_id, decision, criteria, strongest_signal, biggest_risk, biggest_risk_category,
+  what_would_change, resource_estimate, stack_recommendation, brief_md,
+}) {
   const { error } = await supabase
     .from('cc_brew_sessions')
     .update({
       status: 'evaluated',
       decision,
-      evaluation: { criteria, strongest_signal, biggest_risk, what_would_change },
+      evaluation: {
+        criteria, strongest_signal, biggest_risk, biggest_risk_category,
+        what_would_change, resource_estimate, stack_recommendation,
+      },
       brief_md: brief_md ?? null,
       completed_at: new Date().toISOString(),
     })
@@ -151,7 +179,14 @@ async function track_event({ event, metadata = {} }) {
   return { content: [{ type: 'text', text: 'ok' }] }
 }
 
-const TOOLS = { create_session, save_idea, save_questionnaire, get_answers, save_evaluation, track_event }
+async function validate_demand({ keyword, geo }) {
+  if (!keyword) throw new Error('keyword required')
+  const data = await fetchInterestOverTime(keyword, geo ?? '')
+  const verdict = classifyDemand(data)
+  return { content: [{ type: 'text', text: JSON.stringify({ ...data, verdict }) }] }
+}
+
+const TOOLS = { create_session, save_idea, save_questionnaire, get_answers, save_evaluation, track_event, validate_demand }
 
 // Handler JSON-RPC — sin auth
 export async function mcpJsonRpcHandler(event) {
