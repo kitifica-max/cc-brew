@@ -1,8 +1,9 @@
 // Google Trends — endpoint no oficial (sin API key, sin costo). Mismo flujo que usa
 // pytrends (github.com/GeneralMills/pytrends), reversado del sitio trends.google.com.
-// ponytail: sin SLA — Google puede cambiar o rate-limitear esto sin aviso. Si empieza
-// a fallar seguido en prod, la escalada es una fuente paga (DataForSEO — ver
-// git history de este archivo para la integración que ya existía).
+// ponytail: sin SLA — Google puede cambiar o rate-limitear esto sin aviso. Cache de
+// 7 días en Supabase (ver tools.js validate_demand) amortigua bloqueos esporádicos
+// sirviendo el último dato conocido. Si empieza a bloquear seguido incluso con cache
+// tibio, la escalada es una fuente paga (DataForSEO / SerpApi Trends).
 //
 // Dos pasos: 1) "explore" consigue un token, 2) "widgetdata/multiline" trae los datos
 // con ese token. Cada respuesta trae basura al inicio (protección anti-hijacking) que
@@ -96,11 +97,19 @@ export function classifyDemand({ avg_interest }) {
   return 'interes_alto'
 }
 
+const TRENDS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000 // 7 dias — Trends no se mueve rapido
+
+export function isFresh(fetchedAt, ttlMs = TRENDS_CACHE_TTL_MS, now = Date.now()) {
+  return now - new Date(fetchedAt).getTime() < ttlMs
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const assert = (cond, msg) => { if (!cond) throw new Error('FAIL: ' + msg) }
   assert(classifyDemand({ avg_interest: 0 }) === 'sin_interes', 'sin interes')
   assert(classifyDemand({ avg_interest: 10 }) === 'interes_bajo', 'bajo')
   assert(classifyDemand({ avg_interest: 30 }) === 'interes_moderado', 'moderado')
   assert(classifyDemand({ avg_interest: 80 }) === 'interes_alto', 'alto')
-  console.log('trends.js classifyDemand: OK (fn pura — fetchInterestOverTime necesita red real, no cubierta acá)')
+  assert(isFresh(new Date(Date.now() - 1000).toISOString()) === true, 'fresh: hace 1s, dentro de TTL 7d')
+  assert(isFresh(new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString()) === false, 'stale: hace 8d, fuera de TTL 7d')
+  console.log('trends.js classifyDemand/isFresh: OK (fns puras — fetchInterestOverTime necesita red real, no cubierta acá)')
 }
