@@ -68,6 +68,8 @@ Antes de evaluar, ancla la idea a datos reales de intención de búsqueda con la
 
 Si la tool falla (Google Trends no es oficial — puede bloquear o rate-limitar sin aviso), decilo explícitamente y seguí sin este dato. No inventes números.
 
+Si la respuesta trae `stale: true`, es un dato cacheado (`cached_at`) porque Trends no respondió ahora — presentalo como tal ("dato de hace N días, Trends no respondió en esta consulta"), no como interés en tiempo real.
+
 Si el MCP no está disponible, saltá este paso — no hay forma de validar demanda sin datos reales, no lo simules.
 
 ---

@@ -1,5 +1,5 @@
 import { supabase } from './db.js'
-import { fetchInterestOverTime, classifyDemand } from './trends.js'
+import { fetchInterestOverTime, classifyDemand, isFresh } from './trends.js'
 
 export const TOOL_DEFINITIONS = [
   {
@@ -190,9 +190,39 @@ async function track_event({ event, metadata = {} }) {
 
 async function validate_demand({ keyword, geo }) {
   if (!keyword) throw new Error('keyword required')
-  const data = await fetchInterestOverTime(keyword, geo ?? '')
-  const verdict = classifyDemand(data)
-  return { content: [{ type: 'text', text: JSON.stringify({ ...data, verdict }) }] }
+  const g = geo ?? ''
+
+  // Cache-first: Trends no se mueve rapido y el endpoint no oficial bloquea IPs
+  // de datacenter con 429 sin aviso (ver trends.js). Si falla la lectura del cache,
+  // 'cached' queda undefined y seguimos al fetch en vivo — falla abierto, no cierra el tool.
+  const { data: cached } = await supabase
+    .from('cc_brew_trends_cache')
+    .select('data, fetched_at')
+    .eq('keyword', keyword)
+    .eq('geo', g)
+    .maybeSingle()
+
+  if (cached && isFresh(cached.fetched_at)) {
+    return { content: [{ type: 'text', text: JSON.stringify(cached.data) }] }
+  }
+
+  try {
+    const data = await fetchInterestOverTime(keyword, g)
+    const verdict = classifyDemand(data)
+    const result = { ...data, verdict }
+    await supabase.from('cc_brew_trends_cache').upsert(
+      { keyword, geo: g, data: result, fetched_at: new Date().toISOString() },
+      { onConflict: 'keyword,geo' }
+    )
+    return { content: [{ type: 'text', text: JSON.stringify(result) }] }
+  } catch (err) {
+    // Google bloqueó y no hay dato fresco: mejor un dato viejo declarado como tal
+    // que nada — pero solo si hay algo cacheado, nunca se inventa un fallback.
+    if (cached) {
+      return { content: [{ type: 'text', text: JSON.stringify({ ...cached.data, stale: true, cached_at: cached.fetched_at }) }] }
+    }
+    throw err
+  }
 }
 
 const TOOLS = { create_session, save_idea, save_questionnaire, get_answers, save_evaluation, track_event, validate_demand }
