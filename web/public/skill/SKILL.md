@@ -54,19 +54,19 @@ Generá **6-10 preguntas de opción múltiple** que cubran estas áreas:
 
 ### Paso 2.5 — Validar demanda real (si el MCP `cc-brew` está disponible)
 
-Antes de evaluar, ancla la idea a datos reales de intención de búsqueda con la tool `validate_demand` (Google Trends — gratis, sin key). Cero asunciones: si no llamaste la tool, no asumas que hay demanda — decilo explícitamente en el Paso 4.
+Antes de evaluar, ancla la idea a datos reales de intención de búsqueda con la tool `validate_demand` (Google Trends vía SerpApi). Cero asunciones: si no llamaste la tool, no asumas que hay demanda — decilo explícitamente en el Paso 4.
 
 **Importante:** Trends mide interés *relativo* (0-100, últimos 12 meses), no volumen absoluto de búsquedas, y no tiene keyword difficulty (no mide competencia de ranking). Es una señal más débil que un volumen real — comunicalo así, no la presentes como si fuera lo mismo.
 
 1. Desglosá la idea en 3 a 5 términos que un usuario real escribiría en Google para resolver ese problema (ej. para una app de finanzas familiares: "compartir tarjeta de crédito con familia", no "bóveda digital de contraseñas").
-2. Llamá `validate_demand` una vez por término — `keyword` (obligatorio) y `geo` (opcional, código ISO de país como "US"/"SV"/"MX"; vacío = mundial).
+2. Llamá `validate_demand` una vez por término — `keyword` (obligatorio), `geo` (opcional, código ISO de país como "US"/"SV"/"MX"; vacío = mundial) y `category` (opcional, id de categoría de Google Ads — solo si el rubro de la idea es inequívoco, ej. 7 Finance, 32 Software, 71 Food & Drink; si hay duda, omitilo y dejá 0/todas).
 3. Con `avg_interest` (0-100) y `trend` que devuelve cada llamada, clasificá:
    - **Sin interés** (`avg_interest` <5): casi nadie busca esto. Advertí que el problema puede ser una alucinación o requerir mucha inversión en educar al mercado.
    - **Interés bajo** (5-20) / **moderado** (20-50) / **alto** (≥50): más señal, no garantía — sin dato de competencia, no se puede saber si el nicho está saturado.
    - Sumá la tendencia (`subiendo`/`bajando`/`estable`) como matiz: "interés alto y subiendo" pesa más que "interés alto y bajando". Si `trend` viene `sin_datos` (Trends no devolvió ningún punto para ese keyword/geo), no hay tendencia que sumar — tratalo igual que sin interés.
 4. Resumí en una tabla markdown (Término · Interés promedio · Tendencia · Veredicto) y cerrá con un veredicto binario que alimenta el Paso 4: "La demanda justifica seguir evaluando" o "Los datos sugieren pivotar el enfoque antes de construir". Tono pragmático y escéptico — sos la voz de los números, no la motivación.
 
-Si la tool falla (Google Trends no es oficial — puede bloquear o rate-limitar sin aviso), decilo explícitamente y seguí sin este dato. No inventes números.
+Si la tool falla (cuota de SerpApi agotada, key inválida, o timeout), decilo explícitamente y seguí sin este dato. No inventes números.
 
 Si la respuesta trae `stale: true`, es un dato cacheado (`cached_at`) porque Trends no respondió ahora — presentalo como tal ("dato de hace N días, Trends no respondió en esta consulta"), no como interés en tiempo real.
 

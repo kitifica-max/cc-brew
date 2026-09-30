@@ -1,77 +1,59 @@
-// Google Trends — endpoint no oficial (sin API key, sin costo). Mismo flujo que usa
-// pytrends (github.com/GeneralMills/pytrends), reversado del sitio trends.google.com.
-// ponytail: sin SLA — Google puede cambiar o rate-limitear esto sin aviso. Cache de
-// 7 días en Supabase (ver tools.js validate_demand) amortigua bloqueos esporádicos
-// sirviendo el último dato conocido. Si empieza a bloquear seguido incluso con cache
-// tibio, la escalada es una fuente paga (DataForSEO / SerpApi Trends).
+// Google Trends vía SerpApi (https://serpapi.com/google-trends-api) — API paga,
+// requiere SERPAPI_KEY. Reemplaza el scraping del endpoint no oficial: mismo dato
+// de Trends, sin bloqueos de IP por tráfico de datacenter (era el problema real).
 //
-// Dos pasos: 1) "explore" consigue un token, 2) "widgetdata/multiline" trae los datos
-// con ese token. Cada respuesta trae basura al inicio (protección anti-hijacking) que
-// hay que recortar antes de parsear JSON — 4 chars en explore, 5 en widgetdata.
+// cat = categoría de Google Ads (id numérico, 0 = todas). Ids completos en
+// google-trends-categories.json en la raíz del repo — referencia para elegir el
+// id correcto al llamar validate_demand, no se distribuye vía MCP.
 
 import { pathToFileURL } from 'node:url'
 
-const BASE = 'https://trends.google.com/trends/api'
-const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36'
+const BASE = 'https://serpapi.com/search'
 
-// ponytail: Google bloquea agresivo tráfico de IPs de datacenter con 429 genérico
-// (verificado en vivo — bloqueó al primer request desde esta sandbox). 2 reintentos
-// con backoff cubren bloqueos transitorios; si el IP de Netlify está blocklisteado
-// de forma persistente, esto no alcanza y hay que migrar a una fuente autenticada.
-async function trendsFetch(url, method, trimChars, attempt = 0) {
+async function fetchTimeseries(keyword, geo, cat) {
+  const params = new URLSearchParams({
+    engine: 'google_trends',
+    q: keyword,
+    data_type: 'TIMESERIES',
+    date: 'today 12-m',
+    api_key: process.env.SERPAPI_KEY ?? '',
+  })
+  if (geo) params.set('geo', geo)
+  if (cat) params.set('cat', String(cat))
+
   let res
   try {
-    res = await fetch(url, { method, headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(5000) })
+    res = await fetch(`${BASE}?${params}`, { signal: AbortSignal.timeout(10000) })
   } catch (e) {
     if (e.name === 'TimeoutError' || e.name === 'AbortError') {
-      throw new Error('Google Trends: timeout — no respondió a tiempo')
+      throw new Error('SerpApi: timeout — no respondió a tiempo')
     }
     throw e
   }
-  if (res.status === 429 && attempt < 2) {
-    await new Promise(r => setTimeout(r, 500 * 2 ** attempt))
-    return trendsFetch(url, method, trimChars, attempt + 1)
-  }
-  if (!res.ok) throw new Error(`Google Trends HTTP ${res.status}${res.status === 429 ? ' (bloqueado tras reintentos)' : ''}`)
-  const text = await res.text()
-  try {
-    return JSON.parse(text.slice(trimChars))
-  } catch {
-    throw new Error('Google Trends: respuesta inesperada (¿cambiaron el formato del endpoint no oficial?)')
-  }
-}
 
-async function getTimeseriesWidget(keyword, geo) {
-  const req = JSON.stringify({
-    comparisonItem: [{ keyword, geo, time: 'today 12-m' }],
-    category: 0,
-    property: '',
-  })
-  const params = new URLSearchParams({ hl: 'es', tz: '360', req })
-  const data = await trendsFetch(`${BASE}/explore?${params}`, 'POST', 4)
-  const widget = data.widgets?.find(w => w.id === 'TIMESERIES')
-  if (!widget) throw new Error('Google Trends: sin datos para ese keyword/geo')
-  return widget
+  const body = await res.json().catch(() => null)
+  if (!res.ok || body?.error) {
+    throw new Error(`SerpApi: ${body?.error ?? `HTTP ${res.status}`}`)
+  }
+  return body
 }
 
 function avg(arr) {
   return arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0
 }
 
-export async function fetchInterestOverTime(keyword, geo = '') {
-  const widget = await getTimeseriesWidget(keyword, geo)
-  const params = new URLSearchParams({ req: JSON.stringify(widget.request), token: widget.token, tz: '360' })
-  const data = await trendsFetch(`${BASE}/widgetdata/multiline?${params}`, 'GET', 5)
+export async function fetchInterestOverTime(keyword, geo = '', cat = 0) {
+  const body = await fetchTimeseries(keyword, geo, cat)
 
-  const allPoints = data.default?.timelineData ?? []
-  // El último punto suele venir isPartial:true (período en curso, todavía
+  const allPoints = body.interest_over_time?.timeline_data ?? []
+  // El último punto puede venir isPartial:true (período en curso, todavía
   // incompleto) — incluirlo sesga latest_interest y la mitad final del
   // promedio hacia abajo. Se descarta salvo que sea el único dato que hay.
   const points = allPoints.filter(p => !p.isPartial)
   const effectivePoints = points.length ? points : allPoints
   if (!effectivePoints.length) return { keyword, geo, avg_interest: 0, latest_interest: 0, trend: 'sin_datos' }
 
-  const values = effectivePoints.map(p => Number(p.value?.[0] ?? 0))
+  const values = effectivePoints.map(p => Number(p.values?.[0]?.extracted_value ?? 0))
   const mid = Math.floor(values.length / 2)
   const firstHalfAvg = avg(values.slice(0, mid))
   const secondHalfAvg = avg(values.slice(mid))

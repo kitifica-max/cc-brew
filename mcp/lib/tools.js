@@ -98,12 +98,16 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'validate_demand',
-    description: 'Consulta Google Trends para UN término de búsqueda: interés relativo (0-100) y tendencia (subiendo/bajando/estable) en los últimos 12 meses. Llamala una vez por cada término (3-5 por idea) antes de decidir — cero asunciones sobre demanda sin datos. Sin keyword difficulty (Trends no lo mide) — solo nivel de interés.',
+    description: 'Consulta Google Trends (vía SerpApi) para UN término de búsqueda: interés relativo (0-100) y tendencia (subiendo/bajando/estable) en los últimos 12 meses. Llamala una vez por cada término (3-5 por idea) antes de decidir — cero asunciones sobre demanda sin datos. Sin keyword difficulty (Trends no lo mide) — solo nivel de interés.',
     inputSchema: {
       type: 'object',
       properties: {
         keyword: { type: 'string', description: 'Término tal como lo escribiría un usuario real en Google' },
         geo: { type: 'string', description: 'Código de país ISO 3166-1 alpha-2 (ej. "US", "SV", "MX"). Vacío = mundial. Por defecto mundial.' },
+        category: {
+          type: 'integer',
+          description: 'Id de categoría de Google Ads para acotar la búsqueda (0 = todas, default — usar si la categoría es dudosa). Ejemplos: 7 Finance, 8 Games, 12 Business & Industrial, 18 Shopping, 32 Software, 45 Health, 67 Travel, 71 Food & Drink, 74 Education.',
+        },
       },
       required: ['keyword'],
     },
@@ -188,18 +192,21 @@ async function track_event({ event, metadata = {} }) {
   return { content: [{ type: 'text', text: 'ok' }] }
 }
 
-async function validate_demand({ keyword, geo }) {
+async function validate_demand({ keyword, geo, category }) {
   if (!keyword) throw new Error('keyword required')
   const g = geo ?? ''
+  const cat = category ?? 0
 
-  // Cache-first: Trends no se mueve rapido y el endpoint no oficial bloquea IPs
-  // de datacenter con 429 sin aviso (ver trends.js). Si falla la lectura del cache,
-  // 'cached' queda undefined y seguimos al fetch en vivo — falla abierto, no cierra el tool.
+  // Cache-first: Trends no se mueve rapido y SerpApi cobra por búsqueda. category
+  // entra en la key porque el mismo keyword puede dar interés distinto según la
+  // categoría. Si falla la lectura del cache, 'cached' queda undefined y seguimos
+  // al fetch en vivo — falla abierto, no cierra el tool.
   const { data: cached } = await supabase
     .from('cc_brew_trends_cache')
     .select('data, fetched_at')
     .eq('keyword', keyword)
     .eq('geo', g)
+    .eq('category', cat)
     .maybeSingle()
 
   if (cached && isFresh(cached.fetched_at)) {
@@ -207,17 +214,17 @@ async function validate_demand({ keyword, geo }) {
   }
 
   try {
-    const data = await fetchInterestOverTime(keyword, g)
+    const data = await fetchInterestOverTime(keyword, g, cat)
     const verdict = classifyDemand(data)
     const result = { ...data, verdict }
     await supabase.from('cc_brew_trends_cache').upsert(
-      { keyword, geo: g, data: result, fetched_at: new Date().toISOString() },
-      { onConflict: 'keyword,geo' }
+      { keyword, geo: g, category: cat, data: result, fetched_at: new Date().toISOString() },
+      { onConflict: 'keyword,geo,category' }
     )
     return { content: [{ type: 'text', text: JSON.stringify(result) }] }
   } catch (err) {
-    // Google bloqueó y no hay dato fresco: mejor un dato viejo declarado como tal
-    // que nada — pero solo si hay algo cacheado, nunca se inventa un fallback.
+    // SerpApi falló (quota, key inválida, timeout) y no hay dato fresco: mejor un
+    // dato viejo declarado como tal que nada — solo si hay algo cacheado.
     if (cached) {
       return { content: [{ type: 'text', text: JSON.stringify({ ...cached.data, stale: true, cached_at: cached.fetched_at }) }] }
     }
