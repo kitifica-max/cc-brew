@@ -192,6 +192,8 @@ async function track_event({ event, metadata = {} }) {
   return { content: [{ type: 'text', text: 'ok' }] }
 }
 
+const TRENDS_MONTHLY_CAP = 200 // plan free de SerpApi: 250/mes, compartido entre todo el que instale el MCP — deja margen
+
 async function validate_demand({ keyword, geo, category }) {
   if (!keyword) throw new Error('keyword required')
   const g = geo ?? ''
@@ -214,6 +216,15 @@ async function validate_demand({ keyword, geo, category }) {
   }
 
   try {
+    // Tope mensual: la key de SerpApi es una sola, compartida entre todos los
+    // usuarios del MCP público — no hay key por usuario. cc_brew_trends_quota_take
+    // incrementa atómicamente y devuelve false si ya se llegó al tope. Si falla el
+    // chequeo en sí (no la cuota), 'allowed' queda undefined/null y seguimos —
+    // mismo criterio fail-open que el cache de arriba.
+    const month = new Date().toISOString().slice(0, 7)
+    const { data: allowed } = await supabase.rpc('cc_brew_trends_quota_take', { p_month: month, p_cap: TRENDS_MONTHLY_CAP })
+    if (allowed === false) throw new Error(`SerpApi: cuota mensual interna agotada (${TRENDS_MONTHLY_CAP}/mes)`)
+
     const data = await fetchInterestOverTime(keyword, g, cat)
     const verdict = classifyDemand(data)
     const result = { ...data, verdict }
