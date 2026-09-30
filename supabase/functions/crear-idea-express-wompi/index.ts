@@ -63,6 +63,7 @@ Deno.serve(async (req) => {
 
   const wompiToken = await getWompiToken()
   const appUrl = Deno.env.get('APP_URL') || 'https://ccbrew.kitifica.com'
+  const WEBHOOK_URL = `${Deno.env.get('SUPABASE_URL')}/functions/v1/webhook-wompi-idea-express`
 
   const wompiRes = await fetch('https://api.wompi.sv/TransaccionCompra/3DS', {
     method: 'POST',
@@ -83,6 +84,14 @@ Deno.serve(async (req) => {
       idPais:       'SV',
       descripcion:  'CC Brew — Idea Express',
       urlRedirect:  `${appUrl}/idea-express/resultado?check_id=${check.id}`,
+      // Doc de Wompi para TransaccionCompra/3DS muestra urlWebhook top-level
+      // (a diferencia de Bitcoin/Quick-Pay/Compra genérica, que lo anidan en
+      // "configuracion") — se manda en ambas formas porque un campo de más no
+      // rompe nada, y que el webhook nunca dispare sí sería un bug silencioso.
+      urlWebhook: WEBHOOK_URL,
+      configuracion: {
+        urlWebhook: WEBHOOK_URL,
+      },
       tarjetaCreditoDebido: {
         numeroTarjeta:   String(numero_tarjeta),
         cvv:             String(cvv),
