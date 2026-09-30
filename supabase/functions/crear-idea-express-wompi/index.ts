@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
       idRegion:     'SV-SS',
       idPais:       'SV',
       descripcion:  'CC Brew — Idea Express',
-      urlRedirect:  `${appUrl}/idea-express/resultado?check_id=${check.id}`,
+      urlRedirect:  `${appUrl}/?idea_check=${check.id}#idea-express`,
       // Doc de Wompi para TransaccionCompra/3DS muestra urlWebhook top-level
       // (a diferencia de Bitcoin/Quick-Pay/Compra genérica, que lo anidan en
       // "configuracion") — se manda en ambas formas porque un campo de más no

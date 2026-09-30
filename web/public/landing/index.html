@@ -417,6 +417,45 @@ section[id], #hero { scroll-margin-top: 96px; }
 .tool-spinner { margin-left: auto; width: 10px; height: 10px; border: 1.5px solid var(--border); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Idea Express — chat embebido, mismo estilo visual que .claude-mockup */
+.ie-modal {
+  display: none; position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.7);
+  align-items: center; justify-content: center; padding: 16px; box-sizing: border-box;
+}
+.ie-modal.open { display: flex; }
+.ie-modal-inner {
+  width: 100%; max-width: 420px; max-height: 88vh; display: flex; flex-direction: column; background: var(--ink-2);
+  border-radius: 14px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+.ie-modal-inner .mock-header { position: relative; }
+.ie-close {
+  margin-left: auto; background: none; border: none; color: var(--text-3);
+  font-size: 20px; cursor: pointer; line-height: 1; padding: 0 2px;
+}
+.ie-modal-inner .mock-body { flex: 1; overflow-y: auto; }
+.ie-footer { padding: 12px 16px; background: var(--ink-2); border-top: 1px solid var(--border); }
+.ie-text-row { display: flex; gap: 8px; }
+.ie-text-row input {
+  flex: 1; background: var(--ink); border: 1px solid var(--ink-4); border-radius: 8px;
+  color: var(--text); padding: 10px 12px; font-size: 14px; outline: none; font-family: inherit;
+}
+.ie-send-btn { background: var(--orange); color: #fff; border: none; border-radius: 8px; padding: 0 16px; font-size: 16px; cursor: pointer; flex-shrink: 0; }
+.ie-pay-form { display: flex; flex-direction: column; gap: 8px; }
+.ie-pay-form input {
+  background: var(--ink); border: 1px solid var(--ink-4); border-radius: 8px; color: var(--text);
+  padding: 10px 12px; font-size: 13px; outline: none; font-family: inherit; box-sizing: border-box; width: 100%;
+}
+.ie-pay-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ie-pay-btn {
+  background: var(--orange); color: #fff; border: none; border-radius: 10px; padding: 13px 0;
+  font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 4px;
+}
+.ie-pay-btn:disabled { background: var(--ink-4); color: var(--text-3); cursor: not-allowed; }
+.ie-error { color: #ef4444; font-size: 12px; margin-top: 2px; }
+.ie-spinner { width: 28px; height: 28px; border: 3px solid var(--ink-4); border-top-color: var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 8px auto; }
+.ie-verdict-badge { display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: 0.04em; border-radius: 6px; padding: 4px 10px; margin-bottom: 8px; }
+
 /* FAQ */
 .faq-section { padding: 80px 24px; background: var(--paper); color: var(--paper-ink); position: relative; overflow: hidden; }
 .faq-section::before {
@@ -588,7 +627,7 @@ footer {
       <a href="#como-funciona" class="btn btn-ghost">Cómo funciona →</a>
     </div>
 
-    <a href="/idea-express" style="display:inline-block;margin-top:14px;font-size:13px;color:var(--text-3);text-decoration:none;">
+    <a href="#" id="idea-express" onclick="ieOpen(); return false;" style="display:inline-block;margin-top:14px;font-size:13px;color:var(--text-3);text-decoration:none;">
       📱 ¿Te agarró la idea en el celular, sin la compu a mano? <span style="color:var(--orange);text-decoration:underline;">Probá el check express — $1.29</span>
     </a>
   </div>
@@ -969,6 +1008,20 @@ footer {
   <span class="footer-copy">© 2026 Kitifica · Think before you build</span>
 </footer>
 
+<div id="ie-modal" class="ie-modal">
+  <div class="ie-modal-inner">
+    <div class="mock-header">
+      <span class="mock-dot red"></span>
+      <span class="mock-dot yellow"></span>
+      <span class="mock-dot green"></span>
+      <span class="mock-title">Idea Express</span>
+      <button class="ie-close" onclick="ieClose()" aria-label="Cerrar">×</button>
+    </div>
+    <div class="mock-body" id="ie-messages"></div>
+    <div class="ie-footer" id="ie-footer"></div>
+  </div>
+</div>
+
 <script>
 function claudeTab(btn, id) {
   btn.closest('.claude-install-wrap').querySelectorAll('.claude-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1032,6 +1085,273 @@ if (document.readyState === 'loading') {
 } else {
   _loadCopyCounts();
 }
+
+// ---- Idea Express: chat embebido en el landing ----
+var IE_SUPABASE_URL = 'https://qombceeynlvgkmoffcoa.supabase.co';
+var IE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvbWJjZWV5bmx2Z2ttb2ZmY29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxOTM4MTgsImV4cCI6MjEwMTc2OTgxOH0.fksDXB7RD7vMIpdjLPdjH3uLfkJ_IlYqTvOc64FiptE';
+
+var IE_QUESTIONS = [
+  { key: 'idea_text',  text: 'Contame tu idea en una frase.' },
+  { key: 'para_quien', text: '¿Para quién es?' },
+  { key: 'por_que',    text: '¿Por qué ahora, por qué vos?' },
+];
+var ieStep = 0;
+var ieAnswers = {};
+
+function ieMsgEl(who, text) {
+  var wrap = document.createElement('div');
+  wrap.className = who === 'bot' ? 'mock-claude-msg' : 'mock-user-msg';
+  var av = document.createElement('span');
+  av.className = 'mock-avatar ' + (who === 'bot' ? 'claude-av' : 'user-av');
+  av.textContent = who === 'bot' ? 'C' : 'V';
+  var bubble = document.createElement('div');
+  bubble.className = 'mock-bubble' + (who === 'bot' ? '' : ' user-bubble');
+  bubble.textContent = text;
+  wrap.appendChild(av);
+  wrap.appendChild(bubble);
+  return wrap;
+}
+function ieAppend(el) {
+  var box = document.getElementById('ie-messages');
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+}
+function ieBotSay(text) { ieAppend(ieMsgEl('bot', text)); }
+function ieUserSay(text) { ieAppend(ieMsgEl('user', text)); }
+
+function ieShowTextInput() {
+  var footer = document.getElementById('ie-footer');
+  footer.innerHTML = '';
+  var row = document.createElement('div');
+  row.className = 'ie-text-row';
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.id = 'ie-input';
+  input.placeholder = 'Escribí tu respuesta...';
+  var btn = document.createElement('button');
+  btn.className = 'ie-send-btn';
+  btn.textContent = '→';
+  btn.onclick = ieSend;
+  input.onkeydown = function(e) { if (e.key === 'Enter') ieSend(); };
+  row.appendChild(input);
+  row.appendChild(btn);
+  footer.appendChild(row);
+  input.focus();
+}
+
+function ieSend() {
+  var input = document.getElementById('ie-input');
+  var val = input.value.trim();
+  if (!val) return;
+  ieUserSay(val);
+  ieAnswers[IE_QUESTIONS[ieStep].key] = val;
+  ieStep++;
+  if (ieStep < IE_QUESTIONS.length) {
+    setTimeout(function() {
+      ieBotSay(IE_QUESTIONS[ieStep].text);
+      ieShowTextInput();
+    }, 300);
+  } else {
+    setTimeout(function() {
+      ieBotSay('Para darte el veredicto necesito cobrar $1.29 — completá esto:');
+      ieShowPayForm();
+    }, 300);
+  }
+}
+
+function ieShowPayForm() {
+  var footer = document.getElementById('ie-footer');
+  footer.innerHTML =
+    '<div class="ie-pay-form">' +
+      '<input id="ie-nombre" placeholder="Nombre completo" autocomplete="name">' +
+      '<input id="ie-email" type="email" placeholder="Correo electrónico" autocomplete="email">' +
+      '<input id="ie-card" placeholder="1234 5678 9012 3456" inputmode="numeric" autocomplete="cc-number" style="font-family:monospace">' +
+      '<div class="ie-pay-row">' +
+        '<input id="ie-expiry" placeholder="MM/AA" inputmode="numeric" autocomplete="cc-exp" maxlength="5" style="font-family:monospace">' +
+        '<input id="ie-cvv" placeholder="CVV" inputmode="numeric" autocomplete="cc-csc" maxlength="3" style="font-family:monospace">' +
+      '</div>' +
+      '<div id="ie-pay-error" class="ie-error"></div>' +
+      '<button id="ie-pay-btn" class="ie-pay-btn">Pagar $1.29 y ver veredicto →</button>' +
+    '</div>';
+
+  document.getElementById('ie-card').oninput = function(e) {
+    e.target.value = e.target.value.replace(/\D/g,'').slice(0,16).replace(/(.{4})/g,'$1 ').trim();
+  };
+  document.getElementById('ie-expiry').oninput = function(e) {
+    var v = e.target.value.replace(/\D/g,'').slice(0,4);
+    if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+    e.target.value = v;
+  };
+  document.getElementById('ie-cvv').oninput = function(e) {
+    e.target.value = e.target.value.replace(/\D/g,'').slice(0,3);
+  };
+  document.getElementById('ie-pay-btn').onclick = iePagar;
+}
+
+function ieShowError(msg) {
+  var el = document.getElementById('ie-pay-error');
+  if (el) el.textContent = msg;
+}
+
+function iePagar() {
+  ieShowError('');
+  var nombre = document.getElementById('ie-nombre').value.trim();
+  var email = document.getElementById('ie-email').value.trim();
+  var card = document.getElementById('ie-card').value.replace(/\D/g,'');
+  var expiry = document.getElementById('ie-expiry').value;
+  var cvv = document.getElementById('ie-cvv').value.replace(/\D/g,'');
+
+  if (!nombre) return ieShowError('Ingresá tu nombre.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return ieShowError('Correo inválido.');
+  if (card.length < 15) return ieShowError('Número de tarjeta inválido.');
+  if (!/^4/.test(card) && !/^5[1-5]/.test(card) && !/^2[2-7]/.test(card)) return ieShowError('Solo Visa y Mastercard.');
+  if (expiry.indexOf('/') === -1 || expiry.length < 5) return ieShowError('Vencimiento inválido. Formato MM/AA.');
+  if (cvv.length < 3) return ieShowError('CVV debe tener 3 dígitos.');
+
+  var parts = expiry.split('/');
+  var mes = parseInt(parts[0], 10);
+  var anio = parseInt('20' + parts[1], 10);
+  if (isNaN(mes) || mes < 1 || mes > 12) return ieShowError('Mes inválido.');
+  var now = new Date();
+  if (anio < now.getFullYear() || (anio === now.getFullYear() && mes < now.getMonth() + 1)) return ieShowError('Tarjeta vencida.');
+
+  var btn = document.getElementById('ie-pay-btn');
+  btn.disabled = true;
+  btn.textContent = 'Procesando...';
+
+  var answers = {};
+  for (var k in ieAnswers) { if (k !== 'idea_text') answers[k] = ieAnswers[k]; }
+
+  fetch(IE_SUPABASE_URL + '/functions/v1/crear-idea-express-wompi', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      idea_text: ieAnswers.idea_text,
+      answers: answers,
+      nombre: nombre, email: email,
+      numero_tarjeta: card, cvv: cvv,
+      mes_vencimiento: mes, anio_vencimiento: anio,
+    }),
+  }).then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
+    .then(function(r) {
+      if (!r.ok || r.data.error) {
+        btn.disabled = false;
+        btn.textContent = 'Pagar $1.29 y ver veredicto →';
+        return ieShowError(r.data.error || 'Error al procesar el pago.');
+      }
+      window.location.href = r.data.url3ds;
+    })
+    .catch(function() {
+      btn.disabled = false;
+      btn.textContent = 'Pagar $1.29 y ver veredicto →';
+      ieShowError('Error de conexión. Verificá tu internet.');
+    });
+}
+
+function ieOpen() {
+  ieStep = 0;
+  ieAnswers = {};
+  document.getElementById('ie-messages').innerHTML = '';
+  document.getElementById('ie-modal').classList.add('open');
+  ieBotSay(IE_QUESTIONS[0].text);
+  ieShowTextInput();
+}
+function ieClose() {
+  document.getElementById('ie-modal').classList.remove('open');
+}
+
+function ieShowWaiting() {
+  document.getElementById('ie-footer').innerHTML = '';
+  ieBotSay('Confirmando tu pago...');
+  var box = document.getElementById('ie-messages');
+  var sp = document.createElement('div');
+  sp.className = 'ie-spinner';
+  sp.id = 'ie-wait-spinner';
+  box.appendChild(sp);
+  box.scrollTop = box.scrollHeight;
+}
+
+function ieShowVerdict(v) {
+  var sp = document.getElementById('ie-wait-spinner');
+  if (sp) sp.remove();
+  var colors = { BUILD: '#10B981', RETHINK: '#F59E0B', "DON'T BUILD": '#EF4444' };
+  var wrap = document.createElement('div');
+  wrap.className = 'mock-claude-msg';
+  var av = document.createElement('span');
+  av.className = 'mock-avatar claude-av';
+  av.textContent = 'C';
+  var content = document.createElement('div');
+  content.className = 'mock-claude-content';
+  var badge = document.createElement('div');
+  badge.className = 'ie-verdict-badge';
+  badge.style.color = colors[v.decision] || '#E0E0E0';
+  badge.style.border = '1.5px solid ' + (colors[v.decision] || '#525252');
+  badge.textContent = v.decision;
+  var bubble = document.createElement('div');
+  bubble.className = 'mock-bubble';
+  bubble.textContent = v.por_que;
+  content.appendChild(badge);
+  content.appendChild(bubble);
+  wrap.appendChild(av);
+  wrap.appendChild(content);
+  ieAppend(wrap);
+
+  var footer = document.getElementById('ie-footer');
+  footer.innerHTML = '';
+  var cta = document.createElement('a');
+  cta.href = '#claude-code';
+  cta.className = 'ie-pay-btn';
+  cta.style.display = 'block';
+  cta.style.textAlign = 'center';
+  cta.style.textDecoration = 'none';
+  cta.textContent = 'Evaluación completa gratis →';
+  cta.onclick = function() { ieClose(); };
+  footer.appendChild(cta);
+}
+
+function iePollResult(checkId, attempts) {
+  attempts = attempts || 0;
+  fetch(IE_SUPABASE_URL + '/rest/v1/rpc/cc_brew_express_check_get', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': IE_ANON_KEY,
+      'Authorization': 'Bearer ' + IE_ANON_KEY,
+    },
+    body: JSON.stringify({ p_id: checkId }),
+  }).then(function(res) { return res.json(); })
+    .then(function(rows) {
+      var row = Array.isArray(rows) ? rows[0] : rows;
+      if (row && row.status === 'done') return ieShowVerdict(row.verdict);
+      if (row && row.status === 'failed') {
+        var sp = document.getElementById('ie-wait-spinner');
+        if (sp) sp.remove();
+        ieBotSay('El pago no se pudo procesar — no se te cobró nada. Intentá de nuevo.');
+        return;
+      }
+      if (attempts >= 30) {
+        var sp2 = document.getElementById('ie-wait-spinner');
+        if (sp2) sp2.remove();
+        ieBotSay('Está tardando más de lo normal. Si ya pagaste, revisá tu correo en unos minutos.');
+        return;
+      }
+      setTimeout(function() { iePollResult(checkId, attempts + 1); }, 2000);
+    })
+    .catch(function() {
+      setTimeout(function() { iePollResult(checkId, attempts + 1); }, 2000);
+    });
+}
+
+// Si venimos de un redirect de Wompi (?idea_check=...), reabrir el modal y pollear.
+(function ieCheckReturn() {
+  var params = new URLSearchParams(window.location.search);
+  var checkId = params.get('idea_check');
+  if (!checkId) return;
+  document.getElementById('ie-modal').classList.add('open');
+  document.getElementById('ie-messages').innerHTML = '';
+  ieShowWaiting();
+  iePollResult(checkId);
+})();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
