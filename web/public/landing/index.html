@@ -460,6 +460,13 @@ section[id], #hero { scroll-margin-top: 96px; }
 .ie-error { color: #ef4444; font-size: 12px; margin-top: 2px; }
 .ie-spinner { width: 28px; height: 28px; border: 3px solid #e4e4e7; border-top-color: var(--orange); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 8px auto; }
 .ie-verdict-badge { display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: 0.04em; border-radius: 6px; padding: 4px 10px; margin-bottom: 8px; }
+@media print {
+  body > *:not(#ie-modal) { display: none !important; }
+  #ie-modal { position: static !important; background: #fff !important; padding: 0 !important; display: block !important; }
+  .ie-modal-inner { position: static !important; max-width: none !important; max-height: none !important; width: auto !important; border: none !important; box-shadow: none !important; }
+  .ie-modal-inner .mock-header, .ie-footer { display: none !important; }
+  .ie-modal-inner .mock-body { overflow: visible !important; }
+}
 
 /* FAQ */
 .faq-section { padding: 80px 24px; background: var(--paper); color: var(--paper-ink); position: relative; overflow: hidden; }
@@ -1310,6 +1317,12 @@ function ieShowVerdict(v) {
 
   var footer = document.getElementById('ie-footer');
   footer.innerHTML = '';
+  var save = document.createElement('button');
+  save.type = 'button';
+  save.style.cssText = 'display:block;width:100%;background:transparent;border:1px solid #e4e4e7;color:#52525b;border-radius:10px;padding:11px 0;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;font-family:inherit;';
+  save.textContent = 'Guardar como PDF';
+  save.onclick = function() { window.print(); };
+  footer.appendChild(save);
   var cta = document.createElement('a');
   cta.href = '#claude-code';
   cta.className = 'ie-pay-btn';
