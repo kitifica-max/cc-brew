@@ -97,10 +97,10 @@ a { text-decoration: none; color: inherit; }
 .btn-primary { background: var(--orange); color: #fff; padding: 11px 22px; }
 .btn-primary:hover { background: #6c32ce; transform: translateY(-1px); }
 .btn-ghost {
-  background: transparent; color: var(--text-2);
-  border: 1px solid var(--border); padding: 11px 22px;
+  background: transparent; color: var(--text);
+  border: 1px solid rgba(255,255,255,0.22); padding: 11px 22px;
 }
-.btn-ghost:hover { border-color: rgba(255,255,255,0.18); color: var(--text); }
+.btn-ghost:hover { border-color: rgba(255,255,255,0.4); color: #fff; }
 
 /* NAV */
 nav {
@@ -180,7 +180,7 @@ section[id], #hero { scroll-margin-top: 96px; }
 }
 .hero h1 .accent { color: var(--orange); }
 .hero-sub { font-size: 16px; color: var(--text-2); line-height: 1.7; max-width: 420px; margin-bottom: 32px; }
-.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+.hero-actions { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
 .hero-right { display: flex; align-items: center; justify-content: center; overflow: visible; }
 
 @keyframes heroFadeIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
@@ -632,10 +632,10 @@ footer {
         <span style="width:32px;height:32px;border-radius:9px;background:rgba(124,58,237,0.12);display:flex;align-items:center;justify-content:center;color:#6d28d9;flex-shrink:0;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
         </span>
-        <span style="font-size:15px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#6d28d9;">¿Sin la compu a mano?</span>
+        <span style="font-size:15px;font-weight:700;color:#6d28d9;">¿Sin la compu a mano?</span>
       </div>
       <p style="margin:0;font-size:13px;color:#52525b;line-height:1.6;">Validá tu idea ahora desde el celular, en un chat de 3 preguntas.</p>
-      <a href="#" id="idea-express" onclick="ieOpen(); return false;" style="display:inline-flex;align-items:center;justify-content:center;background:#7c3aed;color:#fff;border-radius:10px;padding:12px 20px;font-size:15px;font-weight:700;text-decoration:none;">Check Express — $1.29 →</a>
+      <a href="#" id="idea-express" onclick="ieOpen(); return false;" style="display:inline-flex;align-items:center;justify-content:center;background:#7c3aed;color:#fff;border-radius:999px;padding:12px 20px;font-size:15px;font-weight:700;text-decoration:none;">Check Express — $1.29 →</a>
     </div>
   </div>
 
