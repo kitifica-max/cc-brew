@@ -63,7 +63,7 @@ Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 })
 
   try {
-    const apiSecret = Deno.env.get('WOMPI_API_SECRET')
+    const apiSecret = Deno.env.get('WOMPI_API_SECRET_IDEA_EXPRESS')
     if (!apiSecret) return new Response('Config error', { status: 500 })
 
     const bodyRaw = await req.text()

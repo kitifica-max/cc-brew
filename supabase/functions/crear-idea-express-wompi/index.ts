@@ -18,8 +18,8 @@ async function getWompiToken(): Promise<string> {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
       grant_type:    'client_credentials',
-      client_id:     Deno.env.get('WOMPI_APP_ID')!,
-      client_secret: Deno.env.get('WOMPI_API_SECRET')!,
+      client_id:     Deno.env.get('WOMPI_APP_ID_IDEA_EXPRESS')!,
+      client_secret: Deno.env.get('WOMPI_API_SECRET_IDEA_EXPRESS')!,
       audience:      'wompi_api',
     }),
   })
