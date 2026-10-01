@@ -78,7 +78,11 @@ Deno.serve(async (req: Request) => {
     const payload = JSON.parse(bodyRaw)
     console.log('Webhook Idea Express recibido:', JSON.stringify(payload))
 
-    const datosAd: Record<string, string> = payload.DatosAdicionales || payload.datosAdicionales || {}
+    // Para transacciones 3DS/API, Wompi mete datosAdicionales dentro de "Cliente"
+    // (confirmado en producción) en vez de como objeto top-level — se revisan ambas formas.
+    const datosAd: Record<string, string> =
+      payload.DatosAdicionales || payload.datosAdicionales ||
+      payload.Cliente || payload.cliente || {}
     const checkId = datosAd.check_id
     if (!checkId) {
       // No es de este flujo (probablemente el webhook de minutos) — ignorar.
