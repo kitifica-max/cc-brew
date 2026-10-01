@@ -80,10 +80,10 @@
 <main>
   <div class="page-label">Legal</div>
   <h1>Política de Privacidad</h1>
-  <p class="updated">Última actualización: 28 de agosto de 2026</p>
+  <p class="updated">Última actualización: 1 de octubre de 2026</p>
 
   <div class="highlight">
-    <p><strong>Resumen:</strong> guardamos tu cuenta y tus proyectos (idea, marca, respuestas, CLAUDE.md) en Supabase para que puedas volver a ellos. Tu idea se envía a Anthropic (Claude) para generar el resultado. No vendemos tus datos.</p>
+    <p><strong>Resumen:</strong> CC Brew es gratis — no hay cuentas de pago ni créditos. Tu idea se guarda solo para que el flujo de evaluación funcione (y para que el Check Express te pueda dar un veredicto), se procesa con Claude (Anthropic) para generar el resultado, y nunca se usa para entrenar modelos ni se muestra a otros usuarios. No usamos cookies de rastreo ni analíticas de terceros.</p>
   </div>
 
   <h2>1. Quién somos</h2>
@@ -91,36 +91,48 @@
 
   <h2>2. Qué datos procesamos</h2>
   <ul>
-    <li><strong>Cuenta</strong>: correo electrónico y contraseña (gestionados por Supabase Auth).</li>
-    <li><strong>Tus proyectos</strong>: el texto de tu idea, el perfil de tu público objetivo, los lineamientos de marca que compartís (texto, link de tu sitio, imágenes o PDF que subís), tus respuestas al cuestionario, y el CLAUDE.md generado.</li>
-    <li><strong>Créditos y compras</strong>: tu saldo de créditos y el historial de qué proyecto consumió cada crédito. Los pagos los procesa un proveedor externo — no almacenamos datos de tarjeta.</li>
-    <li><strong>API key de Anthropic (plan "Trae tu API")</strong>: si la cargás, se guarda <strong>encriptada</strong>, nunca en texto plano. No aparece en logs ni en analytics. Se usa únicamente para procesar tus propios proyectos.</li>
+    <li><strong>Evaluación completa (Skill + MCP en Claude Code)</strong>: tu idea, el cuestionario generado, tus respuestas, la decisión (BUILD/RETHINK/DON'T BUILD) y el brief de construcción se guardan en nuestra base de datos — así el flujo de varios pasos puede continuar de un paso al siguiente. El procesamiento de IA lo hace Claude Code con <strong>tu propia</strong> cuenta de Anthropic — no es una llamada que hagamos nosotros con tu idea.</li>
+    <li><strong>Check Express</strong>: tu idea y tus 2 respuestas cortas se envían a un servidor nuestro que le pide un veredicto rápido a Claude (con nuestra cuenta de Anthropic). Esta consulta <strong>no se guarda</strong> — es una sola llamada, sin base de datos de por medio.</li>
+    <li><strong>Términos de búsqueda (Google Trends)</strong>: cuando el Skill valida demanda de mercado, cacheamos el término buscado (no tu idea completa, ni tu identidad) para no repetir consultas innecesarias.</li>
+    <li><strong>Analíticas internas mínimas</strong>: registramos eventos como "evaluación completada" junto con la decisión resultante, para entender uso general — nunca el contenido de tu idea.</li>
     <li><strong>Uso técnico básico</strong>: registros de errores del servicio, necesarios para mantenerlo funcionando.</li>
   </ul>
+  <p>Ya no manejamos cuentas con correo/contraseña, créditos ni compras dentro de la app — ese modelo fue descontinuado; CC Brew es gratis.</p>
 
   <h2>3. Cómo usamos tus datos</h2>
-  <p>El contenido de tu proyecto (idea, marca, respuestas) se envía a <strong>Anthropic</strong> para generar el cuestionario, el semáforo de viabilidad y el CLAUDE.md — ese es el propósito central del servicio. No usamos tu contenido para entrenar modelos propios ni de terceros, y no lo compartimos con nadie más allá de lo necesario para prestar el servicio.</p>
+  <p>El contenido que procesás (idea, respuestas) se envía a <strong>Anthropic</strong> — con tu propia cuenta en el flujo completo, o con la nuestra en el Check Express — para generar el cuestionario, la decisión y el brief. Ese es el propósito central del servicio. No usamos tu contenido para entrenar modelos propios ni de terceros, y no lo compartimos con nadie más allá de lo necesario para prestar el servicio.</p>
 
-  <h2>4. Dónde se guardan los datos</h2>
-  <p>Tu cuenta y tus proyectos se almacenan en una base de datos de <a href="https://supabase.com" target="_blank" rel="noopener">Supabase</a>, sujeta a sus propios <a href="https://supabase.com/privacy" target="_blank" rel="noopener">términos de privacidad</a>. El procesamiento de IA lo realiza <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener">Anthropic</a> bajo su política de privacidad.</p>
+  <h2>4. Cookies y almacenamiento local</h2>
+  <p><strong>No usamos cookies de rastreo, publicidad ni analíticas de terceros</strong> (nada de Google Analytics, Meta Pixel, etc.). Lo que sí usamos es <code>localStorage</code> del navegador — una tecnología distinta a las cookies que no se envía automáticamente a ningún servidor — para guardar, únicamente en tu dispositivo:</p>
+  <ul>
+    <li>Tu propia clave de API de Anthropic, si la cargás en la app.</li>
+    <li>Un identificador de sesión/dispositivo, para que tus proyectos locales se mantengan entre visitas.</li>
+    <li>Tus proyectos guardados localmente, si usás la app web.</li>
+  </ul>
+  <p>Esta información vive en tu navegador y solo nosotros — o cualquier sitio — podríamos leerla si vos la sincronizás activamente. Podés borrarla en cualquier momento desde la configuración de tu navegador.</p>
 
-  <h2>5. Lo que no hacemos</h2>
+  <h2>5. Dónde se guardan los datos</h2>
+  <p>Lo que sí guardamos server-side vive en una base de datos de <a href="https://supabase.com" target="_blank" rel="noopener">Supabase</a>, sujeta a sus propios <a href="https://supabase.com/privacy" target="_blank" rel="noopener">términos de privacidad</a>. El procesamiento de IA lo realiza <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener">Anthropic</a> bajo su política de privacidad. Si elegís donar vía el link "Buy me a coffee", eso te lleva a <a href="https://wompi.sv" target="_blank" rel="noopener">Wompi</a>, un procesador de pagos externo — nosotros no vemos ni guardamos datos de tarjeta.</p>
+
+  <h2>6. Lo que no hacemos</h2>
   <ul>
     <li>No vendemos tus datos ni tu contenido a terceros.</li>
-    <li>No compartimos tu idea o tu marca con otros usuarios.</li>
+    <li>No compartimos tu idea con otros usuarios.</li>
+    <li>No entrenamos modelos propios ni de terceros con tu contenido.</li>
     <li>No almacenamos datos de pago (tarjeta) en nuestros servidores.</li>
+    <li>No usamos cookies de rastreo ni analíticas de terceros.</li>
   </ul>
 
-  <h2>6. Tus opciones</h2>
-  <p>Podés pedirnos eliminar tu cuenta y los proyectos asociados en cualquier momento escribiendo a <a href="mailto:hola@kitifica.com">hola@kitifica.com</a>. Los créditos no consumidos se pierden al eliminar la cuenta.</p>
+  <h2>7. Tus opciones</h2>
+  <p>Podés pedirnos eliminar la información guardada de tu idea o evaluación en cualquier momento escribiendo a <a href="mailto:hola@kitifica.com">hola@kitifica.com</a> (indicá el nombre del proyecto o el <code>session_id</code> si lo tenés, para encontrarla).</p>
 
-  <h2>7. Menores de edad</h2>
+  <h2>8. Menores de edad</h2>
   <p>CC Brew es una herramienta para equipos de marketing y ventas. No está dirigida a menores de 13 años ni recopila datos de menores a sabiendas.</p>
 
-  <h2>8. Cambios a esta política</h2>
+  <h2>9. Cambios a esta política</h2>
   <p>Cualquier cambio material se publicará en esta página con la fecha de actualización. El uso continuado del servicio tras un cambio implica la aceptación de la nueva política.</p>
 
-  <h2>9. Contacto</h2>
+  <h2>10. Contacto</h2>
   <p>Para consultas sobre privacidad: <a href="mailto:hola@kitifica.com">hola@kitifica.com</a></p>
 </main>
 
