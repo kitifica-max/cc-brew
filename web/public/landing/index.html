@@ -444,14 +444,8 @@ section[id], #hero { scroll-margin-top: 96px; }
   flex: 1; background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 8px;
   color: #18181b; padding: 10px 12px; font-size: 16px; outline: none; font-family: inherit;
 }
-.ie-text-row input::placeholder, .ie-pay-form input::placeholder { color: #a1a1aa; }
+.ie-text-row input::placeholder { color: #a1a1aa; }
 .ie-send-btn { background: var(--orange); color: #fff; border: none; border-radius: 8px; padding: 0 16px; font-size: 16px; cursor: pointer; flex-shrink: 0; }
-.ie-pay-form { display: flex; flex-direction: column; gap: 8px; }
-.ie-pay-form input {
-  background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 8px; color: #18181b;
-  padding: 10px 12px; font-size: 16px; outline: none; font-family: inherit; box-sizing: border-box; width: 100%;
-}
-.ie-pay-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .ie-pay-btn {
   background: var(--orange); color: #fff; border: none; border-radius: 10px; padding: 13px 0;
   font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 4px;
@@ -647,7 +641,7 @@ footer {
         <span style="font-size:15px;font-weight:700;color:#6d28d9;">¿Sin la compu a mano?</span>
       </div>
       <p style="margin:0;font-size:13px;color:#52525b;line-height:1.6;">Validá tu idea ahora desde el celular, en un chat de 3 preguntas.</p>
-      <a href="#" id="idea-express" onclick="ieOpen(); return false;" style="display:inline-flex;align-items:center;justify-content:center;background:#7c3aed;color:#fff;border-radius:999px;padding:12px 20px;font-size:15px;font-weight:700;text-decoration:none;">Check Express — $1.29 →</a>
+      <a href="#" id="idea-express" onclick="ieOpen(); return false;" style="display:inline-flex;align-items:center;justify-content:center;background:#7c3aed;color:#fff;border-radius:999px;padding:12px 20px;font-size:15px;font-weight:700;text-decoration:none;">Check Express →</a>
     </div>
   </div>
 
@@ -1107,7 +1101,6 @@ if (document.readyState === 'loading') {
 
 // ---- Idea Express: chat embebido en el landing ----
 var IE_SUPABASE_URL = 'https://qombceeynlvgkmoffcoa.supabase.co';
-var IE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvbWJjZWV5bmx2Z2ttb2ZmY29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxOTM4MTgsImV4cCI6MjEwMTc2OTgxOH0.fksDXB7RD7vMIpdjLPdjH3uLfkJ_IlYqTvOc64FiptE';
 
 var IE_QUESTIONS = [
   { key: 'idea_text',  text: 'Contame tu idea en una frase.' },
@@ -1171,99 +1164,41 @@ function ieSend() {
       ieShowTextInput();
     }, 300);
   } else {
-    setTimeout(function() {
-      ieBotSay('Para darte el veredicto necesito cobrar $1.29 — completá esto:');
-      ieShowPayForm();
-    }, 300);
+    setTimeout(ieGetVerdict, 300);
   }
 }
 
-function ieShowPayForm() {
-  var footer = document.getElementById('ie-footer');
-  footer.innerHTML =
-    '<div class="ie-pay-form">' +
-      '<input id="ie-nombre" placeholder="Nombre completo" autocomplete="name">' +
-      '<input id="ie-email" type="email" placeholder="Correo electrónico" autocomplete="email">' +
-      '<input id="ie-card" placeholder="1234 5678 9012 3456" inputmode="numeric" autocomplete="cc-number" style="font-family:monospace">' +
-      '<div class="ie-pay-row">' +
-        '<input id="ie-expiry" placeholder="MM/AA" inputmode="numeric" autocomplete="cc-exp" maxlength="5" style="font-family:monospace">' +
-        '<input id="ie-cvv" placeholder="CVV" inputmode="numeric" autocomplete="cc-csc" maxlength="3" style="font-family:monospace">' +
-      '</div>' +
-      '<div id="ie-pay-error" class="ie-error"></div>' +
-      '<button id="ie-pay-btn" class="ie-pay-btn">Pagar $1.29 y ver veredicto →</button>' +
-    '</div>';
-
-  document.getElementById('ie-card').oninput = function(e) {
-    e.target.value = e.target.value.replace(/\D/g,'').slice(0,16).replace(/(.{4})/g,'$1 ').trim();
-  };
-  document.getElementById('ie-expiry').oninput = function(e) {
-    var v = e.target.value.replace(/\D/g,'').slice(0,4);
-    if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
-    e.target.value = v;
-  };
-  document.getElementById('ie-cvv').oninput = function(e) {
-    e.target.value = e.target.value.replace(/\D/g,'').slice(0,3);
-  };
-  document.getElementById('ie-pay-btn').onclick = iePagar;
-}
-
-function ieShowError(msg) {
-  var el = document.getElementById('ie-pay-error');
-  if (el) el.textContent = msg;
-}
-
-function iePagar() {
-  ieShowError('');
-  var nombre = document.getElementById('ie-nombre').value.trim();
-  var email = document.getElementById('ie-email').value.trim();
-  var card = document.getElementById('ie-card').value.replace(/\D/g,'');
-  var expiry = document.getElementById('ie-expiry').value;
-  var cvv = document.getElementById('ie-cvv').value.replace(/\D/g,'');
-
-  if (!nombre) return ieShowError('Ingresá tu nombre.');
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return ieShowError('Correo inválido.');
-  if (card.length < 15) return ieShowError('Número de tarjeta inválido.');
-  if (!/^4/.test(card) && !/^5[1-5]/.test(card) && !/^2[2-7]/.test(card)) return ieShowError('Solo Visa y Mastercard.');
-  if (expiry.indexOf('/') === -1 || expiry.length < 5) return ieShowError('Vencimiento inválido. Formato MM/AA.');
-  if (cvv.length < 3) return ieShowError('CVV debe tener 3 dígitos.');
-
-  var parts = expiry.split('/');
-  var mes = parseInt(parts[0], 10);
-  var anio = parseInt('20' + parts[1], 10);
-  if (isNaN(mes) || mes < 1 || mes > 12) return ieShowError('Mes inválido.');
-  var now = new Date();
-  if (anio < now.getFullYear() || (anio === now.getFullYear() && mes < now.getMonth() + 1)) return ieShowError('Tarjeta vencida.');
-
-  var btn = document.getElementById('ie-pay-btn');
-  btn.disabled = true;
-  btn.textContent = 'Procesando...';
+function ieGetVerdict() {
+  document.getElementById('ie-footer').innerHTML = '';
+  ieBotSay('Dame un segundo, estoy pensando el veredicto...');
+  var box = document.getElementById('ie-messages');
+  var sp = document.createElement('div');
+  sp.className = 'ie-spinner';
+  sp.id = 'ie-wait-spinner';
+  box.appendChild(sp);
+  box.scrollTop = box.scrollHeight;
 
   var answers = {};
   for (var k in ieAnswers) { if (k !== 'idea_text') answers[k] = ieAnswers[k]; }
 
-  fetch(IE_SUPABASE_URL + '/functions/v1/crear-idea-express-wompi', {
+  fetch(IE_SUPABASE_URL + '/functions/v1/idea-express-verdict', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      idea_text: ieAnswers.idea_text,
-      answers: answers,
-      nombre: nombre, email: email,
-      numero_tarjeta: card, cvv: cvv,
-      mes_vencimiento: mes, anio_vencimiento: anio,
-    }),
+    body: JSON.stringify({ idea_text: ieAnswers.idea_text, answers: answers }),
   }).then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
     .then(function(r) {
+      var sp2 = document.getElementById('ie-wait-spinner');
+      if (sp2) sp2.remove();
       if (!r.ok || r.data.error) {
-        btn.disabled = false;
-        btn.textContent = 'Pagar $1.29 y ver veredicto →';
-        return ieShowError(r.data.error || 'Error al procesar el pago.');
+        ieBotSay('No pude generar el veredicto. Intentá de nuevo en un rato.');
+        return;
       }
-      window.location.href = r.data.url3ds;
+      ieShowVerdict(r.data);
     })
     .catch(function() {
-      btn.disabled = false;
-      btn.textContent = 'Pagar $1.29 y ver veredicto →';
-      ieShowError('Error de conexión. Verificá tu internet.');
+      var sp2 = document.getElementById('ie-wait-spinner');
+      if (sp2) sp2.remove();
+      ieBotSay('Error de conexión. Verificá tu internet e intentá de nuevo.');
     });
 }
 
@@ -1277,17 +1212,6 @@ function ieOpen() {
 }
 function ieClose() {
   document.getElementById('ie-modal').classList.remove('open');
-}
-
-function ieShowWaiting() {
-  document.getElementById('ie-footer').innerHTML = '';
-  ieBotSay('Confirmando tu pago...');
-  var box = document.getElementById('ie-messages');
-  var sp = document.createElement('div');
-  sp.className = 'ie-spinner';
-  sp.id = 'ie-wait-spinner';
-  box.appendChild(sp);
-  box.scrollTop = box.scrollHeight;
 }
 
 function ieShowVerdict(v) {
@@ -1334,49 +1258,6 @@ function ieShowVerdict(v) {
   footer.appendChild(cta);
 }
 
-function iePollResult(checkId, attempts) {
-  attempts = attempts || 0;
-  fetch(IE_SUPABASE_URL + '/rest/v1/rpc/cc_brew_express_check_get', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': IE_ANON_KEY,
-      'Authorization': 'Bearer ' + IE_ANON_KEY,
-    },
-    body: JSON.stringify({ p_id: checkId }),
-  }).then(function(res) { return res.json(); })
-    .then(function(rows) {
-      var row = Array.isArray(rows) ? rows[0] : rows;
-      if (row && row.status === 'done') return ieShowVerdict(row.verdict);
-      if (row && row.status === 'failed') {
-        var sp = document.getElementById('ie-wait-spinner');
-        if (sp) sp.remove();
-        ieBotSay('El pago no se pudo procesar — no se te cobró nada. Intentá de nuevo.');
-        return;
-      }
-      if (attempts >= 30) {
-        var sp2 = document.getElementById('ie-wait-spinner');
-        if (sp2) sp2.remove();
-        ieBotSay('Está tardando más de lo normal. Si ya pagaste, revisá tu correo en unos minutos.');
-        return;
-      }
-      setTimeout(function() { iePollResult(checkId, attempts + 1); }, 2000);
-    })
-    .catch(function() {
-      setTimeout(function() { iePollResult(checkId, attempts + 1); }, 2000);
-    });
-}
-
-// Si venimos de un redirect de Wompi (?idea_check=...), reabrir el modal y pollear.
-(function ieCheckReturn() {
-  var params = new URLSearchParams(window.location.search);
-  var checkId = params.get('idea_check');
-  if (!checkId) return;
-  document.getElementById('ie-modal').classList.add('open');
-  document.getElementById('ie-messages').innerHTML = '';
-  ieShowWaiting();
-  iePollResult(checkId);
-})();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
